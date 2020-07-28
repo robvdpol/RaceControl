@@ -6,6 +6,7 @@
     <AssemblyName>RaceControl</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="CredentialManagement.Standard" Version="1.0.4" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.19" />
     <PackageReference Include="Prism.DryIoc" Version="7.2.0.1422" />
   </ItemGroup>

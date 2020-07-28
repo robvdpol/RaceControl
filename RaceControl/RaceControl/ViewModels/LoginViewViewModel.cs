@@ -1,4 +1,5 @@
-﻿using Prism.Commands;
+﻿using CredentialManagement;
+using Prism.Commands;
 using Prism.Services.Dialogs;
 using RaceControl.Core.Mvvm;
 using RaceControl.Services.Interfaces.F1TV;
@@ -6,11 +7,14 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using DialogResult = Prism.Services.Dialogs.DialogResult;
 
 namespace RaceControl.ViewModels
 {
     public class LoginViewViewModel : DialogViewModelBase, IDialogAware
     {
+        private const string RaceControlF1TV = "RaceControlF1TV";
+
         private readonly IAuthorizationService _authorizationService;
 
         private ICommand _loginCommand;
@@ -49,9 +53,25 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _error, value);
         }
 
+        public bool CanClose
+        {
+            get => _canClose;
+            set => SetProperty(ref _canClose, value);
+        }
+
+        public override void OnDialogOpened(IDialogParameters parameters)
+        {
+            base.OnDialogOpened(parameters);
+
+            if (LoadCredential())
+            {
+                LoginExecute();
+            }
+        }
+
         public override bool CanCloseDialog()
         {
-            return _canClose;
+            return CanClose;
         }
 
         private bool LoginCanExecute()
@@ -74,12 +94,12 @@ namespace RaceControl.ViewModels
                 return;
             }
 
-            var parameters = new DialogParameters
+            SaveCredential();
+            CanClose = true;
+            RaiseRequestClose(new DialogResult(ButtonResult.OK, new DialogParameters
             {
                 { "token", token }
-            };
-            _canClose = true;
-            RaiseRequestClose(new DialogResult(ButtonResult.OK, parameters));
+            }));
         }
 
         private void PasswordChangedExecute(RoutedEventArgs args)
@@ -87,6 +107,45 @@ namespace RaceControl.ViewModels
             if (args.Source is PasswordBox box)
             {
                 Password = box.Password;
+            }
+        }
+
+        private bool LoadCredential()
+        {
+            using (var cred = new Credential())
+            {
+                cred.Target = RaceControlF1TV;
+
+                if (cred.Load())
+                {
+                    Email = cred.Username;
+                    Password = cred.Password;
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void SaveCredential()
+        {
+            using (var cred = new Credential())
+            {
+                cred.Target = RaceControlF1TV;
+                cred.Username = Email;
+                cred.Password = Password;
+                cred.Type = CredentialType.Generic;
+                cred.PersistanceType = PersistanceType.LocalComputer;
+
+                try
+                {
+                    cred.Save();
+                }
+                catch
+                {
+                    // Just continue if credentials cannot be stored
+                }
             }
         }
     }
