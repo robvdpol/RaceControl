@@ -6,6 +6,19 @@
     xmlns:vlc="clr-namespace:LibVLCSharp.WPF;assembly=LibVLCSharp.WPF"
     prism:ViewModelLocator.AutoWireViewModel="True">
     <Grid>
-        <vlc:VideoView x:Name="videoView" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Button
+            Grid.Row="0"
+            Width="100"
+            Height="25"
+            Command="{Binding PlayCommand}"
+            CommandParameter="{Binding ElementName=videoView}"
+            Content="Play!" />
+        <vlc:VideoView
+            Name="videoView"
+            Grid.Row="1" />
     </Grid>
 </UserControl>

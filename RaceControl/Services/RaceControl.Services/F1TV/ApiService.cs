@@ -1,5 +1,4 @@
-﻿using RaceControl.Services.Interfaces;
-using RaceControl.Services.Interfaces.F1TV;
+﻿using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Api;
 using RaceControl.Services.Interfaces.Lark;
 using System.Collections.Generic;
@@ -14,12 +13,10 @@ namespace RaceControl.Services.F1TV
         private const string SessionOccurrence = "session-occurrence";
 
         private readonly IF1TVClient _f1tvClient;
-        private readonly IRestClient _restClient;
 
-        public ApiService(IF1TVClient f1tvClient, IRestClient restClient)
+        public ApiService(IF1TVClient f1tvClient)
         {
             _f1tvClient = f1tvClient;
-            _restClient = restClient;
         }
 
         public async Task<List<Season>> GetRaceSeasonsAsync()
@@ -31,7 +28,7 @@ namespace RaceControl.Services.F1TV
                 .WithField(Season.HasContentField)
                 .WithField(Season.YearField)
                 .WithField(Season.EventOccurrenceUrlsField)
-                .WithFilter(Season.YearField, LarkFilterType.GreaterThan, "2017")
+                .WithFilter(Season.YearField, LarkFilterType.GreaterThan, "2018")
                 .OrderBy(Season.YearField, LarkSortDirection.Ascending)
                 ;
 
