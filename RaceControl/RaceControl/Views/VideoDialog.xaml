@@ -26,6 +26,10 @@
                 Height="25"
                 Command="{Binding TogglePauseCommand}"
                 Content="Pause" />
+            <ComboBox
+                Width="200"
+                DisplayMemberPath="Name"
+                ItemsSource="{Binding AudioTrackDescriptions}" />
         </StackPanel>
     </Grid>
 </UserControl>

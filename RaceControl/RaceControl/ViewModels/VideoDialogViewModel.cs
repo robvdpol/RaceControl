@@ -4,6 +4,8 @@ using Prism.Commands;
 using Prism.Services.Dialogs;
 using RaceControl.Core.Mvvm;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 
 namespace RaceControl.ViewModels
@@ -13,8 +15,10 @@ namespace RaceControl.ViewModels
         private readonly LibVLC _libVLC;
 
         private ICommand _togglePauseCommand;
+
+        private Media _media;
         private MediaPlayer _mediaPlayer;
-        private ObservableCollection<TrackDescription> _trackDescriptions;
+        private ObservableCollection<TrackDescription> _audioTrackDescriptions;
 
         public VideoDialogViewModel(LibVLC libVLC)
         {
@@ -25,16 +29,22 @@ namespace RaceControl.ViewModels
 
         public ICommand TogglePauseCommand => _togglePauseCommand ?? (_togglePauseCommand = new DelegateCommand(TogglePauseExecute));
 
+        public Media Media
+        {
+            get => _media;
+            set => SetProperty(ref _media, value);
+        }
+
         public MediaPlayer MediaPlayer
         {
-            get => _mediaPlayer ?? (_mediaPlayer = new MediaPlayer(_libVLC) { EnableHardwareDecoding = true });
+            get => _mediaPlayer;
             set => SetProperty(ref _mediaPlayer, value);
         }
 
-        public ObservableCollection<TrackDescription> TrackDescriptions
+        public ObservableCollection<TrackDescription> AudioTrackDescriptions
         {
-            get => _trackDescriptions;
-            set => SetProperty(ref _trackDescriptions, value);
+            get => _audioTrackDescriptions ?? (_audioTrackDescriptions = new ObservableCollection<TrackDescription>());
+            set => SetProperty(ref _audioTrackDescriptions, value);
         }
 
         public override void OnDialogOpened(IDialogParameters parameters)
@@ -42,17 +52,48 @@ namespace RaceControl.ViewModels
             base.OnDialogOpened(parameters);
 
             var url = parameters.GetValue<string>("url");
-            var media = new Media(_libVLC, url, FromType.FromLocation);
-            MediaPlayer.Play(media);
-            //TrackDescriptions = new ObservableCollection<TrackDescription>(MediaPlayer.AudioTrackDescription);
+            Media = new Media(_libVLC, url, FromType.FromLocation);
+
+            MediaPlayer = new MediaPlayer(_libVLC) { EnableHardwareDecoding = true };
+            MediaPlayer.ESAdded += MediaPlayer_ESAdded;
+            MediaPlayer.ESDeleted += MediaPlayer_ESDeleted;
+            MediaPlayer.Play(Media);
         }
 
         public override void OnDialogClosed()
         {
             base.OnDialogClosed();
 
+            MediaPlayer.ESAdded -= MediaPlayer_ESAdded;
+            MediaPlayer.ESDeleted -= MediaPlayer_ESDeleted;
             MediaPlayer.Stop();
             MediaPlayer.Dispose();
+        }
+
+        private void MediaPlayer_ESAdded(object sender, MediaPlayerESAddedEventArgs e)
+        {
+            if (e.Type == TrackType.Audio)
+            {
+                var description = MediaPlayer.AudioTrackDescription.First(p => p.Id == e.Id);
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    AudioTrackDescriptions.Add(description);
+                });
+            }
+        }
+
+        private void MediaPlayer_ESDeleted(object sender, MediaPlayerESDeletedEventArgs e)
+        {
+            if (e.Type == TrackType.Audio && e.Id > -1)
+            {
+                var description = AudioTrackDescriptions.First(p => p.Id == e.Id);
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    AudioTrackDescriptions.Remove(description);
+                });
+            }
         }
 
         private void TogglePauseExecute()
