@@ -31,6 +31,13 @@ namespace RaceControl.Services.Lark
             return this;
         }
 
+        public ILarkRequest WithSubField(string field, string subField)
+        {
+            _fields.Add(new LarkField($"{field}__{subField}"));
+
+            return this;
+        }
+
         public ILarkRequest WithFilter(string field, LarkFilterType filterType, string filterValue)
         {
             _filters.Add(new LarkFilter(field, filterType, filterValue));

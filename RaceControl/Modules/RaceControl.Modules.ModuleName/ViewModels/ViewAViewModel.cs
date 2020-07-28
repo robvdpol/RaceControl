@@ -42,6 +42,7 @@ namespace RaceControl.Modules.ModuleName.ViewModels
                     {
                         var sessionId = sessionUrl.GetUID();
                         var session = await _apiService.GetSessionAsync(sessionId);
+                        var channels = await _apiService.GetChannelsAsync(sessionId);
                     }
                 }
             }

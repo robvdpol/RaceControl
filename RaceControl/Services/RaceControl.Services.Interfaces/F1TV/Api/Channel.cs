@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using RaceControl.Common;
 
 namespace RaceControl.Services.Interfaces.F1TV.Api
 {
@@ -12,5 +13,9 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
 
         [JsonProperty("name")]
         public string Name { get; set; }
+
+        public static string UIDField => JsonUtils.GetJsonPropertyName<Channel>((s) => s.UID);
+        public static string SelfField => JsonUtils.GetJsonPropertyName<Channel>((s) => s.Self);
+        public static string NameField => JsonUtils.GetJsonPropertyName<Channel>((s) => s.Name);
     }
 }

@@ -35,10 +35,10 @@ namespace RaceControl.Services.F1TV
             return (await _f1tvClient.GetCollectionAsync<Season>(request)).Objects;
         }
 
-        public async Task<Event> GetEventAsync(string uid)
+        public async Task<Event> GetEventAsync(string eventUID)
         {
             var request = _f1tvClient
-                .NewRequest(EventOccurrence, uid)
+                .NewRequest(EventOccurrence, eventUID)
                 .WithField(Event.UIDField)
                 .WithField(Event.NameField)
                 .WithField(Event.OfficialNameField)
@@ -50,10 +50,10 @@ namespace RaceControl.Services.F1TV
             return await _f1tvClient.GetItemAsync<Event>(request);
         }
 
-        public async Task<Session> GetSessionAsync(string uid)
+        public async Task<Session> GetSessionAsync(string sessionUID)
         {
             var request = _f1tvClient
-                .NewRequest(SessionOccurrence, uid)
+                .NewRequest(SessionOccurrence, sessionUID)
                 .WithField(Session.UIDField)
                 .WithField(Session.NameField)
                 .WithField(Session.SessionNameField)
@@ -64,6 +64,19 @@ namespace RaceControl.Services.F1TV
                 ;
 
             return await _f1tvClient.GetItemAsync<Session>(request);
+        }
+
+        public async Task<List<Channel>> GetChannelsAsync(string sessionUID)
+        {
+            var request = _f1tvClient
+                .NewRequest(SessionOccurrence, sessionUID)
+                .WithField(Session.ChannelUrlsField, true)
+                .WithSubField(Session.ChannelUrlsField, Channel.UIDField)
+                .WithSubField(Session.ChannelUrlsField, Channel.SelfField)
+                .WithSubField(Session.ChannelUrlsField, Channel.NameField)
+                ;
+
+            return (await _f1tvClient.GetItemAsync<Session>(request)).ChannelUrls;
         }
     }
 }

@@ -4,7 +4,7 @@ namespace RaceControl.Services.Lark
 {
     public class LarkFilter : LarkField
     {
-        public LarkFilter(string fieldName, LarkFilterType filterType, string filterValue) : base(fieldName, false)
+        public LarkFilter(string fieldName, LarkFilterType filterType, string filterValue) : base(fieldName)
         {
             FilterType = filterType;
             FilterValue = filterValue;

@@ -22,6 +22,9 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         [JsonProperty("content_urls")]
         public List<string> ContentUrls { get; set; }
 
+        [JsonProperty("channel_urls")]
+        public List<Channel> ChannelUrls { get; set; }
+
         [JsonProperty("start_time")]
         public DateTime? StartTime { get; set; }
 
@@ -33,6 +36,7 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         public static string SessionNameField => JsonUtils.GetJsonPropertyName<Session>((s) => s.SessionName);
         public static string StatusField => JsonUtils.GetJsonPropertyName<Session>((s) => s.Status);
         public static string ContentUrlsField => JsonUtils.GetJsonPropertyName<Session>((s) => s.ContentUrls);
+        public static string ChannelUrlsField => JsonUtils.GetJsonPropertyName<Session>((s) => s.ChannelUrls);
         public static string StartTimeField => JsonUtils.GetJsonPropertyName<Session>((s) => s.StartTime);
         public static string EndTimeField => JsonUtils.GetJsonPropertyName<Session>((s) => s.EndTime);
     }
