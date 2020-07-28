@@ -2,6 +2,7 @@
     x:Class="RaceControl.Views.VideoDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:prism="http://prismlibrary.com/"
     xmlns:vlc="clr-namespace:LibVLCSharp.WPF;assembly=LibVLCSharp.WPF"
     prism:ViewModelLocator.AutoWireViewModel="True">
@@ -29,7 +30,13 @@
             <ComboBox
                 Width="200"
                 DisplayMemberPath="Name"
-                ItemsSource="{Binding AudioTrackDescriptions}" />
+                ItemsSource="{Binding AudioTrackDescriptions}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <i:InvokeCommandAction Command="{Binding AudioTrackSelectionChangedCommand}" PassEventArgsToCommand="True" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ComboBox>
         </StackPanel>
     </Grid>
 </UserControl>

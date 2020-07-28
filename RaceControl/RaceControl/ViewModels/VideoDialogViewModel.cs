@@ -6,6 +6,7 @@ using RaceControl.Core.Mvvm;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace RaceControl.ViewModels
@@ -15,6 +16,7 @@ namespace RaceControl.ViewModels
         private readonly LibVLC _libVLC;
 
         private ICommand _togglePauseCommand;
+        private ICommand _audioTrackSelectionChangedCommand;
 
         private Media _media;
         private MediaPlayer _mediaPlayer;
@@ -28,6 +30,7 @@ namespace RaceControl.ViewModels
         public override string Title => "Video";
 
         public ICommand TogglePauseCommand => _togglePauseCommand ?? (_togglePauseCommand = new DelegateCommand(TogglePauseExecute));
+        public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ?? (_audioTrackSelectionChangedCommand = new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute));
 
         public Media Media
         {
@@ -72,7 +75,7 @@ namespace RaceControl.ViewModels
 
         private void MediaPlayer_ESAdded(object sender, MediaPlayerESAddedEventArgs e)
         {
-            if (e.Type == TrackType.Audio)
+            if (e.Type == TrackType.Audio && e.Id >= 0)
             {
                 var description = MediaPlayer.AudioTrackDescription.First(p => p.Id == e.Id);
 
@@ -85,7 +88,7 @@ namespace RaceControl.ViewModels
 
         private void MediaPlayer_ESDeleted(object sender, MediaPlayerESDeletedEventArgs e)
         {
-            if (e.Type == TrackType.Audio && e.Id > -1)
+            if (e.Type == TrackType.Audio && e.Id >= 0)
             {
                 var description = AudioTrackDescriptions.First(p => p.Id == e.Id);
 
@@ -102,6 +105,12 @@ namespace RaceControl.ViewModels
             {
                 MediaPlayer.Pause();
             }
+        }
+
+        private void AudioTrackSelectionChangedExecute(SelectionChangedEventArgs e)
+        {
+            var trackDescription = (TrackDescription)e.AddedItems[0];
+            MediaPlayer.SetAudioTrack(trackDescription.Id);
         }
     }
 }
