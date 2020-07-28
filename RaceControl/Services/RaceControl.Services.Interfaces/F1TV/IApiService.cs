@@ -7,5 +7,7 @@ namespace RaceControl.Services.Interfaces.F1TV
     public interface IApiService
     {
         Task<ILarkCollection<Season>> GetRaceSeasonsAsync();
+
+        Task<Event> GetEventAsync(string uid);
     }
 }
