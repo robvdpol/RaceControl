@@ -4,7 +4,7 @@ namespace RaceControl.ViewModels
 {
     public class MainWindowViewModel : BindableBase
     {
-        private string _title = "Prism Application";
+        private string _title = "Race Control";
 
         public MainWindowViewModel()
         {

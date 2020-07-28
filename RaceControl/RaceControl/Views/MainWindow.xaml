@@ -5,8 +5,8 @@
     xmlns:core="clr-namespace:RaceControl.Core;assembly=RaceControl.Core"
     xmlns:prism="http://prismlibrary.com/"
     Title="{Binding Title}"
-    Width="525"
-    Height="350"
+    Width="800"
+    Height="450"
     prism:ViewModelLocator.AutoWireViewModel="True">
     <Grid>
         <ContentControl prism:RegionManager.RegionName="{x:Static core:RegionNames.ContentRegion}" />
