@@ -11,7 +11,6 @@
     <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.11" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\RaceControl.Common\RaceControl.Common.csproj" />
     <ProjectReference Include="..\..\RaceControl.Core\RaceControl.Core.csproj" />
     <ProjectReference Include="..\..\Services\RaceControl.Services.Interfaces\RaceControl.Services.Interfaces.csproj" />
   </ItemGroup>
