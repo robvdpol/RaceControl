@@ -1,19 +1,35 @@
-﻿using Prism.Mvvm;
+﻿using Prism.Commands;
+using Prism.Mvvm;
+using Prism.Services.Dialogs;
+using RaceControl.Views;
+using System.Windows.Input;
 
 namespace RaceControl.ViewModels
 {
     public class MainWindowViewModel : BindableBase
     {
-        private string _title = "Race Control";
+        private readonly IDialogService _dialogService;
 
-        public MainWindowViewModel()
+        private ICommand _loginCommand;
+
+        public MainWindowViewModel(IDialogService dialogService)
         {
+            _dialogService = dialogService;
         }
 
-        public string Title
+        public ICommand LoginCommand => _loginCommand ?? (_loginCommand = new DelegateCommand(LoginExecute));
+
+        public string Title => "Race Control";
+
+        private void LoginExecute()
         {
-            get { return _title; }
-            set { SetProperty(ref _title, value); }
+            _dialogService.ShowDialog(nameof(LoginView), null, r =>
+            {
+                if (r.Result == ButtonResult.OK)
+                {
+                    var token = r.Parameters.GetValue<string>("token");
+                }
+            });
         }
     }
 }

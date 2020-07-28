@@ -7,6 +7,7 @@ using RaceControl.Services.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.Lark;
 using RaceControl.Services.Lark;
+using RaceControl.ViewModels;
 using RaceControl.Views;
 using System.Windows;
 
@@ -21,6 +22,8 @@ namespace RaceControl
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            containerRegistry.RegisterDialog<LoginView, LoginViewViewModel>();
+
             containerRegistry.RegisterSingleton<IRestClient, RestClient>();
             containerRegistry.RegisterSingleton<IAuthorizationService, AuthorizationService>();
             containerRegistry.RegisterSingleton<IApiService, ApiService>();
