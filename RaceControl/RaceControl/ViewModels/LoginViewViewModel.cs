@@ -4,8 +4,6 @@ using Prism.Services.Dialogs;
 using RaceControl.Core.Mvvm;
 using RaceControl.Services.Interfaces.F1TV;
 using System;
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using DialogResult = Prism.Services.Dialogs.DialogResult;
 
@@ -18,7 +16,6 @@ namespace RaceControl.ViewModels
         private readonly IAuthorizationService _authorizationService;
 
         private ICommand _loginCommand;
-        private ICommand _passwordChangedCommand;
 
         private string _email;
         private string _password;
@@ -33,7 +30,6 @@ namespace RaceControl.ViewModels
         public override string Title => "Login to F1TV";
 
         public ICommand LoginCommand => _loginCommand ?? (_loginCommand = new DelegateCommand(LoginExecute, LoginCanExecute).ObservesProperty(() => Email).ObservesProperty(() => Password));
-        public ICommand PasswordChangedCommand => _passwordChangedCommand ?? (_passwordChangedCommand = new DelegateCommand<RoutedEventArgs>(PasswordChangedExecute));
 
         public string Email
         {
@@ -62,11 +58,7 @@ namespace RaceControl.ViewModels
         public override void OnDialogOpened(IDialogParameters parameters)
         {
             base.OnDialogOpened(parameters);
-
-            if (LoadCredential())
-            {
-                LoginExecute();
-            }
+            LoadCredential();
         }
 
         public override bool CanCloseDialog()
@@ -102,15 +94,7 @@ namespace RaceControl.ViewModels
             }));
         }
 
-        private void PasswordChangedExecute(RoutedEventArgs args)
-        {
-            if (args.Source is PasswordBox box)
-            {
-                Password = box.Password;
-            }
-        }
-
-        private bool LoadCredential()
+        private void LoadCredential()
         {
             using (var cred = new Credential())
             {
@@ -120,12 +104,8 @@ namespace RaceControl.ViewModels
                 {
                     Email = cred.Username;
                     Password = cred.Password;
-
-                    return true;
                 }
             }
-
-            return false;
         }
 
         private void SaveCredential()
