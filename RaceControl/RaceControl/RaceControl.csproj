@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>RaceControl</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Prism.DryIoc" Version="7.2.0.1422" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RaceControl.Core\RaceControl.Core.csproj" />
+    <ProjectReference Include="..\Modules\RaceControl.Modules.ModuleName\RaceControl.Modules.ModuleName.csproj" />
+    <ProjectReference Include="..\Services\RaceControl.Services.Interfaces\RaceControl.Services.Interfaces.csproj" />
+    <ProjectReference Include="..\Services\RaceControl.Services\RaceControl.Services.csproj" />
+  </ItemGroup>
+</Project>
