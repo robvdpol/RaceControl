@@ -5,7 +5,7 @@
     xmlns:prism="http://prismlibrary.com/"
     Title="{Binding Title}"
     Width="800"
-    Height="450"
+    Height="500"
     prism:ViewModelLocator.AutoWireViewModel="True">
     <Grid>
         <Grid.RowDefinitions>
