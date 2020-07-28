@@ -64,9 +64,7 @@ namespace RaceControl.ViewModels
                                 { "url", url }
                             };
 
-                            _dialogService.Show(nameof(VideoDialog), parameters, r =>
-                            {
-                            });
+                            _dialogService.Show(nameof(VideoDialog), parameters, null);
 
                             return;
                         }

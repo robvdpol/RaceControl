@@ -10,10 +10,11 @@
             <Setter Property="prism:Dialog.WindowStartupLocation" Value="CenterOwner" />
             <Setter Property="ResizeMode" Value="CanResizeWithGrip" />
             <Setter Property="ShowInTaskbar" Value="True" />
-            <Setter Property="SizeToContent" Value="WidthAndHeight" />
+            <Setter Property="Width" Value="800" />
+            <Setter Property="Height" Value="450" />
         </Style>
     </prism:Dialog.WindowStyle>
-    <Grid Width="800" Height="450">
+    <Grid>
         <vlc:VideoView MediaPlayer="{Binding MediaPlayer}" />
     </Grid>
 </UserControl>
