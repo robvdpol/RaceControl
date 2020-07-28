@@ -1,4 +1,5 @@
-﻿using RaceControl.Services.Interfaces.F1TV;
+﻿using RaceControl.Services.Interfaces;
+using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Api;
 using RaceControl.Services.Interfaces.Lark;
 using System.Collections.Generic;
@@ -13,10 +14,12 @@ namespace RaceControl.Services.F1TV
         private const string SessionOccurrence = "session-occurrence";
 
         private readonly IF1TVClient _f1tvClient;
+        private readonly IRestClient _restClient;
 
-        public ApiService(IF1TVClient f1tvClient)
+        public ApiService(IF1TVClient f1tvClient, IRestClient restClient)
         {
             _f1tvClient = f1tvClient;
+            _restClient = restClient;
         }
 
         public async Task<List<Season>> GetRaceSeasonsAsync()
@@ -77,6 +80,11 @@ namespace RaceControl.Services.F1TV
                 ;
 
             return (await _f1tvClient.GetItemAsync<Session>(request)).ChannelUrls;
+        }
+
+        public async Task<string> GetTokenisedUrlForChannelAsync(string token, string channelUrl)
+        {
+            return (await _f1tvClient.GetTokenisedUrlForChannelAsync(token, channelUrl)).Url;
         }
     }
 }

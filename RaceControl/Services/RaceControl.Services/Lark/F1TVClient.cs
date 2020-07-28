@@ -1,5 +1,7 @@
 ﻿using RaceControl.Services.Interfaces;
+using RaceControl.Services.Interfaces.F1TV.Api;
 using RaceControl.Services.Interfaces.Lark;
+using System.Threading.Tasks;
 
 namespace RaceControl.Services.Lark
 {
@@ -7,6 +9,18 @@ namespace RaceControl.Services.Lark
     {
         public F1TVClient(IRestClient restClient) : base(restClient, "https://f1tv.formula1.com/api")
         {
+        }
+
+        public async Task<TokenisedUrl> GetTokenisedUrlForChannelAsync(string token, string channelUrl)
+        {
+            var url = _endpoint + "/viewings";
+            var request = new ChannelUrl { Url = channelUrl };
+
+            _restClient.SetJWTAuthorizationHeader(token);
+            var tokenisedUrl = await _restClient.PostAsJsonAsync<ChannelUrl, TokenisedUrl>(url, request);
+            _restClient.ClearAuthorizationHeader();
+
+            return tokenisedUrl;
         }
     }
 }

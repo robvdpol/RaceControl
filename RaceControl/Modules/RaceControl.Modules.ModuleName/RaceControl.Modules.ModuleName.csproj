@@ -5,7 +5,10 @@
     <AssemblyName>RaceControl.Modules.ModuleName</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="LibVLCSharp" Version="3.4.6" />
+    <PackageReference Include="LibVLCSharp.WPF" Version="3.4.6" />
     <PackageReference Include="Prism.Wpf" Version="7.2.0.1422" />
+    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.11" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\RaceControl.Common\RaceControl.Common.csproj" />

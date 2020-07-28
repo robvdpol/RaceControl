@@ -3,6 +3,7 @@ using RaceControl.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,6 +18,16 @@ namespace RaceControl.Services
         public RestClient(HttpClient httpClient)
         {
             _httpClient = httpClient;
+        }
+
+        public void SetJWTAuthorizationHeader(string token)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("JWT", token);
+        }
+
+        public void ClearAuthorizationHeader()
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = null;
         }
 
         public async Task<TResponse> GetAsJsonAsync<TResponse>(string url)

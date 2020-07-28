@@ -6,8 +6,8 @@ namespace RaceControl.Services.Lark
 {
     public class LarkClient : ILarkClient
     {
-        private readonly IRestClient _restClient;
-        private readonly string _endpoint;
+        protected readonly IRestClient _restClient;
+        protected readonly string _endpoint;
 
         public LarkClient(IRestClient restClient, string endpoint)
         {

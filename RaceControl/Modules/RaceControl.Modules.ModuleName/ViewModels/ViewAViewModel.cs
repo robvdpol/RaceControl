@@ -28,7 +28,7 @@ namespace RaceControl.Modules.ModuleName.ViewModels
 
         public override async void OnNavigatedTo(NavigationContext navigationContext)
         {
-            //var token = await _authorizationService.LoginAsync("rob_van_der_pol@hotmail.com", "yBz5XfSeacQKVq9");
+            var token = await _authorizationService.LoginAsync("rob_van_der_pol@hotmail.com", "yBz5XfSeacQKVq9");
             var seasons = await _apiService.GetRaceSeasonsAsync();
 
             foreach (var season in seasons)
@@ -41,8 +41,12 @@ namespace RaceControl.Modules.ModuleName.ViewModels
                     foreach (var sessionUrl in eventObj.SessionOccurrenceUrls)
                     {
                         var sessionId = sessionUrl.GetUID();
-                        var session = await _apiService.GetSessionAsync(sessionId);
                         var channels = await _apiService.GetChannelsAsync(sessionId);
+
+                        foreach (var channel in channels)
+                        {
+                            var url = await _apiService.GetTokenisedUrlForChannelAsync(token.Token, channel.Self);
+                        }
                     }
                 }
             }
