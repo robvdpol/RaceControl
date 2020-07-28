@@ -7,12 +7,10 @@ namespace RaceControl.Core.Mvvm
     {
         protected ViewModelBase()
         {
-
         }
 
         public virtual void Destroy()
         {
-
         }
     }
 }
