@@ -13,10 +13,10 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         public string Name { get; set; }
 
         [JsonProperty("has_content")]
-        public bool HasContent { get; set; }
+        public bool? HasContent { get; set; }
 
         [JsonProperty("year")]
-        public int Year { get; set; }
+        public int? Year { get; set; }
 
         [JsonProperty("eventoccurrence_urls")]
         public List<string> EventOccurrenceUrls { get; set; }

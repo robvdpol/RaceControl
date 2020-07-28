@@ -12,6 +12,11 @@ namespace RaceControl.Common
         {
             var memberExpression = expression.Body as MemberExpression;
 
+            if (memberExpression == null && expression.Body is UnaryExpression unaryExpression)
+            {
+                memberExpression = unaryExpression.Operand as MemberExpression;
+            }
+
             if (memberExpression == null)
             {
                 throw new InvalidOperationException("Expression must be a member expression");

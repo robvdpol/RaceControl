@@ -6,6 +6,9 @@ namespace RaceControl.Modules.ModuleName.ViewModels
 {
     public class ViewAViewModel : RegionViewModelBase
     {
+        private readonly IAuthorizationService _authorizationService;
+        private readonly IApiService _apiService;
+
         private string _message;
 
         public string Message
@@ -14,15 +17,18 @@ namespace RaceControl.Modules.ModuleName.ViewModels
             set { SetProperty(ref _message, value); }
         }
 
-        public ViewAViewModel(IRegionManager regionManager, IAuthorizationService authorizationService) :
+        public ViewAViewModel(IRegionManager regionManager, IAuthorizationService authorizationService, IApiService apiService) :
             base(regionManager)
         {
+            _authorizationService = authorizationService;
+            _apiService = apiService;
             Message = "Testmessage";
         }
 
-        public override void OnNavigatedTo(NavigationContext navigationContext)
+        public override async void OnNavigatedTo(NavigationContext navigationContext)
         {
-            //do something
+            var token = await _authorizationService.LoginAsync("rob_van_der_pol@hotmail.com", "yBz5XfSeacQKVq9");
+            var seasons = await _apiService.GetRaceSeasonsAsync();
         }
     }
 }
