@@ -9,7 +9,7 @@ using DialogResult = Prism.Services.Dialogs.DialogResult;
 
 namespace RaceControl.ViewModels
 {
-    public class LoginDialogViewModel : DialogViewModelBase, IDialogAware
+    public class LoginDialogViewModel : DialogViewModelBase
     {
         private const string RaceControlF1TV = "RaceControlF1TV";
 

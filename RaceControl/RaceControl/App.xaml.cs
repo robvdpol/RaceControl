@@ -1,4 +1,5 @@
-﻿using Prism.Ioc;
+﻿using LibVLCSharp.Shared;
+using Prism.Ioc;
 using Prism.Modularity;
 using RaceControl.Modules.ModuleName;
 using RaceControl.Services;
@@ -20,10 +21,18 @@ namespace RaceControl
             return Container.Resolve<MainWindow>();
         }
 
+        public override void Initialize()
+        {
+            base.Initialize();
+            LibVLCSharp.Shared.Core.Initialize();
+        }
+
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterDialog<LoginDialog, LoginDialogViewModel>();
+            containerRegistry.RegisterDialog<VideoDialog, VideoDialogViewModel>();
 
+            containerRegistry.RegisterSingleton<LibVLC>();
             containerRegistry.RegisterSingleton<IRestClient, RestClient>();
             containerRegistry.RegisterSingleton<IAuthorizationService, AuthorizationService>();
             containerRegistry.RegisterSingleton<IApiService, ApiService>();

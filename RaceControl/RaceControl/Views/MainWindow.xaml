@@ -13,12 +13,20 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Button
-            Grid.Row="0"
-            Width="100"
-            Height="25"
-            Command="{Binding LoginCommand}"
-            Content="Login" />
+        <StackPanel Orientation="Horizontal">
+            <Button
+                Grid.Row="0"
+                Width="100"
+                Height="25"
+                Command="{Binding LoginCommand}"
+                Content="Login" />
+            <Button
+                Grid.Row="0"
+                Width="100"
+                Height="25"
+                Command="{Binding PlayCommand}"
+                Content="Play" />
+        </StackPanel>
         <!--
         <ContentControl Grid.Row="1" prism:RegionManager.RegionName="{x:Static core:RegionNames.ContentRegion}" />
         -->
