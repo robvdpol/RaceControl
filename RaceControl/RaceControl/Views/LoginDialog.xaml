@@ -1,5 +1,5 @@
 ﻿<UserControl
-    x:Class="RaceControl.Views.LoginDialogView"
+    x:Class="RaceControl.Views.LoginDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mvvm="clr-namespace:RaceControl.Core.Mvvm;assembly=RaceControl.Core"

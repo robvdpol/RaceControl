@@ -23,7 +23,7 @@ namespace RaceControl.ViewModels
 
         private void LoginExecute()
         {
-            _dialogService.ShowDialog(nameof(LoginDialogView), null, r =>
+            _dialogService.ShowDialog(nameof(LoginDialog), null, r =>
             {
                 if (r.Result == ButtonResult.OK)
                 {
