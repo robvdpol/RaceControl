@@ -22,7 +22,7 @@ namespace RaceControl
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.RegisterDialog<LoginView, LoginViewViewModel>();
+            containerRegistry.RegisterDialog<LoginDialogView, LoginDialogViewModel>();
 
             containerRegistry.RegisterSingleton<IRestClient, RestClient>();
             containerRegistry.RegisterSingleton<IAuthorizationService, AuthorizationService>();

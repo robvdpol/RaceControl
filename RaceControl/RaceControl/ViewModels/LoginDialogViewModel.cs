@@ -9,7 +9,7 @@ using DialogResult = Prism.Services.Dialogs.DialogResult;
 
 namespace RaceControl.ViewModels
 {
-    public class LoginViewViewModel : DialogViewModelBase, IDialogAware
+    public class LoginDialogViewModel : DialogViewModelBase, IDialogAware
     {
         private const string RaceControlF1TV = "RaceControlF1TV";
 
@@ -22,7 +22,7 @@ namespace RaceControl.ViewModels
         private string _error;
         private bool _canClose;
 
-        public LoginViewViewModel(IAuthorizationService authorizationService)
+        public LoginDialogViewModel(IAuthorizationService authorizationService)
         {
             _authorizationService = authorizationService;
         }

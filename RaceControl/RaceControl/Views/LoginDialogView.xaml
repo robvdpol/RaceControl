@@ -1,8 +1,7 @@
 ﻿<UserControl
-    x:Class="RaceControl.Views.LoginView"
+    x:Class="RaceControl.Views.LoginDialogView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:mvvm="clr-namespace:RaceControl.Core.Mvvm;assembly=RaceControl.Core"
     xmlns:prism="http://prismlibrary.com/"
     prism:ViewModelLocator.AutoWireViewModel="True">
