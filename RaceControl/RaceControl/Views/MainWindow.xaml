@@ -2,7 +2,6 @@
     x:Class="RaceControl.Views.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:core="clr-namespace:RaceControl.Core;assembly=RaceControl.Core"
     xmlns:prism="http://prismlibrary.com/"
     Title="{Binding Title}"
     Width="800"
@@ -27,8 +26,5 @@
                 Command="{Binding PlayCommand}"
                 Content="Play" />
         </StackPanel>
-        <!--
-        <ContentControl Grid.Row="1" prism:RegionManager.RegionName="{x:Static core:RegionNames.ContentRegion}" />
-        -->
     </Grid>
 </Window>

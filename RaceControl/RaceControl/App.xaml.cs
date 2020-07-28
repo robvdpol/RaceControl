@@ -1,7 +1,5 @@
 ﻿using LibVLCSharp.Shared;
 using Prism.Ioc;
-using Prism.Modularity;
-using RaceControl.Modules.ModuleName;
 using RaceControl.Services;
 using RaceControl.Services.F1TV;
 using RaceControl.Services.Interfaces;
@@ -37,11 +35,6 @@ namespace RaceControl
             containerRegistry.RegisterSingleton<IAuthorizationService, AuthorizationService>();
             containerRegistry.RegisterSingleton<IApiService, ApiService>();
             containerRegistry.Register<IF1TVClient, F1TVClient>();
-        }
-
-        protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
-        {
-            moduleCatalog.AddModule<ModuleNameModule>();
         }
     }
 }
