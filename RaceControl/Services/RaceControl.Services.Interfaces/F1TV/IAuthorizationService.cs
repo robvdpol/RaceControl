@@ -1,6 +1,12 @@
-﻿namespace RaceControl.Services.Interfaces.F1TV
+﻿using RaceControl.Services.Interfaces.F1TV.Authorization;
+using System.Threading.Tasks;
+
+namespace RaceControl.Services.Interfaces.F1TV
 {
     public interface IAuthorizationService
     {
+        Task<AuthResponse> AuthenticateAsync(string login, string password);
+
+        Task<TokenResponse> LoginAsync(string login, string password);
     }
 }

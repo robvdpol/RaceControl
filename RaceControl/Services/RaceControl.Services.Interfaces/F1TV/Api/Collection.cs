@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace RaceControl.Services.F1TV.Api
+namespace RaceControl.Services.Interfaces.F1TV.Api
 {
     public class Collection
     {

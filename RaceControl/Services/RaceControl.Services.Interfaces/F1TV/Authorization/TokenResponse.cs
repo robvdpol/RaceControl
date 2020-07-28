@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace RaceControl.Services.F1TV.Authorization
+namespace RaceControl.Services.Interfaces.F1TV.Authorization
 {
     public class TokenResponse
     {

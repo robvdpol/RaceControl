@@ -1,6 +1,6 @@
-﻿using RaceControl.Services.F1TV.Authorization;
-using RaceControl.Services.Interfaces;
+﻿using RaceControl.Services.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
+using RaceControl.Services.Interfaces.F1TV.Authorization;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

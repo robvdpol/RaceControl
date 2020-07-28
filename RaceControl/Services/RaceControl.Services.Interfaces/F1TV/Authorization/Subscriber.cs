@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace RaceControl.Services.F1TV.Authorization
+namespace RaceControl.Services.Interfaces.F1TV.Authorization
 {
     public class Subscriber
     {

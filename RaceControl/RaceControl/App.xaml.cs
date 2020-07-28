@@ -23,7 +23,8 @@ namespace RaceControl
         {
             containerRegistry.RegisterSingleton<IRestClient, RestClient>();
             containerRegistry.RegisterSingleton<IAuthorizationService, AuthorizationService>();
-            containerRegistry.Register<ILarkClient, LarkClient>();
+            containerRegistry.RegisterSingleton<IApiService, ApiService>();
+            containerRegistry.Register<IF1TVClient, F1TVClient>();
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)

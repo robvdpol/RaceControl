@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\RaceControl.Common\RaceControl.Common.csproj" />
     <ProjectReference Include="..\RaceControl.Services.Interfaces\RaceControl.Services.Interfaces.csproj" />
   </ItemGroup>
 
