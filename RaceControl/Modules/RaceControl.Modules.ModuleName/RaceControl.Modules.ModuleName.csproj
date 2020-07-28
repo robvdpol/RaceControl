@@ -8,6 +8,7 @@
     <PackageReference Include="Prism.Wpf" Version="7.2.0.1422" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\RaceControl.Common\RaceControl.Common.csproj" />
     <ProjectReference Include="..\..\RaceControl.Core\RaceControl.Core.csproj" />
     <ProjectReference Include="..\..\Services\RaceControl.Services.Interfaces\RaceControl.Services.Interfaces.csproj" />
   </ItemGroup>

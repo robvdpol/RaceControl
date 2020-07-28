@@ -1,6 +1,7 @@
 ﻿using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Api;
 using RaceControl.Services.Interfaces.Lark;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace RaceControl.Services.F1TV
@@ -9,6 +10,7 @@ namespace RaceControl.Services.F1TV
     {
         private const string RaceSeason = "race-season";
         private const string EventOccurrence = "event-occurrence";
+        private const string SessionOccurrence = "session-occurrence";
 
         private readonly IF1TVClient _f1tvClient;
 
@@ -17,7 +19,7 @@ namespace RaceControl.Services.F1TV
             _f1tvClient = f1tvClient;
         }
 
-        public async Task<ILarkCollection<Season>> GetRaceSeasonsAsync()
+        public async Task<List<Season>> GetRaceSeasonsAsync()
         {
             var request = _f1tvClient
                 .NewRequest(RaceSeason)
@@ -30,7 +32,7 @@ namespace RaceControl.Services.F1TV
                 .OrderBy(Season.YearField, LarkSortDirection.Ascending)
                 ;
 
-            return await _f1tvClient.GetCollectionAsync<Season>(request);
+            return (await _f1tvClient.GetCollectionAsync<Season>(request)).Objects;
         }
 
         public async Task<Event> GetEventAsync(string uid)
@@ -46,6 +48,22 @@ namespace RaceControl.Services.F1TV
                 ;
 
             return await _f1tvClient.GetItemAsync<Event>(request);
+        }
+
+        public async Task<Session> GetSessionAsync(string uid)
+        {
+            var request = _f1tvClient
+                .NewRequest(SessionOccurrence, uid)
+                .WithField(Session.UIDField)
+                .WithField(Session.NameField)
+                .WithField(Session.SessionNameField)
+                .WithField(Session.StatusField)
+                .WithField(Session.ContentUrlsField)
+                .WithField(Session.StartTimeField)
+                .WithField(Session.EndTimeField)
+                ;
+
+            return await _f1tvClient.GetItemAsync<Session>(request);
         }
     }
 }
