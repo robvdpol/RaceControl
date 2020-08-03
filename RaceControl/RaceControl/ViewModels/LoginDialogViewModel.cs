@@ -3,6 +3,7 @@ using Prism.Commands;
 using Prism.Services.Dialogs;
 using RaceControl.Core.Mvvm;
 using RaceControl.Services.Interfaces.F1TV;
+using RaceControl.Services.Interfaces.F1TV.Authorization;
 using System;
 using System.Windows.Input;
 using DialogResult = Prism.Services.Dialogs.DialogResult;
@@ -29,7 +30,7 @@ namespace RaceControl.ViewModels
 
         public override string Title => "Login to F1TV";
 
-        public ICommand LoginCommand => _loginCommand ??= new DelegateCommand(LoginExecute, LoginCanExecute).ObservesProperty(() => Email).ObservesProperty(() => Password);
+        public ICommand LoginCommand => _loginCommand ??= new DelegateCommand(LoginExecute, CanLoginExecute).ObservesProperty(() => Email).ObservesProperty(() => Password);
 
         public string Email
         {
@@ -70,7 +71,7 @@ namespace RaceControl.ViewModels
             return CanClose;
         }
 
-        private bool LoginCanExecute()
+        private bool CanLoginExecute()
         {
             return !string.IsNullOrWhiteSpace(Email) && !string.IsNullOrWhiteSpace(Password);
         }
@@ -78,11 +79,11 @@ namespace RaceControl.ViewModels
         private async void LoginExecute()
         {
             Error = null;
-            string token;
+            TokenResponse token;
 
             try
             {
-                token = (await _authorizationService.LoginAsync(Email, Password)).Token;
+                token = await _authorizationService.LoginAsync(Email, Password);
             }
             catch (Exception ex)
             {
@@ -94,46 +95,39 @@ namespace RaceControl.ViewModels
             CanClose = true;
             RaiseRequestClose(new DialogResult(ButtonResult.OK, new DialogParameters
             {
-                { nameof(token), token }
+                { "token", token.Token }
             }));
         }
 
         private bool LoadCredential()
         {
-            using (var cred = new Credential())
+            using (var credential = new Credential())
             {
-                cred.Target = RaceControlF1TV;
+                credential.Target = RaceControlF1TV;
 
-                if (cred.Load())
+                var loaded = credential.Load();
+
+                if (loaded)
                 {
-                    Email = cred.Username;
-                    Password = cred.Password;
-
-                    return true;
+                    Email = credential.Username;
+                    Password = credential.Password;
                 }
-            }
 
-            return false;
+                return loaded;
+            }
         }
 
-        private void SaveCredential()
+        private bool SaveCredential()
         {
-            using (var cred = new Credential())
+            using (var credential = new Credential())
             {
-                cred.Target = RaceControlF1TV;
-                cred.Username = Email;
-                cred.Password = Password;
-                cred.Type = CredentialType.Generic;
-                cred.PersistanceType = PersistanceType.LocalComputer;
+                credential.Target = RaceControlF1TV;
+                credential.Type = CredentialType.Generic;
+                credential.PersistanceType = PersistanceType.LocalComputer;
+                credential.Username = Email;
+                credential.Password = Password;
 
-                try
-                {
-                    cred.Save();
-                }
-                catch
-                {
-                    // Just continue if credentials cannot be stored
-                }
+                return credential.Save();
             }
         }
     }

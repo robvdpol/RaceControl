@@ -33,6 +33,7 @@ namespace RaceControl.ViewModels
         private MediaPlayer _mediaPlayer;
         private MediaPlayer _mediaPlayerCast;
         private RendererDiscoverer _rendererDiscoverer;
+        private SubscriptionToken _syncVideoToken;
         private ObservableCollection<TrackDescription> _audioTrackDescriptions;
         private ObservableCollection<TrackDescription> _videoTrackDescriptions;
         private ObservableCollection<RendererItem> _rendererItems;
@@ -51,7 +52,7 @@ namespace RaceControl.ViewModels
         public ICommand SyncVideoCommand => _syncVideoCommand ??= new DelegateCommand(SyncVideoExecute);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
         public ICommand VideoTrackSelectionChangedCommand => _videoTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(VideoTrackSelectionChangedExecute);
-        public ICommand CastVideoCommand => _castVideoCommand ??= new DelegateCommand(CastVideoExecute, CastVideoCanExecute).ObservesProperty(() => SelectedRendererItem);
+        public ICommand CastVideoCommand => _castVideoCommand ??= new DelegateCommand(CastVideoExecute, CanCastVideoExecute).ObservesProperty(() => SelectedRendererItem);
 
         public MediaPlayer MediaPlayer
         {
@@ -89,16 +90,20 @@ namespace RaceControl.ViewModels
 
             _token = parameters.GetValue<string>("token");
             _channel = parameters.GetValue<Channel>("channel");
-            _eventAggregator.GetEvent<SyncVideoEvent>().Subscribe(SyncVideo);
+
+            var media = await CreatePlaybackMedia();
+            MediaPlayer = CreateMediaPlayer();
+            MediaPlayer.ESAdded += MediaPlayer_ESAdded;
+            MediaPlayer.ESDeleted += MediaPlayer_ESDeleted;
+
+            if (MediaPlayer.Play(media))
+            {
+                _syncVideoToken = _eventAggregator.GetEvent<SyncVideoEvent>().Subscribe(SyncVideo);
+            }
 
             _rendererDiscoverer = new RendererDiscoverer(_libVLC);
             _rendererDiscoverer.ItemAdded += RendererDiscoverer_ItemAdded;
             _rendererDiscoverer.Start();
-
-            MediaPlayer = CreateMediaPlayer();
-            MediaPlayer.ESAdded += MediaPlayer_ESAdded;
-            MediaPlayer.ESDeleted += MediaPlayer_ESDeleted;
-            MediaPlayer.Play(await CreatePlaybackMedia());
         }
 
         public override void OnDialogClosed()
@@ -107,6 +112,11 @@ namespace RaceControl.ViewModels
 
             _rendererDiscoverer.ItemAdded -= RendererDiscoverer_ItemAdded;
             _rendererDiscoverer.Stop();
+
+            if (_syncVideoToken != null)
+            {
+                _eventAggregator.GetEvent<SyncVideoEvent>().Unsubscribe(_syncVideoToken);
+            }
 
             MediaPlayer.ESAdded -= MediaPlayer_ESAdded;
             MediaPlayer.ESDeleted -= MediaPlayer_ESDeleted;
@@ -225,26 +235,22 @@ namespace RaceControl.ViewModels
             MediaPlayer.SetVideoTrack(trackDescription.Id);
         }
 
-        private bool CastVideoCanExecute()
+        private bool CanCastVideoExecute()
         {
             return SelectedRendererItem != null;
         }
 
         private async void CastVideoExecute()
         {
+            var media = await CreatePlaybackMedia();
             _mediaPlayerCast ??= CreateMediaPlayer();
-
-            if (_mediaPlayerCast.IsPlaying)
-            {
-                _mediaPlayerCast.Stop();
-            }
-
+            _mediaPlayerCast.Stop();
             _mediaPlayerCast.SetRenderer(SelectedRendererItem);
-            _mediaPlayerCast.Play(await CreatePlaybackMedia());
+            _mediaPlayerCast.Play(media);
 
-            if (_mediaPlayer.IsPlaying)
+            if (_mediaPlayerCast.IsPlaying && MediaPlayer.IsPlaying)
             {
-                _mediaPlayerCast.Time = _mediaPlayer.Time;
+                _mediaPlayerCast.Time = MediaPlayer.Time;
             }
         }
 
