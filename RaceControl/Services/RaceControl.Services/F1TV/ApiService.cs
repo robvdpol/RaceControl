@@ -1,6 +1,7 @@
 ﻿using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Api;
 using RaceControl.Services.Interfaces.Lark;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -28,8 +29,9 @@ namespace RaceControl.Services.F1TV
                 .WithField(Season.HasContentField)
                 .WithField(Season.YearField)
                 .WithField(Season.EventOccurrenceUrlsField)
-                .WithFilter(Season.YearField, LarkFilterType.GreaterThan, "2018")
-                .OrderBy(Season.YearField, LarkSortDirection.Ascending)
+                .WithFilter(Season.YearField, LarkFilterType.GreaterThan, "2017")
+                .WithFilter(Season.YearField, LarkFilterType.LessThan, DateTime.Now.AddYears(1).Year.ToString())
+                .OrderBy(Season.YearField, LarkSortDirection.Descending)
                 ;
 
             return (await _f1tvClient.GetCollectionAsync<Season>(request)).Objects;

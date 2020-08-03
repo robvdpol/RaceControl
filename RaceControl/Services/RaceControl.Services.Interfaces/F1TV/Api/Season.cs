@@ -26,5 +26,10 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         public static string HasContentField => JsonUtils.GetJsonPropertyName<Season>((s) => s.HasContent);
         public static string YearField => JsonUtils.GetJsonPropertyName<Season>((s) => s.Year);
         public static string EventOccurrenceUrlsField => JsonUtils.GetJsonPropertyName<Season>((s) => s.EventOccurrenceUrls);
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

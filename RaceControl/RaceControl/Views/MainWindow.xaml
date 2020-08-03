@@ -5,8 +5,8 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:prism="http://prismlibrary.com/"
     Title="{Binding Title}"
-    Width="800"
-    Height="500"
+    Width="900"
+    Height="600"
     prism:ViewModelLocator.AutoWireViewModel="True">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
@@ -18,13 +18,73 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal">
-            <Button
-                Grid.Row="0"
-                Width="100"
-                Height="25"
-                Command="{Binding PlayCommand}"
-                Content="Play" />
-        </StackPanel>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Label
+            Grid.Row="0"
+            Grid.Column="0"
+            HorizontalAlignment="Center"
+            Content="Seasons" />
+        <ListView
+            Grid.Row="1"
+            Grid.Column="0"
+            ItemsSource="{Binding Seasons}"
+            SelectedItem="{Binding SelectedSeason}"
+            SelectionMode="Single">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction Command="{Binding SeasonSelectionChangedCommand}" PassEventArgsToCommand="True" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ListView>
+        <Label
+            Grid.Row="0"
+            Grid.Column="1"
+            HorizontalAlignment="Center"
+            Content="Events" />
+        <ListView
+            Grid.Row="1"
+            Grid.Column="1"
+            ItemsSource="{Binding Events}"
+            SelectedItem="{Binding SelectedEvent}"
+            SelectionMode="Single">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction Command="{Binding EventSelectionChangedCommand}" PassEventArgsToCommand="True" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ListView>
+        <Label
+            Grid.Row="0"
+            Grid.Column="2"
+            HorizontalAlignment="Center"
+            Content="Sessions" />
+        <ListView
+            Grid.Row="1"
+            Grid.Column="2"
+            ItemsSource="{Binding Sessions}"
+            SelectedItem="{Binding SelectedSession}"
+            SelectionMode="Single">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction Command="{Binding SessionSelectionChangedCommand}" PassEventArgsToCommand="True" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ListView>
+        <Label
+            Grid.Row="0"
+            Grid.Column="3"
+            HorizontalAlignment="Center"
+            Content="Channels" />
+        <ListView
+            Grid.Row="1"
+            Grid.Column="3"
+            ItemsSource="{Binding Channels}"
+            SelectedItem="{Binding SelectedChannel}"
+            SelectionMode="Single" />
     </Grid>
 </Window>

@@ -39,5 +39,10 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         public static string ChannelUrlsField => JsonUtils.GetJsonPropertyName<Session>((s) => s.ChannelUrls);
         public static string StartTimeField => JsonUtils.GetJsonPropertyName<Session>((s) => s.StartTime);
         public static string EndTimeField => JsonUtils.GetJsonPropertyName<Session>((s) => s.EndTime);
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

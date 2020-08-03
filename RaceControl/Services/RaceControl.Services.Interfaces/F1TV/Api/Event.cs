@@ -31,5 +31,10 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         public static string SessionOccurrenceUrlsField => JsonUtils.GetJsonPropertyName<Event>((s) => s.SessionOccurrenceUrls);
         public static string StartDateField => JsonUtils.GetJsonPropertyName<Event>((s) => s.StartDate);
         public static string EndDateField => JsonUtils.GetJsonPropertyName<Event>((s) => s.EndDate);
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }
