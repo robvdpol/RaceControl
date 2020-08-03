@@ -5,8 +5,11 @@ using Prism.Events;
 using Prism.Services.Dialogs;
 using RaceControl.Core.Mvvm;
 using RaceControl.Events;
+using RaceControl.Services.Interfaces.F1TV;
+using RaceControl.Services.Interfaces.F1TV.Api;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -16,6 +19,7 @@ namespace RaceControl.ViewModels
     public class VideoDialogViewModel : DialogViewModelBase
     {
         private readonly IEventAggregator _eventAggregator;
+        private readonly IApiService _apiService;
         private readonly LibVLC _libVLC;
 
         private ICommand _togglePauseCommand;
@@ -24,33 +28,30 @@ namespace RaceControl.ViewModels
         private ICommand _videoTrackSelectionChangedCommand;
         private ICommand _castVideoCommand;
 
-        private Media _media;
+        private string _token;
+        private Channel _channel;
         private MediaPlayer _mediaPlayer;
+        private MediaPlayer _mediaPlayerCast;
         private RendererDiscoverer _rendererDiscoverer;
         private ObservableCollection<TrackDescription> _audioTrackDescriptions;
         private ObservableCollection<TrackDescription> _videoTrackDescriptions;
         private ObservableCollection<RendererItem> _rendererItems;
         private RendererItem _selectedRendererItem;
 
-        public VideoDialogViewModel(IEventAggregator eventAggregator, LibVLC libVLC)
+        public VideoDialogViewModel(IEventAggregator eventAggregator, IApiService apiService, LibVLC libVLC)
         {
             _eventAggregator = eventAggregator;
+            _apiService = apiService;
             _libVLC = libVLC;
         }
 
         public override string Title => "Video";
 
-        public ICommand TogglePauseCommand => _togglePauseCommand ?? (_togglePauseCommand = new DelegateCommand(TogglePauseExecute));
-        public ICommand SyncVideoCommand => _syncVideoCommand ?? (_syncVideoCommand = new DelegateCommand(SyncVideoExecute));
-        public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ?? (_audioTrackSelectionChangedCommand = new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute));
-        public ICommand VideoTrackSelectionChangedCommand => _videoTrackSelectionChangedCommand ?? (_videoTrackSelectionChangedCommand = new DelegateCommand<SelectionChangedEventArgs>(VideoTrackSelectionChangedExecute));
-        public ICommand CastVideoCommand => _castVideoCommand ?? (_castVideoCommand = new DelegateCommand(CastVideoExecute, CastVideoCanExecute).ObservesProperty(() => SelectedRendererItem));
-
-        public Media Media
-        {
-            get => _media;
-            set => SetProperty(ref _media, value);
-        }
+        public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute);
+        public ICommand SyncVideoCommand => _syncVideoCommand ??= new DelegateCommand(SyncVideoExecute);
+        public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
+        public ICommand VideoTrackSelectionChangedCommand => _videoTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(VideoTrackSelectionChangedExecute);
+        public ICommand CastVideoCommand => _castVideoCommand ??= new DelegateCommand(CastVideoExecute, CastVideoCanExecute).ObservesProperty(() => SelectedRendererItem);
 
         public MediaPlayer MediaPlayer
         {
@@ -58,27 +59,21 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _mediaPlayer, value);
         }
 
-        public RendererDiscoverer RendererDiscoverer
-        {
-            get => _rendererDiscoverer;
-            set => SetProperty(ref _rendererDiscoverer, value);
-        }
-
         public ObservableCollection<TrackDescription> AudioTrackDescriptions
         {
-            get => _audioTrackDescriptions ?? (_audioTrackDescriptions = new ObservableCollection<TrackDescription>());
+            get => _audioTrackDescriptions ??= new ObservableCollection<TrackDescription>();
             set => SetProperty(ref _audioTrackDescriptions, value);
         }
 
         public ObservableCollection<TrackDescription> VideoTrackDescriptions
         {
-            get => _videoTrackDescriptions ?? (_videoTrackDescriptions = new ObservableCollection<TrackDescription>());
+            get => _videoTrackDescriptions ??= new ObservableCollection<TrackDescription>();
             set => SetProperty(ref _videoTrackDescriptions, value);
         }
 
         public ObservableCollection<RendererItem> RendererItems
         {
-            get => _rendererItems ?? (_rendererItems = new ObservableCollection<RendererItem>());
+            get => _rendererItems ??= new ObservableCollection<RendererItem>();
             set => SetProperty(ref _rendererItems, value);
         }
 
@@ -88,40 +83,54 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _selectedRendererItem, value);
         }
 
-        public override void OnDialogOpened(IDialogParameters parameters)
+        public override async void OnDialogOpened(IDialogParameters parameters)
         {
             base.OnDialogOpened(parameters);
 
+            _token = parameters.GetValue<string>("token");
+            _channel = parameters.GetValue<Channel>("channel");
             _eventAggregator.GetEvent<SyncVideoEvent>().Subscribe(SyncVideo);
 
-            RendererDiscoverer = new RendererDiscoverer(_libVLC);
-            RendererDiscoverer.ItemAdded += RendererDiscoverer_ItemAdded;
-            RendererDiscoverer.Start();
+            _rendererDiscoverer = new RendererDiscoverer(_libVLC);
+            _rendererDiscoverer.ItemAdded += RendererDiscoverer_ItemAdded;
+            _rendererDiscoverer.Start();
 
-            var url = parameters.GetValue<string>("url");
-            Media = new Media(_libVLC, url, FromType.FromLocation);
-            MediaPlayer = new MediaPlayer(_libVLC) { EnableHardwareDecoding = true };
+            MediaPlayer = CreateMediaPlayer();
             MediaPlayer.ESAdded += MediaPlayer_ESAdded;
             MediaPlayer.ESDeleted += MediaPlayer_ESDeleted;
-            MediaPlayer.Play(Media);
+            MediaPlayer.Play(await CreatePlaybackMedia());
         }
 
         public override void OnDialogClosed()
         {
             base.OnDialogClosed();
 
-            RendererDiscoverer.ItemAdded -= RendererDiscoverer_ItemAdded;
-            RendererDiscoverer.Stop();
+            _rendererDiscoverer.ItemAdded -= RendererDiscoverer_ItemAdded;
+            _rendererDiscoverer.Stop();
 
             MediaPlayer.ESAdded -= MediaPlayer_ESAdded;
             MediaPlayer.ESDeleted -= MediaPlayer_ESDeleted;
             MediaPlayer.Stop();
             MediaPlayer.Dispose();
+
+            if (_mediaPlayerCast != null)
+            {
+                _mediaPlayerCast.Stop();
+                _mediaPlayerCast.Dispose();
+            }
         }
 
         private void SyncVideo(SyncVideoEventPayload payload)
         {
-            MediaPlayer.Time = payload.Time;
+            if (MediaPlayer.IsPlaying)
+            {
+                MediaPlayer.Time = payload.Time;
+            }
+
+            if (_mediaPlayerCast != null && _mediaPlayerCast.IsPlaying)
+            {
+                _mediaPlayerCast.Time = payload.Time;
+            }
         }
 
         private void RendererDiscoverer_ItemAdded(object sender, RendererDiscovererItemAddedEventArgs e)
@@ -221,9 +230,34 @@ namespace RaceControl.ViewModels
             return SelectedRendererItem != null;
         }
 
-        private void CastVideoExecute()
+        private async void CastVideoExecute()
         {
-            var result = _mediaPlayer.SetRenderer(SelectedRendererItem);
+            _mediaPlayerCast ??= CreateMediaPlayer();
+
+            if (_mediaPlayerCast.IsPlaying)
+            {
+                _mediaPlayerCast.Stop();
+            }
+
+            _mediaPlayerCast.SetRenderer(SelectedRendererItem);
+            _mediaPlayerCast.Play(await CreatePlaybackMedia());
+
+            if (_mediaPlayer.IsPlaying)
+            {
+                _mediaPlayerCast.Time = _mediaPlayer.Time;
+            }
+        }
+
+        private MediaPlayer CreateMediaPlayer()
+        {
+            return new MediaPlayer(_libVLC) { EnableHardwareDecoding = true };
+        }
+
+        private async Task<Media> CreatePlaybackMedia()
+        {
+            var url = await _apiService.GetTokenisedUrlForChannelAsync(_token, _channel.Self);
+
+            return new Media(_libVLC, url, FromType.FromLocation);
         }
     }
 }

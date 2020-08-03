@@ -28,8 +28,8 @@ namespace RaceControl.ViewModels
 
         public string Title => "Race Control";
 
-        public ICommand LoadedCommand => _loadedCommand ?? (_loadedCommand = new DelegateCommand<RoutedEventArgs>(LoadedExecute));
-        public ICommand PlayCommand => _playCommand ?? (_playCommand = new DelegateCommand(PlayExecute));
+        public ICommand LoadedCommand => _loadedCommand ??= new DelegateCommand<RoutedEventArgs>(LoadedExecute);
+        public ICommand PlayCommand => _playCommand ??= new DelegateCommand(PlayExecute);
 
         private void LoadedExecute(RoutedEventArgs args)
         {
@@ -65,10 +65,10 @@ namespace RaceControl.ViewModels
 
                         foreach (var channel in channels)
                         {
-                            var url = await _apiService.GetTokenisedUrlForChannelAsync(_token, channel.Self);
                             var parameters = new DialogParameters
                             {
-                                { "url", url }
+                                { "token", _token },
+                                { "channel", channel }
                             };
 
                             _dialogService.Show(nameof(VideoDialog), parameters, null);
