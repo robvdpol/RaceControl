@@ -153,6 +153,7 @@ namespace RaceControl.ViewModels
 
         private void SyncVideoExecute()
         {
+            // todo: only sync videos from same session
             var payload = new SyncVideoEventPayload(MediaPlayer.Time);
             _eventAggregator.GetEvent<SyncVideoEvent>().Publish(payload);
         }
