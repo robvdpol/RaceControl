@@ -30,6 +30,10 @@
                 Width="75"
                 Command="{Binding SyncVideoCommand}"
                 Content="Sync" />
+            <Button
+                Width="75"
+                Command="{Binding FastForwardCommand}"
+                Content="+1 min" />
             <Label Content="Audio" />
             <ComboBox
                 Width="175"

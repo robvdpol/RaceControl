@@ -24,6 +24,7 @@ namespace RaceControl.ViewModels
 
         private ICommand _pauseCommand;
         private ICommand _syncVideoCommand;
+        private ICommand _fastForwardCommand;
         private ICommand _audioTrackSelectionChangedCommand;
         private ICommand _videoTrackSelectionChangedCommand;
         private ICommand _castVideoCommand;
@@ -50,6 +51,7 @@ namespace RaceControl.ViewModels
 
         public ICommand PauseCommand => _pauseCommand ??= new DelegateCommand(PauseExecute);
         public ICommand SyncVideoCommand => _syncVideoCommand ??= new DelegateCommand(SyncVideoExecute);
+        public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand(FastForwardExecute);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
         public ICommand VideoTrackSelectionChangedCommand => _videoTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(VideoTrackSelectionChangedExecute);
         public ICommand CastVideoCommand => _castVideoCommand ??= new DelegateCommand(CastVideoExecute, CanCastVideoExecute).ObservesProperty(() => SelectedRendererItem);
@@ -207,6 +209,14 @@ namespace RaceControl.ViewModels
             // todo: only sync videos from same session
             var payload = new SyncVideoEventPayload(MediaPlayer.Time);
             _eventAggregator.GetEvent<SyncVideoEvent>().Publish(payload);
+        }
+
+        private void FastForwardExecute()
+        {
+            if (MediaPlayer.IsPlaying)
+            {
+                MediaPlayer.Time = MediaPlayer.Time + 60000;
+            }
         }
 
         private void OnSyncVideo(SyncVideoEventPayload payload)
