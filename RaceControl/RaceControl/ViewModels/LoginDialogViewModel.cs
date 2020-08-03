@@ -58,7 +58,11 @@ namespace RaceControl.ViewModels
         public override void OnDialogOpened(IDialogParameters parameters)
         {
             base.OnDialogOpened(parameters);
-            LoadCredential();
+
+            if (LoadCredential() && LoginCanExecute())
+            {
+                LoginExecute();
+            }
         }
 
         public override bool CanCloseDialog()
@@ -90,11 +94,11 @@ namespace RaceControl.ViewModels
             CanClose = true;
             RaiseRequestClose(new DialogResult(ButtonResult.OK, new DialogParameters
             {
-                { "token", token }
+                { nameof(token), token }
             }));
         }
 
-        private void LoadCredential()
+        private bool LoadCredential()
         {
             using (var cred = new Credential())
             {
@@ -104,8 +108,12 @@ namespace RaceControl.ViewModels
                 {
                     Email = cred.Username;
                     Password = cred.Password;
+
+                    return true;
                 }
             }
+
+            return false;
         }
 
         private void SaveCredential()

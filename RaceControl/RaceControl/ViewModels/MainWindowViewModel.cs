@@ -4,6 +4,7 @@ using Prism.Services.Dialogs;
 using RaceControl.Common;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Views;
+using System.Windows;
 using System.Windows.Input;
 
 namespace RaceControl.ViewModels
@@ -13,9 +14,10 @@ namespace RaceControl.ViewModels
         private readonly IDialogService _dialogService;
         private readonly IApiService _apiService;
 
-        private ICommand _loginCommand;
+        private ICommand _loadedCommand;
         private ICommand _playCommand;
 
+        private bool _loaded;
         private string _token;
 
         public MainWindowViewModel(IDialogService dialogService, IApiService apiService)
@@ -26,18 +28,23 @@ namespace RaceControl.ViewModels
 
         public string Title => "Race Control";
 
-        public ICommand LoginCommand => _loginCommand ?? (_loginCommand = new DelegateCommand(LoginExecute));
+        public ICommand LoadedCommand => _loadedCommand ?? (_loadedCommand = new DelegateCommand<RoutedEventArgs>(LoadedExecute));
         public ICommand PlayCommand => _playCommand ?? (_playCommand = new DelegateCommand(PlayExecute));
 
-        private void LoginExecute()
+        private void LoadedExecute(RoutedEventArgs args)
         {
-            _dialogService.ShowDialog(nameof(LoginDialog), null, r =>
+            if (!_loaded)
             {
-                if (r.Result == ButtonResult.OK)
+                _loaded = true;
+
+                _dialogService.ShowDialog(nameof(LoginDialog), null, r =>
                 {
-                    _token = r.Parameters.GetValue<string>("token");
-                }
-            });
+                    if (r.Result == ButtonResult.OK)
+                    {
+                        _token = r.Parameters.GetValue<string>("token");
+                    }
+                });
+            }
         }
 
         private async void PlayExecute()
