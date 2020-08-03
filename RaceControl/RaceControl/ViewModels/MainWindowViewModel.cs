@@ -118,29 +118,39 @@ namespace RaceControl.ViewModels
             Seasons.AddRange((await _apiService.GetRaceSeasonsAsync()).OrderByDescending(s => s.Year));
         }
 
-        private async void SeasonSelectionChangedExecute(SelectionChangedEventArgs args)
+        private void SeasonSelectionChangedExecute(SelectionChangedEventArgs args)
         {
             ClearEvents();
 
             if (SelectedSeason != null)
             {
-                foreach (var eventUrl in SelectedSeason.EventOccurrenceUrls)
+                Parallel.ForEach(SelectedSeason.EventOccurrenceUrls, async (eventUrl) =>
                 {
-                    Events.Add(await _apiService.GetEventAsync(eventUrl.GetUID()));
-                }
+                    var @event = await _apiService.GetEventAsync(eventUrl.GetUID());
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        Events.Add(@event);
+                    });
+                });
             }
         }
 
-        private async void EventSelectionChangedExecute(SelectionChangedEventArgs args)
+        private void EventSelectionChangedExecute(SelectionChangedEventArgs args)
         {
             ClearSessions();
 
             if (SelectedEvent != null)
             {
-                foreach (var sessionUrl in SelectedEvent.SessionOccurrenceUrls)
+                Parallel.ForEach(SelectedEvent.SessionOccurrenceUrls, async (sessionUrl) =>
                 {
-                    Sessions.Add(await _apiService.GetSessionAsync(sessionUrl.GetUID()));
-                }
+                    var session = await _apiService.GetSessionAsync(sessionUrl.GetUID());
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        Sessions.Add(session);
+                    });
+                });
             }
         }
 
@@ -181,40 +191,5 @@ namespace RaceControl.ViewModels
         {
             Channels.Clear();
         }
-
-        /*
-        private async void PlayExecute()
-        {
-            var seasons = await _apiService.GetRaceSeasonsAsync();
-
-            foreach (var season in seasons)
-            {
-                foreach (var eventUrl in season.EventOccurrenceUrls)
-                {
-                    var eventId = eventUrl.GetUID();
-                    var eventObj = await _apiService.GetEventAsync(eventId);
-
-                    foreach (var sessionUrl in eventObj.SessionOccurrenceUrls)
-                    {
-                        var sessionId = sessionUrl.GetUID();
-                        var channels = await _apiService.GetChannelsAsync(sessionId);
-
-                        foreach (var channel in channels)
-                        {
-                            var parameters = new DialogParameters
-                            {
-                                { "token", _token },
-                                { "channel", channel }
-                            };
-
-                            _dialogService.Show(nameof(VideoDialog), parameters, null);
-
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-        */
     }
 }
