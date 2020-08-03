@@ -91,12 +91,11 @@ namespace RaceControl.ViewModels
             _token = parameters.GetValue<string>("token");
             _channel = parameters.GetValue<Channel>("channel");
 
-            var media = await CreatePlaybackMedia();
             MediaPlayer = CreateMediaPlayer();
             MediaPlayer.ESAdded += MediaPlayer_ESAdded;
             MediaPlayer.ESDeleted += MediaPlayer_ESDeleted;
 
-            if (MediaPlayer.Play(media))
+            if (MediaPlayer.Play(await CreatePlaybackMedia()))
             {
                 _syncVideoToken = _eventAggregator.GetEvent<SyncVideoEvent>().Subscribe(SyncVideo);
             }
@@ -242,13 +241,13 @@ namespace RaceControl.ViewModels
 
         private async void CastVideoExecute()
         {
-            var media = await CreatePlaybackMedia();
             _mediaPlayerCast ??= CreateMediaPlayer();
             _mediaPlayerCast.Stop();
             _mediaPlayerCast.SetRenderer(SelectedRendererItem);
-            _mediaPlayerCast.Play(media);
 
-            if (_mediaPlayerCast.IsPlaying && MediaPlayer.IsPlaying)
+            var media = await CreatePlaybackMedia();
+
+            if (_mediaPlayerCast.Play(media) && MediaPlayer.IsPlaying)
             {
                 _mediaPlayerCast.Time = MediaPlayer.Time;
             }

@@ -60,7 +60,7 @@ namespace RaceControl.ViewModels
         {
             base.OnDialogOpened(parameters);
 
-            if (LoadCredential() && LoginCanExecute())
+            if (LoadCredential() && CanLoginExecute())
             {
                 LoginExecute();
             }
