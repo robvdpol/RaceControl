@@ -24,7 +24,7 @@
         <StackPanel Grid.Row="1" Orientation="Horizontal">
             <Button
                 Width="75"
-                Command="{Binding TogglePauseCommand}"
+                Command="{Binding PauseCommand}"
                 Content="Pause" />
             <Button
                 Width="75"

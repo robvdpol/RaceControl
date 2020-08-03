@@ -22,7 +22,7 @@ namespace RaceControl.ViewModels
         private readonly IApiService _apiService;
         private readonly LibVLC _libVLC;
 
-        private ICommand _togglePauseCommand;
+        private ICommand _pauseCommand;
         private ICommand _syncVideoCommand;
         private ICommand _audioTrackSelectionChangedCommand;
         private ICommand _videoTrackSelectionChangedCommand;
@@ -48,7 +48,7 @@ namespace RaceControl.ViewModels
 
         public override string Title => "Video";
 
-        public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute);
+        public ICommand PauseCommand => _pauseCommand ??= new DelegateCommand(PauseExecute);
         public ICommand SyncVideoCommand => _syncVideoCommand ??= new DelegateCommand(SyncVideoExecute);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
         public ICommand VideoTrackSelectionChangedCommand => _videoTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(VideoTrackSelectionChangedExecute);
@@ -97,7 +97,7 @@ namespace RaceControl.ViewModels
 
             if (MediaPlayer.Play(await CreatePlaybackMedia()))
             {
-                _syncVideoToken = _eventAggregator.GetEvent<SyncVideoEvent>().Subscribe(SyncVideo);
+                _syncVideoToken = _eventAggregator.GetEvent<SyncVideoEvent>().Subscribe(OnSyncVideo);
             }
 
             _rendererDiscoverer = new RendererDiscoverer(_libVLC);
@@ -126,19 +126,6 @@ namespace RaceControl.ViewModels
             {
                 _mediaPlayerCast.Stop();
                 _mediaPlayerCast.Dispose();
-            }
-        }
-
-        private void SyncVideo(SyncVideoEventPayload payload)
-        {
-            if (MediaPlayer.IsPlaying)
-            {
-                MediaPlayer.Time = payload.Time;
-            }
-
-            if (_mediaPlayerCast != null && _mediaPlayerCast.IsPlaying)
-            {
-                _mediaPlayerCast.Time = payload.Time;
             }
         }
 
@@ -207,7 +194,7 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void TogglePauseExecute()
+        private void PauseExecute()
         {
             if (MediaPlayer.CanPause)
             {
@@ -220,6 +207,19 @@ namespace RaceControl.ViewModels
             // todo: only sync videos from same session
             var payload = new SyncVideoEventPayload(MediaPlayer.Time);
             _eventAggregator.GetEvent<SyncVideoEvent>().Publish(payload);
+        }
+
+        private void OnSyncVideo(SyncVideoEventPayload payload)
+        {
+            if (MediaPlayer.IsPlaying)
+            {
+                MediaPlayer.Time = payload.Time;
+            }
+
+            if (_mediaPlayerCast != null && _mediaPlayerCast.IsPlaying)
+            {
+                _mediaPlayerCast.Time = payload.Time;
+            }
         }
 
         private void AudioTrackSelectionChangedExecute(SelectionChangedEventArgs args)

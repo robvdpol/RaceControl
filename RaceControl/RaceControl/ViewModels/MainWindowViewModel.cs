@@ -39,12 +39,15 @@ namespace RaceControl.ViewModels
 
                 _dialogService.ShowDialog(nameof(LoginDialog), null, r =>
                 {
-                    if (r.Result == ButtonResult.OK)
-                    {
-                        _token = r.Parameters.GetValue<string>("token");
-                    }
+                    var token = r.Parameters.GetValue<string>("token");
+                    Initialize(token);
                 });
             }
+        }
+
+        private void Initialize(string token)
+        {
+            _token = token;
         }
 
         private async void PlayExecute()
