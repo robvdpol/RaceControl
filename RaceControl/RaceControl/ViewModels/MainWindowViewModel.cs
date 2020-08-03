@@ -23,6 +23,7 @@ namespace RaceControl.ViewModels
         private ICommand _seasonSelectionChangedCommand;
         private ICommand _eventSelectionChangedCommand;
         private ICommand _sessionSelectionChangedCommand;
+        private ICommand _watchChannelCommand;
 
         private bool _loaded;
         private string _token;
@@ -47,6 +48,7 @@ namespace RaceControl.ViewModels
         public ICommand SeasonSelectionChangedCommand => _seasonSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(SeasonSelectionChangedExecute);
         public ICommand EventSelectionChangedCommand => _eventSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(EventSelectionChangedExecute);
         public ICommand SessionSelectionChangedCommand => _sessionSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(SessionSelectionChangedExecute);
+        public ICommand WatchChannelCommand => _watchChannelCommand ??= new DelegateCommand<Channel>(WatchChannelExecute);
 
         public ObservableCollection<Season> Seasons
         {
@@ -150,6 +152,17 @@ namespace RaceControl.ViewModels
             {
                 Channels.AddRange(await _apiService.GetChannelsAsync(SelectedSession.UID));
             }
+        }
+
+        private void WatchChannelExecute(Channel channel)
+        {
+            var parameters = new DialogParameters
+            {
+                { "token", _token },
+                { "channel", channel }
+            };
+
+            _dialogService.Show(nameof(VideoDialog), parameters, null);
         }
 
         private void ClearEvents()

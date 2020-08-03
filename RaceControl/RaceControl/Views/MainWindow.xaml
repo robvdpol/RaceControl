@@ -83,8 +83,27 @@
         <ListView
             Grid.Row="1"
             Grid.Column="3"
+            HorizontalContentAlignment="Stretch"
             ItemsSource="{Binding Channels}"
             SelectedItem="{Binding SelectedChannel}"
-            SelectionMode="Single" />
+            SelectionMode="Single">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{Binding}" />
+                        <Button
+                            Grid.Column="1"
+                            Width="50"
+                            Command="{Binding DataContext.WatchChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
+                            CommandParameter="{Binding}"
+                            Content="Watch" />
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
     </Grid>
 </Window>
