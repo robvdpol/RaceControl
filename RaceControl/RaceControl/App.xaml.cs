@@ -9,6 +9,7 @@ using RaceControl.Services.Lark;
 using RaceControl.ViewModels;
 using RaceControl.Views;
 using System.Windows;
+using LibVLCSharpCore = LibVLCSharp.Shared.Core;
 
 namespace RaceControl
 {
@@ -22,7 +23,7 @@ namespace RaceControl
         public override void Initialize()
         {
             base.Initialize();
-            LibVLCSharp.Shared.Core.Initialize();
+            LibVLCSharpCore.Initialize();
         }
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
