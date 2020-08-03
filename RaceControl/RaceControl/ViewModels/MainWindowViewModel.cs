@@ -5,6 +5,7 @@ using RaceControl.Common;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Api;
 using RaceControl.Views;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -118,39 +119,35 @@ namespace RaceControl.ViewModels
             Seasons.AddRange((await _apiService.GetRaceSeasonsAsync()).OrderByDescending(s => s.Year));
         }
 
-        private void SeasonSelectionChangedExecute(SelectionChangedEventArgs args)
+        private async void SeasonSelectionChangedExecute(SelectionChangedEventArgs args)
         {
             ClearEvents();
 
             if (SelectedSeason != null)
             {
-                Parallel.ForEach(SelectedSeason.EventOccurrenceUrls, async (eventUrl) =>
+                var events = new ConcurrentBag<Event>();
+                var tasks = SelectedSeason.EventOccurrenceUrls.Select(async eventUrl =>
                 {
-                    var @event = await _apiService.GetEventAsync(eventUrl.GetUID());
-
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        Events.Add(@event);
-                    });
+                    events.Add(await _apiService.GetEventAsync(eventUrl.GetUID()));
                 });
+                await Task.WhenAll(tasks);
+                Events.AddRange(events.OrderBy(e => e.StartDate));
             }
         }
 
-        private void EventSelectionChangedExecute(SelectionChangedEventArgs args)
+        private async void EventSelectionChangedExecute(SelectionChangedEventArgs args)
         {
             ClearSessions();
 
             if (SelectedEvent != null)
             {
-                Parallel.ForEach(SelectedEvent.SessionOccurrenceUrls, async (sessionUrl) =>
+                var sessions = new ConcurrentBag<Session>();
+                var tasks = SelectedEvent.SessionOccurrenceUrls.Select(async sessionUrl =>
                 {
-                    var session = await _apiService.GetSessionAsync(sessionUrl.GetUID());
-
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        Sessions.Add(session);
-                    });
+                    sessions.Add(await _apiService.GetSessionAsync(sessionUrl.GetUID()));
                 });
+                await Task.WhenAll(tasks);
+                Sessions.AddRange(sessions.OrderBy(s => s.StartTime));
             }
         }
 
