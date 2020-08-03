@@ -37,6 +37,16 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </ComboBox>
+            <ComboBox
+                Width="200"
+                DisplayMemberPath="Name"
+                ItemsSource="{Binding VideoTrackDescriptions}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <i:InvokeCommandAction Command="{Binding VideoTrackSelectionChangedCommand}" PassEventArgsToCommand="True" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ComboBox>
         </StackPanel>
     </Grid>
 </UserControl>

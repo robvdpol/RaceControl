@@ -17,10 +17,12 @@ namespace RaceControl.ViewModels
 
         private ICommand _togglePauseCommand;
         private ICommand _audioTrackSelectionChangedCommand;
+        private ICommand _videoTrackSelectionChangedCommand;
 
         private Media _media;
         private MediaPlayer _mediaPlayer;
         private ObservableCollection<TrackDescription> _audioTrackDescriptions;
+        private ObservableCollection<TrackDescription> _videoTrackDescriptions;
 
         public VideoDialogViewModel(LibVLC libVLC)
         {
@@ -31,6 +33,7 @@ namespace RaceControl.ViewModels
 
         public ICommand TogglePauseCommand => _togglePauseCommand ?? (_togglePauseCommand = new DelegateCommand(TogglePauseExecute));
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ?? (_audioTrackSelectionChangedCommand = new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute));
+        public ICommand VideoTrackSelectionChangedCommand => _videoTrackSelectionChangedCommand ?? (_videoTrackSelectionChangedCommand = new DelegateCommand<SelectionChangedEventArgs>(VideoTrackSelectionChangedExecute));
 
         public Media Media
         {
@@ -48,6 +51,12 @@ namespace RaceControl.ViewModels
         {
             get => _audioTrackDescriptions ?? (_audioTrackDescriptions = new ObservableCollection<TrackDescription>());
             set => SetProperty(ref _audioTrackDescriptions, value);
+        }
+
+        public ObservableCollection<TrackDescription> VideoTrackDescriptions
+        {
+            get => _videoTrackDescriptions ?? (_videoTrackDescriptions = new ObservableCollection<TrackDescription>());
+            set => SetProperty(ref _videoTrackDescriptions, value);
         }
 
         public override void OnDialogOpened(IDialogParameters parameters)
@@ -75,27 +84,55 @@ namespace RaceControl.ViewModels
 
         private void MediaPlayer_ESAdded(object sender, MediaPlayerESAddedEventArgs e)
         {
-            if (e.Type == TrackType.Audio && e.Id >= 0)
+            if (e.Id >= 0)
             {
-                var description = MediaPlayer.AudioTrackDescription.First(p => p.Id == e.Id);
-
-                Application.Current.Dispatcher.Invoke(() =>
+                switch (e.Type)
                 {
-                    AudioTrackDescriptions.Add(description);
-                });
+                    case TrackType.Audio:
+                        var audioTrackDescription = MediaPlayer.AudioTrackDescription.First(p => p.Id == e.Id);
+
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            AudioTrackDescriptions.Add(audioTrackDescription);
+                        });
+                        break;
+
+                    case TrackType.Video:
+                        var videoTrackDescription = MediaPlayer.VideoTrackDescription.First(p => p.Id == e.Id);
+
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            VideoTrackDescriptions.Add(videoTrackDescription);
+                        });
+                        break;
+                }
             }
         }
 
         private void MediaPlayer_ESDeleted(object sender, MediaPlayerESDeletedEventArgs e)
         {
-            if (e.Type == TrackType.Audio && e.Id >= 0)
+            if (e.Id >= 0)
             {
-                var description = AudioTrackDescriptions.First(p => p.Id == e.Id);
-
-                Application.Current.Dispatcher.Invoke(() =>
+                switch (e.Type)
                 {
-                    AudioTrackDescriptions.Remove(description);
-                });
+                    case TrackType.Audio:
+                        var audioTrackDescription = AudioTrackDescriptions.First(p => p.Id == e.Id);
+
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            AudioTrackDescriptions.Remove(audioTrackDescription);
+                        });
+                        break;
+
+                    case TrackType.Video:
+                        var videoTrackDescription = VideoTrackDescriptions.First(p => p.Id == e.Id);
+
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            VideoTrackDescriptions.Remove(videoTrackDescription);
+                        });
+                        break;
+                }
             }
         }
 
@@ -107,10 +144,16 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void AudioTrackSelectionChangedExecute(SelectionChangedEventArgs e)
+        private void AudioTrackSelectionChangedExecute(SelectionChangedEventArgs args)
         {
-            var trackDescription = (TrackDescription)e.AddedItems[0];
+            var trackDescription = (TrackDescription)args.AddedItems[0];
             MediaPlayer.SetAudioTrack(trackDescription.Id);
+        }
+
+        private void VideoTrackSelectionChangedExecute(SelectionChangedEventArgs args)
+        {
+            var trackDescription = (TrackDescription)args.AddedItems[0];
+            MediaPlayer.SetVideoTrack(trackDescription.Id);
         }
     }
 }
