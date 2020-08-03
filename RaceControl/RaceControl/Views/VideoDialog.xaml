@@ -27,6 +27,11 @@
                 Height="25"
                 Command="{Binding TogglePauseCommand}"
                 Content="Pause" />
+            <Button
+                Width="100"
+                Height="25"
+                Command="{Binding SyncVideoCommand}"
+                Content="Sync" />
             <ComboBox
                 Width="200"
                 DisplayMemberPath="Name"

@@ -1,8 +1,10 @@
 ﻿using LibVLCSharp.Shared;
 using LibVLCSharp.Shared.Structures;
 using Prism.Commands;
+using Prism.Events;
 using Prism.Services.Dialogs;
 using RaceControl.Core.Mvvm;
+using RaceControl.Events;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -13,9 +15,11 @@ namespace RaceControl.ViewModels
 {
     public class VideoDialogViewModel : DialogViewModelBase
     {
+        private readonly IEventAggregator _eventAggregator;
         private readonly LibVLC _libVLC;
 
         private ICommand _togglePauseCommand;
+        private ICommand _syncVideoCommand;
         private ICommand _audioTrackSelectionChangedCommand;
         private ICommand _videoTrackSelectionChangedCommand;
 
@@ -24,14 +28,16 @@ namespace RaceControl.ViewModels
         private ObservableCollection<TrackDescription> _audioTrackDescriptions;
         private ObservableCollection<TrackDescription> _videoTrackDescriptions;
 
-        public VideoDialogViewModel(LibVLC libVLC)
+        public VideoDialogViewModel(IEventAggregator eventAggregator, LibVLC libVLC)
         {
+            _eventAggregator = eventAggregator;
             _libVLC = libVLC;
         }
 
         public override string Title => "Video";
 
         public ICommand TogglePauseCommand => _togglePauseCommand ?? (_togglePauseCommand = new DelegateCommand(TogglePauseExecute));
+        public ICommand SyncVideoCommand => _syncVideoCommand ?? (_syncVideoCommand = new DelegateCommand(SyncVideoExecute));
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ?? (_audioTrackSelectionChangedCommand = new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute));
         public ICommand VideoTrackSelectionChangedCommand => _videoTrackSelectionChangedCommand ?? (_videoTrackSelectionChangedCommand = new DelegateCommand<SelectionChangedEventArgs>(VideoTrackSelectionChangedExecute));
 
@@ -63,9 +69,10 @@ namespace RaceControl.ViewModels
         {
             base.OnDialogOpened(parameters);
 
+            _eventAggregator.GetEvent<SyncVideoEvent>().Subscribe(SyncVideo);
+
             var url = parameters.GetValue<string>("url");
             Media = new Media(_libVLC, url, FromType.FromLocation);
-
             MediaPlayer = new MediaPlayer(_libVLC) { EnableHardwareDecoding = true };
             MediaPlayer.ESAdded += MediaPlayer_ESAdded;
             MediaPlayer.ESDeleted += MediaPlayer_ESDeleted;
@@ -142,6 +149,17 @@ namespace RaceControl.ViewModels
             {
                 MediaPlayer.Pause();
             }
+        }
+
+        private void SyncVideoExecute()
+        {
+            var payload = new SyncVideoEventPayload(MediaPlayer.Time);
+            _eventAggregator.GetEvent<SyncVideoEvent>().Publish(payload);
+        }
+
+        private void SyncVideo(SyncVideoEventPayload payload)
+        {
+            MediaPlayer.Time = payload.Time;
         }
 
         private void AudioTrackSelectionChangedExecute(SelectionChangedEventArgs args)
