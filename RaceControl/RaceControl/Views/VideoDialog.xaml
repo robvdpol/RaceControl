@@ -11,30 +11,28 @@
             <Setter Property="prism:Dialog.WindowStartupLocation" Value="CenterOwner" />
             <Setter Property="ResizeMode" Value="CanResizeWithGrip" />
             <Setter Property="ShowInTaskbar" Value="True" />
-            <Setter Property="Width" Value="800" />
-            <Setter Property="Height" Value="500" />
+            <Setter Property="Width" Value="1000" />
+            <Setter Property="Height" Value="600" />
         </Style>
     </prism:Dialog.WindowStyle>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="25" />
         </Grid.RowDefinitions>
         <vlc:VideoView Grid.Row="0" MediaPlayer="{Binding MediaPlayer}" />
         <StackPanel Grid.Row="1" Orientation="Horizontal">
             <Button
-                Width="100"
-                Height="25"
+                Width="75"
                 Command="{Binding TogglePauseCommand}"
                 Content="Pause" />
             <Button
-                Width="100"
-                Height="25"
+                Width="75"
                 Command="{Binding SyncVideoCommand}"
                 Content="Sync" />
-            <Label Content="Audio track" />
+            <Label Content="Audio" />
             <ComboBox
-                Width="200"
+                Width="175"
                 DisplayMemberPath="Name"
                 ItemsSource="{Binding AudioTrackDescriptions}">
                 <i:Interaction.Triggers>
@@ -43,9 +41,9 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </ComboBox>
-            <Label Content="Video track" />
+            <Label Content="Video" />
             <ComboBox
-                Width="200"
+                Width="175"
                 DisplayMemberPath="Name"
                 ItemsSource="{Binding VideoTrackDescriptions}">
                 <i:Interaction.Triggers>
@@ -56,13 +54,12 @@
             </ComboBox>
             <Label Content="Chromecast" />
             <ComboBox
-                Width="200"
+                Width="175"
                 DisplayMemberPath="Name"
                 ItemsSource="{Binding RendererItems}"
                 SelectedItem="{Binding SelectedRendererItem}" />
             <Button
-                Width="100"
-                Height="25"
+                Width="75"
                 Command="{Binding CastVideoCommand}"
                 Content="Cast" />
         </StackPanel>
