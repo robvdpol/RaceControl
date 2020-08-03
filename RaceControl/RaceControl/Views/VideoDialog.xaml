@@ -32,6 +32,7 @@
                 Height="25"
                 Command="{Binding SyncVideoCommand}"
                 Content="Sync" />
+            <Label Content="Audio track" />
             <ComboBox
                 Width="200"
                 DisplayMemberPath="Name"
@@ -42,6 +43,7 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </ComboBox>
+            <Label Content="Video track" />
             <ComboBox
                 Width="200"
                 DisplayMemberPath="Name"
@@ -52,6 +54,17 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </ComboBox>
+            <Label Content="Chromecast" />
+            <ComboBox
+                Width="200"
+                DisplayMemberPath="Name"
+                ItemsSource="{Binding RendererItems}"
+                SelectedItem="{Binding SelectedRendererItem}" />
+            <Button
+                Width="100"
+                Height="25"
+                Command="{Binding CastVideoCommand}"
+                Content="Cast" />
         </StackPanel>
     </Grid>
 </UserControl>
