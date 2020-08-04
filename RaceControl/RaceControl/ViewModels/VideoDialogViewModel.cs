@@ -56,7 +56,7 @@ namespace RaceControl.ViewModels
             _libVLC = libVLC;
         }
 
-        public override string Title => "Video";
+        public override string Title => _channel?.ToString();
 
         public ICommand MouseEnterCommand => _mouseEnterCommand ??= new DelegateCommand<MouseEventArgs>(MouseEnterExecute);
         public ICommand MouseLeaveCommand => _mouseLeaveCommand ??= new DelegateCommand<MouseEventArgs>(MouseLeaveExecute);
@@ -294,19 +294,6 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void OnSyncSession(SyncSessionEventPayload payload)
-        {
-            if (MediaPlayer.IsPlaying)
-            {
-                MediaPlayer.Time = payload.Time;
-            }
-
-            if (_mediaPlayerCast != null && _mediaPlayerCast.IsPlaying)
-            {
-                _mediaPlayerCast.Time = payload.Time;
-            }
-        }
-
         private void AudioTrackSelectionChangedExecute(SelectionChangedEventArgs args)
         {
             var trackDescription = (TrackDescription)args.AddedItems[0];
@@ -335,6 +322,19 @@ namespace RaceControl.ViewModels
             if (_mediaPlayerCast.Play(media) && MediaPlayer.IsPlaying)
             {
                 _mediaPlayerCast.Time = MediaPlayer.Time;
+            }
+        }
+
+        private void OnSyncSession(SyncSessionEventPayload payload)
+        {
+            if (MediaPlayer.IsPlaying)
+            {
+                MediaPlayer.Time = payload.Time;
+            }
+
+            if (_mediaPlayerCast != null && _mediaPlayerCast.IsPlaying)
+            {
+                _mediaPlayerCast.Time = payload.Time;
             }
         }
 
