@@ -13,7 +13,7 @@
             <Setter Property="SizeToContent" Value="WidthAndHeight" />
         </Style>
     </prism:Dialog.WindowStyle>
-    <Grid Margin="5">
+    <Grid Margin="2">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -34,12 +34,12 @@
         <TextBox
             Grid.Row="0"
             Grid.Column="1"
-            Margin="0,2"
+            Margin="2"
             Text="{Binding Email}" />
         <PasswordBox
             Grid.Row="1"
             Grid.Column="1"
-            Margin="0,2"
+            Margin="2"
             mvvm:PasswordBoxAssistant.BindPassword="True"
             mvvm:PasswordBoxAssistant.BoundPassword="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <Label
@@ -50,7 +50,7 @@
         <Button
             Grid.Row="2"
             Grid.Column="1"
-            Margin="0,2"
+            Margin="2"
             Command="{Binding LoginCommand}"
             Content="Login" />
     </Grid>

@@ -21,7 +21,6 @@ namespace RaceControl.ViewModels
         private string _email;
         private string _password;
         private string _error;
-        private bool _canClose;
 
         public LoginDialogViewModel(IAuthorizationService authorizationService)
         {
@@ -50,12 +49,6 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _error, value);
         }
 
-        public bool CanClose
-        {
-            get => _canClose;
-            set => SetProperty(ref _canClose, value);
-        }
-
         public override void OnDialogOpened(IDialogParameters parameters)
         {
             base.OnDialogOpened(parameters);
@@ -68,7 +61,7 @@ namespace RaceControl.ViewModels
 
         public override bool CanCloseDialog()
         {
-            return CanClose;
+            return true;
         }
 
         private bool CanLoginExecute()
@@ -92,7 +85,6 @@ namespace RaceControl.ViewModels
             }
 
             SaveCredential();
-            CanClose = true;
             RaiseRequestClose(new DialogResult(ButtonResult.OK, new DialogParameters
             {
                 { "token", token.Token }

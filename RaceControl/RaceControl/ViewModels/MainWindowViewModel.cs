@@ -9,6 +9,7 @@ using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace RaceControl.ViewModels
@@ -47,7 +48,7 @@ namespace RaceControl.ViewModels
 
         public string Title => "Race Control";
 
-        public ICommand LoadedCommand => _loadedCommand ??= new DelegateCommand(LoadedExecute);
+        public ICommand LoadedCommand => _loadedCommand ??= new DelegateCommand<RoutedEventArgs>(LoadedExecute);
         public ICommand SeasonSelectionChangedCommand => _seasonSelectionChangedCommand ??= new DelegateCommand(SeasonSelectionChangedExecute);
         public ICommand EventSelectionChangedCommand => _eventSelectionChangedCommand ??= new DelegateCommand(EventSelectionChangedExecute);
         public ICommand SessionSelectionChangedCommand => _sessionSelectionChangedCommand ??= new DelegateCommand(SessionSelectionChangedExecute);
@@ -115,17 +116,31 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _selectedVodType, value);
         }
 
-        private void LoadedExecute()
+        private async void LoadedExecute(RoutedEventArgs args)
         {
             if (!_loaded)
             {
                 _loaded = true;
 
-                _dialogService.ShowDialog(nameof(LoginDialog), null, async r =>
+                _dialogService.ShowDialog(nameof(LoginDialog), null, dialogResult =>
                 {
-                    _token = r.Parameters.GetValue<string>("token");
-                    await Initialize();
+                    if (dialogResult.Result == ButtonResult.OK)
+                    {
+                        _token = dialogResult.Parameters.GetValue<string>("token");
+                    }
                 });
+
+                if (string.IsNullOrWhiteSpace(_token))
+                {
+                    if (args.Source is Window window)
+                    {
+                        window.Close();
+                    }
+
+                    return;
+                }
+
+                await Initialize();
             }
         }
 

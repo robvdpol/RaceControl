@@ -49,38 +49,45 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel
                     Grid.Column="0"
-                    Margin="3"
+                    Margin="2"
                     Orientation="Horizontal">
                     <Button
                         Width="70"
+                        Margin="2"
                         Command="{Binding TogglePauseCommand}"
                         Content="Pause" />
                     <Button
                         Width="70"
+                        Margin="2"
                         Command="{Binding SyncSessionCommand}"
                         Content="Sync" />
                     <Button
                         Width="70"
+                        Margin="2"
                         Command="{Binding FastForwardCommand}"
                         CommandParameter="-60"
                         Content="-1 min" />
                     <Button
                         Width="70"
+                        Margin="2"
                         Command="{Binding FastForwardCommand}"
                         CommandParameter="-10"
                         Content="-10 sec" />
                     <Button
                         Width="70"
+                        Margin="2"
                         Command="{Binding FastForwardCommand}"
                         CommandParameter="10"
                         Content="+10 sec" />
                     <Button
                         Width="70"
+                        Margin="2"
                         Command="{Binding FastForwardCommand}"
                         CommandParameter="60"
                         Content="+1 min" />
                     <Button
                         Width="70"
+                        Margin="2"
                         Command="{Binding ToggleFullScreenCommand}"
                         Content="Fullscreen" />
                     <!--
@@ -99,16 +106,18 @@
                 </StackPanel>
                 <StackPanel
                     Grid.Column="1"
-                    Margin="3"
+                    Margin="2"
                     Orientation="Horizontal">
                     <Grid>
                         <ComboBox
                             Width="200"
+                            Margin="2"
                             DisplayMemberPath="Name"
                             ItemsSource="{Binding RendererItems}"
                             SelectedItem="{Binding SelectedRendererItem}" />
                         <TextBlock
                             Width="200"
+                            Margin="2"
                             Padding="6,0,0,2"
                             VerticalAlignment="Center"
                             IsHitTestVisible="False"
@@ -127,6 +136,7 @@
                     </Grid>
                     <Button
                         Width="70"
+                        Margin="2"
                         Command="{Binding CastVideoCommand}"
                         Content="Cast" />
                 </StackPanel>
