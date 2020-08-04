@@ -35,7 +35,7 @@ namespace RaceControl.ViewModels
 
         private string _token;
         private Channel _channel;
-        private SubscriptionToken _syncVideoToken;
+        private SubscriptionToken _syncSessionSubscriptionToken;
         private MediaPlayer _mediaPlayer;
         private MediaPlayer _mediaPlayerCast;
         private ObservableCollection<TrackDescription> _audioTrackDescriptions;
@@ -144,7 +144,7 @@ namespace RaceControl.ViewModels
 
             if (MediaPlayer.Play(await CreatePlaybackMedia()))
             {
-                _syncVideoToken = _eventAggregator.GetEvent<SyncVideoEvent>().Subscribe(OnSyncVideo);
+                _syncSessionSubscriptionToken = _eventAggregator.GetEvent<SyncSessionEvent>().Subscribe(OnSyncSession);
             }
 
             _rendererDiscoverer = new RendererDiscoverer(_libVLC);
@@ -159,9 +159,9 @@ namespace RaceControl.ViewModels
             _rendererDiscoverer.ItemAdded -= RendererDiscoverer_ItemAdded;
             _rendererDiscoverer.Stop();
 
-            if (_syncVideoToken != null)
+            if (_syncSessionSubscriptionToken != null)
             {
-                _eventAggregator.GetEvent<SyncVideoEvent>().Unsubscribe(_syncVideoToken);
+                _eventAggregator.GetEvent<SyncSessionEvent>().Unsubscribe(_syncSessionSubscriptionToken);
             }
 
             MediaPlayer.ESAdded -= MediaPlayer_ESAdded;
@@ -270,8 +270,8 @@ namespace RaceControl.ViewModels
         private void SyncSessionExecute()
         {
             // todo: only sync videos from same session
-            var payload = new SyncVideoEventPayload(MediaPlayer.Time);
-            _eventAggregator.GetEvent<SyncVideoEvent>().Publish(payload);
+            var payload = new SyncSessionEventPayload(MediaPlayer.Time);
+            _eventAggregator.GetEvent<SyncSessionEvent>().Publish(payload);
         }
 
         private void FastForwardExecute()
@@ -294,7 +294,7 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void OnSyncVideo(SyncVideoEventPayload payload)
+        private void OnSyncSession(SyncSessionEventPayload payload)
         {
             if (MediaPlayer.IsPlaying)
             {
