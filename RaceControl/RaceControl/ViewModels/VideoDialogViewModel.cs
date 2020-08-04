@@ -276,10 +276,7 @@ namespace RaceControl.ViewModels
 
         private void FastForwardExecute()
         {
-            if (MediaPlayer.IsPlaying)
-            {
-                MediaPlayer.Time = MediaPlayer.Time + 60000;
-            }
+            ChangeTime(60);
         }
 
         private void ToggleFullScreenExecute()
@@ -335,6 +332,14 @@ namespace RaceControl.ViewModels
             if (_mediaPlayerCast != null && _mediaPlayerCast.IsPlaying)
             {
                 _mediaPlayerCast.Time = payload.Time;
+            }
+        }
+
+        private void ChangeTime(int seconds)
+        {
+            if (MediaPlayer.IsPlaying)
+            {
+                MediaPlayer.Time = MediaPlayer.Time + (seconds * 1000);
             }
         }
 
