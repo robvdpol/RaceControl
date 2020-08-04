@@ -61,11 +61,23 @@
                         Content="Sync" />
                     <Button
                         Width="70"
-                        Command="{Binding FastForwardTenSecondsCommand}"
+                        Command="{Binding FastForwardCommand}"
+                        CommandParameter="-60"
+                        Content="-1 min" />
+                    <Button
+                        Width="70"
+                        Command="{Binding FastForwardCommand}"
+                        CommandParameter="-10"
+                        Content="-10 sec" />
+                    <Button
+                        Width="70"
+                        Command="{Binding FastForwardCommand}"
+                        CommandParameter="10"
                         Content="+10 sec" />
                     <Button
                         Width="70"
-                        Command="{Binding FastForwardOneMinuteCommand}"
+                        Command="{Binding FastForwardCommand}"
+                        CommandParameter="60"
                         Content="+1 min" />
                     <Button
                         Width="70"

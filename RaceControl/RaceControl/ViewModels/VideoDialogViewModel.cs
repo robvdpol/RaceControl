@@ -29,8 +29,7 @@ namespace RaceControl.ViewModels
         private ICommand _mouseDownCommand;
         private ICommand _togglePauseCommand;
         private ICommand _syncSessionCommand;
-        private ICommand _fastForwardTenSecondsCommand;
-        private ICommand _fastForwardOneMinuteCommand;
+        private ICommand _fastForwardCommand;
         private ICommand _toggleFullScreenCommand;
         private ICommand _audioTrackSelectionChangedCommand;
         private ICommand _castVideoCommand;
@@ -65,8 +64,7 @@ namespace RaceControl.ViewModels
         public ICommand MouseDownCommand => _mouseDownCommand ??= new DelegateCommand<MouseButtonEventArgs>(MouseDownExecute);
         public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute);
         public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute);
-        public ICommand FastForwardTenSecondsCommand => _fastForwardTenSecondsCommand ??= new DelegateCommand(FastForwardTenSecondsExecute);
-        public ICommand FastForwardOneMinuteCommand => _fastForwardOneMinuteCommand ??= new DelegateCommand(FastForwardOneMinuteExecute);
+        public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<string>(FastForwardExecute);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand(ToggleFullScreenExecute);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
         public ICommand CastVideoCommand => _castVideoCommand ??= new DelegateCommand(CastVideoExecute, CanCastVideoExecute).ObservesProperty(() => SelectedRendererItem);
@@ -268,14 +266,12 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void FastForwardTenSecondsExecute()
+        private void FastForwardExecute(string value)
         {
-            ChangeTime(10);
-        }
-
-        private void FastForwardOneMinuteExecute()
-        {
-            ChangeTime(60);
+            if (MediaPlayer.IsPlaying && int.TryParse(value, out var seconds))
+            {
+                MediaPlayer.Time = MediaPlayer.Time + (seconds * 1000);
+            }
         }
 
         private void ToggleFullScreenExecute()
@@ -328,14 +324,6 @@ namespace RaceControl.ViewModels
                 {
                     _mediaPlayerCast.Time = payload.Time;
                 }
-            }
-        }
-
-        private void ChangeTime(int seconds)
-        {
-            if (MediaPlayer.IsPlaying)
-            {
-                MediaPlayer.Time = MediaPlayer.Time + (seconds * 1000);
             }
         }
 
