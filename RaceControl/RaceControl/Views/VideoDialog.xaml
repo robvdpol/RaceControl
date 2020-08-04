@@ -59,7 +59,6 @@
                     Width="75"
                     Command="{Binding ToggleFullScreenCommand}"
                     Content="Fullscreen" />
-                <!--
                 <Label Content="Audio" />
                 <ComboBox
                     Width="175"
@@ -71,18 +70,6 @@
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </ComboBox>
-                <Label Content="Video" />
-                <ComboBox
-                    Width="175"
-                    DisplayMemberPath="Name"
-                    ItemsSource="{Binding VideoTrackDescriptions}">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="SelectionChanged">
-                            <i:InvokeCommandAction Command="{Binding VideoTrackSelectionChangedCommand}" PassEventArgsToCommand="True" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </ComboBox>
-                -->
                 <Label Content="Chromecast" />
                 <ComboBox
                     Width="175"

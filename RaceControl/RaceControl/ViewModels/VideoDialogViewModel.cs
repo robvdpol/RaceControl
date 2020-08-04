@@ -30,7 +30,6 @@ namespace RaceControl.ViewModels
         private ICommand _fastForwardCommand;
         private ICommand _toggleFullScreenCommand;
         private ICommand _audioTrackSelectionChangedCommand;
-        private ICommand _videoTrackSelectionChangedCommand;
         private ICommand _castVideoCommand;
 
         private string _token;
@@ -40,7 +39,6 @@ namespace RaceControl.ViewModels
         private MediaPlayer _mediaPlayer;
         private MediaPlayer _mediaPlayerCast;
         private ObservableCollection<TrackDescription> _audioTrackDescriptions;
-        private ObservableCollection<TrackDescription> _videoTrackDescriptions;
         private RendererDiscoverer _rendererDiscoverer;
         private ObservableCollection<RendererItem> _rendererItems;
         private RendererItem _selectedRendererItem;
@@ -67,7 +65,6 @@ namespace RaceControl.ViewModels
         public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand(FastForwardExecute);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand(ToggleFullScreenExecute);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
-        public ICommand VideoTrackSelectionChangedCommand => _videoTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(VideoTrackSelectionChangedExecute);
         public ICommand CastVideoCommand => _castVideoCommand ??= new DelegateCommand(CastVideoExecute, CanCastVideoExecute).ObservesProperty(() => SelectedRendererItem);
 
         public MediaPlayer MediaPlayer
@@ -80,12 +77,6 @@ namespace RaceControl.ViewModels
         {
             get => _audioTrackDescriptions ??= new ObservableCollection<TrackDescription>();
             set => SetProperty(ref _audioTrackDescriptions, value);
-        }
-
-        public ObservableCollection<TrackDescription> VideoTrackDescriptions
-        {
-            get => _videoTrackDescriptions ??= new ObservableCollection<TrackDescription>();
-            set => SetProperty(ref _videoTrackDescriptions, value);
         }
 
         public ObservableCollection<RendererItem> RendererItems
@@ -203,15 +194,6 @@ namespace RaceControl.ViewModels
                             AudioTrackDescriptions.Add(audioTrackDescription);
                         });
                         break;
-
-                    case TrackType.Video:
-                        var videoTrackDescription = MediaPlayer.VideoTrackDescription.First(p => p.Id == e.Id);
-
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            VideoTrackDescriptions.Add(videoTrackDescription);
-                        });
-                        break;
                 }
             }
         }
@@ -228,15 +210,6 @@ namespace RaceControl.ViewModels
                         Application.Current.Dispatcher.Invoke(() =>
                         {
                             AudioTrackDescriptions.Remove(audioTrackDescription);
-                        });
-                        break;
-
-                    case TrackType.Video:
-                        var videoTrackDescription = VideoTrackDescriptions.First(p => p.Id == e.Id);
-
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            VideoTrackDescriptions.Remove(videoTrackDescription);
                         });
                         break;
                 }
@@ -296,12 +269,6 @@ namespace RaceControl.ViewModels
         {
             var trackDescription = (TrackDescription)args.AddedItems[0];
             MediaPlayer.SetAudioTrack(trackDescription.Id);
-        }
-
-        private void VideoTrackSelectionChangedExecute(SelectionChangedEventArgs args)
-        {
-            var trackDescription = (TrackDescription)args.AddedItems[0];
-            MediaPlayer.SetVideoTrack(trackDescription.Id);
         }
 
         private bool CanCastVideoExecute()
@@ -376,8 +343,9 @@ namespace RaceControl.ViewModels
         private async Task<Media> CreatePlaybackMedia()
         {
             var url = await _apiService.GetTokenisedUrlForChannelAsync(_token, _channel.Self);
+            var media = new Media(_libVLC, url, FromType.FromLocation);
 
-            return new Media(_libVLC, url, FromType.FromLocation);
+            return media;
         }
     }
 }
