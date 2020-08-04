@@ -13,7 +13,7 @@
             <i:InvokeCommandAction Command="{Binding LoadedCommand}" PassEventArgsToCommand="True" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
-    <Grid>
+    <Grid Margin="2">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -34,6 +34,7 @@
         <ListView
             Grid.Row="1"
             Grid.Column="0"
+            Margin="2"
             ItemsSource="{Binding Seasons}"
             SelectedItem="{Binding SelectedSeason}"
             SelectionMode="Single">
@@ -51,6 +52,7 @@
         <ListView
             Grid.Row="1"
             Grid.Column="1"
+            Margin="2"
             ItemsSource="{Binding Events}"
             SelectedItem="{Binding SelectedEvent}"
             SelectionMode="Single">
@@ -68,6 +70,7 @@
         <ListView
             Grid.Row="1"
             Grid.Column="2"
+            Margin="2"
             ItemsSource="{Binding Sessions}"
             SelectedItem="{Binding SelectedSession}"
             SelectionMode="Single">
@@ -85,6 +88,7 @@
         <ListView
             Grid.Row="1"
             Grid.Column="3"
+            Margin="2"
             HorizontalContentAlignment="Stretch"
             ItemsSource="{Binding Channels}">
             <ListView.ItemContainerStyle>
@@ -118,6 +122,7 @@
         <ListView
             Grid.Row="3"
             Grid.Column="0"
+            Margin="2"
             ItemsSource="{Binding VodTypes}"
             SelectedItem="{Binding SelectedVodType}"
             SelectionMode="Single">
@@ -137,6 +142,7 @@
             Grid.Row="3"
             Grid.Column="1"
             Grid.ColumnSpan="2"
+            Margin="2"
             HorizontalContentAlignment="Stretch"
             ItemsSource="{Binding Episodes}">
             <ListView.ItemContainerStyle>
