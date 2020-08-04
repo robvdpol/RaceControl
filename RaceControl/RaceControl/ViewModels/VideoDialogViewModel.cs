@@ -59,7 +59,7 @@ namespace RaceControl.ViewModels
             _libVLC = libVLC;
         }
 
-        public override string Title => $"{_session} - {_channel}";
+        public override string Title => _channel != null ? $"{_session} - {_channel}" : $"{_episode}";
 
         public ICommand MouseEnterCommand => _mouseEnterCommand ??= new DelegateCommand(MouseEnterExecute);
         public ICommand MouseLeaveCommand => _mouseLeaveCommand ??= new DelegateCommand(MouseLeaveExecute);
