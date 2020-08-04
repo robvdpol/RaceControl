@@ -10,6 +10,7 @@ using RaceControl.Services.Interfaces.F1TV.Api;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -21,6 +22,7 @@ namespace RaceControl.ViewModels
         private readonly IEventAggregator _eventAggregator;
         private readonly IApiService _apiService;
         private readonly LibVLC _libVLC;
+        private readonly Timer _showControlsTimer = new Timer();
 
         private ICommand _mouseEnterCommand;
         private ICommand _mouseLeaveCommand;
@@ -145,14 +147,23 @@ namespace RaceControl.ViewModels
             _rendererDiscoverer = new RendererDiscoverer(_libVLC);
             _rendererDiscoverer.ItemAdded += RendererDiscoverer_ItemAdded;
             _rendererDiscoverer.Start();
+
+            _showControlsTimer.AutoReset = false;
+            _showControlsTimer.Interval = 1500;
+            _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
         }
 
         public override void OnDialogClosed()
         {
             base.OnDialogClosed();
 
+            _showControlsTimer.Elapsed -= ShowControlsTimer_Elapsed;
+            _showControlsTimer.Stop();
+            _showControlsTimer.Dispose();
+
             _rendererDiscoverer.ItemAdded -= RendererDiscoverer_ItemAdded;
             _rendererDiscoverer.Stop();
+            _rendererDiscoverer.Dispose();
 
             if (_syncSessionSubscriptionToken != null)
             {
@@ -218,14 +229,20 @@ namespace RaceControl.ViewModels
             }
         }
 
+        private void ShowControlsTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            ShowControls = false;
+        }
+
         private void MouseEnterExecute(MouseEventArgs args)
         {
+            _showControlsTimer.Stop();
             ShowControls = true;
         }
 
         private void MouseLeaveExecute(MouseEventArgs args)
         {
-            ShowControls = false;
+            _showControlsTimer.Start();
         }
 
         private void MouseDownExecute(MouseButtonEventArgs args)
