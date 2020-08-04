@@ -159,6 +159,7 @@ namespace RaceControl.ViewModels
             var parameters = new DialogParameters
             {
                 { "token", _token },
+                { "session", SelectedSession },
                 { "channel", channel }
             };
 

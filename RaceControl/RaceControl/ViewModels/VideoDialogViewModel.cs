@@ -34,6 +34,7 @@ namespace RaceControl.ViewModels
         private ICommand _castVideoCommand;
 
         private string _token;
+        private Session _session;
         private Channel _channel;
         private SubscriptionToken _syncSessionSubscriptionToken;
         private MediaPlayer _mediaPlayer;
@@ -56,7 +57,7 @@ namespace RaceControl.ViewModels
             _libVLC = libVLC;
         }
 
-        public override string Title => _channel?.ToString();
+        public override string Title => $"{_session} - {_channel}";
 
         public ICommand MouseEnterCommand => _mouseEnterCommand ??= new DelegateCommand<MouseEventArgs>(MouseEnterExecute);
         public ICommand MouseLeaveCommand => _mouseLeaveCommand ??= new DelegateCommand<MouseEventArgs>(MouseLeaveExecute);
@@ -136,6 +137,7 @@ namespace RaceControl.ViewModels
             SetWindowed();
 
             _token = parameters.GetValue<string>("token");
+            _session = parameters.GetValue<Session>("session");
             _channel = parameters.GetValue<Channel>("channel");
 
             MediaPlayer = CreateMediaPlayer();
@@ -269,8 +271,7 @@ namespace RaceControl.ViewModels
 
         private void SyncSessionExecute()
         {
-            // todo: only sync videos from same session
-            var payload = new SyncSessionEventPayload(MediaPlayer.Time);
+            var payload = new SyncSessionEventPayload(_session.UID, MediaPlayer.Time);
             _eventAggregator.GetEvent<SyncSessionEvent>().Publish(payload);
         }
 
@@ -324,14 +325,17 @@ namespace RaceControl.ViewModels
 
         private void OnSyncSession(SyncSessionEventPayload payload)
         {
-            if (MediaPlayer.IsPlaying)
+            if (_session.UID == payload.SessionUID)
             {
-                MediaPlayer.Time = payload.Time;
-            }
+                if (MediaPlayer.IsPlaying)
+                {
+                    MediaPlayer.Time = payload.Time;
+                }
 
-            if (_mediaPlayerCast != null && _mediaPlayerCast.IsPlaying)
-            {
-                _mediaPlayerCast.Time = payload.Time;
+                if (_mediaPlayerCast != null && _mediaPlayerCast.IsPlaying)
+                {
+                    _mediaPlayerCast.Time = payload.Time;
+                }
             }
         }
 

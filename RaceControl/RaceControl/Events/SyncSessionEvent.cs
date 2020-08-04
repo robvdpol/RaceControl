@@ -8,11 +8,13 @@ namespace RaceControl.Events
 
     public class SyncSessionEventPayload
     {
-        public SyncSessionEventPayload(long time)
+        public SyncSessionEventPayload(string sessionUID, long time)
         {
+            SessionUID = sessionUID;
             Time = time;
         }
 
+        public string SessionUID { get; }
         public long Time { get; }
     }
 }
