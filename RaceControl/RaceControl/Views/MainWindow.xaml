@@ -113,11 +113,13 @@
         <Label
             Grid.Row="2"
             Grid.Column="0"
+            Grid.ColumnSpan="2"
             Content="Video On Demand"
             FontWeight="Bold" />
         <ListView
             Grid.Row="3"
             Grid.Column="0"
+            Grid.ColumnSpan="2"
             Margin="2"
             ItemsSource="{Binding VodTypes}"
             SelectedItem="{Binding SelectedVodType}"
@@ -130,13 +132,13 @@
         </ListView>
         <Label
             Grid.Row="2"
-            Grid.Column="1"
+            Grid.Column="2"
             Grid.ColumnSpan="2"
             Content="Episodes"
             FontWeight="Bold" />
         <ListView
             Grid.Row="3"
-            Grid.Column="1"
+            Grid.Column="2"
             Grid.ColumnSpan="2"
             Margin="2"
             HorizontalContentAlignment="Stretch"

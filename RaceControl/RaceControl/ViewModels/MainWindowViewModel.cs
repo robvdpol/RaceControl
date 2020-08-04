@@ -156,7 +156,7 @@ namespace RaceControl.ViewModels
         {
             ClearEvents();
 
-            if (SelectedSeason != null)
+            if (SelectedSeason != null && SelectedSeason.EventOccurrenceUrls.Any())
             {
                 var events = new ConcurrentBag<Event>();
                 var tasks = SelectedSeason.EventOccurrenceUrls.Select(async eventUrl =>
@@ -172,7 +172,7 @@ namespace RaceControl.ViewModels
         {
             ClearSessions();
 
-            if (SelectedEvent != null)
+            if (SelectedEvent != null && SelectedEvent.SessionOccurrenceUrls.Any())
             {
                 var sessions = new ConcurrentBag<Session>();
                 var tasks = SelectedEvent.SessionOccurrenceUrls.Select(async sessionUrl =>
@@ -186,11 +186,24 @@ namespace RaceControl.ViewModels
 
         private async void SessionSelectionChangedExecute()
         {
+            SelectedVodType = null;
             ClearChannels();
+            ClearEpisodes();
 
             if (SelectedSession != null)
             {
                 Channels.AddRange(await _apiService.GetChannelsAsync(SelectedSession.UID));
+
+                if (SelectedSession.ContentUrls.Any())
+                {
+                    var episodes = new ConcurrentBag<Episode>();
+                    var tasks = SelectedSession.ContentUrls.Select(async episodeUrl =>
+                    {
+                        episodes.Add(await _apiService.GetEpisodeAsync(episodeUrl.GetUID()));
+                    });
+                    await Task.WhenAll(tasks);
+                    Episodes.AddRange(episodes.OrderBy(e => e.Title));
+                }
             }
         }
 
@@ -208,9 +221,11 @@ namespace RaceControl.ViewModels
 
         private async void VodTypeSelectionChangedExecute()
         {
+            SelectedSession = null;
             ClearEpisodes();
+            ClearChannels();
 
-            if (SelectedVodType != null)
+            if (SelectedVodType != null && SelectedVodType.ContentUrls.Any())
             {
                 var episodes = new ConcurrentBag<Episode>();
                 var tasks = SelectedVodType.ContentUrls.Select(async episodeUrl =>
