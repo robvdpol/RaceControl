@@ -27,7 +27,8 @@ namespace RaceControl.ViewModels
         private ICommand _mouseDownCommand;
         private ICommand _togglePauseCommand;
         private ICommand _syncSessionCommand;
-        private ICommand _fastForwardCommand;
+        private ICommand _fastForwardTenSecondsCommand;
+        private ICommand _fastForwardOneMinuteCommand;
         private ICommand _toggleFullScreenCommand;
         private ICommand _audioTrackSelectionChangedCommand;
         private ICommand _castVideoCommand;
@@ -62,7 +63,8 @@ namespace RaceControl.ViewModels
         public ICommand MouseDownCommand => _mouseDownCommand ??= new DelegateCommand<MouseButtonEventArgs>(MouseDownExecute);
         public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute);
         public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute);
-        public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand(FastForwardExecute);
+        public ICommand FastForwardTenSecondsCommand => _fastForwardTenSecondsCommand ??= new DelegateCommand(FastForwardTenSecondsExecute);
+        public ICommand FastForwardOneMinuteCommand => _fastForwardOneMinuteCommand ??= new DelegateCommand(FastForwardOneMinuteExecute);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand(ToggleFullScreenExecute);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
         public ICommand CastVideoCommand => _castVideoCommand ??= new DelegateCommand(CastVideoExecute, CanCastVideoExecute).ObservesProperty(() => SelectedRendererItem);
@@ -228,9 +230,9 @@ namespace RaceControl.ViewModels
 
         private void MouseDownExecute(MouseButtonEventArgs args)
         {
-            if (args.ClickCount == 2)
+            if (args.ClickCount == 2 && ToggleFullScreenCommand.CanExecute(null))
             {
-                ToggleFullScreenExecute();
+                ToggleFullScreenCommand.Execute(null);
             }
         }
 
@@ -244,11 +246,19 @@ namespace RaceControl.ViewModels
 
         private void SyncSessionExecute()
         {
-            var payload = new SyncSessionEventPayload(_session.UID, MediaPlayer.Time);
-            _eventAggregator.GetEvent<SyncSessionEvent>().Publish(payload);
+            if (MediaPlayer.IsPlaying)
+            {
+                var payload = new SyncSessionEventPayload(_session.UID, MediaPlayer.Time);
+                _eventAggregator.GetEvent<SyncSessionEvent>().Publish(payload);
+            }
         }
 
-        private void FastForwardExecute()
+        private void FastForwardTenSecondsExecute()
+        {
+            ChangeTime(10);
+        }
+
+        private void FastForwardOneMinuteExecute()
         {
             ChangeTime(60);
         }

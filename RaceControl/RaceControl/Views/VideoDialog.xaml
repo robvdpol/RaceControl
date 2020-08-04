@@ -38,49 +38,68 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <StackPanel
+            <Grid
                 Grid.Row="1"
-                Background="LightGray"
-                Orientation="Horizontal"
+                Height="34"
+                Background="White"
                 Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <Button
-                    Width="75"
-                    Command="{Binding TogglePauseCommand}"
-                    Content="Pause" />
-                <Button
-                    Width="75"
-                    Command="{Binding SyncSessionCommand}"
-                    Content="Sync" />
-                <Button
-                    Width="75"
-                    Command="{Binding FastForwardCommand}"
-                    Content="+1 min" />
-                <Button
-                    Width="75"
-                    Command="{Binding ToggleFullScreenCommand}"
-                    Content="Fullscreen" />
-                <Label Content="Audio" />
-                <ComboBox
-                    Width="175"
-                    DisplayMemberPath="Name"
-                    ItemsSource="{Binding AudioTrackDescriptions}">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="SelectionChanged">
-                            <i:InvokeCommandAction Command="{Binding AudioTrackSelectionChangedCommand}" PassEventArgsToCommand="True" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </ComboBox>
-                <Label Content="Chromecast" />
-                <ComboBox
-                    Width="175"
-                    DisplayMemberPath="Name"
-                    ItemsSource="{Binding RendererItems}"
-                    SelectedItem="{Binding SelectedRendererItem}" />
-                <Button
-                    Width="75"
-                    Command="{Binding CastVideoCommand}"
-                    Content="Cast" />
-            </StackPanel>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel
+                    Grid.Column="0"
+                    Margin="4"
+                    Orientation="Horizontal">
+                    <Button
+                        Width="70"
+                        Command="{Binding TogglePauseCommand}"
+                        Content="Pause" />
+                    <Button
+                        Width="70"
+                        Command="{Binding SyncSessionCommand}"
+                        Content="Sync" />
+                    <Button
+                        Width="70"
+                        Command="{Binding FastForwardTenSecondsCommand}"
+                        Content="+10 sec" />
+                    <Button
+                        Width="70"
+                        Command="{Binding FastForwardOneMinuteCommand}"
+                        Content="+1 min" />
+                    <Button
+                        Width="70"
+                        Command="{Binding ToggleFullScreenCommand}"
+                        Content="Fullscreen" />
+                    <!--
+                    <Label Content="Audio" />
+                    <ComboBox
+                        Width="175"
+                        DisplayMemberPath="Name"
+                        ItemsSource="{Binding AudioTrackDescriptions}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="SelectionChanged">
+                                <i:InvokeCommandAction Command="{Binding AudioTrackSelectionChangedCommand}" PassEventArgsToCommand="True" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ComboBox>
+                    -->
+                </StackPanel>
+                <StackPanel
+                    Grid.Column="1"
+                    Margin="4"
+                    Orientation="Horizontal">
+                    <ComboBox
+                        Width="200"
+                        DisplayMemberPath="Name"
+                        ItemsSource="{Binding RendererItems}"
+                        SelectedItem="{Binding SelectedRendererItem}" />
+                    <Button
+                        Width="70"
+                        Command="{Binding CastVideoCommand}"
+                        Content="Cast" />
+                </StackPanel>
+            </Grid>
         </Grid>
     </vlc:VideoView>
 </UserControl>
