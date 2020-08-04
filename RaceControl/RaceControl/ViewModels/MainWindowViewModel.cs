@@ -2,6 +2,7 @@
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
 using RaceControl.Common;
+using RaceControl.Comparers;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Api;
 using RaceControl.Views;
@@ -192,7 +193,8 @@ namespace RaceControl.ViewModels
 
             if (SelectedSession != null)
             {
-                Channels.AddRange(await _apiService.GetChannelsAsync(SelectedSession.UID));
+                var channels = await _apiService.GetChannelsAsync(SelectedSession.UID);
+                Channels.AddRange(channels.OrderBy(c => c.Name, new ChannelComparer()));
 
                 if (SelectedSession.ContentUrls.Any())
                 {

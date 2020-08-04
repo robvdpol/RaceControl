@@ -5,6 +5,11 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
 {
     public class Channel
     {
+        public const string WIF = "WIF";
+        public const string PitLane = "pit lane";
+        public const string Driver = "driver";
+        public const string Data = "data";
+
         [JsonProperty("uid")]
         public string UID { get; set; }
 
@@ -22,16 +27,16 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         {
             switch (Name)
             {
-                case "WIF":
+                case WIF:
                     return "World Feed";
 
-                case "pit lane":
+                case PitLane:
                     return "Pit Lane";
 
-                case "driver":
+                case Driver:
                     return "Driver Tracker";
 
-                case "data":
+                case Data:
                     return "Data";
             }
 
