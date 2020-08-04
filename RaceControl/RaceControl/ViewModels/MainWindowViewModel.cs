@@ -227,7 +227,6 @@ namespace RaceControl.ViewModels
             var parameters = new DialogParameters
             {
                 { "token", _token },
-                { "vodtype", SelectedVodType },
                 { "episode", episode }
             };
 

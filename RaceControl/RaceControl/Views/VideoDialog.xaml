@@ -113,6 +113,7 @@
                             Width="200"
                             Margin="2"
                             DisplayMemberPath="Name"
+                            IsEnabled="{Binding HasItems, RelativeSource={RelativeSource Self}}"
                             ItemsSource="{Binding RendererItems}"
                             SelectedItem="{Binding SelectedRendererItem}" />
                         <TextBlock

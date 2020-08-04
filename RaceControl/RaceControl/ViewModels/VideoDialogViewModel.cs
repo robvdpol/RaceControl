@@ -37,7 +37,6 @@ namespace RaceControl.ViewModels
         private string _token;
         private Session _session;
         private Channel _channel;
-        private VodType _vodType;
         private Episode _episode;
         private SubscriptionToken _syncSessionSubscriptionToken;
         private MediaPlayer _mediaPlayer;
@@ -134,7 +133,6 @@ namespace RaceControl.ViewModels
             _token = parameters.GetValue<string>("token");
             _session = parameters.GetValue<Session>("session");
             _channel = parameters.GetValue<Channel>("channel");
-            _vodType = parameters.GetValue<VodType>("vodtype");
             _episode = parameters.GetValue<Episode>("episode");
 
             MediaPlayer = CreateMediaPlayer();
@@ -263,7 +261,7 @@ namespace RaceControl.ViewModels
 
         private void SyncSessionExecute()
         {
-            if (MediaPlayer.IsPlaying)
+            if (MediaPlayer.IsPlaying && _session != null)
             {
                 var payload = new SyncSessionEventPayload(_session.UID, MediaPlayer.Time);
                 _eventAggregator.GetEvent<SyncSessionEvent>().Publish(payload);
@@ -317,7 +315,7 @@ namespace RaceControl.ViewModels
 
         private void OnSyncSession(SyncSessionEventPayload payload)
         {
-            if (_session.UID == payload.SessionUID)
+            if (_session != null && _session.UID == payload.SessionUID)
             {
                 if (MediaPlayer.IsPlaying)
                 {
