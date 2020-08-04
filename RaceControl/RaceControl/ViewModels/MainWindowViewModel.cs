@@ -46,7 +46,7 @@ namespace RaceControl.ViewModels
             _apiService = apiService;
         }
 
-        public string Title => "Race Control";
+        public string Title => "Race Control - An open source F1TV client";
 
         public ICommand LoadedCommand => _loadedCommand ??= new DelegateCommand<RoutedEventArgs>(LoadedExecute);
         public ICommand SeasonSelectionChangedCommand => _seasonSelectionChangedCommand ??= new DelegateCommand(SeasonSelectionChangedExecute);
