@@ -27,7 +27,7 @@ namespace RaceControl.ViewModels
             _authorizationService = authorizationService;
         }
 
-        public override string Title => "Login to F1TV";
+        public override string Title => "Login";
 
         public ICommand LoginCommand => _loginCommand ??= new DelegateCommand(LoginExecute, CanLoginExecute).ObservesProperty(() => Email).ObservesProperty(() => Password);
 
