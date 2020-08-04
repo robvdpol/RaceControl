@@ -22,7 +22,7 @@ namespace RaceControl.ViewModels
         private readonly IEventAggregator _eventAggregator;
         private readonly IApiService _apiService;
         private readonly LibVLC _libVLC;
-        private readonly Timer _showControlsTimer = new Timer();
+        private readonly Timer _showControlsTimer = new Timer(1500) { AutoReset = false };
 
         private ICommand _mouseEnterCommand;
         private ICommand _mouseLeaveCommand;
@@ -148,8 +148,6 @@ namespace RaceControl.ViewModels
             _rendererDiscoverer.ItemAdded += RendererDiscoverer_ItemAdded;
             _rendererDiscoverer.Start();
 
-            _showControlsTimer.AutoReset = false;
-            _showControlsTimer.Interval = 1500;
             _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
         }
 
