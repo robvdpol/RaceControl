@@ -5,7 +5,7 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:prism="http://prismlibrary.com/"
     Title="{Binding Title}"
-    Width="1000"
+    Width="1200"
     Height="800"
     prism:ViewModelLocator.AutoWireViewModel="True">
     <i:Interaction.Triggers>
@@ -126,13 +126,45 @@
             ItemsSource="{Binding VodTypes}"
             SelectedItem="{Binding SelectedVodType}"
             SelectionMode="Single">
-            <!--
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
-                    <i:InvokeCommandAction Command="{Binding SeasonSelectionChangedCommand}" PassEventArgsToCommand="True" />
+                    <i:InvokeCommandAction Command="{Binding VodTypeSelectionChangedCommand}" />
                 </i:EventTrigger>
             </i:Interaction.Triggers>
-            -->
+        </ListView>
+        <Label
+            Grid.Row="2"
+            Grid.Column="1"
+            HorizontalAlignment="Center"
+            Content="Episodes"
+            FontWeight="Bold" />
+        <ListView
+            Grid.Row="3"
+            Grid.Column="1"
+            HorizontalContentAlignment="Stretch"
+            ItemsSource="{Binding Episodes}">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Focusable" Value="False" />
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{Binding}" />
+                        <Button
+                            Grid.Column="1"
+                            Width="50"
+                            Command="{Binding DataContext.WatchEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
+                            CommandParameter="{Binding}"
+                            Content="Watch" />
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
         </ListView>
     </Grid>
 </Window>

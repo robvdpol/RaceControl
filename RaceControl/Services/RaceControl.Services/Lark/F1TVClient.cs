@@ -22,5 +22,17 @@ namespace RaceControl.Services.Lark
 
             return tokenisedUrl;
         }
+
+        public async Task<TokenisedUrlContainer> GetTokenisedUrlForAssetAsync(string token, string assetUrl)
+        {
+            var url = _endpoint + "/viewings";
+            var request = new AssetUrl { Url = assetUrl };
+
+            _restClient.SetJWTAuthorizationHeader(token);
+            var tokenisedUrlContainer = await _restClient.PostAsJsonAsync<AssetUrl, TokenisedUrlContainer>(url, request);
+            _restClient.ClearAuthorizationHeader();
+
+            return tokenisedUrlContainer;
+        }
     }
 }

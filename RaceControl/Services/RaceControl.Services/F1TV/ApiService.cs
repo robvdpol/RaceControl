@@ -3,6 +3,7 @@ using RaceControl.Services.Interfaces.F1TV.Api;
 using RaceControl.Services.Interfaces.Lark;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace RaceControl.Services.F1TV
@@ -10,9 +11,10 @@ namespace RaceControl.Services.F1TV
     public class ApiService : IApiService
     {
         private const string RaceSeason = "race-season";
-        private const string VodTypeTag = "vod-type-tag";
         private const string EventOccurrence = "event-occurrence";
         private const string SessionOccurrence = "session-occurrence";
+        private const string VodTypeTag = "vod-type-tag";
+        private const string Episodes = "episodes";
 
         private readonly IF1TVClient _f1tvClient;
 
@@ -32,22 +34,10 @@ namespace RaceControl.Services.F1TV
                 .WithField(Season.EventOccurrenceUrlsField)
                 .WithFilter(Season.YearField, LarkFilterType.GreaterThan, "2017")
                 .WithFilter(Season.YearField, LarkFilterType.LessThan, DateTime.Now.AddYears(1).Year.ToString())
-                .OrderBy(Season.YearField, LarkSortDirection.Descending)
+                .OrderBy(Season.YearField, LarkSortDirection.Ascending)
                 ;
 
             return (await _f1tvClient.GetCollectionAsync<Season>(request)).Objects;
-        }
-
-        public async Task<List<VodType>> GetVodTypesAsync()
-        {
-            var request = _f1tvClient
-                .NewRequest(VodTypeTag)
-                .WithField(VodType.UIDField)
-                .WithField(VodType.NameField)
-                .WithField(VodType.ContentUrlsField)
-                ;
-
-            return (await _f1tvClient.GetCollectionAsync<VodType>(request)).Objects;
         }
 
         public async Task<Event> GetEventAsync(string eventUID)
@@ -94,9 +84,40 @@ namespace RaceControl.Services.F1TV
             return (await _f1tvClient.GetItemAsync<Session>(request)).ChannelUrls;
         }
 
+        public async Task<List<VodType>> GetVodTypesAsync()
+        {
+            var request = _f1tvClient
+                .NewRequest(VodTypeTag)
+                .WithField(VodType.UIDField)
+                .WithField(VodType.NameField)
+                .WithField(VodType.ContentUrlsField)
+                ;
+
+            return (await _f1tvClient.GetCollectionAsync<VodType>(request)).Objects;
+        }
+
+        public async Task<Episode> GetEpisodeAsync(string episodeUID)
+        {
+            var request = _f1tvClient
+                .NewRequest(Episodes, episodeUID)
+                .WithField(Episode.UIDField)
+                .WithField(Episode.TitleField)
+                .WithField(Episode.SubtitleField)
+                .WithField(Episode.DataSourceIDField)
+                .WithField(Episode.ItemsField)
+                ;
+
+            return await _f1tvClient.GetItemAsync<Episode>(request);
+        }
+
         public async Task<string> GetTokenisedUrlForChannelAsync(string token, string channelUrl)
         {
             return (await _f1tvClient.GetTokenisedUrlForChannelAsync(token, channelUrl)).Url;
+        }
+
+        public async Task<string> GetTokenisedUrlForAssetAsync(string token, string assetUrl)
+        {
+            return (await _f1tvClient.GetTokenisedUrlForAssetAsync(token, assetUrl)).Objects.First().TokenisedUrl.Url;
         }
     }
 }

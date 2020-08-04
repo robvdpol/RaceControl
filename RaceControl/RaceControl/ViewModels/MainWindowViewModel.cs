@@ -9,7 +9,6 @@ using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 
 namespace RaceControl.ViewModels
@@ -24,6 +23,8 @@ namespace RaceControl.ViewModels
         private ICommand _eventSelectionChangedCommand;
         private ICommand _sessionSelectionChangedCommand;
         private ICommand _watchChannelCommand;
+        private ICommand _vodTypeSelectionChangedCommand;
+        private ICommand _watchEpisodeCommand;
 
         private bool _loaded;
         private string _token;
@@ -32,6 +33,7 @@ namespace RaceControl.ViewModels
         private ObservableCollection<Session> _sessions;
         private ObservableCollection<Channel> _channels;
         private ObservableCollection<VodType> _vodTypes;
+        private ObservableCollection<Episode> _episodes;
         private Season _selectedSeason;
         private Event _selectedEvent;
         private Session _selectedSession;
@@ -50,6 +52,8 @@ namespace RaceControl.ViewModels
         public ICommand EventSelectionChangedCommand => _eventSelectionChangedCommand ??= new DelegateCommand(EventSelectionChangedExecute);
         public ICommand SessionSelectionChangedCommand => _sessionSelectionChangedCommand ??= new DelegateCommand(SessionSelectionChangedExecute);
         public ICommand WatchChannelCommand => _watchChannelCommand ??= new DelegateCommand<Channel>(WatchChannelExecute);
+        public ICommand VodTypeSelectionChangedCommand => _vodTypeSelectionChangedCommand ??= new DelegateCommand(VodTypeSelectionChangedExecute);
+        public ICommand WatchEpisodeCommand => _watchEpisodeCommand ??= new DelegateCommand<Episode>(WatchEpisodeExecute);
 
         public ObservableCollection<Season> Seasons
         {
@@ -79,6 +83,12 @@ namespace RaceControl.ViewModels
         {
             get => _vodTypes ??= new ObservableCollection<VodType>();
             set => SetProperty(ref _vodTypes, value);
+        }
+
+        public ObservableCollection<Episode> Episodes
+        {
+            get => _episodes ??= new ObservableCollection<Episode>();
+            set => SetProperty(ref _episodes, value);
         }
 
         public Season SelectedSeason
@@ -123,8 +133,8 @@ namespace RaceControl.ViewModels
         {
             Seasons.Clear();
             VodTypes.Clear();
-            Seasons.AddRange(await _apiService.GetRaceSeasonsAsync());
-            VodTypes.AddRange(await _apiService.GetVodTypesAsync());
+            Seasons.AddRange((await _apiService.GetRaceSeasonsAsync()).Where(s => s.EventOccurrenceUrls.Any()));
+            VodTypes.AddRange((await _apiService.GetVodTypesAsync()).Where(v => v.ContentUrls.Any()));
         }
 
         private async void SeasonSelectionChangedExecute()
@@ -181,6 +191,34 @@ namespace RaceControl.ViewModels
             _dialogService.Show(nameof(VideoDialog), parameters, null);
         }
 
+        private async void VodTypeSelectionChangedExecute()
+        {
+            ClearEpisodes();
+
+            if (SelectedVodType != null)
+            {
+                var episodes = new ConcurrentBag<Episode>();
+                var tasks = SelectedVodType.ContentUrls.Select(async episodeUrl =>
+                {
+                    episodes.Add(await _apiService.GetEpisodeAsync(episodeUrl.GetUID()));
+                });
+                await Task.WhenAll(tasks);
+                Episodes.AddRange(episodes.OrderBy(e => e.Title));
+            }
+        }
+
+        private void WatchEpisodeExecute(Episode episode)
+        {
+            var parameters = new DialogParameters
+            {
+                { "token", _token },
+                { "vodtype", SelectedVodType },
+                { "episode", episode }
+            };
+
+            _dialogService.Show(nameof(VideoDialog), parameters, null);
+        }
+
         private void ClearEvents()
         {
             Events.Clear();
@@ -196,6 +234,11 @@ namespace RaceControl.ViewModels
         private void ClearChannels()
         {
             Channels.Clear();
+        }
+
+        private void ClearEpisodes()
+        {
+            Episodes.Clear();
         }
     }
 }

@@ -37,6 +37,8 @@ namespace RaceControl.ViewModels
         private string _token;
         private Session _session;
         private Channel _channel;
+        private VodType _vodType;
+        private Episode _episode;
         private SubscriptionToken _syncSessionSubscriptionToken;
         private MediaPlayer _mediaPlayer;
         private MediaPlayer _mediaPlayerCast;
@@ -132,6 +134,8 @@ namespace RaceControl.ViewModels
             _token = parameters.GetValue<string>("token");
             _session = parameters.GetValue<Session>("session");
             _channel = parameters.GetValue<Channel>("channel");
+            _vodType = parameters.GetValue<VodType>("vodtype");
+            _episode = parameters.GetValue<Episode>("episode");
 
             MediaPlayer = CreateMediaPlayer();
             MediaPlayer.ESAdded += MediaPlayer_ESAdded;
@@ -355,10 +359,18 @@ namespace RaceControl.ViewModels
 
         private async Task<Media> CreatePlaybackMedia()
         {
-            var url = await _apiService.GetTokenisedUrlForChannelAsync(_token, _channel.Self);
-            var media = new Media(_libVLC, url, FromType.FromLocation);
+            string url;
 
-            return media;
+            if (_channel != null)
+            {
+                url = await _apiService.GetTokenisedUrlForChannelAsync(_token, _channel.Self);
+            }
+            else
+            {
+                url = await _apiService.GetTokenisedUrlForAssetAsync(_token, _episode.Items.First());
+            }
+
+            return new Media(_libVLC, url, FromType.FromLocation);
         }
     }
 }
