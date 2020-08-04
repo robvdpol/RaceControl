@@ -29,6 +29,8 @@
         <Label
             Grid.Row="0"
             Grid.Column="0"
+            Margin="2"
+            Background="LightGray"
             Content="Seasons"
             FontWeight="Bold" />
         <ListView
@@ -47,6 +49,8 @@
         <Label
             Grid.Row="0"
             Grid.Column="1"
+            Margin="2"
+            Background="LightGray"
             Content="Events"
             FontWeight="Bold" />
         <ListView
@@ -65,6 +69,8 @@
         <Label
             Grid.Row="0"
             Grid.Column="2"
+            Margin="2"
+            Background="LightGray"
             Content="Sessions"
             FontWeight="Bold" />
         <ListView
@@ -83,6 +89,8 @@
         <Label
             Grid.Row="0"
             Grid.Column="3"
+            Margin="2"
+            Background="LightGray"
             Content="Channels"
             FontWeight="Bold" />
         <ListView
@@ -114,6 +122,8 @@
             Grid.Row="2"
             Grid.Column="0"
             Grid.ColumnSpan="2"
+            Margin="2"
+            Background="LightGray"
             Content="Video On Demand"
             FontWeight="Bold" />
         <ListView
@@ -134,6 +144,8 @@
             Grid.Row="2"
             Grid.Column="2"
             Grid.ColumnSpan="2"
+            Margin="2"
+            Background="LightGray"
             Content="Episodes"
             FontWeight="Bold" />
         <ListView
