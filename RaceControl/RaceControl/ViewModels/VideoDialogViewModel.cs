@@ -7,6 +7,7 @@ using RaceControl.Core.Mvvm;
 using RaceControl.Events;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Api;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace RaceControl.ViewModels
         private readonly IEventAggregator _eventAggregator;
         private readonly IApiService _apiService;
         private readonly LibVLC _libVLC;
-        private readonly Timer _showControlsTimer = new Timer(1500) { AutoReset = false };
+        private readonly Timer _showControlsTimer = new Timer(2000) { AutoReset = false };
 
         private ICommand _mouseEnterCommand;
         private ICommand _mouseLeaveCommand;
@@ -41,6 +42,7 @@ namespace RaceControl.ViewModels
         private SubscriptionToken _syncSessionSubscriptionToken;
         private MediaPlayer _mediaPlayer;
         private MediaPlayer _mediaPlayerCast;
+        private TimeSpan _time;
         private ObservableCollection<TrackDescription> _audioTrackDescriptions;
         private RendererDiscoverer _rendererDiscoverer;
         private ObservableCollection<RendererItem> _rendererItems;
@@ -80,6 +82,12 @@ namespace RaceControl.ViewModels
         {
             get => _audioTrackDescriptions ??= new ObservableCollection<TrackDescription>();
             set => SetProperty(ref _audioTrackDescriptions, value);
+        }
+
+        public TimeSpan Time
+        {
+            get => _time;
+            set => SetProperty(ref _time, value);
         }
 
         public ObservableCollection<RendererItem> RendererItems
@@ -138,6 +146,7 @@ namespace RaceControl.ViewModels
             MediaPlayer = CreateMediaPlayer();
             MediaPlayer.ESAdded += MediaPlayer_ESAdded;
             MediaPlayer.ESDeleted += MediaPlayer_ESDeleted;
+            MediaPlayer.TimeChanged += MediaPlayer_TimeChanged;
 
             if (MediaPlayer.Play(await CreatePlaybackMedia()))
             {
@@ -170,6 +179,7 @@ namespace RaceControl.ViewModels
 
             MediaPlayer.ESAdded -= MediaPlayer_ESAdded;
             MediaPlayer.ESDeleted -= MediaPlayer_ESDeleted;
+            MediaPlayer.TimeChanged -= MediaPlayer_TimeChanged;
             MediaPlayer.Stop();
             MediaPlayer.Dispose();
 
@@ -225,6 +235,11 @@ namespace RaceControl.ViewModels
                         break;
                 }
             }
+        }
+
+        private void MediaPlayer_TimeChanged(object sender, MediaPlayerTimeChangedEventArgs e)
+        {
+            Time = TimeSpan.FromMilliseconds(e.Time);
         }
 
         private void ShowControlsTimer_Elapsed(object sender, ElapsedEventArgs e)

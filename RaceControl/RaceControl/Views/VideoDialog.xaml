@@ -51,6 +51,19 @@
                     Grid.Column="0"
                     Margin="2"
                     Orientation="Horizontal">
+                    <TextBlock
+                        Width="55"
+                        Margin="2"
+                        VerticalAlignment="Center"
+                        TextAlignment="Center">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}{0:00}:{1:00}:{2:00}">
+                                <Binding Path="Time.Hours" />
+                                <Binding Path="Time.Minutes" />
+                                <Binding Path="Time.Seconds" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
                     <Button
                         Width="65"
                         Margin="2"
