@@ -30,6 +30,9 @@
                 <i:EventTrigger EventName="MouseLeave">
                     <i:InvokeCommandAction Command="{Binding MouseLeaveCommand}" PassEventArgsToCommand="True" />
                 </i:EventTrigger>
+                <i:EventTrigger EventName="MouseDown">
+                    <i:InvokeCommandAction Command="{Binding MouseDownCommand}" PassEventArgsToCommand="True" />
+                </i:EventTrigger>
             </i:Interaction.Triggers>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />

@@ -24,6 +24,7 @@ namespace RaceControl.ViewModels
 
         private ICommand _mouseEnterCommand;
         private ICommand _mouseLeaveCommand;
+        private ICommand _mouseDownCommand;
         private ICommand _togglePauseCommand;
         private ICommand _syncSessionCommand;
         private ICommand _fastForwardCommand;
@@ -45,8 +46,8 @@ namespace RaceControl.ViewModels
         private bool _showControls;
         private bool _fullScreen;
         private WindowStyle _windowStyle;
-        private WindowState _windowState;
         private ResizeMode _resizeMode;
+        private WindowState _windowState;
 
         public VideoDialogViewModel(IEventAggregator eventAggregator, IApiService apiService, LibVLC libVLC)
         {
@@ -59,6 +60,7 @@ namespace RaceControl.ViewModels
 
         public ICommand MouseEnterCommand => _mouseEnterCommand ??= new DelegateCommand<MouseEventArgs>(MouseEnterExecute);
         public ICommand MouseLeaveCommand => _mouseLeaveCommand ??= new DelegateCommand<MouseEventArgs>(MouseLeaveExecute);
+        public ICommand MouseDownCommand => _mouseDownCommand ??= new DelegateCommand<MouseButtonEventArgs>(MouseDownExecute);
         public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute);
         public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute);
         public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand(FastForwardExecute);
@@ -115,16 +117,16 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _windowStyle, value);
         }
 
-        public WindowState WindowState
-        {
-            get => _windowState;
-            set => SetProperty(ref _windowState, value);
-        }
-
         public ResizeMode ResizeMode
         {
             get => _resizeMode;
             set => SetProperty(ref _resizeMode, value);
+        }
+
+        public WindowState WindowState
+        {
+            get => _windowState;
+            set => SetProperty(ref _windowState, value);
         }
 
         public override async void OnDialogOpened(IDialogParameters parameters)
@@ -244,9 +246,17 @@ namespace RaceControl.ViewModels
             ShowControls = true;
         }
 
-        private void MouseLeaveExecute(MouseEventArgs obj)
+        private void MouseLeaveExecute(MouseEventArgs args)
         {
             ShowControls = false;
+        }
+
+        private void MouseDownExecute(MouseButtonEventArgs args)
+        {
+            if (args.ClickCount == 2)
+            {
+                ToggleFullScreenExecute();
+            }
         }
 
         private void TogglePauseExecute()
@@ -330,18 +340,18 @@ namespace RaceControl.ViewModels
 
         private void SetFullScreen()
         {
-            WindowStyle = WindowStyle.None;
-            WindowState = WindowState.Maximized;
-            ResizeMode = ResizeMode.NoResize;
             FullScreen = true;
+            WindowStyle = WindowStyle.None;
+            ResizeMode = ResizeMode.NoResize;
+            WindowState = WindowState.Maximized;
         }
 
         private void SetWindowed()
         {
-            WindowStyle = WindowStyle.SingleBorderWindow;
-            WindowState = WindowState.Normal;
-            ResizeMode = ResizeMode.CanResize;
             FullScreen = false;
+            WindowStyle = WindowStyle.SingleBorderWindow;
+            ResizeMode = ResizeMode.CanResize;
+            WindowState = WindowState.Normal;
         }
 
         private MediaPlayer CreateMediaPlayer()
