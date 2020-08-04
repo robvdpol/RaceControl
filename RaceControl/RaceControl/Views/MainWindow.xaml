@@ -5,7 +5,7 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:prism="http://prismlibrary.com/"
     Title="{Binding Title}"
-    Width="1200"
+    Width="1100"
     Height="800"
     prism:ViewModelLocator.AutoWireViewModel="True">
     <i:Interaction.Triggers>
@@ -29,7 +29,6 @@
         <Label
             Grid.Row="0"
             Grid.Column="0"
-            HorizontalAlignment="Center"
             Content="Seasons"
             FontWeight="Bold" />
         <ListView
@@ -47,7 +46,6 @@
         <Label
             Grid.Row="0"
             Grid.Column="1"
-            HorizontalAlignment="Center"
             Content="Events"
             FontWeight="Bold" />
         <ListView
@@ -65,7 +63,6 @@
         <Label
             Grid.Row="0"
             Grid.Column="2"
-            HorizontalAlignment="Center"
             Content="Sessions"
             FontWeight="Bold" />
         <ListView
@@ -83,7 +80,6 @@
         <Label
             Grid.Row="0"
             Grid.Column="3"
-            HorizontalAlignment="Center"
             Content="Channels"
             FontWeight="Bold" />
         <ListView
@@ -117,7 +113,6 @@
         <Label
             Grid.Row="2"
             Grid.Column="0"
-            HorizontalAlignment="Center"
             Content="Video On Demand"
             FontWeight="Bold" />
         <ListView
@@ -135,12 +130,13 @@
         <Label
             Grid.Row="2"
             Grid.Column="1"
-            HorizontalAlignment="Center"
+            Grid.ColumnSpan="2"
             Content="Episodes"
             FontWeight="Bold" />
         <ListView
             Grid.Row="3"
             Grid.Column="1"
+            Grid.ColumnSpan="2"
             HorizontalContentAlignment="Stretch"
             ItemsSource="{Binding Episodes}">
             <ListView.ItemContainerStyle>
