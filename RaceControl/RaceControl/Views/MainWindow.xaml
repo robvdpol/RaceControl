@@ -28,7 +28,8 @@
             Grid.Row="0"
             Grid.Column="0"
             HorizontalAlignment="Center"
-            Content="Seasons" />
+            Content="Seasons"
+            FontWeight="Bold" />
         <ListView
             Grid.Row="1"
             Grid.Column="0"
@@ -45,7 +46,8 @@
             Grid.Row="0"
             Grid.Column="1"
             HorizontalAlignment="Center"
-            Content="Events" />
+            Content="Events"
+            FontWeight="Bold" />
         <ListView
             Grid.Row="1"
             Grid.Column="1"
@@ -62,7 +64,8 @@
             Grid.Row="0"
             Grid.Column="2"
             HorizontalAlignment="Center"
-            Content="Sessions" />
+            Content="Sessions"
+            FontWeight="Bold" />
         <ListView
             Grid.Row="1"
             Grid.Column="2"
@@ -79,7 +82,8 @@
             Grid.Row="0"
             Grid.Column="3"
             HorizontalAlignment="Center"
-            Content="Channels" />
+            Content="Channels"
+            FontWeight="Bold" />
         <ListView
             Grid.Row="1"
             Grid.Column="3"
