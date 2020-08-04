@@ -21,6 +21,7 @@
         </Style>
     </prism:Dialog.WindowStyle>
     <vlc:VideoView MediaPlayer="{Binding MediaPlayer}">
+        <!--  Non-transparent background is required to capture mouse events  -->
         <Grid Background="#01000000">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="MouseEnter">
