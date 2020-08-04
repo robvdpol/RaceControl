@@ -6,66 +6,88 @@
     xmlns:prism="http://prismlibrary.com/"
     xmlns:vlc="clr-namespace:LibVLCSharp.WPF;assembly=LibVLCSharp.WPF"
     prism:ViewModelLocator.AutoWireViewModel="True">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </UserControl.Resources>
     <prism:Dialog.WindowStyle>
         <Style TargetType="Window">
-            <Setter Property="prism:Dialog.WindowStartupLocation" Value="CenterOwner" />
-            <Setter Property="ResizeMode" Value="CanResizeWithGrip" />
+            <Setter Property="prism:Dialog.WindowStartupLocation" Value="CenterScreen" />
+            <Setter Property="WindowStyle" Value="{Binding WindowStyle}" />
+            <Setter Property="WindowState" Value="{Binding WindowState}" />
+            <Setter Property="ResizeMode" Value="{Binding ResizeMode}" />
             <Setter Property="ShowInTaskbar" Value="True" />
             <Setter Property="Width" Value="1000" />
             <Setter Property="Height" Value="600" />
         </Style>
     </prism:Dialog.WindowStyle>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="25" />
-        </Grid.RowDefinitions>
-        <vlc:VideoView Grid.Row="0" MediaPlayer="{Binding MediaPlayer}" />
-        <StackPanel Grid.Row="1" Orientation="Horizontal">
-            <Button
-                Width="75"
-                Command="{Binding PauseCommand}"
-                Content="Pause" />
-            <Button
-                Width="75"
-                Command="{Binding SyncVideoCommand}"
-                Content="Sync" />
-            <Button
-                Width="75"
-                Command="{Binding FastForwardCommand}"
-                Content="+1 min" />
-            <Label Content="Audio" />
-            <ComboBox
-                Width="175"
-                DisplayMemberPath="Name"
-                ItemsSource="{Binding AudioTrackDescriptions}">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="SelectionChanged">
-                        <i:InvokeCommandAction Command="{Binding AudioTrackSelectionChangedCommand}" PassEventArgsToCommand="True" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </ComboBox>
-            <Label Content="Video" />
-            <ComboBox
-                Width="175"
-                DisplayMemberPath="Name"
-                ItemsSource="{Binding VideoTrackDescriptions}">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="SelectionChanged">
-                        <i:InvokeCommandAction Command="{Binding VideoTrackSelectionChangedCommand}" PassEventArgsToCommand="True" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </ComboBox>
-            <Label Content="Chromecast" />
-            <ComboBox
-                Width="175"
-                DisplayMemberPath="Name"
-                ItemsSource="{Binding RendererItems}"
-                SelectedItem="{Binding SelectedRendererItem}" />
-            <Button
-                Width="75"
-                Command="{Binding CastVideoCommand}"
-                Content="Cast" />
-        </StackPanel>
-    </Grid>
+    <vlc:VideoView MediaPlayer="{Binding MediaPlayer}">
+        <Grid Background="#01000000">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseEnter">
+                    <i:InvokeCommandAction Command="{Binding MouseEnterCommand}" PassEventArgsToCommand="True" />
+                </i:EventTrigger>
+                <i:EventTrigger EventName="MouseLeave">
+                    <i:InvokeCommandAction Command="{Binding MouseLeaveCommand}" PassEventArgsToCommand="True" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <StackPanel
+                Grid.Row="1"
+                Background="LightGray"
+                Orientation="Horizontal"
+                Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Button
+                    Width="75"
+                    Command="{Binding TogglePauseCommand}"
+                    Content="Pause" />
+                <Button
+                    Width="75"
+                    Command="{Binding SyncSessionCommand}"
+                    Content="Sync" />
+                <Button
+                    Width="75"
+                    Command="{Binding FastForwardCommand}"
+                    Content="+1 min" />
+                <Button
+                    Width="75"
+                    Command="{Binding ToggleFullScreenCommand}"
+                    Content="Fullscreen" />
+                <Label Content="Audio" />
+                <ComboBox
+                    Width="175"
+                    DisplayMemberPath="Name"
+                    ItemsSource="{Binding AudioTrackDescriptions}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SelectionChanged">
+                            <i:InvokeCommandAction Command="{Binding AudioTrackSelectionChangedCommand}" PassEventArgsToCommand="True" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ComboBox>
+                <Label Content="Video" />
+                <ComboBox
+                    Width="175"
+                    DisplayMemberPath="Name"
+                    ItemsSource="{Binding VideoTrackDescriptions}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SelectionChanged">
+                            <i:InvokeCommandAction Command="{Binding VideoTrackSelectionChangedCommand}" PassEventArgsToCommand="True" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ComboBox>
+                <Label Content="Chromecast" />
+                <ComboBox
+                    Width="175"
+                    DisplayMemberPath="Name"
+                    ItemsSource="{Binding RendererItems}"
+                    SelectedItem="{Binding SelectedRendererItem}" />
+                <Button
+                    Width="75"
+                    Command="{Binding CastVideoCommand}"
+                    Content="Cast" />
+            </StackPanel>
+        </Grid>
+    </vlc:VideoView>
 </UserControl>

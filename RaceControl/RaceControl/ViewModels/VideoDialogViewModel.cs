@@ -22,23 +22,31 @@ namespace RaceControl.ViewModels
         private readonly IApiService _apiService;
         private readonly LibVLC _libVLC;
 
-        private ICommand _pauseCommand;
-        private ICommand _syncVideoCommand;
+        private ICommand _mouseEnterCommand;
+        private ICommand _mouseLeaveCommand;
+        private ICommand _togglePauseCommand;
+        private ICommand _syncSessionCommand;
         private ICommand _fastForwardCommand;
+        private ICommand _toggleFullScreenCommand;
         private ICommand _audioTrackSelectionChangedCommand;
         private ICommand _videoTrackSelectionChangedCommand;
         private ICommand _castVideoCommand;
 
         private string _token;
         private Channel _channel;
+        private SubscriptionToken _syncVideoToken;
         private MediaPlayer _mediaPlayer;
         private MediaPlayer _mediaPlayerCast;
-        private RendererDiscoverer _rendererDiscoverer;
-        private SubscriptionToken _syncVideoToken;
         private ObservableCollection<TrackDescription> _audioTrackDescriptions;
         private ObservableCollection<TrackDescription> _videoTrackDescriptions;
+        private RendererDiscoverer _rendererDiscoverer;
         private ObservableCollection<RendererItem> _rendererItems;
         private RendererItem _selectedRendererItem;
+        private bool _showControls;
+        private bool _fullScreen;
+        private WindowStyle _windowStyle;
+        private WindowState _windowState;
+        private ResizeMode _resizeMode;
 
         public VideoDialogViewModel(IEventAggregator eventAggregator, IApiService apiService, LibVLC libVLC)
         {
@@ -49,9 +57,12 @@ namespace RaceControl.ViewModels
 
         public override string Title => "Video";
 
-        public ICommand PauseCommand => _pauseCommand ??= new DelegateCommand(PauseExecute);
-        public ICommand SyncVideoCommand => _syncVideoCommand ??= new DelegateCommand(SyncVideoExecute);
+        public ICommand MouseEnterCommand => _mouseEnterCommand ??= new DelegateCommand<MouseEventArgs>(MouseEnterExecute);
+        public ICommand MouseLeaveCommand => _mouseLeaveCommand ??= new DelegateCommand<MouseEventArgs>(MouseLeaveExecute);
+        public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute);
+        public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute);
         public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand(FastForwardExecute);
+        public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand(ToggleFullScreenExecute);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
         public ICommand VideoTrackSelectionChangedCommand => _videoTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(VideoTrackSelectionChangedExecute);
         public ICommand CastVideoCommand => _castVideoCommand ??= new DelegateCommand(CastVideoExecute, CanCastVideoExecute).ObservesProperty(() => SelectedRendererItem);
@@ -86,9 +97,41 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _selectedRendererItem, value);
         }
 
+        public bool ShowControls
+        {
+            get => _showControls;
+            set => SetProperty(ref _showControls, value);
+        }
+
+        public bool FullScreen
+        {
+            get => _fullScreen;
+            set => SetProperty(ref _fullScreen, value);
+        }
+
+        public WindowStyle WindowStyle
+        {
+            get => _windowStyle;
+            set => SetProperty(ref _windowStyle, value);
+        }
+
+        public WindowState WindowState
+        {
+            get => _windowState;
+            set => SetProperty(ref _windowState, value);
+        }
+
+        public ResizeMode ResizeMode
+        {
+            get => _resizeMode;
+            set => SetProperty(ref _resizeMode, value);
+        }
+
         public override async void OnDialogOpened(IDialogParameters parameters)
         {
             base.OnDialogOpened(parameters);
+
+            SetWindowed();
 
             _token = parameters.GetValue<string>("token");
             _channel = parameters.GetValue<Channel>("channel");
@@ -196,7 +239,17 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void PauseExecute()
+        private void MouseEnterExecute(MouseEventArgs args)
+        {
+            ShowControls = true;
+        }
+
+        private void MouseLeaveExecute(MouseEventArgs obj)
+        {
+            ShowControls = false;
+        }
+
+        private void TogglePauseExecute()
         {
             if (MediaPlayer.CanPause)
             {
@@ -204,7 +257,7 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void SyncVideoExecute()
+        private void SyncSessionExecute()
         {
             // todo: only sync videos from same session
             var payload = new SyncVideoEventPayload(MediaPlayer.Time);
@@ -216,6 +269,18 @@ namespace RaceControl.ViewModels
             if (MediaPlayer.IsPlaying)
             {
                 MediaPlayer.Time = MediaPlayer.Time + 60000;
+            }
+        }
+
+        private void ToggleFullScreenExecute()
+        {
+            if (!FullScreen)
+            {
+                SetFullScreen();
+            }
+            else
+            {
+                SetWindowed();
             }
         }
 
@@ -263,9 +328,30 @@ namespace RaceControl.ViewModels
             }
         }
 
+        private void SetFullScreen()
+        {
+            WindowStyle = WindowStyle.None;
+            WindowState = WindowState.Maximized;
+            ResizeMode = ResizeMode.NoResize;
+            FullScreen = true;
+        }
+
+        private void SetWindowed()
+        {
+            WindowStyle = WindowStyle.SingleBorderWindow;
+            WindowState = WindowState.Normal;
+            ResizeMode = ResizeMode.CanResize;
+            FullScreen = false;
+        }
+
         private MediaPlayer CreateMediaPlayer()
         {
-            return new MediaPlayer(_libVLC) { EnableHardwareDecoding = true };
+            return new MediaPlayer(_libVLC)
+            {
+                EnableHardwareDecoding = true,
+                EnableMouseInput = false,
+                EnableKeyInput = false
+            };
         }
 
         private async Task<Media> CreatePlaybackMedia()
