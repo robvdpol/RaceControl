@@ -10,6 +10,7 @@ namespace RaceControl.Services.F1TV
     public class ApiService : IApiService
     {
         private const string RaceSeason = "race-season";
+        private const string VodTypeTag = "vod-type-tag";
         private const string EventOccurrence = "event-occurrence";
         private const string SessionOccurrence = "session-occurrence";
 
@@ -35,6 +36,18 @@ namespace RaceControl.Services.F1TV
                 ;
 
             return (await _f1tvClient.GetCollectionAsync<Season>(request)).Objects;
+        }
+
+        public async Task<List<VodType>> GetVodTypesAsync()
+        {
+            var request = _f1tvClient
+                .NewRequest(VodTypeTag)
+                .WithField(VodType.UIDField)
+                .WithField(VodType.NameField)
+                .WithField(VodType.ContentUrlsField)
+                ;
+
+            return (await _f1tvClient.GetCollectionAsync<VodType>(request)).Objects;
         }
 
         public async Task<Event> GetEventAsync(string eventUID)

@@ -5,16 +5,18 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:prism="http://prismlibrary.com/"
     Title="{Binding Title}"
-    Width="900"
-    Height="600"
+    Width="1000"
+    Height="800"
     prism:ViewModelLocator.AutoWireViewModel="True">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
-            <i:InvokeCommandAction Command="{Binding LoadedCommand}" PassEventArgsToCommand="True" />
+            <i:InvokeCommandAction Command="{Binding LoadedCommand}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
@@ -38,7 +40,7 @@
             SelectionMode="Single">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
-                    <i:InvokeCommandAction Command="{Binding SeasonSelectionChangedCommand}" PassEventArgsToCommand="True" />
+                    <i:InvokeCommandAction Command="{Binding SeasonSelectionChangedCommand}" />
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </ListView>
@@ -56,7 +58,7 @@
             SelectionMode="Single">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
-                    <i:InvokeCommandAction Command="{Binding EventSelectionChangedCommand}" PassEventArgsToCommand="True" />
+                    <i:InvokeCommandAction Command="{Binding EventSelectionChangedCommand}" />
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </ListView>
@@ -74,7 +76,7 @@
             SelectionMode="Single">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
-                    <i:InvokeCommandAction Command="{Binding SessionSelectionChangedCommand}" PassEventArgsToCommand="True" />
+                    <i:InvokeCommandAction Command="{Binding SessionSelectionChangedCommand}" />
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </ListView>
@@ -88,8 +90,7 @@
             Grid.Row="1"
             Grid.Column="3"
             HorizontalContentAlignment="Stretch"
-            ItemsSource="{Binding Channels}"
-            SelectionMode="Single">
+            ItemsSource="{Binding Channels}">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="Focusable" Value="False" />
@@ -112,6 +113,26 @@
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
+        </ListView>
+        <Label
+            Grid.Row="2"
+            Grid.Column="0"
+            HorizontalAlignment="Center"
+            Content="Video On Demand"
+            FontWeight="Bold" />
+        <ListView
+            Grid.Row="3"
+            Grid.Column="0"
+            ItemsSource="{Binding VodTypes}"
+            SelectedItem="{Binding SelectedVodType}"
+            SelectionMode="Single">
+            <!--
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction Command="{Binding SeasonSelectionChangedCommand}" PassEventArgsToCommand="True" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            -->
         </ListView>
     </Grid>
 </Window>

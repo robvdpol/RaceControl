@@ -25,10 +25,10 @@
         <Grid Background="#01000000">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="MouseEnter">
-                    <i:InvokeCommandAction Command="{Binding MouseEnterCommand}" PassEventArgsToCommand="True" />
+                    <i:InvokeCommandAction Command="{Binding MouseEnterCommand}" />
                 </i:EventTrigger>
                 <i:EventTrigger EventName="MouseLeave">
-                    <i:InvokeCommandAction Command="{Binding MouseLeaveCommand}" PassEventArgsToCommand="True" />
+                    <i:InvokeCommandAction Command="{Binding MouseLeaveCommand}" />
                 </i:EventTrigger>
                 <i:EventTrigger EventName="MouseDown">
                     <i:InvokeCommandAction Command="{Binding MouseDownCommand}" PassEventArgsToCommand="True" />

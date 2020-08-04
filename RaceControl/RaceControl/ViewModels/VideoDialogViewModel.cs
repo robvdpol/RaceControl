@@ -59,8 +59,8 @@ namespace RaceControl.ViewModels
 
         public override string Title => $"{_session} - {_channel}";
 
-        public ICommand MouseEnterCommand => _mouseEnterCommand ??= new DelegateCommand<MouseEventArgs>(MouseEnterExecute);
-        public ICommand MouseLeaveCommand => _mouseLeaveCommand ??= new DelegateCommand<MouseEventArgs>(MouseLeaveExecute);
+        public ICommand MouseEnterCommand => _mouseEnterCommand ??= new DelegateCommand(MouseEnterExecute);
+        public ICommand MouseLeaveCommand => _mouseLeaveCommand ??= new DelegateCommand(MouseLeaveExecute);
         public ICommand MouseDownCommand => _mouseDownCommand ??= new DelegateCommand<MouseButtonEventArgs>(MouseDownExecute);
         public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute);
         public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute);
@@ -230,13 +230,13 @@ namespace RaceControl.ViewModels
             ShowControls = false;
         }
 
-        private void MouseEnterExecute(MouseEventArgs args)
+        private void MouseEnterExecute()
         {
             _showControlsTimer.Stop();
             ShowControls = true;
         }
 
-        private void MouseLeaveExecute(MouseEventArgs args)
+        private void MouseLeaveExecute()
         {
             _showControlsTimer.Start();
         }

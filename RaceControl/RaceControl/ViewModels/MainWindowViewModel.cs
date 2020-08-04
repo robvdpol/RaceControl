@@ -10,7 +10,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace RaceControl.ViewModels
@@ -32,9 +31,11 @@ namespace RaceControl.ViewModels
         private ObservableCollection<Event> _events;
         private ObservableCollection<Session> _sessions;
         private ObservableCollection<Channel> _channels;
+        private ObservableCollection<VodType> _vodTypes;
         private Season _selectedSeason;
         private Event _selectedEvent;
         private Session _selectedSession;
+        private VodType _selectedVodType;
 
         public MainWindowViewModel(IDialogService dialogService, IApiService apiService)
         {
@@ -44,10 +45,10 @@ namespace RaceControl.ViewModels
 
         public string Title => "Race Control";
 
-        public ICommand LoadedCommand => _loadedCommand ??= new DelegateCommand<RoutedEventArgs>(LoadedExecute);
-        public ICommand SeasonSelectionChangedCommand => _seasonSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(SeasonSelectionChangedExecute);
-        public ICommand EventSelectionChangedCommand => _eventSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(EventSelectionChangedExecute);
-        public ICommand SessionSelectionChangedCommand => _sessionSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(SessionSelectionChangedExecute);
+        public ICommand LoadedCommand => _loadedCommand ??= new DelegateCommand(LoadedExecute);
+        public ICommand SeasonSelectionChangedCommand => _seasonSelectionChangedCommand ??= new DelegateCommand(SeasonSelectionChangedExecute);
+        public ICommand EventSelectionChangedCommand => _eventSelectionChangedCommand ??= new DelegateCommand(EventSelectionChangedExecute);
+        public ICommand SessionSelectionChangedCommand => _sessionSelectionChangedCommand ??= new DelegateCommand(SessionSelectionChangedExecute);
         public ICommand WatchChannelCommand => _watchChannelCommand ??= new DelegateCommand<Channel>(WatchChannelExecute);
 
         public ObservableCollection<Season> Seasons
@@ -74,6 +75,12 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _channels, value);
         }
 
+        public ObservableCollection<VodType> VodTypes
+        {
+            get => _vodTypes ??= new ObservableCollection<VodType>();
+            set => SetProperty(ref _vodTypes, value);
+        }
+
         public Season SelectedSeason
         {
             get => _selectedSeason;
@@ -92,7 +99,13 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _selectedSession, value);
         }
 
-        private void LoadedExecute(RoutedEventArgs args)
+        public VodType SelectedVodType
+        {
+            get => _selectedVodType;
+            set => SetProperty(ref _selectedVodType, value);
+        }
+
+        private void LoadedExecute()
         {
             if (!_loaded)
             {
@@ -109,10 +122,12 @@ namespace RaceControl.ViewModels
         private async Task Initialize()
         {
             Seasons.Clear();
-            Seasons.AddRange((await _apiService.GetRaceSeasonsAsync()).OrderByDescending(s => s.Year));
+            VodTypes.Clear();
+            Seasons.AddRange(await _apiService.GetRaceSeasonsAsync());
+            VodTypes.AddRange(await _apiService.GetVodTypesAsync());
         }
 
-        private async void SeasonSelectionChangedExecute(SelectionChangedEventArgs args)
+        private async void SeasonSelectionChangedExecute()
         {
             ClearEvents();
 
@@ -128,7 +143,7 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private async void EventSelectionChangedExecute(SelectionChangedEventArgs args)
+        private async void EventSelectionChangedExecute()
         {
             ClearSessions();
 
@@ -144,7 +159,7 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private async void SessionSelectionChangedExecute(SelectionChangedEventArgs args)
+        private async void SessionSelectionChangedExecute()
         {
             ClearChannels();
 
