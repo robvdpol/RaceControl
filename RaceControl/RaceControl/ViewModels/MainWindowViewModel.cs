@@ -35,7 +35,6 @@ namespace RaceControl.ViewModels
         private Season _selectedSeason;
         private Event _selectedEvent;
         private Session _selectedSession;
-        private Channel _selectedChannel;
 
         public MainWindowViewModel(IDialogService dialogService, IApiService apiService)
         {
@@ -91,12 +90,6 @@ namespace RaceControl.ViewModels
         {
             get => _selectedSession;
             set => SetProperty(ref _selectedSession, value);
-        }
-
-        public Channel SelectedChannel
-        {
-            get => _selectedChannel;
-            set => SetProperty(ref _selectedChannel, value);
         }
 
         private void LoadedExecute(RoutedEventArgs args)

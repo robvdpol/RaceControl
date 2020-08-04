@@ -85,8 +85,12 @@
             Grid.Column="3"
             HorizontalContentAlignment="Stretch"
             ItemsSource="{Binding Channels}"
-            SelectedItem="{Binding SelectedChannel}"
             SelectionMode="Single">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Focusable" Value="False" />
+                </Style>
+            </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Grid>

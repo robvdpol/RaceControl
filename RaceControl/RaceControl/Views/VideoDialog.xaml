@@ -59,6 +59,7 @@
                     Width="75"
                     Command="{Binding ToggleFullScreenCommand}"
                     Content="Fullscreen" />
+                <!--
                 <Label Content="Audio" />
                 <ComboBox
                     Width="175"
@@ -81,6 +82,7 @@
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </ComboBox>
+                -->
                 <Label Content="Chromecast" />
                 <ComboBox
                     Width="175"
