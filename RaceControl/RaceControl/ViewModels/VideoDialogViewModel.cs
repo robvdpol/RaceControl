@@ -257,6 +257,11 @@ namespace RaceControl.ViewModels
             {
                 MediaPlayer.Pause();
             }
+
+            if (_mediaPlayerCast != null && _mediaPlayerCast.CanPause)
+            {
+                _mediaPlayerCast.Pause();
+            }
         }
 
         private void SyncSessionExecute()
@@ -268,11 +273,20 @@ namespace RaceControl.ViewModels
             }
         }
 
+        private void OnSyncSession(SyncSessionEventPayload payload)
+        {
+            if (_session?.UID == payload.SessionUID)
+            {
+                SetMediaPlayerTime(payload.Time, true, false);
+            }
+        }
+
         private void FastForwardExecute(string value)
         {
-            if (MediaPlayer.IsPlaying && int.TryParse(value, out var seconds))
+            if (int.TryParse(value, out var seconds))
             {
-                MediaPlayer.Time = MediaPlayer.Time + (seconds * 1000);
+                var time = MediaPlayer.Time + (seconds * 1000);
+                SetMediaPlayerTime(time, false, false);
             }
         }
 
@@ -307,25 +321,9 @@ namespace RaceControl.ViewModels
 
             var media = await CreatePlaybackMedia();
 
-            if (_mediaPlayerCast.Play(media) && MediaPlayer.IsPlaying)
+            if (_mediaPlayerCast.Play(media))
             {
-                _mediaPlayerCast.Time = MediaPlayer.Time;
-            }
-        }
-
-        private void OnSyncSession(SyncSessionEventPayload payload)
-        {
-            if (_session != null && _session.UID == payload.SessionUID)
-            {
-                if (MediaPlayer.IsPlaying)
-                {
-                    MediaPlayer.Time = payload.Time;
-                }
-
-                if (_mediaPlayerCast != null && _mediaPlayerCast.IsPlaying)
-                {
-                    _mediaPlayerCast.Time = payload.Time;
-                }
+                SetMediaPlayerTime(MediaPlayer.Time, false, true);
             }
         }
 
@@ -343,6 +341,24 @@ namespace RaceControl.ViewModels
             WindowStyle = WindowStyle.SingleBorderWindow;
             ResizeMode = ResizeMode.CanResize;
             WindowState = WindowState.Normal;
+        }
+
+        private void SetMediaPlayerTime(long time, bool mustBePlaying, bool castOnly)
+        {
+            if (!castOnly && (!mustBePlaying || MediaPlayer.IsPlaying))
+            {
+                MediaPlayer.Time = time;
+            }
+
+            if (_mediaPlayerCast == null)
+            {
+                return;
+            }
+
+            if (!mustBePlaying || _mediaPlayerCast.IsPlaying)
+            {
+                _mediaPlayerCast.Time = time;
+            }
         }
 
         private MediaPlayer CreateMediaPlayer()
