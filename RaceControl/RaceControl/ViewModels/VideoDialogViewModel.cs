@@ -29,8 +29,9 @@ namespace RaceControl.ViewModels
         private ICommand _mouseLeaveCommand;
         private ICommand _mouseDownCommand;
         private ICommand _togglePauseCommand;
-        private ICommand _syncSessionCommand;
+        private ICommand _toggleMuteCommand;
         private ICommand _fastForwardCommand;
+        private ICommand _syncSessionCommand;
         private ICommand _toggleFullScreenCommand;
         private ICommand _audioTrackSelectionChangedCommand;
         private ICommand _castVideoCommand;
@@ -66,8 +67,9 @@ namespace RaceControl.ViewModels
         public ICommand MouseLeaveCommand => _mouseLeaveCommand ??= new DelegateCommand(MouseLeaveExecute);
         public ICommand MouseDownCommand => _mouseDownCommand ??= new DelegateCommand<MouseButtonEventArgs>(MouseDownExecute);
         public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute);
-        public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute);
+        public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand(ToggleMuteExecute);
         public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<string>(FastForwardExecute);
+        public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand(ToggleFullScreenExecute);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
         public ICommand CastVideoCommand => _castVideoCommand ??= new DelegateCommand(CastVideoExecute, CanCastVideoExecute).ObservesProperty(() => SelectedRendererItem);
@@ -279,6 +281,20 @@ namespace RaceControl.ViewModels
             }
         }
 
+        private void ToggleMuteExecute()
+        {
+            MediaPlayer.ToggleMute();
+        }
+
+        private void FastForwardExecute(string value)
+        {
+            if (int.TryParse(value, out var seconds))
+            {
+                var time = MediaPlayer.Time + (seconds * 1000);
+                SetMediaPlayerTime(time, false, false);
+            }
+        }
+
         private void SyncSessionExecute()
         {
             if (MediaPlayer.IsPlaying && _session != null)
@@ -293,15 +309,6 @@ namespace RaceControl.ViewModels
             if (_session?.UID == payload.SessionUID)
             {
                 SetMediaPlayerTime(payload.Time, true, false);
-            }
-        }
-
-        private void FastForwardExecute(string value)
-        {
-            if (int.TryParse(value, out var seconds))
-            {
-                var time = MediaPlayer.Time + (seconds * 1000);
-                SetMediaPlayerTime(time, false, false);
             }
         }
 

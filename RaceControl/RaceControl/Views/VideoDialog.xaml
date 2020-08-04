@@ -72,8 +72,8 @@
                     <Button
                         Width="65"
                         Margin="2"
-                        Command="{Binding SyncSessionCommand}"
-                        Content="Sync" />
+                        Command="{Binding ToggleMuteCommand}"
+                        Content="Mute" />
                     <Button
                         Width="65"
                         Margin="2"
@@ -98,6 +98,11 @@
                         Command="{Binding FastForwardCommand}"
                         CommandParameter="60"
                         Content="+1 min" />
+                    <Button
+                        Width="65"
+                        Margin="2"
+                        Command="{Binding SyncSessionCommand}"
+                        Content="Sync" />
                     <Button
                         Width="65"
                         Margin="2"
