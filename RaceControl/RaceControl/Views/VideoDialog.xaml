@@ -52,41 +52,41 @@
                     Margin="2"
                     Orientation="Horizontal">
                     <Button
-                        Width="70"
+                        Width="65"
                         Margin="2"
                         Command="{Binding TogglePauseCommand}"
                         Content="Pause" />
                     <Button
-                        Width="70"
+                        Width="65"
                         Margin="2"
                         Command="{Binding SyncSessionCommand}"
                         Content="Sync" />
                     <Button
-                        Width="70"
+                        Width="65"
                         Margin="2"
                         Command="{Binding FastForwardCommand}"
                         CommandParameter="-60"
                         Content="-1 min" />
                     <Button
-                        Width="70"
+                        Width="65"
                         Margin="2"
                         Command="{Binding FastForwardCommand}"
                         CommandParameter="-10"
                         Content="-10 sec" />
                     <Button
-                        Width="70"
+                        Width="65"
                         Margin="2"
                         Command="{Binding FastForwardCommand}"
                         CommandParameter="10"
                         Content="+10 sec" />
                     <Button
-                        Width="70"
+                        Width="65"
                         Margin="2"
                         Command="{Binding FastForwardCommand}"
                         CommandParameter="60"
                         Content="+1 min" />
                     <Button
-                        Width="70"
+                        Width="65"
                         Margin="2"
                         Command="{Binding ToggleFullScreenCommand}"
                         Content="Fullscreen" />
@@ -135,7 +135,7 @@
                         </TextBlock>
                     </Grid>
                     <Button
-                        Width="70"
+                        Width="65"
                         Margin="2"
                         Command="{Binding CastVideoCommand}"
                         Content="Cast" />

@@ -90,12 +90,8 @@
             Grid.Column="3"
             Margin="2"
             HorizontalContentAlignment="Stretch"
-            ItemsSource="{Binding Channels}">
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="Focusable" Value="False" />
-                </Style>
-            </ListView.ItemContainerStyle>
+            ItemsSource="{Binding Channels}"
+            SelectionMode="Single">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Grid>
@@ -144,12 +140,8 @@
             Grid.ColumnSpan="2"
             Margin="2"
             HorizontalContentAlignment="Stretch"
-            ItemsSource="{Binding Episodes}">
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="Focusable" Value="False" />
-                </Style>
-            </ListView.ItemContainerStyle>
+            ItemsSource="{Binding Episodes}"
+            SelectionMode="Single">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Grid>
