@@ -10,6 +10,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -50,9 +51,12 @@ namespace RaceControl.ViewModels
         {
             _dialogService = dialogService;
             _apiService = apiService;
+
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
+            Title = $"Race Control v{version.Major}.{version.Minor} - An open source F1TV client";
         }
 
-        public string Title => "Race Control - An open source F1TV client";
+        public string Title { get; }
 
         public ICommand LoadedCommand => _loadedCommand ??= new DelegateCommand<RoutedEventArgs>(LoadedExecute);
         public ICommand ClosingCommand => _closingCommand ??= new DelegateCommand(ClosingExecute);
