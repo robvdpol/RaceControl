@@ -349,20 +349,20 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void SetFullScreen()
-        {
-            FullScreen = true;
-            WindowStyle = WindowStyle.None;
-            ResizeMode = ResizeMode.NoResize;
-            WindowState = WindowState.Maximized;
-        }
-
         private void SetWindowed()
         {
             FullScreen = false;
             WindowStyle = WindowStyle.SingleBorderWindow;
             ResizeMode = ResizeMode.CanResize;
             WindowState = WindowState.Normal;
+        }
+
+        private void SetFullScreen()
+        {
+            FullScreen = true;
+            WindowStyle = WindowStyle.None;
+            ResizeMode = ResizeMode.NoResize;
+            WindowState = WindowState.Maximized;
         }
 
         private void SetMediaPlayerTime(long time, bool mustBePlaying, bool castOnly)

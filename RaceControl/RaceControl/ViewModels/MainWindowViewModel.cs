@@ -159,10 +159,9 @@ namespace RaceControl.ViewModels
 
         private async Task Initialize()
         {
-            await RefreshLiveEvents();
             Seasons.AddRange((await _apiService.GetRaceSeasonsAsync()).Where(s => s.EventOccurrenceUrls.Any()));
             VodTypes.AddRange((await _apiService.GetVodTypesAsync()).Where(v => v.ContentUrls.Any()));
-
+            await RefreshLiveEvents();
             _refreshLiveEventsTimer.Elapsed += RefreshLiveEventsTimer_Elapsed;
             _refreshLiveEventsTimer.Start();
         }

@@ -16,8 +16,8 @@
             <Setter Property="WindowState" Value="{Binding WindowState}" />
             <Setter Property="ResizeMode" Value="{Binding ResizeMode}" />
             <Setter Property="ShowInTaskbar" Value="True" />
-            <Setter Property="Width" Value="1000" />
-            <Setter Property="Height" Value="600" />
+            <Setter Property="Width" Value="1200" />
+            <Setter Property="Height" Value="705" />
         </Style>
     </prism:Dialog.WindowStyle>
     <vlc:VideoView MediaPlayer="{Binding MediaPlayer}">
