@@ -1,4 +1,5 @@
-﻿using RaceControl.Services.Interfaces.F1TV;
+﻿using RaceControl.Common;
+using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Api;
 using RaceControl.Services.Interfaces.Lark;
 using System;
@@ -15,6 +16,9 @@ namespace RaceControl.Services.F1TV
         private const string SessionOccurrence = "session-occurrence";
         private const string VodTypeTag = "vod-type-tag";
         private const string Episodes = "episodes";
+        private const string Sets = "sets";
+        private const string Slug = "slug";
+        private const string GrandPrixWeekendLiveSlug = "grand-prix-weekend-live";
 
         private readonly IF1TVClient _f1tvClient;
 
@@ -38,6 +42,28 @@ namespace RaceControl.Services.F1TV
                 ;
 
             return (await _f1tvClient.GetCollectionAsync<Season>(request)).Objects;
+        }
+
+        public async Task<List<Event>> GetLiveEventsAsync()
+        {
+            var request = _f1tvClient
+                .NewRequest(Sets)
+                .WithField(Collection.ItemsField)
+                .WithFilter(Slug, LarkFilterType.Equals, GrandPrixWeekendLiveSlug)
+                ;
+
+            var collectionList = await _f1tvClient.GetCollectionAsync<Collection>(request);
+            var events = new List<Event>();
+
+            foreach (var collection in collectionList.Objects)
+            {
+                foreach (var collectionItem in collection.Items)
+                {
+                    events.Add(await GetEventAsync(collectionItem.ContentURL.GetUID()));
+                }
+            }
+
+            return events;
         }
 
         public async Task<Event> GetEventAsync(string eventUID)

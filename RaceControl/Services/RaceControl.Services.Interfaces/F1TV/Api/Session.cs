@@ -31,6 +31,9 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         [JsonProperty("end_time")]
         public DateTime? EndTime { get; set; }
 
+        [JsonIgnore]
+        public bool IsLive => Status == "live";
+
         public static string UIDField => JsonUtils.GetJsonPropertyName<Session>((s) => s.UID);
         public static string NameField => JsonUtils.GetJsonPropertyName<Session>((s) => s.Name);
         public static string SessionNameField => JsonUtils.GetJsonPropertyName<Session>((s) => s.SessionName);

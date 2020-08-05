@@ -7,9 +7,11 @@ using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Api;
 using RaceControl.Views;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Input;
 
@@ -19,8 +21,10 @@ namespace RaceControl.ViewModels
     {
         private readonly IDialogService _dialogService;
         private readonly IApiService _apiService;
+        private readonly Timer _refreshLiveEventsTimer = new Timer(30000) { AutoReset = false };
 
         private ICommand _loadedCommand;
+        private ICommand _closingCommand;
         private ICommand _seasonSelectionChangedCommand;
         private ICommand _eventSelectionChangedCommand;
         private ICommand _sessionSelectionChangedCommand;
@@ -33,6 +37,7 @@ namespace RaceControl.ViewModels
         private ObservableCollection<Season> _seasons;
         private ObservableCollection<Event> _events;
         private ObservableCollection<Session> _sessions;
+        private ObservableCollection<Session> _liveSessions;
         private ObservableCollection<Channel> _channels;
         private ObservableCollection<VodType> _vodTypes;
         private ObservableCollection<Episode> _episodes;
@@ -50,6 +55,7 @@ namespace RaceControl.ViewModels
         public string Title => "Race Control - An open source F1TV client";
 
         public ICommand LoadedCommand => _loadedCommand ??= new DelegateCommand<RoutedEventArgs>(LoadedExecute);
+        public ICommand ClosingCommand => _closingCommand ??= new DelegateCommand(ClosingExecute);
         public ICommand SeasonSelectionChangedCommand => _seasonSelectionChangedCommand ??= new DelegateCommand(SeasonSelectionChangedExecute);
         public ICommand EventSelectionChangedCommand => _eventSelectionChangedCommand ??= new DelegateCommand(EventSelectionChangedExecute);
         public ICommand SessionSelectionChangedCommand => _sessionSelectionChangedCommand ??= new DelegateCommand(SessionSelectionChangedExecute);
@@ -73,6 +79,12 @@ namespace RaceControl.ViewModels
         {
             get => _sessions ??= new ObservableCollection<Session>();
             set => SetProperty(ref _sessions, value);
+        }
+
+        public ObservableCollection<Session> LiveSessions
+        {
+            get => _liveSessions ??= new ObservableCollection<Session>();
+            set => SetProperty(ref _liveSessions, value);
         }
 
         public ObservableCollection<Channel> Channels
@@ -147,10 +159,19 @@ namespace RaceControl.ViewModels
 
         private async Task Initialize()
         {
-            Seasons.Clear();
-            VodTypes.Clear();
+            await RefreshLiveEvents();
             Seasons.AddRange((await _apiService.GetRaceSeasonsAsync()).Where(s => s.EventOccurrenceUrls.Any()));
             VodTypes.AddRange((await _apiService.GetVodTypesAsync()).Where(v => v.ContentUrls.Any()));
+
+            _refreshLiveEventsTimer.Elapsed += RefreshLiveEventsTimer_Elapsed;
+            _refreshLiveEventsTimer.Start();
+        }
+
+        private void ClosingExecute()
+        {
+            _refreshLiveEventsTimer.Elapsed -= RefreshLiveEventsTimer_Elapsed;
+            _refreshLiveEventsTimer.Stop();
+            _refreshLiveEventsTimer.Dispose();
         }
 
         private async void SeasonSelectionChangedExecute()
@@ -248,6 +269,49 @@ namespace RaceControl.ViewModels
             };
 
             _dialogService.Show(nameof(VideoDialog), parameters, null);
+        }
+
+        private async void RefreshLiveEventsTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            _refreshLiveEventsTimer.Stop();
+            await RefreshLiveEvents();
+            _refreshLiveEventsTimer.Start();
+        }
+
+        private async Task RefreshLiveEvents()
+        {
+            var liveEvents = await _apiService.GetLiveEventsAsync();
+            var liveSessions = new List<Session>();
+
+            foreach (var liveEvent in liveEvents)
+            {
+                foreach (var liveSessionUrl in liveEvent.SessionOccurrenceUrls)
+                {
+                    var liveSession = await _apiService.GetSessionAsync(liveSessionUrl.GetUID());
+
+                    if (liveSession.IsLive)
+                    {
+                        liveSession.Name = $"{liveEvent.Name} - {liveSession.Name}";
+                        liveSessions.Add(liveSession);
+                    }
+                }
+            }
+
+            var sessionsToRemove = LiveSessions.Where(existingLiveSession => !liveSessions.Any(liveSession => liveSession.UID == existingLiveSession.UID)).ToList();
+            var sessionsToAdd = liveSessions.Where(newLiveSession => !LiveSessions.Any(liveSession => liveSession.UID == newLiveSession.UID)).ToList();
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                foreach (var sessionToRemove in sessionsToRemove)
+                {
+                    LiveSessions.Remove(sessionToRemove);
+                }
+
+                if (sessionsToAdd.Any())
+                {
+                    LiveSessions.AddRange(sessionsToAdd);
+                }
+            });
         }
 
         private void ClearEvents()

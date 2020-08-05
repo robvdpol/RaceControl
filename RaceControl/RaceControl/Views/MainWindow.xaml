@@ -5,12 +5,15 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:prism="http://prismlibrary.com/"
     Title="{Binding Title}"
-    Width="1100"
+    Width="1150"
     Height="800"
     prism:ViewModelLocator.AutoWireViewModel="True">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding LoadedCommand}" PassEventArgsToCommand="True" />
+        </i:EventTrigger>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding ClosingCommand}" PassEventArgsToCommand="False" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Grid Margin="2">
@@ -66,26 +69,64 @@
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </ListView>
-        <Label
+        <Grid
             Grid.Row="0"
-            Grid.Column="2"
-            Margin="2"
-            Background="LightGray"
-            Content="Sessions"
-            FontWeight="Bold" />
-        <ListView
-            Grid.Row="1"
-            Grid.Column="2"
-            Margin="2"
-            ItemsSource="{Binding Sessions}"
-            SelectedItem="{Binding SelectedSession}"
-            SelectionMode="Single">
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="SelectionChanged">
-                    <i:InvokeCommandAction Command="{Binding SessionSelectionChangedCommand}" />
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-        </ListView>
+            Grid.RowSpan="2"
+            Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="28" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Label
+                Grid.Row="0"
+                Margin="2"
+                Content="Live Now"
+                FontWeight="Bold">
+                <Label.Style>
+                    <Style TargetType="Label">
+                        <Setter Property="Background" Value="LightGray" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding HasItems, ElementName=lvLiveSessions}" Value="True">
+                                <Setter Property="Background" Value="LightGreen" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Label.Style>
+            </Label>
+            <ListView
+                x:Name="lvLiveSessions"
+                Grid.Row="1"
+                Margin="2"
+                ItemsSource="{Binding LiveSessions}"
+                SelectedItem="{Binding SelectedSession}"
+                SelectionMode="Single">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <i:InvokeCommandAction Command="{Binding SessionSelectionChangedCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ListView>
+            <Label
+                Grid.Row="2"
+                Margin="2"
+                Background="LightGray"
+                Content="Sessions"
+                FontWeight="Bold" />
+            <ListView
+                Grid.Row="3"
+                Margin="2"
+                ItemsSource="{Binding Sessions}"
+                SelectedItem="{Binding SelectedSession}"
+                SelectionMode="Single">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <i:InvokeCommandAction Command="{Binding SessionSelectionChangedCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ListView>
+        </Grid>
         <Label
             Grid.Row="0"
             Grid.Column="3"
