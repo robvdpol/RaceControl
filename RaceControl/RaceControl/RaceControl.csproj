@@ -5,9 +5,9 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>RaceControl</AssemblyName>
     <SignAssembly>false</SignAssembly>
-    <AssemblyOriginatorKeyFile>RaceControl.pfx</AssemblyOriginatorKeyFile>
     <AssemblyVersion>1.1.0.0</AssemblyVersion>
     <FileVersion>1.1.0.0</FileVersion>
+    <Version>1.1.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CredentialManagement.Standard" Version="1.0.4" />
