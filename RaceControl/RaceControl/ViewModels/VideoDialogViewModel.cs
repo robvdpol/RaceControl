@@ -27,6 +27,7 @@ namespace RaceControl.ViewModels
 
         private ICommand _mouseEnterCommand;
         private ICommand _mouseLeaveCommand;
+        private ICommand _mouseMoveCommand;
         private ICommand _mouseDownCommand;
         private ICommand _togglePauseCommand;
         private ICommand _toggleMuteCommand;
@@ -63,8 +64,9 @@ namespace RaceControl.ViewModels
 
         public override string Title => _channel != null ? $"{_session} - {_channel}" : $"{_episode}";
 
-        public ICommand MouseEnterCommand => _mouseEnterCommand ??= new DelegateCommand(MouseEnterExecute);
-        public ICommand MouseLeaveCommand => _mouseLeaveCommand ??= new DelegateCommand(MouseLeaveExecute);
+        public ICommand MouseEnterCommand => _mouseEnterCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveExecute);
+        public ICommand MouseLeaveCommand => _mouseLeaveCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveExecute);
+        public ICommand MouseMoveCommand => _mouseMoveCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveExecute);
         public ICommand MouseDownCommand => _mouseDownCommand ??= new DelegateCommand<MouseButtonEventArgs>(MouseDownExecute);
         public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute);
         public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand(ToggleMuteExecute);
@@ -249,14 +251,10 @@ namespace RaceControl.ViewModels
             ShowControls = false;
         }
 
-        private void MouseEnterExecute()
+        private void MouseEnterOrLeaveOrMoveExecute()
         {
             _showControlsTimer.Stop();
             ShowControls = true;
-        }
-
-        private void MouseLeaveExecute()
-        {
             _showControlsTimer.Start();
         }
 
