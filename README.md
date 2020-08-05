@@ -10,6 +10,7 @@ Race Control is a standalone, open source F1TV client for Windows.
 
 ## Installation
 * Download the latest release and extract it to a location of your choice
+* Make sure you have the .NET Core runtime v3.1 or above installed (https://dotnet.microsoft.com/download/dotnet-core/current/runtime)
 * Run RaceControl.exe to start the application
 
 ## FAQ
