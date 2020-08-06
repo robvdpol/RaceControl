@@ -32,6 +32,7 @@ namespace RaceControl.ViewModels
         private ICommand _syncSessionCommand;
         private ICommand _toggleFullScreenCommand;
         private ICommand _audioTrackSelectionChangedCommand;
+        private ICommand _scanChromecastCommand;
         private ICommand _castVideoCommand;
 
         private Func<string, Task<string>> _urlFunc;
@@ -70,6 +71,7 @@ namespace RaceControl.ViewModels
         public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand(ToggleFullScreenExecute);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
+        public ICommand ScanChromecastCommand => _scanChromecastCommand ??= new DelegateCommand(ScanChromecastExecute, CanScanChromecastExecute).ObservesProperty(() => RendererDiscoverer);
         public ICommand CastVideoCommand => _castVideoCommand ??= new DelegateCommand(CastVideoExecute, CanCastVideoExecute).ObservesProperty(() => SelectedRendererItem);
 
         public MediaPlayer MediaPlayer
@@ -88,6 +90,12 @@ namespace RaceControl.ViewModels
         {
             get => _time;
             set => SetProperty(ref _time, value);
+        }
+
+        public RendererDiscoverer RendererDiscoverer
+        {
+            get => _rendererDiscoverer;
+            set => SetProperty(ref _rendererDiscoverer, value);
         }
 
         public ObservableCollection<RendererItem> RendererItems
@@ -153,10 +161,6 @@ namespace RaceControl.ViewModels
                 _syncSessionSubscriptionToken = _eventAggregator.GetEvent<SyncStreamsEvent>().Subscribe(OnSyncSession);
             }
 
-            _rendererDiscoverer = new RendererDiscoverer(_libVLC);
-            _rendererDiscoverer.ItemAdded += RendererDiscoverer_ItemAdded;
-            _rendererDiscoverer.Start();
-
             _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
         }
 
@@ -164,40 +168,32 @@ namespace RaceControl.ViewModels
         {
             base.OnDialogClosed();
 
-            _showControlsTimer.Elapsed -= ShowControlsTimer_Elapsed;
-            _showControlsTimer.Stop();
-            _showControlsTimer.Dispose();
+            if (RendererDiscoverer != null)
+            {
+                RendererDiscoverer.Stop();
+                RendererDiscoverer.ItemAdded -= RendererDiscoverer_ItemAdded;
+                RendererDiscoverer.Dispose();
+            }
 
-            _rendererDiscoverer.ItemAdded -= RendererDiscoverer_ItemAdded;
-            _rendererDiscoverer.Stop();
-            _rendererDiscoverer.Dispose();
+            _showControlsTimer.Stop();
+            _showControlsTimer.Elapsed -= ShowControlsTimer_Elapsed;
+            _showControlsTimer.Dispose();
 
             if (_syncSessionSubscriptionToken != null)
             {
                 _eventAggregator.GetEvent<SyncStreamsEvent>().Unsubscribe(_syncSessionSubscriptionToken);
             }
 
+            MediaPlayer.Stop();
             MediaPlayer.ESAdded -= MediaPlayer_ESAdded;
             MediaPlayer.ESDeleted -= MediaPlayer_ESDeleted;
             MediaPlayer.TimeChanged -= MediaPlayer_TimeChanged;
-            MediaPlayer.Stop();
             MediaPlayer.Dispose();
 
             if (_mediaPlayerCast != null)
             {
                 _mediaPlayerCast.Stop();
                 _mediaPlayerCast.Dispose();
-            }
-        }
-
-        private void RendererDiscoverer_ItemAdded(object sender, RendererDiscovererItemAddedEventArgs e)
-        {
-            if (e.RendererItem.CanRenderVideo)
-            {
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    RendererItems.Add(e.RendererItem);
-                });
             }
         }
 
@@ -240,6 +236,17 @@ namespace RaceControl.ViewModels
         private void MediaPlayer_TimeChanged(object sender, MediaPlayerTimeChangedEventArgs e)
         {
             Time = TimeSpan.FromMilliseconds(e.Time);
+        }
+
+        private void RendererDiscoverer_ItemAdded(object sender, RendererDiscovererItemAddedEventArgs e)
+        {
+            if (e.RendererItem.CanRenderVideo)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    RendererItems.Add(e.RendererItem);
+                });
+            }
         }
 
         private void ShowControlsTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -322,6 +329,18 @@ namespace RaceControl.ViewModels
         {
             var trackDescription = (TrackDescription)args.AddedItems[0];
             MediaPlayer.SetAudioTrack(trackDescription.Id);
+        }
+
+        private bool CanScanChromecastExecute()
+        {
+            return RendererDiscoverer == null;
+        }
+
+        private void ScanChromecastExecute()
+        {
+            RendererDiscoverer = new RendererDiscoverer(_libVLC);
+            RendererDiscoverer.ItemAdded += RendererDiscoverer_ItemAdded;
+            RendererDiscoverer.Start();
         }
 
         private bool CanCastVideoExecute()

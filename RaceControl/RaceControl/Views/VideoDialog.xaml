@@ -129,6 +129,11 @@
                     Grid.Column="1"
                     Margin="2"
                     Orientation="Horizontal">
+                    <Button
+                        Width="60"
+                        Margin="2"
+                        Command="{Binding ScanChromecastCommand}"
+                        Content="Scan" />
                     <Grid>
                         <ComboBox
                             Width="200"
