@@ -5,7 +5,7 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:prism="http://prismlibrary.com/"
     Title="{Binding Title}"
-    Width="1150"
+    Width="1100"
     Height="800"
     prism:ViewModelLocator.AutoWireViewModel="True">
     <i:Interaction.Triggers>
@@ -24,9 +24,9 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" MaxWidth="260" />
+            <ColumnDefinition Width="*" MaxWidth="260" />
+            <ColumnDefinition Width="*" MaxWidth="260" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Label
