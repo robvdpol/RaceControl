@@ -9,7 +9,6 @@ using RaceControl.Services.Lark;
 using RaceControl.ViewModels;
 using RaceControl.Views;
 using System.Windows;
-using LibVLCSharpCore = LibVLCSharp.Shared.Core;
 
 namespace RaceControl
 {
@@ -17,13 +16,9 @@ namespace RaceControl
     {
         protected override Window CreateShell()
         {
-            return Container.Resolve<MainWindow>();
-        }
+            LibVLCSharp.Shared.Core.Initialize();
 
-        public override void Initialize()
-        {
-            base.Initialize();
-            LibVLCSharpCore.Initialize();
+            return Container.Resolve<MainWindow>();
         }
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)

@@ -1,4 +1,5 @@
-﻿using Prism.Commands;
+﻿using LibVLCSharp.Shared;
+using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
 using RaceControl.Common;
@@ -6,6 +7,7 @@ using RaceControl.Comparers;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Api;
 using RaceControl.Views;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -22,6 +24,7 @@ namespace RaceControl.ViewModels
     {
         private readonly IDialogService _dialogService;
         private readonly IApiService _apiService;
+        private readonly LibVLC _libVLC;
         private readonly Timer _refreshLiveEventsTimer = new Timer(30000) { AutoReset = false };
 
         private ICommand _loadedCommand;
@@ -29,8 +32,8 @@ namespace RaceControl.ViewModels
         private ICommand _seasonSelectionChangedCommand;
         private ICommand _eventSelectionChangedCommand;
         private ICommand _sessionSelectionChangedCommand;
-        private ICommand _watchChannelCommand;
         private ICommand _vodTypeSelectionChangedCommand;
+        private ICommand _watchChannelCommand;
         private ICommand _watchEpisodeCommand;
 
         private bool _loaded;
@@ -47,10 +50,12 @@ namespace RaceControl.ViewModels
         private Session _selectedSession;
         private VodType _selectedVodType;
 
-        public MainWindowViewModel(IDialogService dialogService, IApiService apiService)
+        public MainWindowViewModel(IDialogService dialogService, IApiService apiService, LibVLC libVLC)
         {
             _dialogService = dialogService;
             _apiService = apiService;
+            // Force creation of LibVLC-singleton at startup for better performance
+            _libVLC = libVLC;
 
             var version = Assembly.GetExecutingAssembly().GetName().Version;
             Title = $"Race Control v{version.Major}.{version.Minor} - An open source F1TV client";
@@ -63,8 +68,8 @@ namespace RaceControl.ViewModels
         public ICommand SeasonSelectionChangedCommand => _seasonSelectionChangedCommand ??= new DelegateCommand(SeasonSelectionChangedExecute);
         public ICommand EventSelectionChangedCommand => _eventSelectionChangedCommand ??= new DelegateCommand(EventSelectionChangedExecute);
         public ICommand SessionSelectionChangedCommand => _sessionSelectionChangedCommand ??= new DelegateCommand(SessionSelectionChangedExecute);
-        public ICommand WatchChannelCommand => _watchChannelCommand ??= new DelegateCommand<Channel>(WatchChannelExecute);
         public ICommand VodTypeSelectionChangedCommand => _vodTypeSelectionChangedCommand ??= new DelegateCommand(VodTypeSelectionChangedExecute);
+        public ICommand WatchChannelCommand => _watchChannelCommand ??= new DelegateCommand<Channel>(WatchChannelExecute);
         public ICommand WatchEpisodeCommand => _watchEpisodeCommand ??= new DelegateCommand<Episode>(WatchEpisodeExecute);
 
         public ObservableCollection<Season> Seasons
@@ -233,18 +238,6 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void WatchChannelExecute(Channel channel)
-        {
-            var parameters = new DialogParameters
-            {
-                { "token", _token },
-                { "session", SelectedSession },
-                { "channel", channel }
-            };
-
-            _dialogService.Show(nameof(VideoDialog), parameters, null);
-        }
-
         private async void VodTypeSelectionChangedExecute()
         {
             SelectedSession = null;
@@ -263,12 +256,31 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void WatchEpisodeExecute(Episode episode)
+        private void WatchChannelExecute(Channel channel)
         {
+            Func<string, Task<string>> urlFunc = (channelUrl) => GetTokenisedUrlForChannelAsync(channelUrl);
+
             var parameters = new DialogParameters
             {
-                { "token", _token },
-                { "episode", episode }
+                { "urlfunc", urlFunc },
+                { "url", channel.Self },
+                { "syncuid", SelectedSession.UID },
+                { "title", $"{SelectedSession} - {channel}" }
+            };
+
+            _dialogService.Show(nameof(VideoDialog), parameters, null);
+        }
+
+        private void WatchEpisodeExecute(Episode episode)
+        {
+            Func<string, Task<string>> urlFunc = (assetUrl) => GetTokenisedUrlForAssetAsync(assetUrl);
+
+            var parameters = new DialogParameters
+            {
+                { "urlfunc", urlFunc },
+                { "url", episode.Items.First() },
+                { "syncuid", episode.UID },
+                { "title", episode.ToString() }
             };
 
             _dialogService.Show(nameof(VideoDialog), parameters, null);
@@ -315,6 +327,16 @@ namespace RaceControl.ViewModels
                     LiveSessions.AddRange(sessionsToAdd);
                 }
             });
+        }
+
+        private async Task<string> GetTokenisedUrlForChannelAsync(string channelUrl)
+        {
+            return await _apiService.GetTokenisedUrlForChannelAsync(_token, channelUrl);
+        }
+
+        private async Task<string> GetTokenisedUrlForAssetAsync(string assetUrl)
+        {
+            return await _apiService.GetTokenisedUrlForAssetAsync(_token, assetUrl);
         }
 
         private void ClearEvents()

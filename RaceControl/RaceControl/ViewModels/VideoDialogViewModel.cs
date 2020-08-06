@@ -5,8 +5,6 @@ using Prism.Events;
 using Prism.Services.Dialogs;
 using RaceControl.Core.Mvvm;
 using RaceControl.Events;
-using RaceControl.Services.Interfaces.F1TV;
-using RaceControl.Services.Interfaces.F1TV.Api;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -21,7 +19,6 @@ namespace RaceControl.ViewModels
     public class VideoDialogViewModel : DialogViewModelBase
     {
         private readonly IEventAggregator _eventAggregator;
-        private readonly IApiService _apiService;
         private readonly LibVLC _libVLC;
         private readonly Timer _showControlsTimer = new Timer(2000) { AutoReset = false };
 
@@ -37,10 +34,10 @@ namespace RaceControl.ViewModels
         private ICommand _audioTrackSelectionChangedCommand;
         private ICommand _castVideoCommand;
 
-        private string _token;
-        private Session _session;
-        private Channel _channel;
-        private Episode _episode;
+        private Func<string, Task<string>> _urlFunc;
+        private string _url;
+        private string _syncUID;
+        private string _title;
         private SubscriptionToken _syncSessionSubscriptionToken;
         private MediaPlayer _mediaPlayer;
         private MediaPlayer _mediaPlayerCast;
@@ -55,14 +52,13 @@ namespace RaceControl.ViewModels
         private ResizeMode _resizeMode;
         private WindowState _windowState;
 
-        public VideoDialogViewModel(IEventAggregator eventAggregator, IApiService apiService, LibVLC libVLC)
+        public VideoDialogViewModel(IEventAggregator eventAggregator, LibVLC libVLC)
         {
             _eventAggregator = eventAggregator;
-            _apiService = apiService;
             _libVLC = libVLC;
         }
 
-        public override string Title => _channel != null ? $"{_session} - {_channel}" : $"{_episode}";
+        public override string Title => _title;
 
         public ICommand MouseEnterCommand => _mouseEnterCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveExecute);
         public ICommand MouseLeaveCommand => _mouseLeaveCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveExecute);
@@ -142,10 +138,10 @@ namespace RaceControl.ViewModels
 
             SetWindowed();
 
-            _token = parameters.GetValue<string>("token");
-            _session = parameters.GetValue<Session>("session");
-            _channel = parameters.GetValue<Channel>("channel");
-            _episode = parameters.GetValue<Episode>("episode");
+            _urlFunc = parameters.GetValue<Func<string, Task<string>>>("urlfunc");
+            _url = parameters.GetValue<string>("url");
+            _syncUID = parameters.GetValue<string>("syncuid");
+            _title = parameters.GetValue<string>("title");
 
             MediaPlayer = CreateMediaPlayer();
             MediaPlayer.ESAdded += MediaPlayer_ESAdded;
@@ -154,7 +150,7 @@ namespace RaceControl.ViewModels
 
             if (MediaPlayer.Play(await CreatePlaybackMedia()))
             {
-                _syncSessionSubscriptionToken = _eventAggregator.GetEvent<SyncSessionEvent>().Subscribe(OnSyncSession);
+                _syncSessionSubscriptionToken = _eventAggregator.GetEvent<SyncStreamsEvent>().Subscribe(OnSyncSession);
             }
 
             _rendererDiscoverer = new RendererDiscoverer(_libVLC);
@@ -178,7 +174,7 @@ namespace RaceControl.ViewModels
 
             if (_syncSessionSubscriptionToken != null)
             {
-                _eventAggregator.GetEvent<SyncSessionEvent>().Unsubscribe(_syncSessionSubscriptionToken);
+                _eventAggregator.GetEvent<SyncStreamsEvent>().Unsubscribe(_syncSessionSubscriptionToken);
             }
 
             MediaPlayer.ESAdded -= MediaPlayer_ESAdded;
@@ -295,16 +291,16 @@ namespace RaceControl.ViewModels
 
         private void SyncSessionExecute()
         {
-            if (MediaPlayer.IsPlaying && _session != null)
+            if (MediaPlayer.IsPlaying)
             {
-                var payload = new SyncSessionEventPayload(_session.UID, MediaPlayer.Time);
-                _eventAggregator.GetEvent<SyncSessionEvent>().Publish(payload);
+                var payload = new SyncStreamsEventPayload(_syncUID, MediaPlayer.Time);
+                _eventAggregator.GetEvent<SyncStreamsEvent>().Publish(payload);
             }
         }
 
-        private void OnSyncSession(SyncSessionEventPayload payload)
+        private void OnSyncSession(SyncStreamsEventPayload payload)
         {
-            if (_session?.UID == payload.SessionUID)
+            if (_syncUID == payload.SyncUID)
             {
                 SetMediaPlayerTime(payload.Time, true, false);
             }
@@ -393,16 +389,7 @@ namespace RaceControl.ViewModels
 
         private async Task<Media> CreatePlaybackMedia()
         {
-            string url;
-
-            if (_channel != null)
-            {
-                url = await _apiService.GetTokenisedUrlForChannelAsync(_token, _channel.Self);
-            }
-            else
-            {
-                url = await _apiService.GetTokenisedUrlForAssetAsync(_token, _episode.Items.First());
-            }
+            var url = await _urlFunc.Invoke(_url);
 
             return new Media(_libVLC, url, FromType.FromLocation);
         }
