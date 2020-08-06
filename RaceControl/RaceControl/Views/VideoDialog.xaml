@@ -131,10 +131,14 @@
                         Margin="2"
                         Command="{Binding ToggleFullScreenCommand}"
                         Content="Fullscreen" />
-                    <!--
-                    <Label Content="Audio" />
+                    <TextBlock
+                        Margin="2"
+                        VerticalAlignment="Center"
+                        Text="Audio"
+                        TextAlignment="Center" />
                     <ComboBox
                         Width="175"
+                        Margin="2"
                         DisplayMemberPath="Name"
                         ItemsSource="{Binding AudioTrackDescriptions}">
                         <i:Interaction.Triggers>
@@ -143,7 +147,6 @@
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </ComboBox>
-                    -->
                 </StackPanel>
                 <StackPanel
                     Grid.Row="1"

@@ -430,10 +430,8 @@ namespace RaceControl.ViewModels
         private async Task<Media> CreatePlaybackMedia()
         {
             var url = await _urlFunc.Invoke(_url);
-            var media = new Media(_libVLC, url, FromType.FromLocation);
-            await media.Parse(MediaParseOptions.ParseNetwork);
 
-            return media;
+            return new Media(_libVLC, url, FromType.FromLocation);
         }
 
         private MediaPlayer CreateMediaPlayer()
