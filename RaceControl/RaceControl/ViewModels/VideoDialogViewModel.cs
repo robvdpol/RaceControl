@@ -41,8 +41,11 @@ namespace RaceControl.ViewModels
         private string _title;
         private MediaPlayer _mediaPlayer;
         private MediaPlayer _mediaPlayerCast;
+        private Media _media;
         private ObservableCollection<TrackDescription> _audioTrackDescriptions;
-        private TimeSpan _time;
+        private long _duration;
+        private long _sliderTime;
+        private TimeSpan _displayTime;
         private RendererDiscoverer _rendererDiscoverer;
         private ObservableCollection<RendererItem> _rendererItems;
         private RendererItem _selectedRendererItem;
@@ -85,10 +88,28 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _audioTrackDescriptions, value);
         }
 
-        public TimeSpan Time
+        public long Duration
         {
-            get => _time;
-            set => SetProperty(ref _time, value);
+            get => _duration;
+            set => SetProperty(ref _duration, value);
+        }
+
+        public long SliderTime
+        {
+            get => _sliderTime;
+            set
+            {
+                if (SetProperty(ref _sliderTime, value))
+                {
+                    SetMediaPlayerTime(SliderTime, false, false);
+                }
+            }
+        }
+
+        public TimeSpan DisplayTime
+        {
+            get => _displayTime;
+            set => SetProperty(ref _displayTime, value);
         }
 
         public RendererDiscoverer RendererDiscoverer
@@ -152,7 +173,11 @@ namespace RaceControl.ViewModels
             MediaPlayer.ESAdded += MediaPlayer_ESAdded;
             MediaPlayer.ESDeleted += MediaPlayer_ESDeleted;
             MediaPlayer.TimeChanged += MediaPlayer_TimeChanged;
-            MediaPlayer.Play(await CreatePlaybackMedia());
+
+            _media = await CreatePlaybackMedia();
+            _media.DurationChanged += Media_DurationChanged;
+
+            MediaPlayer.Play(_media);
 
             _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
 
@@ -168,6 +193,9 @@ namespace RaceControl.ViewModels
             _showControlsTimer.Stop();
             _showControlsTimer.Elapsed -= ShowControlsTimer_Elapsed;
             _showControlsTimer.Dispose();
+
+            _media.DurationChanged -= Media_DurationChanged;
+            _media.Dispose();
 
             MediaPlayer.Stop();
             MediaPlayer.ESAdded -= MediaPlayer_ESAdded;
@@ -225,9 +253,15 @@ namespace RaceControl.ViewModels
             }
         }
 
+        private void Media_DurationChanged(object sender, MediaDurationChangedEventArgs e)
+        {
+            Duration = e.Duration;
+        }
+
         private void MediaPlayer_TimeChanged(object sender, MediaPlayerTimeChangedEventArgs e)
         {
-            Time = TimeSpan.FromMilliseconds(e.Time);
+            SetProperty(ref _sliderTime, e.Time, nameof(SliderTime));
+            DisplayTime = TimeSpan.FromMilliseconds(e.Time);
         }
 
         private void RendererDiscoverer_ItemAdded(object sender, RendererDiscovererItemAddedEventArgs e)
@@ -401,8 +435,10 @@ namespace RaceControl.ViewModels
         private async Task<Media> CreatePlaybackMedia()
         {
             var url = await _urlFunc.Invoke(_url);
+            var media = new Media(_libVLC, url, FromType.FromLocation);
+            await media.Parse(MediaParseOptions.ParseNetwork);
 
-            return new Media(_libVLC, url, FromType.FromLocation);
+            return media;
         }
     }
 }

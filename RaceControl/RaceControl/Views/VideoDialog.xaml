@@ -47,14 +47,30 @@
             </Grid>
             <Grid
                 Grid.Row="1"
-                Height="30"
+                Height="Auto"
                 Background="White"
                 Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Slider
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Margin="2"
+                    IsMoveToPointEnabled="True"
+                    IsSnapToTickEnabled="False"
+                    Maximum="{Binding Duration}"
+                    TickFrequency="60000"
+                    TickPlacement="BottomRight"
+                    Value="{Binding SliderTime}" />
                 <StackPanel
+                    Grid.Row="1"
                     Grid.Column="0"
                     Margin="2"
                     Orientation="Horizontal">
@@ -65,9 +81,9 @@
                         TextAlignment="Center">
                         <TextBlock.Text>
                             <MultiBinding StringFormat="{}{0:00}:{1:00}:{2:00}">
-                                <Binding Path="Time.Hours" />
-                                <Binding Path="Time.Minutes" />
-                                <Binding Path="Time.Seconds" />
+                                <Binding Path="DisplayTime.Hours" />
+                                <Binding Path="DisplayTime.Minutes" />
+                                <Binding Path="DisplayTime.Seconds" />
                             </MultiBinding>
                         </TextBlock.Text>
                     </TextBlock>
@@ -130,6 +146,7 @@
                     -->
                 </StackPanel>
                 <StackPanel
+                    Grid.Row="1"
                     Grid.Column="1"
                     Margin="2"
                     Orientation="Horizontal">

@@ -18,10 +18,10 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="30" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="120" />
+            <ColumnDefinition Width="160" />
             <ColumnDefinition Width="220" />
         </Grid.ColumnDefinitions>
         <TextBlock
@@ -50,15 +50,19 @@
             Margin="2"
             mvvm:PasswordBoxAssistant.BindPassword="True"
             mvvm:PasswordBoxAssistant.BoundPassword="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-        <Label
+        <TextBlock
             Grid.Row="3"
             Grid.Column="0"
-            Content="{Binding Error}"
-            Foreground="Red" />
+            Margin="5,2"
+            Foreground="Red"
+            Text="{Binding Error}"
+            TextWrapping="Wrap" />
         <Button
             Grid.Row="3"
             Grid.Column="1"
+            Height="26"
             Margin="2"
+            VerticalAlignment="Top"
             Command="{Binding LoginCommand}"
             Content="Login" />
     </Grid>
