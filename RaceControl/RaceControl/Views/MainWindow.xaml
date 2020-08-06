@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:prism="http://prismlibrary.com/"
-    Width="1150"
+    Width="1200"
     Height="800"
     prism:ViewModelLocator.AutoWireViewModel="True">
     <i:Interaction.Triggers>
@@ -25,7 +25,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" MaxWidth="250" />
             <ColumnDefinition Width="*" MaxWidth="250" />
-            <ColumnDefinition Width="*" MaxWidth="250" />
+            <ColumnDefinition Width="*" MaxWidth="300" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Label
@@ -74,7 +74,7 @@
             Grid.Column="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="28" />
+                <RowDefinition Height="48" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>

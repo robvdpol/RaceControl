@@ -315,8 +315,9 @@ namespace RaceControl.ViewModels
 
         private async void WatchVlcChannelExecute(Channel channel)
         {
+            var title = $"{SelectedSession} - {channel}";
             var url = await GetTokenisedUrlForChannelAsync(channel.Self);
-            Process.Start(VlcExeLocation, url);
+            Process.Start(VlcExeLocation, $"{url} --meta-title=\"{title}\"");
         }
 
         private bool CanWatchVlcEpisodeExecute(Episode episode)
@@ -326,8 +327,9 @@ namespace RaceControl.ViewModels
 
         private async void WatchVlcEpisodeExecute(Episode episode)
         {
+            var title = episode.ToString();
             var url = await GetTokenisedUrlForAssetAsync(episode.Items.First());
-            Process.Start(VlcExeLocation, url);
+            Process.Start(VlcExeLocation, $"{url} --meta-title=\"{title}\"");
         }
 
         private async void CopyUrlChannelExecute(Channel channel)
