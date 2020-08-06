@@ -35,6 +35,8 @@ namespace RaceControl.ViewModels
         private ICommand _vodTypeSelectionChangedCommand;
         private ICommand _watchChannelCommand;
         private ICommand _watchEpisodeCommand;
+        private ICommand _copyURLChannelCommand;
+        private ICommand _copyURLEpisodeCommand;
 
         private bool _loaded;
         private string _token;
@@ -71,6 +73,8 @@ namespace RaceControl.ViewModels
         public ICommand VodTypeSelectionChangedCommand => _vodTypeSelectionChangedCommand ??= new DelegateCommand(VodTypeSelectionChangedExecute);
         public ICommand WatchChannelCommand => _watchChannelCommand ??= new DelegateCommand<Channel>(WatchChannelExecute);
         public ICommand WatchEpisodeCommand => _watchEpisodeCommand ??= new DelegateCommand<Episode>(WatchEpisodeExecute);
+        public ICommand CopyURLChannelCommand => _copyURLChannelCommand ??= new DelegateCommand<Channel>(CopyURLChannelExecute);
+        public ICommand CopyURLEpisodeCommand => _copyURLEpisodeCommand ??= new DelegateCommand<Episode>(CopyURLEpisodeExecute);
 
         public ObservableCollection<Season> Seasons
         {
@@ -284,6 +288,18 @@ namespace RaceControl.ViewModels
             };
 
             _dialogService.Show(nameof(VideoDialog), parameters, null);
+        }
+
+        private async void CopyURLChannelExecute(Channel channel)
+        {
+            var url = await GetTokenisedUrlForChannelAsync(channel.Self);
+            Clipboard.SetText(url);
+        }
+
+        private async void CopyURLEpisodeExecute(Episode episode)
+        {
+            var url = await GetTokenisedUrlForAssetAsync(episode.Items.First());
+            Clipboard.SetText(url);
         }
 
         private async void RefreshLiveEventsTimer_Elapsed(object sender, ElapsedEventArgs e)

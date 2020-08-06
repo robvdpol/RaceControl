@@ -5,7 +5,7 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:prism="http://prismlibrary.com/"
     Title="{Binding Title}"
-    Width="1100"
+    Width="1150"
     Height="800"
     prism:ViewModelLocator.AutoWireViewModel="True">
     <i:Interaction.Triggers>
@@ -24,9 +24,9 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" MaxWidth="260" />
-            <ColumnDefinition Width="*" MaxWidth="260" />
-            <ColumnDefinition Width="*" MaxWidth="260" />
+            <ColumnDefinition Width="*" MaxWidth="250" />
+            <ColumnDefinition Width="*" MaxWidth="250" />
+            <ColumnDefinition Width="*" MaxWidth="250" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Label
@@ -147,11 +147,20 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="{Binding}" />
                         <Button
                             Grid.Column="1"
+                            Width="60"
+                            Margin="2,0"
+                            Command="{Binding DataContext.CopyURLChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
+                            CommandParameter="{Binding}"
+                            Content="Copy URL" />
+                        <Button
+                            Grid.Column="2"
                             Width="50"
+                            Margin="2,0"
                             Command="{Binding DataContext.WatchChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
                             CommandParameter="{Binding}"
                             Content="Watch" />
@@ -203,11 +212,20 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="{Binding}" />
                         <Button
                             Grid.Column="1"
+                            Width="60"
+                            Margin="2,0"
+                            Command="{Binding DataContext.CopyURLEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
+                            CommandParameter="{Binding}"
+                            Content="Copy URL" />
+                        <Button
+                            Grid.Column="2"
                             Width="50"
+                            Margin="2,0"
                             Command="{Binding DataContext.WatchEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
                             CommandParameter="{Binding}"
                             Content="Watch" />
