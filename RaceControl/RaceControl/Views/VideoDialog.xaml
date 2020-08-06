@@ -62,7 +62,7 @@
                     Grid.Row="0"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
-                    Margin="2"
+                    Margin="4"
                     IsMoveToPointEnabled="True"
                     IsSnapToTickEnabled="False"
                     Maximum="{Binding Duration}"
