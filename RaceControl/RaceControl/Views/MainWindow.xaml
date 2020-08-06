@@ -4,7 +4,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:prism="http://prismlibrary.com/"
-    Title="{Binding Title}"
     Width="1150"
     Height="800"
     prism:ViewModelLocator.AutoWireViewModel="True">
@@ -148,19 +147,27 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="{Binding}" />
                         <Button
                             Grid.Column="1"
                             Width="60"
                             Margin="2,0"
-                            Command="{Binding DataContext.CopyURLChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
+                            Command="{Binding DataContext.CopyUrlChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
                             CommandParameter="{Binding}"
                             Content="Copy URL" />
                         <Button
                             Grid.Column="2"
-                            Width="50"
+                            Width="80"
                             Margin="2,0"
+                            Command="{Binding DataContext.WatchVlcChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
+                            CommandParameter="{Binding}"
+                            Content="Watch in VLC" />
+                        <Button
+                            Grid.Column="3"
+                            Width="50"
+                            Margin="2,0,0,0"
                             Command="{Binding DataContext.WatchChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
                             CommandParameter="{Binding}"
                             Content="Watch" />
@@ -213,19 +220,27 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="{Binding}" />
                         <Button
                             Grid.Column="1"
                             Width="60"
                             Margin="2,0"
-                            Command="{Binding DataContext.CopyURLEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
+                            Command="{Binding DataContext.CopyUrlEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
                             CommandParameter="{Binding}"
                             Content="Copy URL" />
                         <Button
                             Grid.Column="2"
-                            Width="50"
+                            Width="80"
                             Margin="2,0"
+                            Command="{Binding DataContext.WatchVlcEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
+                            CommandParameter="{Binding}"
+                            Content="Watch in VLC" />
+                        <Button
+                            Grid.Column="3"
+                            Width="50"
+                            Margin="2,0,0,0"
                             Command="{Binding DataContext.WatchEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
                             CommandParameter="{Binding}"
                             Content="Watch" />

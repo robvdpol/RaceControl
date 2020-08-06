@@ -1,4 +1,5 @@
 ﻿using LibVLCSharp.Shared;
+using Microsoft.Win32;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
@@ -11,8 +12,8 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -25,7 +26,7 @@ namespace RaceControl.ViewModels
         private readonly IDialogService _dialogService;
         private readonly IApiService _apiService;
         private readonly LibVLC _libVLC;
-        private readonly Timer _refreshLiveEventsTimer = new Timer(30000) { AutoReset = false };
+        private readonly Timer _refreshLiveEventsTimer;
 
         private ICommand _loadedCommand;
         private ICommand _closingCommand;
@@ -35,11 +36,14 @@ namespace RaceControl.ViewModels
         private ICommand _vodTypeSelectionChangedCommand;
         private ICommand _watchChannelCommand;
         private ICommand _watchEpisodeCommand;
-        private ICommand _copyURLChannelCommand;
-        private ICommand _copyURLEpisodeCommand;
+        private ICommand _watchVlcChannelCommand;
+        private ICommand _watchVlcEpisodeCommand;
+        private ICommand _copyUrlChannelCommand;
+        private ICommand _copyUrlEpisodeCommand;
 
         private bool _loaded;
         private string _token;
+        private string _vlcExeLocation;
         private ObservableCollection<Season> _seasons;
         private ObservableCollection<Event> _events;
         private ObservableCollection<Session> _sessions;
@@ -56,14 +60,9 @@ namespace RaceControl.ViewModels
         {
             _dialogService = dialogService;
             _apiService = apiService;
-            // Force creation of LibVLC-singleton at startup for better performance
             _libVLC = libVLC;
-
-            var version = Assembly.GetExecutingAssembly().GetName().Version;
-            Title = $"Race Control v{version.Major}.{version.Minor} - An open source F1TV client";
+            _refreshLiveEventsTimer = new Timer(60000) { AutoReset = false };
         }
-
-        public string Title { get; }
 
         public ICommand LoadedCommand => _loadedCommand ??= new DelegateCommand<RoutedEventArgs>(LoadedExecute);
         public ICommand ClosingCommand => _closingCommand ??= new DelegateCommand(ClosingExecute);
@@ -73,8 +72,16 @@ namespace RaceControl.ViewModels
         public ICommand VodTypeSelectionChangedCommand => _vodTypeSelectionChangedCommand ??= new DelegateCommand(VodTypeSelectionChangedExecute);
         public ICommand WatchChannelCommand => _watchChannelCommand ??= new DelegateCommand<Channel>(WatchChannelExecute);
         public ICommand WatchEpisodeCommand => _watchEpisodeCommand ??= new DelegateCommand<Episode>(WatchEpisodeExecute);
-        public ICommand CopyURLChannelCommand => _copyURLChannelCommand ??= new DelegateCommand<Channel>(CopyURLChannelExecute);
-        public ICommand CopyURLEpisodeCommand => _copyURLEpisodeCommand ??= new DelegateCommand<Episode>(CopyURLEpisodeExecute);
+        public ICommand WatchVlcChannelCommand => _watchVlcChannelCommand ??= new DelegateCommand<Channel>(WatchVlcChannelExecute, CanWatchVlcChannelExecute).ObservesProperty(() => VlcExeLocation);
+        public ICommand WatchVlcEpisodeCommand => _watchVlcEpisodeCommand ??= new DelegateCommand<Episode>(WatchVlcEpisodeExecute, CanWatchVlcEpisodeExecute).ObservesProperty(() => VlcExeLocation);
+        public ICommand CopyUrlChannelCommand => _copyUrlChannelCommand ??= new DelegateCommand<Channel>(CopyUrlChannelExecute);
+        public ICommand CopyUrlEpisodeCommand => _copyUrlEpisodeCommand ??= new DelegateCommand<Episode>(CopyUrlEpisodeExecute);
+
+        public string VlcExeLocation
+        {
+            get => _vlcExeLocation;
+            set => SetProperty(ref _vlcExeLocation, value);
+        }
 
         public ObservableCollection<Season> Seasons
         {
@@ -166,7 +173,18 @@ namespace RaceControl.ViewModels
                     return;
                 }
 
+                SetVlcExeLocation();
                 await Initialize();
+            }
+        }
+
+        private void SetVlcExeLocation()
+        {
+            var vlcRegistryKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\VideoLAN\VLC") ?? Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\VideoLAN\VLC");
+
+            if (vlcRegistryKey != null)
+            {
+                VlcExeLocation = vlcRegistryKey.GetValue(null) as string;
             }
         }
 
@@ -290,13 +308,35 @@ namespace RaceControl.ViewModels
             _dialogService.Show(nameof(VideoDialog), parameters, null);
         }
 
-        private async void CopyURLChannelExecute(Channel channel)
+        private bool CanWatchVlcChannelExecute(Channel channel)
+        {
+            return channel != null && !string.IsNullOrWhiteSpace(VlcExeLocation);
+        }
+
+        private async void WatchVlcChannelExecute(Channel channel)
+        {
+            var url = await GetTokenisedUrlForChannelAsync(channel.Self);
+            Process.Start(VlcExeLocation, url);
+        }
+
+        private bool CanWatchVlcEpisodeExecute(Episode episode)
+        {
+            return episode != null && !string.IsNullOrWhiteSpace(VlcExeLocation);
+        }
+
+        private async void WatchVlcEpisodeExecute(Episode episode)
+        {
+            var url = await GetTokenisedUrlForAssetAsync(episode.Items.First());
+            Process.Start(VlcExeLocation, url);
+        }
+
+        private async void CopyUrlChannelExecute(Channel channel)
         {
             var url = await GetTokenisedUrlForChannelAsync(channel.Self);
             Clipboard.SetText(url);
         }
 
-        private async void CopyURLEpisodeExecute(Episode episode)
+        private async void CopyUrlEpisodeExecute(Episode episode)
         {
             var url = await GetTokenisedUrlForAssetAsync(episode.Items.First());
             Clipboard.SetText(url);
