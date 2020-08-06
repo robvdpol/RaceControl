@@ -39,27 +39,24 @@ namespace RaceControl.ViewModels
         private string _url;
         private string _syncUID;
         private string _title;
-        private SubscriptionToken _syncSessionSubscriptionToken;
         private MediaPlayer _mediaPlayer;
         private MediaPlayer _mediaPlayerCast;
-        private TimeSpan _time;
         private ObservableCollection<TrackDescription> _audioTrackDescriptions;
+        private TimeSpan _time;
         private RendererDiscoverer _rendererDiscoverer;
         private ObservableCollection<RendererItem> _rendererItems;
         private RendererItem _selectedRendererItem;
         private bool _showControls;
         private bool _fullScreen;
-        private WindowStyle _windowStyle;
-        private ResizeMode _resizeMode;
-        private WindowState _windowState;
+        private WindowStyle _windowStyle = WindowStyle.SingleBorderWindow;
+        private ResizeMode _resizeMode = ResizeMode.CanResize;
+        private WindowState _windowState = WindowState.Normal;
 
         public VideoDialogViewModel(IEventAggregator eventAggregator, LibVLC libVLC)
         {
             _eventAggregator = eventAggregator;
             _libVLC = libVLC;
         }
-
-        public override string Title => _title;
 
         public ICommand MouseEnterCommand => _mouseEnterCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveExecute);
         public ICommand MouseLeaveCommand => _mouseLeaveCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveExecute);
@@ -73,6 +70,8 @@ namespace RaceControl.ViewModels
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
         public ICommand ScanChromecastCommand => _scanChromecastCommand ??= new DelegateCommand(ScanChromecastExecute, CanScanChromecastExecute).ObservesProperty(() => RendererDiscoverer);
         public ICommand CastVideoCommand => _castVideoCommand ??= new DelegateCommand(CastVideoExecute, CanCastVideoExecute).ObservesProperty(() => SelectedRendererItem);
+
+        public override string Title => _title;
 
         public MediaPlayer MediaPlayer
         {
@@ -144,8 +143,6 @@ namespace RaceControl.ViewModels
         {
             base.OnDialogOpened(parameters);
 
-            SetWindowed();
-
             _urlFunc = parameters.GetValue<Func<string, Task<string>>>("urlfunc");
             _url = parameters.GetValue<string>("url");
             _syncUID = parameters.GetValue<string>("syncuid");
@@ -155,34 +152,22 @@ namespace RaceControl.ViewModels
             MediaPlayer.ESAdded += MediaPlayer_ESAdded;
             MediaPlayer.ESDeleted += MediaPlayer_ESDeleted;
             MediaPlayer.TimeChanged += MediaPlayer_TimeChanged;
-
-            if (MediaPlayer.Play(await CreatePlaybackMedia()))
-            {
-                _syncSessionSubscriptionToken = _eventAggregator.GetEvent<SyncStreamsEvent>().Subscribe(OnSyncSession);
-            }
+            MediaPlayer.Play(await CreatePlaybackMedia());
 
             _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
+
+            _eventAggregator.GetEvent<SyncStreamsEvent>().Subscribe(OnSyncSession);
         }
 
         public override void OnDialogClosed()
         {
             base.OnDialogClosed();
 
-            if (RendererDiscoverer != null)
-            {
-                RendererDiscoverer.Stop();
-                RendererDiscoverer.ItemAdded -= RendererDiscoverer_ItemAdded;
-                RendererDiscoverer.Dispose();
-            }
+            _eventAggregator.GetEvent<SyncStreamsEvent>().Unsubscribe(OnSyncSession);
 
             _showControlsTimer.Stop();
             _showControlsTimer.Elapsed -= ShowControlsTimer_Elapsed;
             _showControlsTimer.Dispose();
-
-            if (_syncSessionSubscriptionToken != null)
-            {
-                _eventAggregator.GetEvent<SyncStreamsEvent>().Unsubscribe(_syncSessionSubscriptionToken);
-            }
 
             MediaPlayer.Stop();
             MediaPlayer.ESAdded -= MediaPlayer_ESAdded;
@@ -194,6 +179,13 @@ namespace RaceControl.ViewModels
             {
                 _mediaPlayerCast.Stop();
                 _mediaPlayerCast.Dispose();
+            }
+
+            if (RendererDiscoverer != null)
+            {
+                RendererDiscoverer.Stop();
+                RendererDiscoverer.ItemAdded -= RendererDiscoverer_ItemAdded;
+                RendererDiscoverer.Dispose();
             }
         }
 
