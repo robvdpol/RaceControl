@@ -175,9 +175,9 @@ namespace RaceControl.ViewModels
             _media.DurationChanged += Media_DurationChanged;
 
             MediaPlayer = CreateMediaPlayer();
+            MediaPlayer.TimeChanged += MediaPlayer_TimeChanged;
             MediaPlayer.ESAdded += MediaPlayer_ESAdded;
             MediaPlayer.ESDeleted += MediaPlayer_ESDeleted;
-            MediaPlayer.TimeChanged += MediaPlayer_TimeChanged;
             MediaPlayer.Play(_media);
 
             _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
@@ -196,9 +196,9 @@ namespace RaceControl.ViewModels
             _showControlsTimer.Dispose();
 
             MediaPlayer.Stop();
+            MediaPlayer.TimeChanged -= MediaPlayer_TimeChanged;
             MediaPlayer.ESAdded -= MediaPlayer_ESAdded;
             MediaPlayer.ESDeleted -= MediaPlayer_ESDeleted;
-            MediaPlayer.TimeChanged -= MediaPlayer_TimeChanged;
             MediaPlayer.Dispose();
 
             _media.DurationChanged -= Media_DurationChanged;
@@ -221,6 +221,17 @@ namespace RaceControl.ViewModels
                 RendererDiscoverer.ItemAdded -= RendererDiscoverer_ItemAdded;
                 RendererDiscoverer.Dispose();
             }
+        }
+
+        private void Media_DurationChanged(object sender, MediaDurationChangedEventArgs e)
+        {
+            Duration = e.Duration;
+        }
+
+        private void MediaPlayer_TimeChanged(object sender, MediaPlayerTimeChangedEventArgs e)
+        {
+            SetProperty(ref _sliderTime, e.Time, nameof(SliderTime));
+            DisplayTime = TimeSpan.FromMilliseconds(e.Time);
         }
 
         private void MediaPlayer_ESAdded(object sender, MediaPlayerESAddedEventArgs e)
@@ -259,15 +270,9 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void Media_DurationChanged(object sender, MediaDurationChangedEventArgs e)
+        private void ShowControlsTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            Duration = e.Duration;
-        }
-
-        private void MediaPlayer_TimeChanged(object sender, MediaPlayerTimeChangedEventArgs e)
-        {
-            SetProperty(ref _sliderTime, e.Time, nameof(SliderTime));
-            DisplayTime = TimeSpan.FromMilliseconds(e.Time);
+            ShowControls = false;
         }
 
         private void RendererDiscoverer_ItemAdded(object sender, RendererDiscovererItemAddedEventArgs e)
@@ -279,11 +284,6 @@ namespace RaceControl.ViewModels
                     RendererItems.Add(e.RendererItem);
                 });
             }
-        }
-
-        private void ShowControlsTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            ShowControls = false;
         }
 
         private void MouseEnterOrLeaveOrMoveExecute()
