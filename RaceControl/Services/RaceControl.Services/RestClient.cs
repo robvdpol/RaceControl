@@ -20,16 +20,6 @@ namespace RaceControl.Services
             _httpClient = httpClient;
         }
 
-        public void SetJWTAuthorizationHeader(string token)
-        {
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("JWT", token);
-        }
-
-        public void ClearAuthorizationHeader()
-        {
-            _httpClient.DefaultRequestHeaders.Authorization = null;
-        }
-
         public async Task<TResponse> GetAsJsonAsync<TResponse>(string url)
         {
             var httpResponse = await _httpClient.GetAsync(url);
@@ -45,7 +35,7 @@ namespace RaceControl.Services
             return response;
         }
 
-        public async Task<TResponse> PostAsJsonAsync<TRequest, TResponse>(string url, TRequest requestObject, IDictionary<string, string> requestHeaders = null)
+        public async Task<TResponse> PostAsJsonAsync<TRequest, TResponse>(string url, TRequest requestObject, IDictionary<string, string> requestHeaders = null, string token = null)
         {
             var requestJson = JsonConvert.SerializeObject(requestObject);
             var requestContent = new StringContent(requestJson, Encoding.UTF8, mediaTypeJson);
@@ -58,7 +48,19 @@ namespace RaceControl.Services
                 }
             }
 
-            var httpResponse = await _httpClient.PostAsync(url, requestContent);
+            HttpResponseMessage httpResponse;
+
+            using (var requestMessage = new HttpRequestMessage(HttpMethod.Post, url))
+            {
+                requestMessage.Content = requestContent;
+
+                if (!string.IsNullOrWhiteSpace(token))
+                {
+                    requestMessage.Headers.Authorization = CreateJWTAuthorizationHeader(token);
+                }
+
+                httpResponse = await _httpClient.SendAsync(requestMessage);
+            }
 
             if (!httpResponse.IsSuccessStatusCode)
             {
@@ -69,6 +71,11 @@ namespace RaceControl.Services
             var response = JsonConvert.DeserializeObject<TResponse>(responseContent);
 
             return response;
+        }
+
+        private AuthenticationHeaderValue CreateJWTAuthorizationHeader(string token)
+        {
+            return new AuthenticationHeaderValue("JWT", token);
         }
     }
 }

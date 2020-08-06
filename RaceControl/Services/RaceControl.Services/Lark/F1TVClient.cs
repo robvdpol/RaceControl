@@ -15,10 +15,7 @@ namespace RaceControl.Services.Lark
         {
             var url = _endpoint + "/viewings";
             var request = new ChannelUrl { Url = channelUrl };
-
-            _restClient.SetJWTAuthorizationHeader(token);
-            var tokenisedUrl = await _restClient.PostAsJsonAsync<ChannelUrl, TokenisedUrl>(url, request);
-            _restClient.ClearAuthorizationHeader();
+            var tokenisedUrl = await _restClient.PostAsJsonAsync<ChannelUrl, TokenisedUrl>(url, request, null, token);
 
             return tokenisedUrl;
         }
@@ -27,10 +24,7 @@ namespace RaceControl.Services.Lark
         {
             var url = _endpoint + "/viewings";
             var request = new AssetUrl { Url = assetUrl };
-
-            _restClient.SetJWTAuthorizationHeader(token);
-            var tokenisedUrlContainer = await _restClient.PostAsJsonAsync<AssetUrl, TokenisedUrlContainer>(url, request);
-            _restClient.ClearAuthorizationHeader();
+            var tokenisedUrlContainer = await _restClient.PostAsJsonAsync<AssetUrl, TokenisedUrlContainer>(url, request, null, token);
 
             return tokenisedUrlContainer;
         }
