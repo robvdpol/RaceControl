@@ -6,6 +6,7 @@ using Prism.Services.Dialogs;
 using RaceControl.Core.Mvvm;
 using RaceControl.Events;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,6 +22,8 @@ namespace RaceControl.ViewModels
         private readonly IEventAggregator _eventAggregator;
         private readonly LibVLC _libVLC;
         private readonly Timer _showControlsTimer = new Timer(2000) { AutoReset = false };
+        private readonly List<MediaPlayer> _castMediaPlayers = new List<MediaPlayer>();
+        private readonly List<Media> _castMedia = new List<Media>();
 
         private ICommand _mouseEnterCommand;
         private ICommand _mouseLeaveCommand;
@@ -40,7 +43,6 @@ namespace RaceControl.ViewModels
         private string _syncUID;
         private string _title;
         private MediaPlayer _mediaPlayer;
-        private MediaPlayer _mediaPlayerCast;
         private Media _media;
         private ObservableCollection<TrackDescription> _audioTrackDescriptions;
         private long _duration;
@@ -101,7 +103,7 @@ namespace RaceControl.ViewModels
             {
                 if (SetProperty(ref _sliderTime, value))
                 {
-                    SetMediaPlayerTime(SliderTime, false, false);
+                    SetMediaPlayerTime(SliderTime, false);
                 }
             }
         }
@@ -169,14 +171,13 @@ namespace RaceControl.ViewModels
             _syncUID = parameters.GetValue<string>("syncuid");
             _title = parameters.GetValue<string>("title");
 
+            _media = await CreatePlaybackMedia();
+            _media.DurationChanged += Media_DurationChanged;
+
             MediaPlayer = CreateMediaPlayer();
             MediaPlayer.ESAdded += MediaPlayer_ESAdded;
             MediaPlayer.ESDeleted += MediaPlayer_ESDeleted;
             MediaPlayer.TimeChanged += MediaPlayer_TimeChanged;
-
-            _media = await CreatePlaybackMedia();
-            _media.DurationChanged += Media_DurationChanged;
-
             MediaPlayer.Play(_media);
 
             _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
@@ -194,19 +195,24 @@ namespace RaceControl.ViewModels
             _showControlsTimer.Elapsed -= ShowControlsTimer_Elapsed;
             _showControlsTimer.Dispose();
 
-            _media.DurationChanged -= Media_DurationChanged;
-            _media.Dispose();
-
             MediaPlayer.Stop();
             MediaPlayer.ESAdded -= MediaPlayer_ESAdded;
             MediaPlayer.ESDeleted -= MediaPlayer_ESDeleted;
             MediaPlayer.TimeChanged -= MediaPlayer_TimeChanged;
             MediaPlayer.Dispose();
 
-            if (_mediaPlayerCast != null)
+            _media.DurationChanged -= Media_DurationChanged;
+            _media.Dispose();
+
+            foreach (var mediaPlayer in _castMediaPlayers)
             {
-                _mediaPlayerCast.Stop();
-                _mediaPlayerCast.Dispose();
+                mediaPlayer.Stop();
+                mediaPlayer.Dispose();
+            }
+
+            foreach (var media in _castMedia)
+            {
+                media.Dispose();
             }
 
             if (RendererDiscoverer != null)
@@ -302,9 +308,12 @@ namespace RaceControl.ViewModels
                 MediaPlayer.Pause();
             }
 
-            if (_mediaPlayerCast != null && _mediaPlayerCast.CanPause)
+            foreach (var mediaPlayer in _castMediaPlayers)
             {
-                _mediaPlayerCast.Pause();
+                if (mediaPlayer.CanPause)
+                {
+                    mediaPlayer.Pause();
+                }
             }
         }
 
@@ -318,7 +327,7 @@ namespace RaceControl.ViewModels
             if (int.TryParse(value, out var seconds))
             {
                 var time = MediaPlayer.Time + (seconds * 1000);
-                SetMediaPlayerTime(time, false, false);
+                SetMediaPlayerTime(time, false);
             }
         }
 
@@ -335,7 +344,7 @@ namespace RaceControl.ViewModels
         {
             if (_syncUID == payload.SyncUID)
             {
-                SetMediaPlayerTime(payload.Time, true, false);
+                SetMediaPlayerTime(payload.Time, true);
             }
         }
 
@@ -376,16 +385,14 @@ namespace RaceControl.ViewModels
 
         private async void CastVideoExecute()
         {
-            _mediaPlayerCast ??= CreateMediaPlayer();
-            _mediaPlayerCast.Stop();
-            _mediaPlayerCast.SetRenderer(SelectedRendererItem);
-
             var media = await CreatePlaybackMedia();
+            var mediaPlayer = CreateMediaPlayer();
+            mediaPlayer.SetRenderer(SelectedRendererItem);
+            mediaPlayer.Play(media);
+            mediaPlayer.Time = MediaPlayer.Time;
 
-            if (_mediaPlayerCast.Play(media))
-            {
-                SetMediaPlayerTime(MediaPlayer.Time, false, true);
-            }
+            _castMediaPlayers.Add(mediaPlayer);
+            _castMedia.Add(media);
         }
 
         private void SetWindowed()
@@ -404,22 +411,29 @@ namespace RaceControl.ViewModels
             WindowState = WindowState.Maximized;
         }
 
-        private void SetMediaPlayerTime(long time, bool mustBePlaying, bool castOnly)
+        private void SetMediaPlayerTime(long time, bool mustBePlaying)
         {
-            if (!castOnly && (!mustBePlaying || MediaPlayer.IsPlaying))
+            if (!mustBePlaying || MediaPlayer.IsPlaying)
             {
                 MediaPlayer.Time = time;
             }
 
-            if (_mediaPlayerCast == null)
+            foreach (var mediaPlayer in _castMediaPlayers)
             {
-                return;
+                if (!mustBePlaying || mediaPlayer.IsPlaying)
+                {
+                    mediaPlayer.Time = time;
+                }
             }
+        }
 
-            if (!mustBePlaying || _mediaPlayerCast.IsPlaying)
-            {
-                _mediaPlayerCast.Time = time;
-            }
+        private async Task<Media> CreatePlaybackMedia()
+        {
+            var url = await _urlFunc.Invoke(_url);
+            var media = new Media(_libVLC, url, FromType.FromLocation);
+            await media.Parse(MediaParseOptions.ParseNetwork);
+
+            return media;
         }
 
         private MediaPlayer CreateMediaPlayer()
@@ -430,15 +444,6 @@ namespace RaceControl.ViewModels
                 EnableMouseInput = false,
                 EnableKeyInput = false
             };
-        }
-
-        private async Task<Media> CreatePlaybackMedia()
-        {
-            var url = await _urlFunc.Invoke(_url);
-            var media = new Media(_libVLC, url, FromType.FromLocation);
-            await media.Parse(MediaParseOptions.ParseNetwork);
-
-            return media;
         }
     }
 }
