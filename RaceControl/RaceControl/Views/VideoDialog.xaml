@@ -21,8 +21,7 @@
         </Style>
     </prism:Dialog.WindowStyle>
     <vlc:VideoView MediaPlayer="{Binding MediaPlayer}">
-        <!--  Non-transparent background is required to capture mouse events  -->
-        <Grid Background="#01000000">
+        <Grid>
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="MouseEnter">
                     <i:InvokeCommandAction Command="{Binding MouseEnterCommand}" />
@@ -33,14 +32,19 @@
                 <i:EventTrigger EventName="MouseMove">
                     <i:InvokeCommandAction Command="{Binding MouseMoveCommand}" />
                 </i:EventTrigger>
-                <i:EventTrigger EventName="MouseDown">
-                    <i:InvokeCommandAction Command="{Binding MouseDownCommand}" PassEventArgsToCommand="True" />
-                </i:EventTrigger>
             </i:Interaction.Triggers>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
+            <!--  Non-transparent background is required to capture mouse events  -->
+            <Grid Grid.Row="0" Background="#01000000">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseDown">
+                        <i:InvokeCommandAction Command="{Binding MouseDownCommand}" PassEventArgsToCommand="True" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </Grid>
             <Grid
                 Grid.Row="1"
                 Height="30"
