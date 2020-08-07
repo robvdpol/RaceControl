@@ -5,6 +5,7 @@ using Prism.Mvvm;
 using Prism.Services.Dialogs;
 using RaceControl.Common;
 using RaceControl.Comparers;
+using RaceControl.Core.Helpers;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Api;
 using RaceControl.Views;
@@ -158,6 +159,8 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _selectedVodType, value);
         }
 
+        public Session CurrentSession => SelectedLiveSession ?? SelectedSession;
+
         private async void LoadedExecute(RoutedEventArgs args)
         {
             if (!_loaded)
@@ -305,7 +308,7 @@ namespace RaceControl.ViewModels
 
         private void WatchChannelExecute(Channel channel)
         {
-            var session = SelectedLiveSession ?? SelectedSession;
+            var session = CurrentSession;
             Func<string, Task<string>> urlFunc = (channelUrl) => GetTokenisedUrlForChannelAsync(channelUrl);
 
             var parameters = new DialogParameters
@@ -343,10 +346,17 @@ namespace RaceControl.ViewModels
 
         private async void WatchVlcChannelExecute(Channel channel)
         {
-            var session = SelectedLiveSession ?? SelectedSession;
-            var title = $"{session} - {channel}";
+            var title = $"{CurrentSession} - {channel}";
             var url = await GetTokenisedUrlForChannelAsync(channel.Self);
-            Process.Start(VlcExeLocation, $"{url} --meta-title=\"{title}\"");
+
+            try
+            {
+                Process.Start(VlcExeLocation, $"{url} --meta-title=\"{title}\"");
+            }
+            catch (Exception ex)
+            {
+                MessageBoxHelper.ShowError(ex.Message);
+            }
         }
 
         private bool CanWatchVlcEpisodeExecute(Episode episode)
@@ -358,7 +368,15 @@ namespace RaceControl.ViewModels
         {
             var title = episode.ToString();
             var url = await GetTokenisedUrlForAssetAsync(episode.Items.First());
-            Process.Start(VlcExeLocation, $"{url} --meta-title=\"{title}\"");
+
+            try
+            {
+                Process.Start(VlcExeLocation, $"{url} --meta-title=\"{title}\"");
+            }
+            catch (Exception ex)
+            {
+                MessageBoxHelper.ShowError(ex.Message);
+            }
         }
 
         private async void CopyUrlChannelExecute(Channel channel)
