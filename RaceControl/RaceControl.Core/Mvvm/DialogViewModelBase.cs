@@ -6,7 +6,7 @@ namespace RaceControl.Core.Mvvm
 {
     public abstract class DialogViewModelBase : BindableBase, IDialogAware
     {
-        public abstract string Title { get; }
+        public abstract string Title { get; set; }
 
         public event Action<IDialogResult> RequestClose;
 

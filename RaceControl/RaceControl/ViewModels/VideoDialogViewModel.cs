@@ -35,10 +35,12 @@ namespace RaceControl.ViewModels
         private ICommand _scanChromecastCommand;
         private ICommand _castVideoCommand;
 
+        private Guid _uniqueIdentifier = Guid.NewGuid();
         private Func<string, Task<string>> _urlFunc;
         private string _url;
         private string _syncUID;
         private string _title;
+        private bool _isLive;
         private MediaPlayer _mediaPlayer;
         private Media _media;
         private ObservableCollection<TrackDescription> _audioTrackDescriptions;
@@ -73,7 +75,17 @@ namespace RaceControl.ViewModels
         public ICommand ScanChromecastCommand => _scanChromecastCommand ??= new DelegateCommand(ScanChromecastExecute, CanScanChromecastExecute).ObservesProperty(() => RendererDiscoverer);
         public ICommand CastVideoCommand => _castVideoCommand ??= new DelegateCommand(CastVideoExecute, CanCastVideoExecute).ObservesProperty(() => SelectedRendererItem);
 
-        public override string Title => _title;
+        public override string Title
+        {
+            get => _title;
+            set => SetProperty(ref _title, value);
+        }
+
+        public bool IsLive
+        {
+            get => _isLive;
+            set => SetProperty(ref _isLive, value);
+        }
 
         public MediaPlayer MediaPlayer
         {
@@ -166,7 +178,8 @@ namespace RaceControl.ViewModels
             _urlFunc = parameters.GetValue<Func<string, Task<string>>>("urlfunc");
             _url = parameters.GetValue<string>("url");
             _syncUID = parameters.GetValue<string>("syncuid");
-            _title = parameters.GetValue<string>("title");
+            Title = parameters.GetValue<string>("title");
+            IsLive = parameters.GetValue<bool>("islive");
 
             MediaPlayer = CreateMediaPlayer();
             _media = await CreateMedia();
@@ -303,14 +316,14 @@ namespace RaceControl.ViewModels
         {
             if (MediaPlayer.IsPlaying)
             {
-                var payload = new SyncStreamsEventPayload(_syncUID, MediaPlayer.Time);
+                var payload = new SyncStreamsEventPayload(_uniqueIdentifier, _syncUID, MediaPlayer.Time);
                 _eventAggregator.GetEvent<SyncStreamsEvent>().Publish(payload);
             }
         }
 
         private void OnSyncSession(SyncStreamsEventPayload payload)
         {
-            if (_syncUID == payload.SyncUID)
+            if (_syncUID == payload.SyncUID && _uniqueIdentifier != payload.RequesterIdentifier)
             {
                 SetMediaPlayerTime(payload.Time, true);
             }
@@ -330,8 +343,11 @@ namespace RaceControl.ViewModels
 
         private void AudioTrackSelectionChangedExecute(SelectionChangedEventArgs args)
         {
-            var trackDescription = (TrackDescription)args.AddedItems[0];
-            MediaPlayer.SetAudioTrack(trackDescription.Id);
+            if (args.AddedItems.Count > 0)
+            {
+                var trackDescription = (TrackDescription)args.AddedItems[0];
+                MediaPlayer.SetAudioTrack(trackDescription.Id);
+            }
         }
 
         private bool CanScanChromecastExecute()

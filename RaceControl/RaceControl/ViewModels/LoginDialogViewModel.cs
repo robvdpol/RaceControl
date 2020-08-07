@@ -18,6 +18,7 @@ namespace RaceControl.ViewModels
 
         private ICommand _loginCommand;
 
+        private string _title;
         private string _email;
         private string _password;
         private string _error;
@@ -25,11 +26,16 @@ namespace RaceControl.ViewModels
         public LoginDialogViewModel(IAuthorizationService authorizationService)
         {
             _authorizationService = authorizationService;
+            Title = "Login";
         }
 
-        public override string Title => "Login";
-
         public ICommand LoginCommand => _loginCommand ??= new DelegateCommand(LoginExecute, CanLoginExecute).ObservesProperty(() => Email).ObservesProperty(() => Password);
+
+        public override string Title
+        {
+            get => _title;
+            set => SetProperty(ref _title, value);
+        }
 
         public string Email
         {

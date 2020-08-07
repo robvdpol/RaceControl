@@ -287,7 +287,8 @@ namespace RaceControl.ViewModels
                 { "urlfunc", urlFunc },
                 { "url", channel.Self },
                 { "syncuid", SelectedSession.UID },
-                { "title", $"{SelectedSession} - {channel}" }
+                { "title", $"{SelectedSession} - {channel}" },
+                { "islive", SelectedSession.IsLive }
             };
 
             _dialogService.Show(nameof(VideoDialog), parameters, null);
@@ -302,7 +303,8 @@ namespace RaceControl.ViewModels
                 { "urlfunc", urlFunc },
                 { "url", episode.Items.First() },
                 { "syncuid", episode.UID },
-                { "title", episode.ToString() }
+                { "title", episode.ToString() },
+                { "islive", false }
             };
 
             _dialogService.Show(nameof(VideoDialog), parameters, null);
