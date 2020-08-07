@@ -6,7 +6,6 @@ using Prism.Services.Dialogs;
 using RaceControl.Core.Mvvm;
 using RaceControl.Events;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,8 +21,6 @@ namespace RaceControl.ViewModels
         private readonly IEventAggregator _eventAggregator;
         private readonly LibVLC _libVLC;
         private readonly Timer _showControlsTimer = new Timer(2000) { AutoReset = false };
-        private readonly List<MediaPlayer> _castMediaPlayers = new List<MediaPlayer>();
-        private readonly List<Media> _castMedia = new List<Media>();
 
         private ICommand _mouseEnterCommand;
         private ICommand _mouseLeaveCommand;
@@ -103,7 +100,7 @@ namespace RaceControl.ViewModels
             {
                 if (SetProperty(ref _sliderTime, value))
                 {
-                    SetMediaPlayerTime(SliderTime, false);
+                    SetMediaPlayerTime(_sliderTime);
                 }
             }
         }
@@ -171,16 +168,12 @@ namespace RaceControl.ViewModels
             _syncUID = parameters.GetValue<string>("syncuid");
             _title = parameters.GetValue<string>("title");
 
-            _media = await CreatePlaybackMedia();
-            _media.DurationChanged += Media_DurationChanged;
-
             MediaPlayer = CreateMediaPlayer();
-            MediaPlayer.TimeChanged += MediaPlayer_TimeChanged;
-            MediaPlayer.ESAdded += MediaPlayer_ESAdded;
-            MediaPlayer.ESDeleted += MediaPlayer_ESDeleted;
+            _media = await CreateMedia();
             MediaPlayer.Play(_media);
 
             _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
+            _showControlsTimer.Start();
 
             _eventAggregator.GetEvent<SyncStreamsEvent>().Subscribe(OnSyncSession);
         }
@@ -195,25 +188,8 @@ namespace RaceControl.ViewModels
             _showControlsTimer.Elapsed -= ShowControlsTimer_Elapsed;
             _showControlsTimer.Dispose();
 
-            MediaPlayer.Stop();
-            MediaPlayer.TimeChanged -= MediaPlayer_TimeChanged;
-            MediaPlayer.ESAdded -= MediaPlayer_ESAdded;
-            MediaPlayer.ESDeleted -= MediaPlayer_ESDeleted;
-            MediaPlayer.Dispose();
-
-            _media.DurationChanged -= Media_DurationChanged;
-            _media.Dispose();
-
-            foreach (var mediaPlayer in _castMediaPlayers)
-            {
-                mediaPlayer.Stop();
-                mediaPlayer.Dispose();
-            }
-
-            foreach (var media in _castMedia)
-            {
-                media.Dispose();
-            }
+            RemoveMedia(_media);
+            RemoveMediaPlayer(MediaPlayer);
 
             if (RendererDiscoverer != null)
             {
@@ -307,14 +283,6 @@ namespace RaceControl.ViewModels
             {
                 MediaPlayer.Pause();
             }
-
-            foreach (var mediaPlayer in _castMediaPlayers)
-            {
-                if (mediaPlayer.CanPause)
-                {
-                    mediaPlayer.Pause();
-                }
-            }
         }
 
         private void ToggleMuteExecute()
@@ -327,7 +295,7 @@ namespace RaceControl.ViewModels
             if (int.TryParse(value, out var seconds))
             {
                 var time = MediaPlayer.Time + (seconds * 1000);
-                SetMediaPlayerTime(time, false);
+                SetMediaPlayerTime(time);
             }
         }
 
@@ -385,14 +353,13 @@ namespace RaceControl.ViewModels
 
         private async void CastVideoExecute()
         {
-            var media = await CreatePlaybackMedia();
-            var mediaPlayer = CreateMediaPlayer();
-            mediaPlayer.SetRenderer(SelectedRendererItem);
-            mediaPlayer.Play(media);
-            mediaPlayer.Time = MediaPlayer.Time;
-
-            _castMediaPlayers.Add(mediaPlayer);
-            _castMedia.Add(media);
+            var time = MediaPlayer.Time;
+            MediaPlayer.Stop();
+            RemoveMedia(_media);
+            _media = await CreateMedia();
+            MediaPlayer.SetRenderer(SelectedRendererItem);
+            MediaPlayer.Play(_media);
+            SetMediaPlayerTime(time);
         }
 
         private void SetWindowed()
@@ -411,37 +378,52 @@ namespace RaceControl.ViewModels
             WindowState = WindowState.Maximized;
         }
 
-        private void SetMediaPlayerTime(long time, bool mustBePlaying)
+        private void SetMediaPlayerTime(long time, bool mustBePlaying = false)
         {
             if (!mustBePlaying || MediaPlayer.IsPlaying)
             {
                 MediaPlayer.Time = time;
             }
-
-            foreach (var mediaPlayer in _castMediaPlayers)
-            {
-                if (!mustBePlaying || mediaPlayer.IsPlaying)
-                {
-                    mediaPlayer.Time = time;
-                }
-            }
         }
 
-        private async Task<Media> CreatePlaybackMedia()
+        private async Task<Media> CreateMedia()
         {
             var url = await _urlFunc.Invoke(_url);
+            var media = new Media(_libVLC, url, FromType.FromLocation);
+            media.DurationChanged += Media_DurationChanged;
 
-            return new Media(_libVLC, url, FromType.FromLocation);
+            return media;
+        }
+
+        private void RemoveMedia(Media media)
+        {
+            media.DurationChanged -= Media_DurationChanged;
+            media.Dispose();
         }
 
         private MediaPlayer CreateMediaPlayer()
         {
-            return new MediaPlayer(_libVLC)
+            var mediaPlayer = new MediaPlayer(_libVLC)
             {
                 EnableHardwareDecoding = true,
                 EnableMouseInput = false,
                 EnableKeyInput = false
             };
+
+            mediaPlayer.TimeChanged += MediaPlayer_TimeChanged;
+            mediaPlayer.ESAdded += MediaPlayer_ESAdded;
+            mediaPlayer.ESDeleted += MediaPlayer_ESDeleted;
+
+            return mediaPlayer;
+        }
+
+        private void RemoveMediaPlayer(MediaPlayer mediaPlayer)
+        {
+            mediaPlayer.Stop();
+            mediaPlayer.TimeChanged -= MediaPlayer_TimeChanged;
+            mediaPlayer.ESAdded -= MediaPlayer_ESAdded;
+            mediaPlayer.ESDeleted -= MediaPlayer_ESDeleted;
+            mediaPlayer.Dispose();
         }
     }
 }
