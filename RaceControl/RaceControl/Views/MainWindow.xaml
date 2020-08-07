@@ -99,11 +99,11 @@
                 Grid.Row="1"
                 Margin="2"
                 ItemsSource="{Binding LiveSessions}"
-                SelectedItem="{Binding SelectedSession}"
+                SelectedItem="{Binding SelectedLiveSession}"
                 SelectionMode="Single">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectionChanged">
-                        <i:InvokeCommandAction Command="{Binding SessionSelectionChangedCommand}" />
+                        <i:InvokeCommandAction Command="{Binding LiveSessionSelectionChangedCommand}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </ListView>

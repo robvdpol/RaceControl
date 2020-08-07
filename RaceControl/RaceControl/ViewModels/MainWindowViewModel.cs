@@ -32,6 +32,7 @@ namespace RaceControl.ViewModels
         private ICommand _closingCommand;
         private ICommand _seasonSelectionChangedCommand;
         private ICommand _eventSelectionChangedCommand;
+        private ICommand _liveSessionSelectionChangedCommand;
         private ICommand _sessionSelectionChangedCommand;
         private ICommand _vodTypeSelectionChangedCommand;
         private ICommand _watchChannelCommand;
@@ -53,6 +54,7 @@ namespace RaceControl.ViewModels
         private ObservableCollection<Episode> _episodes;
         private Season _selectedSeason;
         private Event _selectedEvent;
+        private Session _selectedLiveSession;
         private Session _selectedSession;
         private VodType _selectedVodType;
 
@@ -68,6 +70,7 @@ namespace RaceControl.ViewModels
         public ICommand ClosingCommand => _closingCommand ??= new DelegateCommand(ClosingExecute);
         public ICommand SeasonSelectionChangedCommand => _seasonSelectionChangedCommand ??= new DelegateCommand(SeasonSelectionChangedExecute);
         public ICommand EventSelectionChangedCommand => _eventSelectionChangedCommand ??= new DelegateCommand(EventSelectionChangedExecute);
+        public ICommand LiveSessionSelectionChangedCommand => _liveSessionSelectionChangedCommand ??= new DelegateCommand(LiveSessionSelectionChangedExecute);
         public ICommand SessionSelectionChangedCommand => _sessionSelectionChangedCommand ??= new DelegateCommand(SessionSelectionChangedExecute);
         public ICommand VodTypeSelectionChangedCommand => _vodTypeSelectionChangedCommand ??= new DelegateCommand(VodTypeSelectionChangedExecute);
         public ICommand WatchChannelCommand => _watchChannelCommand ??= new DelegateCommand<Channel>(WatchChannelExecute);
@@ -135,6 +138,12 @@ namespace RaceControl.ViewModels
         {
             get => _selectedEvent;
             set => SetProperty(ref _selectedEvent, value);
+        }
+
+        public Session SelectedLiveSession
+        {
+            get => _selectedLiveSession;
+            set => SetProperty(ref _selectedLiveSession, value);
         }
 
         public Session SelectedSession
@@ -236,27 +245,42 @@ namespace RaceControl.ViewModels
             }
         }
 
+        private async void LiveSessionSelectionChangedExecute()
+        {
+            if (SelectedLiveSession != null)
+            {
+                SelectedSession = null;
+                await SelectSession(SelectedLiveSession);
+            }
+        }
+
         private async void SessionSelectionChangedExecute()
+        {
+            if (SelectedSession != null)
+            {
+                SelectedLiveSession = null;
+                await SelectSession(SelectedSession);
+            }
+        }
+
+        private async Task SelectSession(Session session)
         {
             SelectedVodType = null;
             ClearChannels();
             ClearEpisodes();
 
-            if (SelectedSession != null)
-            {
-                var channels = await _apiService.GetChannelsAsync(SelectedSession.UID);
-                Channels.AddRange(channels.OrderBy(c => c.Name, new ChannelComparer()));
+            var channels = await _apiService.GetChannelsAsync(session.UID);
+            Channels.AddRange(channels.OrderBy(c => c.Name, new ChannelComparer()));
 
-                if (SelectedSession.ContentUrls.Any())
+            if (session.ContentUrls.Any())
+            {
+                var episodes = new ConcurrentBag<Episode>();
+                var tasks = session.ContentUrls.Select(async episodeUrl =>
                 {
-                    var episodes = new ConcurrentBag<Episode>();
-                    var tasks = SelectedSession.ContentUrls.Select(async episodeUrl =>
-                    {
-                        episodes.Add(await _apiService.GetEpisodeAsync(episodeUrl.GetUID()));
-                    });
-                    await Task.WhenAll(tasks);
-                    Episodes.AddRange(episodes.OrderBy(e => e.Title));
-                }
+                    episodes.Add(await _apiService.GetEpisodeAsync(episodeUrl.GetUID()));
+                });
+                await Task.WhenAll(tasks);
+                Episodes.AddRange(episodes.OrderBy(e => e.Title));
             }
         }
 
@@ -407,6 +431,7 @@ namespace RaceControl.ViewModels
 
         private void ClearSessions()
         {
+            SelectedLiveSession = null;
             Sessions.Clear();
             ClearChannels();
         }
