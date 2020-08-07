@@ -293,20 +293,23 @@ namespace RaceControl.ViewModels
 
         private async void VodTypeSelectionChangedExecute()
         {
-            SelectedLiveSession = null;
-            SelectedSession = null;
-            ClearEpisodes();
-            ClearChannels();
-
-            if (SelectedVodType != null && SelectedVodType.ContentUrls.Any())
+            if (SelectedVodType != null)
             {
-                var episodes = new ConcurrentBag<Episode>();
-                var tasks = SelectedVodType.ContentUrls.Select(async episodeUrl =>
+                SelectedLiveSession = null;
+                SelectedSession = null;
+                ClearChannels();
+                ClearEpisodes();
+
+                if (SelectedVodType.ContentUrls.Any())
                 {
-                    episodes.Add(await _apiService.GetEpisodeAsync(episodeUrl.GetUID()));
-                });
-                await Task.WhenAll(tasks);
-                Episodes.AddRange(episodes.OrderBy(e => e.Title));
+                    var episodes = new ConcurrentBag<Episode>();
+                    var tasks = SelectedVodType.ContentUrls.Select(async episodeUrl =>
+                    {
+                        episodes.Add(await _apiService.GetEpisodeAsync(episodeUrl.GetUID()));
+                    });
+                    await Task.WhenAll(tasks);
+                    Episodes.AddRange(episodes.OrderBy(e => e.Title));
+                }
             }
         }
 
