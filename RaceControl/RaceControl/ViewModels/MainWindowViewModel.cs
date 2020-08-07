@@ -286,6 +286,7 @@ namespace RaceControl.ViewModels
 
         private async void VodTypeSelectionChangedExecute()
         {
+            SelectedLiveSession = null;
             SelectedSession = null;
             ClearEpisodes();
             ClearChannels();
@@ -304,15 +305,16 @@ namespace RaceControl.ViewModels
 
         private void WatchChannelExecute(Channel channel)
         {
+            var session = SelectedLiveSession ?? SelectedSession;
             Func<string, Task<string>> urlFunc = (channelUrl) => GetTokenisedUrlForChannelAsync(channelUrl);
 
             var parameters = new DialogParameters
             {
                 { "urlfunc", urlFunc },
                 { "url", channel.Self },
-                { "syncuid", SelectedSession.UID },
-                { "title", $"{SelectedSession} - {channel}" },
-                { "islive", SelectedSession.IsLive }
+                { "syncuid", session.UID },
+                { "title", $"{session} - {channel}" },
+                { "islive", session.IsLive }
             };
 
             _dialogService.Show(nameof(VideoDialog), parameters, null);
@@ -341,7 +343,8 @@ namespace RaceControl.ViewModels
 
         private async void WatchVlcChannelExecute(Channel channel)
         {
-            var title = $"{SelectedSession} - {channel}";
+            var session = SelectedLiveSession ?? SelectedSession;
+            var title = $"{session} - {channel}";
             var url = await GetTokenisedUrlForChannelAsync(channel.Self);
             Process.Start(VlcExeLocation, $"{url} --meta-title=\"{title}\"");
         }
