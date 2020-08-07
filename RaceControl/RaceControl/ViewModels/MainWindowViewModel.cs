@@ -232,7 +232,7 @@ namespace RaceControl.ViewModels
                     sessions.Add(await _apiService.GetSessionAsync(sessionUrl.GetUID()));
                 });
                 await Task.WhenAll(tasks);
-                Sessions.AddRange(sessions.OrderBy(s => s.StartTime));
+                Sessions.AddRange(sessions.Where(s => s.IsLive || s.IsReplay).OrderBy(s => s.StartTime));
             }
         }
 
