@@ -148,24 +148,32 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="{Binding}" />
                         <Button
                             Grid.Column="1"
-                            Width="60"
+                            Width="50"
                             Margin="2,0"
                             Command="{Binding DataContext.CopyUrlChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
                             CommandParameter="{Binding}"
-                            Content="Copy URL" />
+                            Content="Copy" />
                         <Button
                             Grid.Column="2"
-                            Width="80"
+                            Width="50"
                             Margin="2,0"
                             Command="{Binding DataContext.WatchVlcChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
                             CommandParameter="{Binding}"
-                            Content="Watch in VLC" />
+                            Content="VLC" />
                         <Button
                             Grid.Column="3"
+                            Width="50"
+                            Margin="2,0"
+                            Command="{Binding DataContext.WatchMpvChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
+                            CommandParameter="{Binding}"
+                            Content="MPV" />
+                        <Button
+                            Grid.Column="4"
                             Width="50"
                             Margin="2,0,0,0"
                             Command="{Binding DataContext.WatchChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
@@ -221,24 +229,32 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="{Binding}" />
                         <Button
                             Grid.Column="1"
-                            Width="60"
+                            Width="50"
                             Margin="2,0"
                             Command="{Binding DataContext.CopyUrlEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
                             CommandParameter="{Binding}"
-                            Content="Copy URL" />
+                            Content="Copy" />
                         <Button
                             Grid.Column="2"
-                            Width="80"
+                            Width="50"
                             Margin="2,0"
                             Command="{Binding DataContext.WatchVlcEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
                             CommandParameter="{Binding}"
-                            Content="Watch in VLC" />
+                            Content="VLC" />
                         <Button
                             Grid.Column="3"
+                            Width="50"
+                            Margin="2,0"
+                            Command="{Binding DataContext.WatchMpvEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
+                            CommandParameter="{Binding}"
+                            Content="MPV" />
+                        <Button
+                            Grid.Column="4"
                             Width="50"
                             Margin="2,0,0,0"
                             Command="{Binding DataContext.WatchEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"

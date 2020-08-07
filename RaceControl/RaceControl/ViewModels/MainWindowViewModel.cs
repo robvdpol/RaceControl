@@ -40,6 +40,8 @@ namespace RaceControl.ViewModels
         private ICommand _watchEpisodeCommand;
         private ICommand _watchVlcChannelCommand;
         private ICommand _watchVlcEpisodeCommand;
+        private ICommand _watchMpvChannelCommand;
+        private ICommand _watchMpvEpisodeCommand;
         private ICommand _copyUrlChannelCommand;
         private ICommand _copyUrlEpisodeCommand;
 
@@ -78,6 +80,8 @@ namespace RaceControl.ViewModels
         public ICommand WatchEpisodeCommand => _watchEpisodeCommand ??= new DelegateCommand<Episode>(WatchEpisodeExecute);
         public ICommand WatchVlcChannelCommand => _watchVlcChannelCommand ??= new DelegateCommand<Channel>(WatchVlcChannelExecute, CanWatchVlcChannelExecute).ObservesProperty(() => VlcExeLocation);
         public ICommand WatchVlcEpisodeCommand => _watchVlcEpisodeCommand ??= new DelegateCommand<Episode>(WatchVlcEpisodeExecute, CanWatchVlcEpisodeExecute).ObservesProperty(() => VlcExeLocation);
+        public ICommand WatchMpvChannelCommand => _watchMpvChannelCommand ??= new DelegateCommand<Channel>(WatchMpvChannelExecute);
+        public ICommand WatchMpvEpisodeCommand => _watchMpvEpisodeCommand ??= new DelegateCommand<Episode>(WatchMpvEpisodeExecute);
         public ICommand CopyUrlChannelCommand => _copyUrlChannelCommand ??= new DelegateCommand<Channel>(CopyUrlChannelExecute);
         public ICommand CopyUrlEpisodeCommand => _copyUrlEpisodeCommand ??= new DelegateCommand<Episode>(CopyUrlEpisodeExecute);
 
@@ -372,6 +376,36 @@ namespace RaceControl.ViewModels
             try
             {
                 Process.Start(VlcExeLocation, $"{url} --meta-title=\"{title}\"");
+            }
+            catch (Exception ex)
+            {
+                MessageBoxHelper.ShowError(ex.Message);
+            }
+        }
+
+        private async void WatchMpvChannelExecute(Channel channel)
+        {
+            var title = $"{CurrentSession} - {channel}";
+            var url = await GetTokenisedUrlForChannelAsync(channel.Self);
+
+            try
+            {
+                Process.Start("mpv/mpv.exe", $"{url} --title=\"{title}\"");
+            }
+            catch (Exception ex)
+            {
+                MessageBoxHelper.ShowError(ex.Message);
+            }
+        }
+
+        private async void WatchMpvEpisodeExecute(Episode episode)
+        {
+            var title = episode.ToString();
+            var url = await GetTokenisedUrlForAssetAsync(episode.Items.First());
+
+            try
+            {
+                Process.Start("mpv/mpv.exe", $"{url} --title=\"{title}\"");
             }
             catch (Exception ex)
             {

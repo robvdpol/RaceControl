@@ -23,4 +23,9 @@
     <ProjectReference Include="..\Services\RaceControl.Services.Interfaces\RaceControl.Services.Interfaces.csproj" />
     <ProjectReference Include="..\Services\RaceControl.Services\RaceControl.Services.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="Mpv\mpv.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
