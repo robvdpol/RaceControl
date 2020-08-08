@@ -7,6 +7,16 @@
     Width="1200"
     Height="800"
     prism:ViewModelLocator.AutoWireViewModel="True">
+    <Window.Resources>
+        <Style x:Key="HeaderLabelStyle" TargetType="Label">
+            <Setter Property="Margin" Value="2" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Background" Value="LightGray" />
+        </Style>
+        <Style x:Key="ContentListViewStyle" TargetType="ListView">
+            <Setter Property="Margin" Value="2" />
+        </Style>
+    </Window.Resources>
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding LoadedCommand}" PassEventArgsToCommand="True" />
@@ -31,17 +41,15 @@
         <Label
             Grid.Row="0"
             Grid.Column="0"
-            Margin="2"
-            Background="LightGray"
             Content="Seasons"
-            FontWeight="Bold" />
+            Style="{StaticResource HeaderLabelStyle}" />
         <ListView
             Grid.Row="1"
             Grid.Column="0"
-            Margin="2"
             ItemsSource="{Binding Seasons}"
             SelectedItem="{Binding SelectedSeason}"
-            SelectionMode="Single">
+            SelectionMode="Single"
+            Style="{StaticResource ContentListViewStyle}">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <i:InvokeCommandAction Command="{Binding SeasonSelectionChangedCommand}" />
@@ -51,17 +59,15 @@
         <Label
             Grid.Row="0"
             Grid.Column="1"
-            Margin="2"
-            Background="LightGray"
             Content="Events"
-            FontWeight="Bold" />
+            Style="{StaticResource HeaderLabelStyle}" />
         <ListView
             Grid.Row="1"
             Grid.Column="1"
-            Margin="2"
             ItemsSource="{Binding Events}"
             SelectedItem="{Binding SelectedEvent}"
-            SelectionMode="Single">
+            SelectionMode="Single"
+            Style="{StaticResource ContentListViewStyle}">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <i:InvokeCommandAction Command="{Binding EventSelectionChangedCommand}" />
@@ -78,14 +84,9 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <Label
-                Grid.Row="0"
-                Margin="2"
-                Content="Live Now"
-                FontWeight="Bold">
+            <Label Grid.Row="0" Content="Live Now">
                 <Label.Style>
-                    <Style TargetType="Label">
-                        <Setter Property="Background" Value="LightGray" />
+                    <Style BasedOn="{StaticResource HeaderLabelStyle}" TargetType="Label">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding HasItems, ElementName=lvLiveSessions}" Value="True">
                                 <Setter Property="Background" Value="LightGreen" />
@@ -97,10 +98,10 @@
             <ListView
                 x:Name="lvLiveSessions"
                 Grid.Row="1"
-                Margin="2"
                 ItemsSource="{Binding LiveSessions}"
                 SelectedItem="{Binding SelectedLiveSession}"
-                SelectionMode="Single">
+                SelectionMode="Single"
+                Style="{StaticResource ContentListViewStyle}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectionChanged">
                         <i:InvokeCommandAction Command="{Binding LiveSessionSelectionChangedCommand}" />
@@ -109,16 +110,14 @@
             </ListView>
             <Label
                 Grid.Row="2"
-                Margin="2"
-                Background="LightGray"
                 Content="Sessions"
-                FontWeight="Bold" />
+                Style="{StaticResource HeaderLabelStyle}" />
             <ListView
                 Grid.Row="3"
-                Margin="2"
                 ItemsSource="{Binding Sessions}"
                 SelectedItem="{Binding SelectedSession}"
-                SelectionMode="Single">
+                SelectionMode="Single"
+                Style="{StaticResource ContentListViewStyle}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectionChanged">
                         <i:InvokeCommandAction Command="{Binding SessionSelectionChangedCommand}" />
@@ -129,17 +128,15 @@
         <Label
             Grid.Row="0"
             Grid.Column="3"
-            Margin="2"
-            Background="LightGray"
             Content="Channels"
-            FontWeight="Bold" />
+            Style="{StaticResource HeaderLabelStyle}" />
         <ListView
             Grid.Row="1"
             Grid.Column="3"
-            Margin="2"
             HorizontalContentAlignment="Stretch"
             ItemsSource="{Binding Channels}"
-            SelectionMode="Single">
+            SelectionMode="Single"
+            Style="{StaticResource ContentListViewStyle}">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Grid>
@@ -191,18 +188,16 @@
             Grid.Row="2"
             Grid.Column="0"
             Grid.ColumnSpan="2"
-            Margin="2"
-            Background="LightGray"
             Content="Video On Demand"
-            FontWeight="Bold" />
+            Style="{StaticResource HeaderLabelStyle}" />
         <ListView
             Grid.Row="3"
             Grid.Column="0"
             Grid.ColumnSpan="2"
-            Margin="2"
             ItemsSource="{Binding VodTypes}"
             SelectedItem="{Binding SelectedVodType}"
-            SelectionMode="Single">
+            SelectionMode="Single"
+            Style="{StaticResource ContentListViewStyle}">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <i:InvokeCommandAction Command="{Binding VodTypeSelectionChangedCommand}" />
@@ -213,18 +208,16 @@
             Grid.Row="2"
             Grid.Column="2"
             Grid.ColumnSpan="2"
-            Margin="2"
-            Background="LightGray"
             Content="Episodes"
-            FontWeight="Bold" />
+            Style="{StaticResource HeaderLabelStyle}" />
         <ListView
             Grid.Row="3"
             Grid.Column="2"
             Grid.ColumnSpan="2"
-            Margin="2"
             HorizontalContentAlignment="Stretch"
             ItemsSource="{Binding Episodes}"
-            SelectionMode="Single">
+            SelectionMode="Single"
+            Style="{StaticResource ContentListViewStyle}">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Grid>

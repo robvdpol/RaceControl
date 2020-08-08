@@ -26,7 +26,6 @@ namespace RaceControl.ViewModels
         public LoginDialogViewModel(IAuthorizationService authorizationService)
         {
             _authorizationService = authorizationService;
-            Title = "Login";
         }
 
         public ICommand LoginCommand => _loginCommand ??= new DelegateCommand(LoginExecute, CanLoginExecute).ObservesProperty(() => Email).ObservesProperty(() => Password);
@@ -59,15 +58,12 @@ namespace RaceControl.ViewModels
         {
             base.OnDialogOpened(parameters);
 
+            Title = "Login";
+
             if (LoadCredential() && LoginCommand.CanExecute(null))
             {
                 LoginCommand.Execute(null);
             }
-        }
-
-        public override bool CanCloseDialog()
-        {
-            return true;
         }
 
         private bool CanLoginExecute()
