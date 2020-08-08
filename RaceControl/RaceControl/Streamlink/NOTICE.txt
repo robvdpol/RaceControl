@@ -1,0 +1,1 @@
+Streamlink Portable uses some bundled libraries and binaries, including bundles the Windows 10 Universal Runtime
