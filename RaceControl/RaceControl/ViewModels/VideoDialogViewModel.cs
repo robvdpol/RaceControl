@@ -3,10 +3,12 @@ using LibVLCSharp.Shared.Structures;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Services.Dialogs;
+using RaceControl.Common;
 using RaceControl.Core.Mvvm;
 using RaceControl.Events;
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
@@ -36,8 +38,9 @@ namespace RaceControl.ViewModels
         private ICommand _castVideoCommand;
 
         private Guid _uniqueIdentifier = Guid.NewGuid();
-        private Func<string, Task<string>> _urlFunc;
-        private string _url;
+        private Process _streamlinkProcess;
+        private Func<string, Task<string>> _contentUrlFunc;
+        private string _contentUrl;
         private string _syncUID;
         private string _title;
         private bool _isLive;
@@ -68,12 +71,30 @@ namespace RaceControl.ViewModels
         public ICommand MouseDownCommand => _mouseDownCommand ??= new DelegateCommand<MouseButtonEventArgs>(MouseDownExecute);
         public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute);
         public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand(ToggleMuteExecute);
-        public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<string>(FastForwardExecute);
-        public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute);
+        public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<string>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => IsLive);
+        public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => IsLive);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand(ToggleFullScreenExecute);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
         public ICommand ScanChromecastCommand => _scanChromecastCommand ??= new DelegateCommand(ScanChromecastExecute, CanScanChromecastExecute).ObservesProperty(() => RendererDiscoverer);
         public ICommand CastVideoCommand => _castVideoCommand ??= new DelegateCommand(CastVideoExecute, CanCastVideoExecute).ObservesProperty(() => SelectedRendererItem);
+
+        public Func<string, Task<string>> ContentUrlFunc
+        {
+            get => _contentUrlFunc;
+            set => SetProperty(ref _contentUrlFunc, value);
+        }
+
+        public string ContentUrl
+        {
+            get => _contentUrl;
+            set => SetProperty(ref _contentUrl, value);
+        }
+
+        public string SyncUID
+        {
+            get => _syncUID;
+            set => SetProperty(ref _syncUID, value);
+        }
 
         public override string Title
         {
@@ -175,14 +196,25 @@ namespace RaceControl.ViewModels
         {
             base.OnDialogOpened(parameters);
 
-            _urlFunc = parameters.GetValue<Func<string, Task<string>>>("urlfunc");
-            _url = parameters.GetValue<string>("url");
-            _syncUID = parameters.GetValue<string>("syncuid");
-            Title = parameters.GetValue<string>("title");
-            IsLive = parameters.GetValue<bool>("islive");
+            ContentUrlFunc = parameters.GetValue<Func<string, Task<string>>>(ParameterNames.ContentUrlFunc);
+            ContentUrl = parameters.GetValue<string>(ParameterNames.ContentUrl);
+            SyncUID = parameters.GetValue<string>(ParameterNames.SyncUID);
+            Title = parameters.GetValue<string>(ParameterNames.Title);
+            IsLive = parameters.GetValue<bool>(ParameterNames.IsLive);
+
+            var streamUrl = await ContentUrlFunc.Invoke(ContentUrl);
+
+            if (IsLive)
+            {
+                _streamlinkProcess = StartStreamlink(streamUrl, out var streamlinkUrl);
+                _media = CreateMedia(streamlinkUrl);
+            }
+            else
+            {
+                _media = CreateMedia(streamUrl);
+            }
 
             MediaPlayer = CreateMediaPlayer();
-            _media = await CreateMedia();
             MediaPlayer.Play(_media);
 
             _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
@@ -209,6 +241,11 @@ namespace RaceControl.ViewModels
                 RendererDiscoverer.Stop();
                 RendererDiscoverer.ItemAdded -= RendererDiscoverer_ItemAdded;
                 RendererDiscoverer.Dispose();
+            }
+
+            if (_streamlinkProcess != null)
+            {
+                _streamlinkProcess.Kill();
             }
         }
 
@@ -303,6 +340,11 @@ namespace RaceControl.ViewModels
             MediaPlayer.ToggleMute();
         }
 
+        private bool CanFastForwardExecute(string arg)
+        {
+            return !IsLive;
+        }
+
         private void FastForwardExecute(string value)
         {
             if (int.TryParse(value, out var seconds))
@@ -312,18 +354,23 @@ namespace RaceControl.ViewModels
             }
         }
 
+        private bool CanSyncSessionExecute()
+        {
+            return !IsLive;
+        }
+
         private void SyncSessionExecute()
         {
             if (MediaPlayer.IsPlaying)
             {
-                var payload = new SyncStreamsEventPayload(_uniqueIdentifier, _syncUID, MediaPlayer.Time);
+                var payload = new SyncStreamsEventPayload(_uniqueIdentifier, SyncUID, MediaPlayer.Time);
                 _eventAggregator.GetEvent<SyncStreamsEvent>().Publish(payload);
             }
         }
 
         private void OnSyncSession(SyncStreamsEventPayload payload)
         {
-            if (_syncUID == payload.SyncUID && _uniqueIdentifier != payload.RequesterIdentifier)
+            if (SyncUID == payload.SyncUID && _uniqueIdentifier != payload.RequesterIdentifier)
             {
                 SetMediaPlayerTime(payload.Time, true);
             }
@@ -371,11 +418,21 @@ namespace RaceControl.ViewModels
         {
             var time = MediaPlayer.Time;
             MediaPlayer.Stop();
-            RemoveMedia(_media);
-            _media = await CreateMedia();
+
+            if (!IsLive)
+            {
+                RemoveMedia(_media);
+                var streamUrl = await ContentUrlFunc.Invoke(ContentUrl);
+                _media = CreateMedia(streamUrl);
+            }
+
             MediaPlayer.SetRenderer(SelectedRendererItem);
             MediaPlayer.Play(_media);
-            SetMediaPlayerTime(time);
+
+            if (!IsLive)
+            {
+                SetMediaPlayerTime(time);
+            }
         }
 
         private void SetWindowed()
@@ -402,9 +459,8 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private async Task<Media> CreateMedia()
+        private Media CreateMedia(string url)
         {
-            var url = await _urlFunc.Invoke(_url);
             var media = new Media(_libVLC, url, FromType.FromLocation);
             media.DurationChanged += Media_DurationChanged;
 
@@ -423,7 +479,9 @@ namespace RaceControl.ViewModels
             {
                 EnableHardwareDecoding = true,
                 EnableMouseInput = false,
-                EnableKeyInput = false
+                EnableKeyInput = false,
+                FileCaching = 1000,
+                NetworkCaching = 2000
             };
 
             mediaPlayer.TimeChanged += MediaPlayer_TimeChanged;
@@ -440,6 +498,20 @@ namespace RaceControl.ViewModels
             mediaPlayer.ESAdded -= MediaPlayer_ESAdded;
             mediaPlayer.ESDeleted -= MediaPlayer_ESDeleted;
             mediaPlayer.Dispose();
+        }
+
+        private static Process StartStreamlink(string streamUrl, out string streamlinkUrl)
+        {
+            var port = SocketUtils.GetFreePort();
+            streamlinkUrl = $"http://127.0.0.1:{port}";
+
+            return Process.Start(new ProcessStartInfo
+            {
+                FileName = @"streamlink\streamlink.bat",
+                Arguments = $"\"{streamUrl}\" best --player-external-http --player-external-http-port {port} --hls-audio-select *",
+                UseShellExecute = false,
+                CreateNoWindow = true
+            });
         }
     }
 }

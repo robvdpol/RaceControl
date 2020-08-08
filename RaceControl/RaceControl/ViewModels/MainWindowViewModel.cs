@@ -315,16 +315,16 @@ namespace RaceControl.ViewModels
 
         private void WatchChannelExecute(Channel channel)
         {
+            Func<string, Task<string>> contentUrlFunc = (channelUrl) => GetTokenisedUrlForChannelAsync(channelUrl);
             var session = CurrentSession;
-            Func<string, Task<string>> urlFunc = (channelUrl) => GetTokenisedUrlForChannelAsync(channelUrl);
 
             var parameters = new DialogParameters
             {
-                { "urlfunc", urlFunc },
-                { "url", channel.Self },
-                { "syncuid", session.UID },
-                { "title", $"{session} - {channel}" },
-                { "islive", session.IsLive }
+                { ParameterNames.ContentUrlFunc, contentUrlFunc },
+                { ParameterNames.ContentUrl, channel.Self },
+                { ParameterNames.SyncUID, session.UID },
+                { ParameterNames.Title, $"{session} - {channel}" },
+                { ParameterNames.IsLive, session.IsLive }
             };
 
             _dialogService.Show(nameof(VideoDialog), parameters, null);
@@ -332,15 +332,15 @@ namespace RaceControl.ViewModels
 
         private void WatchEpisodeExecute(Episode episode)
         {
-            Func<string, Task<string>> urlFunc = (assetUrl) => GetTokenisedUrlForAssetAsync(assetUrl);
+            Func<string, Task<string>> contentUrlFunc = (assetUrl) => GetTokenisedUrlForAssetAsync(assetUrl);
 
             var parameters = new DialogParameters
             {
-                { "urlfunc", urlFunc },
-                { "url", episode.Items.First() },
-                { "syncuid", episode.UID },
-                { "title", episode.ToString() },
-                { "islive", false }
+                { ParameterNames.ContentUrlFunc, contentUrlFunc },
+                { ParameterNames.ContentUrl, episode.Items.First() },
+                { ParameterNames.SyncUID, episode.UID },
+                { ParameterNames.Title, episode.ToString() },
+                { ParameterNames.IsLive, false }
             };
 
             _dialogService.Show(nameof(VideoDialog), parameters, null);
@@ -393,7 +393,7 @@ namespace RaceControl.ViewModels
 
             try
             {
-                Process.Start("mpv/mpv.exe", $"{url} --title=\"{title}\"");
+                Process.Start(@"mpv\mpv.exe", $"{url} --title=\"{title}\"");
             }
             catch (Exception ex)
             {
@@ -408,7 +408,7 @@ namespace RaceControl.ViewModels
 
             try
             {
-                Process.Start("mpv/mpv.exe", $"{url} --title=\"{title}\"");
+                Process.Start(@"mpv\mpv.exe", $"{url} --title=\"{title}\"");
             }
             catch (Exception ex)
             {
