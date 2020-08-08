@@ -206,13 +206,10 @@ namespace RaceControl.ViewModels
 
             if (IsLive)
             {
-                _streamlinkProcess = StartStreamlink(streamUrl, out var streamlinkUrl);
-                _media = CreateMedia(streamlinkUrl);
+                _streamlinkProcess = StartStreamlink(streamUrl, out streamUrl);
             }
-            else
-            {
-                _media = CreateMedia(streamUrl);
-            }
+
+            _media = CreateMedia(streamUrl);
 
             MediaPlayer = CreateMediaPlayer();
             MediaPlayer.Play(_media);
