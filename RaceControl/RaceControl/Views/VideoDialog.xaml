@@ -94,46 +94,54 @@
                         Width="60"
                         Margin="2"
                         Command="{Binding TogglePauseCommand}"
-                        Content="Pause" />
+                        Content="Pause"
+                        ToolTip="Toggle pause" />
                     <Button
                         Width="60"
                         Margin="2"
                         Command="{Binding ToggleMuteCommand}"
-                        Content="Mute" />
+                        Content="Mute"
+                        ToolTip="Toggle mute" />
                     <Button
                         Width="60"
                         Margin="2"
                         Command="{Binding FastForwardCommand}"
                         CommandParameter="-60"
-                        Content="-1 min" />
+                        Content="-1 min"
+                        ToolTip="Rewind one minute" />
                     <Button
                         Width="60"
                         Margin="2"
                         Command="{Binding FastForwardCommand}"
                         CommandParameter="-10"
-                        Content="-10 sec" />
+                        Content="-10 sec"
+                        ToolTip="Rewind ten seconds" />
                     <Button
                         Width="60"
                         Margin="2"
                         Command="{Binding FastForwardCommand}"
                         CommandParameter="10"
-                        Content="+10 sec" />
+                        Content="+10 sec"
+                        ToolTip="Fast forward ten seconds" />
                     <Button
                         Width="60"
                         Margin="2"
                         Command="{Binding FastForwardCommand}"
                         CommandParameter="60"
-                        Content="+1 min" />
+                        Content="+1 min"
+                        ToolTip="Fast forward one minute" />
                     <Button
                         Width="60"
                         Margin="2"
                         Command="{Binding SyncSessionCommand}"
-                        Content="Sync" />
+                        Content="Sync"
+                        ToolTip="Synchronize playback across players *experimental*" />
                     <Button
                         Width="60"
                         Margin="2"
                         Command="{Binding ToggleFullScreenCommand}"
-                        Content="Fullscreen" />
+                        Content="Fullscreen"
+                        ToolTip="Toggle fullscreen mode" />
                     <TextBlock
                         Margin="2"
                         VerticalAlignment="Center"
@@ -160,7 +168,8 @@
                         Width="60"
                         Margin="2"
                         Command="{Binding ScanChromecastCommand}"
-                        Content="Scan" />
+                        Content="Scan"
+                        ToolTip="Scan for Chromecast devices in local network" />
                     <Grid>
                         <ComboBox
                             Width="200"
@@ -192,7 +201,8 @@
                         Width="60"
                         Margin="2"
                         Command="{Binding CastVideoCommand}"
-                        Content="Cast" />
+                        Content="Cast"
+                        ToolTip="Cast stream to selected Chromecast device" />
                 </StackPanel>
             </Grid>
         </Grid>
