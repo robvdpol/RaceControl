@@ -15,6 +15,7 @@ Race Control is a standalone, open source F1TV client for Windows.
 
 ## FAQ
 #### Why do I get a login popup? What credentials do I use to login?
-You need an F1TV account to watch F1TV VODs. If you want to watch live sessions or race replays, an F1TV Pro subscription is required. You can create an account and subscribe at http://f1tv.formula1.com.
+You need an F1TV account to watch F1TV VODs. If you want to watch race replays, an F1TV Access subscription is required. If you want to watch live sessions, an F1TV Pro subscription is required. You can create an account and subscribe at http://f1tv.formula1.com.
+
 #### What happens with my credentials when I login?
 You F1TV login credentials are stored locally in the Windows Credential Manager, so you don't have to login every time you start the application. If you wish to switch to a different F1TV account, open the Credential Manager, go to 'Windows Credentials' and under 'Generic Credentials' find the entry called 'RaceControlF1TV'. If you delete the entry, you will be asked to login again when you start the application.
