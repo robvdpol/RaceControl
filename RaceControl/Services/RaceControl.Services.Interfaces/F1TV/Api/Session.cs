@@ -32,6 +32,9 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         public DateTime? EndTime { get; set; }
 
         [JsonIgnore]
+        public string PrettyName { get; set; }
+
+        [JsonIgnore]
         public bool IsUpcoming => Status == "upcoming";
 
         [JsonIgnore]
@@ -54,7 +57,7 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
 
         public override string ToString()
         {
-            return Name;
+            return !string.IsNullOrWhiteSpace(PrettyName) ? PrettyName : Name;
         }
     }
 }

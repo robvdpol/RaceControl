@@ -448,7 +448,7 @@ namespace RaceControl.ViewModels
 
                     if (liveSession.IsLive)
                     {
-                        liveSession.Name = $"{liveEvent.Name} - {liveSession.Name}";
+                        liveSession.PrettyName = $"{liveEvent.Name} - {liveSession.Name}";
                         liveSessions.Add(liveSession);
                     }
                 }
