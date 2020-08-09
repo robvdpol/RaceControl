@@ -39,6 +39,14 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
+            <Label
+                Grid.Row="0"
+                Grid.RowSpan="2"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Content="Casting..."
+                FontSize="24"
+                Visibility="{Binding IsCasting, Converter={StaticResource BooleanToVisibilityConverter}}" />
             <!--  Non-transparent background is required to capture mouse events  -->
             <Grid Grid.Row="0" Background="#01000000">
                 <i:Interaction.Triggers>

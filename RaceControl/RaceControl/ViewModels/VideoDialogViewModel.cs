@@ -44,6 +44,7 @@ namespace RaceControl.ViewModels
         private string _syncUID;
         private string _title;
         private bool _isLive;
+        private bool _isCasting;
         private MediaPlayer _mediaPlayer;
         private Media _media;
         private ObservableCollection<TrackDescription> _audioTrackDescriptions;
@@ -108,10 +109,22 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _isLive, value);
         }
 
+        public bool IsCasting
+        {
+            get => _isCasting;
+            set => SetProperty(ref _isCasting, value);
+        }
+
         public MediaPlayer MediaPlayer
         {
             get => _mediaPlayer;
             set => SetProperty(ref _mediaPlayer, value);
+        }
+
+        public Media Media
+        {
+            get => _media;
+            set => SetProperty(ref _media, value);
         }
 
         public ObservableCollection<TrackDescription> AudioTrackDescriptions
@@ -209,10 +222,9 @@ namespace RaceControl.ViewModels
                 _streamlinkProcess = StartStreamlink(streamUrl, out streamUrl);
             }
 
-            _media = CreateMedia(streamUrl);
-
-            MediaPlayer = CreateMediaPlayer();
-            MediaPlayer.Play(_media);
+            CreateMedia(streamUrl);
+            CreateMediaPlayer();
+            StartPlayback();
 
             _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
             _showControlsTimer.Start();
@@ -230,8 +242,9 @@ namespace RaceControl.ViewModels
             _showControlsTimer.Elapsed -= ShowControlsTimer_Elapsed;
             _showControlsTimer.Dispose();
 
-            RemoveMedia(_media);
-            RemoveMediaPlayer(MediaPlayer);
+            StopPlayback();
+            RemoveMediaPlayer();
+            RemoveMedia();
 
             if (RendererDiscoverer != null)
             {
@@ -413,23 +426,20 @@ namespace RaceControl.ViewModels
 
         private async void CastVideoExecute()
         {
-            var time = MediaPlayer.Time;
-            MediaPlayer.Stop();
+            var streamTime = MediaPlayer.Time;
+            var streamUrl = IsLive ? Media.Mrl : await ContentUrlFunc.Invoke(ContentUrl);
+
+            StopPlayback();
+            RemoveMedia();
+            CreateMedia(streamUrl);
+            StartPlayback(SelectedRendererItem);
 
             if (!IsLive)
             {
-                RemoveMedia(_media);
-                var streamUrl = await ContentUrlFunc.Invoke(ContentUrl);
-                _media = CreateMedia(streamUrl);
+                SetMediaPlayerTime(streamTime);
             }
 
-            MediaPlayer.SetRenderer(SelectedRendererItem);
-            MediaPlayer.Play(_media);
-
-            if (!IsLive)
-            {
-                SetMediaPlayerTime(time);
-            }
+            IsCasting = true;
         }
 
         private void SetWindowed()
@@ -456,23 +466,15 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private Media CreateMedia(string url)
+        private void CreateMedia(string url)
         {
-            var media = new Media(_libVLC, url, FromType.FromLocation);
-            media.DurationChanged += Media_DurationChanged;
-
-            return media;
+            Media = new Media(_libVLC, url, FromType.FromLocation);
+            Media.DurationChanged += Media_DurationChanged;
         }
 
-        private void RemoveMedia(Media media)
+        private void CreateMediaPlayer()
         {
-            media.DurationChanged -= Media_DurationChanged;
-            media.Dispose();
-        }
-
-        private MediaPlayer CreateMediaPlayer()
-        {
-            var mediaPlayer = new MediaPlayer(_libVLC)
+            MediaPlayer = new MediaPlayer(_libVLC)
             {
                 EnableHardwareDecoding = true,
                 EnableMouseInput = false,
@@ -481,20 +483,41 @@ namespace RaceControl.ViewModels
                 NetworkCaching = 2000
             };
 
-            mediaPlayer.TimeChanged += MediaPlayer_TimeChanged;
-            mediaPlayer.ESAdded += MediaPlayer_ESAdded;
-            mediaPlayer.ESDeleted += MediaPlayer_ESDeleted;
-
-            return mediaPlayer;
+            MediaPlayer.TimeChanged += MediaPlayer_TimeChanged;
+            MediaPlayer.ESAdded += MediaPlayer_ESAdded;
+            MediaPlayer.ESDeleted += MediaPlayer_ESDeleted;
         }
 
-        private void RemoveMediaPlayer(MediaPlayer mediaPlayer)
+        private void StartPlayback(RendererItem renderer = null)
         {
-            mediaPlayer.Stop();
-            mediaPlayer.TimeChanged -= MediaPlayer_TimeChanged;
-            mediaPlayer.ESAdded -= MediaPlayer_ESAdded;
-            mediaPlayer.ESDeleted -= MediaPlayer_ESDeleted;
-            mediaPlayer.Dispose();
+            AudioTrackDescriptions.Clear();
+
+            if (renderer != null)
+            {
+                MediaPlayer.SetRenderer(renderer);
+            }
+
+            MediaPlayer.Play(Media);
+        }
+
+        private void RemoveMedia()
+        {
+            Media.DurationChanged -= Media_DurationChanged;
+            Media.Dispose();
+        }
+
+        private void RemoveMediaPlayer()
+        {
+            MediaPlayer.TimeChanged -= MediaPlayer_TimeChanged;
+            MediaPlayer.ESAdded -= MediaPlayer_ESAdded;
+            MediaPlayer.ESDeleted -= MediaPlayer_ESDeleted;
+            MediaPlayer.Dispose();
+        }
+
+        private void StopPlayback()
+        {
+            MediaPlayer.Stop();
+            AudioTrackDescriptions.Clear();
         }
 
         private static Process StartStreamlink(string streamUrl, out string streamlinkUrl)
