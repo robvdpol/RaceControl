@@ -24,10 +24,12 @@ namespace RaceControl.ViewModels
         private readonly LibVLC _libVLC;
         private readonly Timer _showControlsTimer = new Timer(2000) { AutoReset = false };
 
-        private ICommand _mouseEnterCommand;
-        private ICommand _mouseLeaveCommand;
-        private ICommand _mouseMoveCommand;
-        private ICommand _mouseDownCommand;
+        private ICommand _mouseDownVideoCommand;
+        private ICommand _mouseMoveVideoCommand;
+        private ICommand _mouseEnterVideoCommand;
+        private ICommand _mouseLeaveVideoCommand;
+        private ICommand _mouseEnterControlBarCommand;
+        private ICommand _mouseLeaveControlBarCommand;
         private ICommand _togglePauseCommand;
         private ICommand _toggleMuteCommand;
         private ICommand _fastForwardCommand;
@@ -66,10 +68,12 @@ namespace RaceControl.ViewModels
             _libVLC = libVLC;
         }
 
-        public ICommand MouseEnterCommand => _mouseEnterCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveExecute);
-        public ICommand MouseLeaveCommand => _mouseLeaveCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveExecute);
-        public ICommand MouseMoveCommand => _mouseMoveCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveExecute);
-        public ICommand MouseDownCommand => _mouseDownCommand ??= new DelegateCommand<MouseButtonEventArgs>(MouseDownExecute);
+        public ICommand MouseDownVideoCommand => _mouseDownVideoCommand ??= new DelegateCommand<MouseButtonEventArgs>(MouseDownVideoExecute);
+        public ICommand MouseMoveVideoCommand => _mouseMoveVideoCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveVideoExecute);
+        public ICommand MouseEnterVideoCommand => _mouseEnterVideoCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveVideoExecute);
+        public ICommand MouseLeaveVideoCommand => _mouseLeaveVideoCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveVideoExecute);
+        public ICommand MouseEnterControlBarCommand => _mouseEnterControlBarCommand ??= new DelegateCommand(MouseEnterControlBarExecute);
+        public ICommand MouseLeaveControlBarCommand => _mouseLeaveControlBarCommand ??= new DelegateCommand(MouseLeaveControlBarExecute);
         public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute);
         public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand(ToggleMuteExecute);
         public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<string>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => IsLive);
@@ -322,19 +326,29 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void MouseEnterOrLeaveOrMoveExecute()
+        private void MouseDownVideoExecute(MouseButtonEventArgs args)
+        {
+            if (args.ClickCount == 2 && ToggleFullScreenCommand.CanExecute(null))
+            {
+                ToggleFullScreenCommand.Execute(null);
+            }
+        }
+
+        private void MouseEnterOrLeaveOrMoveVideoExecute()
         {
             _showControlsTimer.Stop();
             ShowControls = true;
             _showControlsTimer.Start();
         }
 
-        private void MouseDownExecute(MouseButtonEventArgs args)
+        private void MouseEnterControlBarExecute()
         {
-            if (args.ClickCount == 2 && ToggleFullScreenCommand.CanExecute(null))
-            {
-                ToggleFullScreenCommand.Execute(null);
-            }
+            _showControlsTimer.Stop();
+        }
+
+        private void MouseLeaveControlBarExecute()
+        {
+            _showControlsTimer.Start();
         }
 
         private void TogglePauseExecute()

@@ -24,17 +24,6 @@
     </prism:Dialog.WindowStyle>
     <vlc:VideoView MediaPlayer="{Binding MediaPlayer}">
         <Grid>
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="MouseEnter">
-                    <i:InvokeCommandAction Command="{Binding MouseEnterCommand}" />
-                </i:EventTrigger>
-                <i:EventTrigger EventName="MouseLeave">
-                    <i:InvokeCommandAction Command="{Binding MouseLeaveCommand}" />
-                </i:EventTrigger>
-                <i:EventTrigger EventName="MouseMove">
-                    <i:InvokeCommandAction Command="{Binding MouseMoveCommand}" />
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
@@ -51,7 +40,16 @@
             <Grid Grid.Row="0" Background="#01000000">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseDown">
-                        <i:InvokeCommandAction Command="{Binding MouseDownCommand}" PassEventArgsToCommand="True" />
+                        <i:InvokeCommandAction Command="{Binding MouseDownVideoCommand}" PassEventArgsToCommand="True" />
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="MouseMove">
+                        <i:InvokeCommandAction Command="{Binding MouseMoveVideoCommand}" />
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="MouseEnter">
+                        <i:InvokeCommandAction Command="{Binding MouseEnterVideoCommand}" />
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="MouseLeave">
+                        <i:InvokeCommandAction Command="{Binding MouseLeaveVideoCommand}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </Grid>
@@ -60,6 +58,14 @@
                 Height="Auto"
                 Background="White"
                 Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseEnter">
+                        <i:InvokeCommandAction Command="{Binding MouseEnterControlBarCommand}" />
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="MouseLeave">
+                        <i:InvokeCommandAction Command="{Binding MouseLeaveControlBarCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
