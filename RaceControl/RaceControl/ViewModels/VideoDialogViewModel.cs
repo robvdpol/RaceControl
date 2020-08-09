@@ -242,7 +242,7 @@ namespace RaceControl.ViewModels
 
             if (_streamlinkProcess != null)
             {
-                _streamlinkProcess.Kill();
+                _streamlinkProcess.Kill(true);
             }
         }
 
@@ -504,7 +504,7 @@ namespace RaceControl.ViewModels
 
             return Process.Start(new ProcessStartInfo
             {
-                FileName = @"streamlink\streamlink.bat",
+                FileName = @".\streamlink\streamlink.bat",
                 Arguments = $"\"{streamUrl}\" best --player-external-http --player-external-http-port {port} --hls-audio-select *",
                 UseShellExecute = false,
                 CreateNoWindow = true

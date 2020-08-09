@@ -393,7 +393,7 @@ namespace RaceControl.ViewModels
 
             try
             {
-                Process.Start(@"mpv\mpv.exe", $"{url} --title=\"{title}\"");
+                Process.Start(@".\mpv\mpv.exe", $"{url} --title=\"{title}\"");
             }
             catch (Exception ex)
             {
@@ -408,7 +408,7 @@ namespace RaceControl.ViewModels
 
             try
             {
-                Process.Start(@"mpv\mpv.exe", $"{url} --title=\"{title}\"");
+                Process.Start(@".\mpv\mpv.exe", $"{url} --title=\"{title}\"");
             }
             catch (Exception ex)
             {

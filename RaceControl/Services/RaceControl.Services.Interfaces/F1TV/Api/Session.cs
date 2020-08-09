@@ -57,7 +57,17 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
 
         public override string ToString()
         {
-            return !string.IsNullOrWhiteSpace(PrettyName) ? PrettyName : Name;
+            if (!string.IsNullOrWhiteSpace(PrettyName))
+            {
+                return PrettyName;
+            }
+
+            if (IsLive)
+            {
+                return $"{Name} - LIVE";
+            }
+
+            return Name;
         }
     }
 }

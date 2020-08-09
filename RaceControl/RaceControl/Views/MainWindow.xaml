@@ -118,6 +118,15 @@
                 SelectedItem="{Binding SelectedSession}"
                 SelectionMode="Single"
                 Style="{StaticResource ContentListViewStyle}">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsLive}" Value="True">
+                                <Setter Property="Background" Value="LightGreen" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListView.ItemContainerStyle>
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectionChanged">
                         <i:InvokeCommandAction Command="{Binding SessionSelectionChangedCommand}" />
