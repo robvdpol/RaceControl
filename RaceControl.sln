@@ -15,7 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RaceControl.Core", "RaceCon
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RaceControl.Common", "RaceControl\RaceControl.Common\RaceControl.Common.csproj", "{429905E6-0DEE-4CFA-AB4B-C0BF8E897F6E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RaceControl.Mpv", "RaceControl\RaceControl.Mpv\RaceControl.Mpv.csproj", "{10B35B16-A352-462F-B1E2-FDED5CF869BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RaceControl.Mpv", "RaceControl\RaceControl.Mpv\RaceControl.Mpv.csproj", "{10B35B16-A352-462F-B1E2-FDED5CF869BF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RaceControl.Streamlink", "RaceControl\RaceControl.Streamlink\RaceControl.Streamlink.csproj", "{103B7B77-2DD8-4C62-AA28-D09216A65FD0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +49,10 @@ Global
 		{10B35B16-A352-462F-B1E2-FDED5CF869BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{10B35B16-A352-462F-B1E2-FDED5CF869BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{10B35B16-A352-462F-B1E2-FDED5CF869BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{103B7B77-2DD8-4C62-AA28-D09216A65FD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{103B7B77-2DD8-4C62-AA28-D09216A65FD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{103B7B77-2DD8-4C62-AA28-D09216A65FD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{103B7B77-2DD8-4C62-AA28-D09216A65FD0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
