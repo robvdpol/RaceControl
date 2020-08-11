@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace RaceControl.Common
+namespace RaceControl.Common.Utils
 {
     public static class EnumerableUtils
     {

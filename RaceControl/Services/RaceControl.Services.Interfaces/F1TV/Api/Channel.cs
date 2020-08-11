@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using RaceControl.Common;
+using RaceControl.Common.Utils;
 
 namespace RaceControl.Services.Interfaces.F1TV.Api
 {

@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 
-namespace RaceControl.Common
+namespace RaceControl.Common.Utils
 {
     public static class SocketUtils
     {

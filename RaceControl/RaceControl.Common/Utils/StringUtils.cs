@@ -1,4 +1,4 @@
-﻿namespace RaceControl.Common
+﻿namespace RaceControl.Common.Utils
 {
     public static class StringUtils
     {

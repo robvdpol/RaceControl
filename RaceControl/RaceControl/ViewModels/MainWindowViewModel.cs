@@ -3,7 +3,7 @@ using Microsoft.Win32;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Services.Dialogs;
-using RaceControl.Common;
+using RaceControl.Common.Utils;
 using RaceControl.Comparers;
 using RaceControl.Core.Helpers;
 using RaceControl.Services.Interfaces.F1TV;

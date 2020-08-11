@@ -1,4 +1,5 @@
 ﻿using RaceControl.Common;
+using RaceControl.Common.Utils;
 using System.Diagnostics;
 
 namespace RaceControl.Streamlink

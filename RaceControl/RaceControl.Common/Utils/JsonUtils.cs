@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace RaceControl.Common
+namespace RaceControl.Common.Utils
 {
     public static class JsonUtils
     {
