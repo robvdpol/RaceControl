@@ -6,6 +6,13 @@ namespace RaceControl.Streamlink
 {
     public class StreamlinkLauncher : IStreamlinkLauncher
     {
+        private readonly IChildProcessTracker _childProcessTracker;
+
+        public StreamlinkLauncher(IChildProcessTracker childProcessTracker)
+        {
+            _childProcessTracker = childProcessTracker;
+        }
+
         public Process StartStreamlinkExternal(string streamUrl, out string streamlinkUrl)
         {
             var port = SocketUtils.GetFreePort();
@@ -17,7 +24,7 @@ namespace RaceControl.Streamlink
                 CreateNoWindow = true
             });
 
-            ChildProcessTracker.AddProcess(process);
+            _childProcessTracker.AddProcess(process);
             streamlinkUrl = $"http://127.0.0.1:{port}";
 
             return process;

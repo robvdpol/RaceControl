@@ -1,5 +1,6 @@
 ﻿using LibVLCSharp.Shared;
 using Prism.Ioc;
+using RaceControl.Common;
 using RaceControl.Core.Helpers;
 using RaceControl.Services;
 using RaceControl.Services.F1TV;
@@ -30,11 +31,12 @@ namespace RaceControl
             containerRegistry.RegisterDialog<VideoDialog, VideoDialogViewModel>();
 
             containerRegistry.RegisterSingleton<LibVLC>();
-            containerRegistry.RegisterSingleton<IStreamlinkLauncher, StreamlinkLauncher>();
+            containerRegistry.RegisterSingleton<IChildProcessTracker, ChildProcessTracker>();
             containerRegistry.RegisterSingleton<IRestClient, RestClient>();
-            containerRegistry.RegisterSingleton<IAuthorizationService, AuthorizationService>();
-            containerRegistry.RegisterSingleton<IApiService, ApiService>();
+            containerRegistry.Register<IAuthorizationService, AuthorizationService>();
             containerRegistry.Register<IF1TVClient, F1TVClient>();
+            containerRegistry.Register<IApiService, ApiService>();
+            containerRegistry.Register<IStreamlinkLauncher, StreamlinkLauncher>();
         }
 
         private void PrismApplication_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)

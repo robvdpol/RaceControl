@@ -11,12 +11,12 @@ namespace RaceControl.Common
     /// <remarks>References:
     /// https://stackoverflow.com/a/4657392/386091
     /// https://stackoverflow.com/a/9164742/386091 </remarks>
-    public static class ChildProcessTracker
+    public class ChildProcessTracker : IChildProcessTracker
     {
         // Windows will automatically close any open job handles when our process terminates. When the job handle is closed, the child processes will be killed.
-        private static readonly IntPtr _jobHandle;
+        private readonly IntPtr _jobHandle;
 
-        static ChildProcessTracker()
+        public ChildProcessTracker()
         {
             // This feature requires Windows 8 or later. To support Windows 7 requires registry settings to be added if you are using Visual Studio plus an app.manifest change.
             // https://stackoverflow.com/a/4232259/386091
@@ -64,7 +64,7 @@ namespace RaceControl.Common
         /// that we are tracking will be automatically killed, too. If the child process terminates
         /// first, that's fine, too.</summary>
         /// <param name="process"></param>
-        public static void AddProcess(Process process)
+        public void AddProcess(Process process)
         {
             if (_jobHandle != IntPtr.Zero)
             {
