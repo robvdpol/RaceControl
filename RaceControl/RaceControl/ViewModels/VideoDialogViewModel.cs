@@ -62,7 +62,6 @@ namespace RaceControl.ViewModels
         private RendererItem _selectedRendererItem;
         private bool _showControls;
         private bool _fullScreen;
-        private WindowStyle _windowStyle = WindowStyle.SingleBorderWindow;
         private ResizeMode _resizeMode = ResizeMode.CanResize;
         private WindowState _windowState = WindowState.Normal;
 
@@ -177,12 +176,6 @@ namespace RaceControl.ViewModels
         {
             get => _fullScreen;
             set => SetProperty(ref _fullScreen, value);
-        }
-
-        public WindowStyle WindowStyle
-        {
-            get => _windowStyle;
-            set => SetProperty(ref _windowStyle, value);
         }
 
         public ResizeMode ResizeMode
@@ -317,9 +310,27 @@ namespace RaceControl.ViewModels
 
         private void MouseDownVideoExecute(MouseButtonEventArgs args)
         {
-            if (args.ClickCount == 2 && ToggleFullScreenCommand.CanExecute(null))
+            if (args.ChangedButton == MouseButton.Left)
             {
-                ToggleFullScreenCommand.Execute(null);
+                if (args.ClickCount == 1)
+                {
+                    if (args.Source is DependencyObject dependencyObject)
+                    {
+                        var window = Window.GetWindow(dependencyObject);
+
+                        if (window != null && window.Owner is Window dialogWindow)
+                        {
+                            dialogWindow.DragMove();
+                        }
+                    }
+                }
+                else if (args.ClickCount == 2)
+                {
+                    if (ToggleFullScreenCommand.CanExecute(null))
+                    {
+                        ToggleFullScreenCommand.Execute(null);
+                    }
+                }
             }
         }
 
@@ -453,7 +464,6 @@ namespace RaceControl.ViewModels
         private void SetWindowed()
         {
             FullScreen = false;
-            WindowStyle = WindowStyle.SingleBorderWindow;
             ResizeMode = ResizeMode.CanResize;
             WindowState = WindowState.Normal;
         }
@@ -461,7 +471,6 @@ namespace RaceControl.ViewModels
         private void SetFullScreen()
         {
             FullScreen = true;
-            WindowStyle = WindowStyle.None;
             ResizeMode = ResizeMode.NoResize;
             WindowState = WindowState.Maximized;
         }

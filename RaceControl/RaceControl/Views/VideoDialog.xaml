@@ -10,11 +10,16 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <core:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <Style x:Key="ControlBarButtonStyle" TargetType="Button">
+            <Setter Property="Margin" Value="2" />
+            <Setter Property="Width" Value="Auto" />
+            <Setter Property="MinWidth" Value="50" />
+        </Style>
     </UserControl.Resources>
     <prism:Dialog.WindowStyle>
         <Style TargetType="Window">
             <Setter Property="prism:Dialog.WindowStartupLocation" Value="CenterScreen" />
-            <Setter Property="WindowStyle" Value="{Binding WindowStyle}" />
+            <Setter Property="WindowStyle" Value="None" />
             <Setter Property="WindowState" Value="{Binding WindowState}" />
             <Setter Property="ResizeMode" Value="{Binding ResizeMode}" />
             <Setter Property="ShowInTaskbar" Value="True" />
@@ -38,6 +43,16 @@
                 Visibility="{Binding IsCasting, Converter={StaticResource BooleanToVisibilityConverter}}" />
             <!--  Non-transparent background is required to capture mouse events  -->
             <Grid Grid.Row="0" Background="#01000000">
+                <Button
+                    Height="22"
+                    Margin="4"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Command="{Binding CloseWindowCommand}"
+                    Content="Close"
+                    Style="{StaticResource ControlBarButtonStyle}"
+                    ToolTip="Close window"
+                    Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}" />
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseDown">
                         <i:InvokeCommandAction Command="{Binding MouseDownVideoCommand}" PassEventArgsToCommand="True" />
@@ -74,26 +89,17 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <Slider
+                <Grid
                     Grid.Row="0"
                     Grid.Column="0"
-                    Grid.ColumnSpan="2"
-                    Margin="4"
-                    IsEnabled="{Binding IsLive, Converter={StaticResource InverseBooleanConverter}}"
-                    IsMoveToPointEnabled="True"
-                    IsSnapToTickEnabled="False"
-                    Maximum="{Binding Duration}"
-                    TickFrequency="60000"
-                    TickPlacement="BottomRight"
-                    Value="{Binding SliderTime}" />
-                <StackPanel
-                    Grid.Row="1"
-                    Grid.Column="0"
-                    Margin="2"
-                    Orientation="Horizontal">
+                    Grid.ColumnSpan="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
                     <TextBlock
-                        Width="55"
-                        Margin="2"
+                        Grid.Column="0"
+                        Margin="5,2"
                         VerticalAlignment="Center"
                         TextAlignment="Center">
                         <TextBlock.Text>
@@ -104,65 +110,74 @@
                             </MultiBinding>
                         </TextBlock.Text>
                     </TextBlock>
+                    <Slider
+                        Grid.Column="1"
+                        Margin="4"
+                        IsEnabled="{Binding IsLive, Converter={StaticResource InverseBooleanConverter}}"
+                        IsMoveToPointEnabled="True"
+                        IsSnapToTickEnabled="False"
+                        Maximum="{Binding Duration}"
+                        TickFrequency="60000"
+                        TickPlacement="BottomRight"
+                        Value="{Binding SliderTime}" />
+                </Grid>
+                <StackPanel
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Margin="2"
+                    Orientation="Horizontal">
                     <Button
-                        Width="60"
                         Margin="2"
                         Command="{Binding TogglePauseCommand}"
                         Content="Pause"
+                        Style="{StaticResource ControlBarButtonStyle}"
                         ToolTip="Toggle pause" />
                     <Button
-                        Width="60"
-                        Margin="2"
                         Command="{Binding ToggleMuteCommand}"
                         Content="Mute"
+                        Style="{StaticResource ControlBarButtonStyle}"
                         ToolTip="Toggle mute" />
                     <Button
-                        Width="60"
-                        Margin="2"
                         Command="{Binding FastForwardCommand}"
                         CommandParameter="-60"
                         Content="-1 min"
+                        Style="{StaticResource ControlBarButtonStyle}"
                         ToolTip="Rewind one minute" />
                     <Button
-                        Width="60"
-                        Margin="2"
                         Command="{Binding FastForwardCommand}"
                         CommandParameter="-10"
                         Content="-10 sec"
+                        Style="{StaticResource ControlBarButtonStyle}"
                         ToolTip="Rewind ten seconds" />
                     <Button
-                        Width="60"
-                        Margin="2"
                         Command="{Binding FastForwardCommand}"
                         CommandParameter="10"
                         Content="+10 sec"
+                        Style="{StaticResource ControlBarButtonStyle}"
                         ToolTip="Fast forward ten seconds" />
                     <Button
-                        Width="60"
-                        Margin="2"
                         Command="{Binding FastForwardCommand}"
                         CommandParameter="60"
                         Content="+1 min"
+                        Style="{StaticResource ControlBarButtonStyle}"
                         ToolTip="Fast forward one minute" />
                     <Button
-                        Width="60"
-                        Margin="2"
                         Command="{Binding SyncSessionCommand}"
                         Content="Sync"
+                        Style="{StaticResource ControlBarButtonStyle}"
                         ToolTip="Synchronize playback across players *experimental*" />
                     <Button
-                        Width="60"
-                        Margin="2"
                         Command="{Binding ToggleFullScreenCommand}"
                         Content="Fullscreen"
+                        Style="{StaticResource ControlBarButtonStyle}"
                         ToolTip="Toggle fullscreen mode" />
                     <TextBlock
-                        Margin="2"
+                        Margin="5,2"
                         VerticalAlignment="Center"
-                        Text="Audio"
+                        Text="Audio track:"
                         TextAlignment="Center" />
                     <ComboBox
-                        Width="175"
+                        Width="200"
                         Margin="2"
                         DisplayMemberPath="Name"
                         ItemsSource="{Binding AudioTrackDescriptions}">
@@ -179,10 +194,9 @@
                     Margin="2"
                     Orientation="Horizontal">
                     <Button
-                        Width="60"
-                        Margin="2"
                         Command="{Binding ScanChromecastCommand}"
                         Content="Scan"
+                        Style="{StaticResource ControlBarButtonStyle}"
                         ToolTip="Scan for Chromecast devices in local network" />
                     <Grid>
                         <ComboBox
@@ -212,10 +226,9 @@
                         </TextBlock>
                     </Grid>
                     <Button
-                        Width="60"
-                        Margin="2"
                         Command="{Binding CastVideoCommand}"
                         Content="Cast"
+                        Style="{StaticResource ControlBarButtonStyle}"
                         ToolTip="Cast stream to selected Chromecast device" />
                 </StackPanel>
             </Grid>

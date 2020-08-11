@@ -27,6 +27,7 @@ namespace RaceControl
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            containerRegistry.RegisterDialogWindow<DialogWindow>();
             containerRegistry.RegisterDialog<LoginDialog, LoginDialogViewModel>();
             containerRegistry.RegisterDialog<VideoDialog, VideoDialogViewModel>();
 

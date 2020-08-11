@@ -1,12 +1,18 @@
-﻿using Prism.Mvvm;
+﻿using Prism.Commands;
+using Prism.Mvvm;
 using Prism.Services.Dialogs;
 using System;
+using System.Windows.Input;
 
 namespace RaceControl.Core.Mvvm
 {
     public abstract class DialogViewModelBase : BindableBase, IDialogAware
     {
+        private ICommand _closeWindowCommand;
+
         public abstract string Title { get; set; }
+
+        public ICommand CloseWindowCommand => _closeWindowCommand ??= new DelegateCommand(CloseWindowExecute);
 
         public event Action<IDialogResult> RequestClose;
 
@@ -26,6 +32,11 @@ namespace RaceControl.Core.Mvvm
         protected virtual void RaiseRequestClose(IDialogResult dialogResult)
         {
             RequestClose?.Invoke(dialogResult);
+        }
+
+        private void CloseWindowExecute()
+        {
+            RaiseRequestClose(null);
         }
     }
 }
