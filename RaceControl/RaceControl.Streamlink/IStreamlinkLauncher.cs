@@ -6,6 +6,6 @@ namespace RaceControl.Streamlink
     {
         Process StartStreamlinkExternal(string streamUrl, out string streamlinkUrl);
 
-        void StartStreamlinkVLC(string vlcExeLocation, string streamUrl);
+        Process StartStreamlinkVLC(string vlcExeLocation, string streamUrl);
     }
 }

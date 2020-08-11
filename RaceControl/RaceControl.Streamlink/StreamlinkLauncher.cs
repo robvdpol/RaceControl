@@ -22,15 +22,17 @@ namespace RaceControl.Streamlink
             return process;
         }
 
-        public void StartStreamlinkVLC(string vlcExeLocation, string streamUrl)
+        public Process StartStreamlinkVLC(string vlcExeLocation, string streamUrl)
         {
-            Process.Start(new ProcessStartInfo
+            var process = Process.Start(new ProcessStartInfo
             {
                 FileName = @".\streamlink\streamlink.bat",
                 Arguments = $"--player \"{vlcExeLocation} --file-caching=2000 --network-caching=4000\" --hls-audio-select * \"{streamUrl}\" best",
                 UseShellExecute = false,
                 CreateNoWindow = true
             });
+
+            return process;
         }
     }
 }
