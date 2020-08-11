@@ -29,7 +29,7 @@ namespace RaceControl.ViewModels
         private readonly IApiService _apiService;
         private readonly IStreamlinkLauncher _streamlinkLauncher;
         private readonly LibVLC _libVLC;
-        private readonly Timer _refreshLiveEventsTimer;
+        private readonly Timer _refreshLiveEventsTimer = new Timer(60000) { AutoReset = false };
 
         private ICommand _loadedCommand;
         private ICommand _closingCommand;
@@ -69,7 +69,6 @@ namespace RaceControl.ViewModels
             _apiService = apiService;
             _streamlinkLauncher = streamlinkLauncher;
             _libVLC = libVLC;
-            _refreshLiveEventsTimer = new Timer(60000) { AutoReset = false };
         }
 
         public ICommand LoadedCommand => _loadedCommand ??= new DelegateCommand<RoutedEventArgs>(LoadedExecute);
