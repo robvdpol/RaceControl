@@ -495,8 +495,8 @@ namespace RaceControl.ViewModels
                 EnableHardwareDecoding = true,
                 EnableMouseInput = false,
                 EnableKeyInput = false,
-                FileCaching = 1000,
-                NetworkCaching = 2000
+                FileCaching = 2000,
+                NetworkCaching = 4000
             };
 
             MediaPlayer.TimeChanged += MediaPlayer_TimeChanged;

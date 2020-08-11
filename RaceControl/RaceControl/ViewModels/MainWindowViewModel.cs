@@ -8,6 +8,7 @@ using RaceControl.Comparers;
 using RaceControl.Core.Helpers;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Api;
+using RaceControl.Streamlink;
 using RaceControl.Views;
 using System;
 using System.Collections.Concurrent;
@@ -26,6 +27,7 @@ namespace RaceControl.ViewModels
     {
         private readonly IDialogService _dialogService;
         private readonly IApiService _apiService;
+        private readonly IStreamlinkLauncher _streamlinkLauncher;
         private readonly LibVLC _libVLC;
         private readonly Timer _refreshLiveEventsTimer;
 
@@ -61,10 +63,11 @@ namespace RaceControl.ViewModels
         private Session _selectedSession;
         private VodType _selectedVodType;
 
-        public MainWindowViewModel(IDialogService dialogService, IApiService apiService, LibVLC libVLC)
+        public MainWindowViewModel(IDialogService dialogService, IApiService apiService, IStreamlinkLauncher streamlinkLauncher, LibVLC libVLC)
         {
             _dialogService = dialogService;
             _apiService = apiService;
+            _streamlinkLauncher = streamlinkLauncher;
             _libVLC = libVLC;
             _refreshLiveEventsTimer = new Timer(60000) { AutoReset = false };
         }
@@ -353,12 +356,13 @@ namespace RaceControl.ViewModels
 
         private async void WatchVlcChannelExecute(Channel channel)
         {
-            var title = $"{CurrentSession} - {channel}";
             var url = await GetTokenisedUrlForChannelAsync(channel.Self);
+            var title = $"{CurrentSession} - {channel}";
+            var isLive = CurrentSession.IsLive;
 
             try
             {
-                Process.Start(VlcExeLocation, $"{url} --meta-title=\"{title}\"");
+                WatchStreamInVlc(url, title, isLive);
             }
             catch (Exception ex)
             {
@@ -373,12 +377,12 @@ namespace RaceControl.ViewModels
 
         private async void WatchVlcEpisodeExecute(Episode episode)
         {
-            var title = episode.ToString();
             var url = await GetTokenisedUrlForAssetAsync(episode.Items.First());
+            var title = episode.ToString();
 
             try
             {
-                Process.Start(VlcExeLocation, $"{url} --meta-title=\"{title}\"");
+                WatchStreamInVlc(url, title, false);
             }
             catch (Exception ex)
             {
@@ -469,6 +473,18 @@ namespace RaceControl.ViewModels
                     LiveSessions.AddRange(sessionsToAdd);
                 }
             });
+        }
+
+        private void WatchStreamInVlc(string url, string title, bool isLive)
+        {
+            if (isLive)
+            {
+                _streamlinkLauncher.StartStreamlinkVLC(VlcExeLocation, url);
+            }
+            else
+            {
+                Process.Start(VlcExeLocation, $"{url} --meta-title=\"{title}\"");
+            }
         }
 
         private async Task<string> GetTokenisedUrlForChannelAsync(string channelUrl)
