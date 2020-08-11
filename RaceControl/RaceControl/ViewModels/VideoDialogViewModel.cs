@@ -3,9 +3,9 @@ using LibVLCSharp.Shared.Structures;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Services.Dialogs;
-using RaceControl.Common;
 using RaceControl.Core.Mvvm;
 using RaceControl.Events;
+using RaceControl.Streamlink;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -21,6 +21,7 @@ namespace RaceControl.ViewModels
     public class VideoDialogViewModel : DialogViewModelBase
     {
         private readonly IEventAggregator _eventAggregator;
+        private readonly IStreamlinkLauncher _streamlinkLauncher;
         private readonly LibVLC _libVLC;
         private readonly Timer _showControlsTimer = new Timer(2000) { AutoReset = false };
 
@@ -62,9 +63,10 @@ namespace RaceControl.ViewModels
         private ResizeMode _resizeMode = ResizeMode.CanResize;
         private WindowState _windowState = WindowState.Normal;
 
-        public VideoDialogViewModel(IEventAggregator eventAggregator, LibVLC libVLC)
+        public VideoDialogViewModel(IEventAggregator eventAggregator, IStreamlinkLauncher streamlinkLauncher, LibVLC libVLC)
         {
             _eventAggregator = eventAggregator;
+            _streamlinkLauncher = streamlinkLauncher;
             _libVLC = libVLC;
         }
 
@@ -219,11 +221,16 @@ namespace RaceControl.ViewModels
             Title = parameters.GetValue<string>(ParameterNames.Title);
             IsLive = parameters.GetValue<bool>(ParameterNames.IsLive);
 
+//#if DEBUG
+//            // to test streamlink
+//            IsLive = true;
+//#endif
+
             var streamUrl = await ContentUrlFunc.Invoke(ContentUrl);
 
             if (IsLive)
             {
-                _streamlinkProcess = StartStreamlink(streamUrl, out streamUrl);
+                _streamlinkProcess = _streamlinkLauncher.StartStreamlinkExternal(streamUrl, out streamUrl);
             }
 
             CreateMedia(streamUrl);
@@ -532,20 +539,6 @@ namespace RaceControl.ViewModels
         {
             MediaPlayer.Stop();
             AudioTrackDescriptions.Clear();
-        }
-
-        private static Process StartStreamlink(string streamUrl, out string streamlinkUrl)
-        {
-            var port = SocketUtils.GetFreePort();
-            streamlinkUrl = $"http://127.0.0.1:{port}";
-
-            return Process.Start(new ProcessStartInfo
-            {
-                FileName = @".\streamlink\streamlink.bat",
-                Arguments = $"\"{streamUrl}\" best --player-external-http --player-external-http-port {port} --hls-audio-select *",
-                UseShellExecute = false,
-                CreateNoWindow = true
-            });
         }
     }
 }

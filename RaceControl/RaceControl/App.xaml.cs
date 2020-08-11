@@ -6,6 +6,7 @@ using RaceControl.Services.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.Lark;
 using RaceControl.Services.Lark;
+using RaceControl.Streamlink;
 using RaceControl.ViewModels;
 using RaceControl.Views;
 using System.Windows;
@@ -31,6 +32,7 @@ namespace RaceControl
             containerRegistry.RegisterSingleton<IAuthorizationService, AuthorizationService>();
             containerRegistry.RegisterSingleton<IApiService, ApiService>();
             containerRegistry.Register<IF1TVClient, F1TVClient>();
+            containerRegistry.RegisterSingleton<IStreamlinkLauncher, StreamlinkLauncher>();
         }
     }
 }
