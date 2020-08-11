@@ -2,6 +2,7 @@
     x:Class="RaceControl.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:prism="http://prismlibrary.com/">
+    xmlns:prism="http://prismlibrary.com/"
+    DispatcherUnhandledException="PrismApplication_DispatcherUnhandledException">
     <Application.Resources />
 </prism:PrismApplication>

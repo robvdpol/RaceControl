@@ -1,5 +1,6 @@
 ﻿using LibVLCSharp.Shared;
 using Prism.Ioc;
+using RaceControl.Core.Helpers;
 using RaceControl.Services;
 using RaceControl.Services.F1TV;
 using RaceControl.Services.Interfaces;
@@ -10,6 +11,7 @@ using RaceControl.Streamlink;
 using RaceControl.ViewModels;
 using RaceControl.Views;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace RaceControl
 {
@@ -33,6 +35,12 @@ namespace RaceControl
             containerRegistry.RegisterSingleton<IApiService, ApiService>();
             containerRegistry.Register<IF1TVClient, F1TVClient>();
             containerRegistry.RegisterSingleton<IStreamlinkLauncher, StreamlinkLauncher>();
+        }
+
+        private void PrismApplication_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            MessageBoxHelper.ShowError(e.Exception.Message);
+            e.Handled = true;
         }
     }
 }
