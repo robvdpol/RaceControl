@@ -40,7 +40,8 @@ namespace RaceControl.ViewModels
         private ICommand _toggleFullScreenCommand;
         private ICommand _audioTrackSelectionChangedCommand;
         private ICommand _scanChromecastCommand;
-        private ICommand _castVideoCommand;
+        private ICommand _startCastVideoCommand;
+        private ICommand _stopCastVideoCommand;
 
         private Guid _uniqueIdentifier = Guid.NewGuid();
         private string _token;
@@ -86,7 +87,8 @@ namespace RaceControl.ViewModels
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand(ToggleFullScreenExecute);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
         public ICommand ScanChromecastCommand => _scanChromecastCommand ??= new DelegateCommand(ScanChromecastExecute, CanScanChromecastExecute).ObservesProperty(() => RendererDiscoverer);
-        public ICommand CastVideoCommand => _castVideoCommand ??= new DelegateCommand(CastVideoExecute, CanCastVideoExecute).ObservesProperty(() => SelectedRendererItem);
+        public ICommand StartCastVideoCommand => _startCastVideoCommand ??= new DelegateCommand(StartCastVideoExecute, CanStartCastVideoExecute).ObservesProperty(() => SelectedRendererItem);
+        public ICommand StopCastVideoCommand => _stopCastVideoCommand ??= new DelegateCommand(StopCastVideoExecute, CanStopCastVideoExecute).ObservesProperty(() => IsCasting);
 
         public override string Title
         {
@@ -443,12 +445,34 @@ namespace RaceControl.ViewModels
             RendererDiscoverer.Start();
         }
 
-        private bool CanCastVideoExecute()
+        private bool CanStartCastVideoExecute()
         {
             return SelectedRendererItem != null;
         }
 
-        private async void CastVideoExecute()
+        private async void StartCastVideoExecute()
+        {
+            await ChangeRenderer(SelectedRendererItem);
+            IsCasting = true;
+        }
+
+        private bool CanStopCastVideoExecute()
+        {
+            return IsCasting;
+        }
+
+        private async void StopCastVideoExecute()
+        {
+            await ChangeRenderer(null);
+            IsCasting = false;
+        }
+
+        private async Task<string> GenerateStreamUrl()
+        {
+            return await _apiService.GetTokenisedUrlAsync(_token, _contentType, _contentUrl);
+        }
+
+        private async Task ChangeRenderer(RendererItem renderer)
         {
             var streamTime = MediaPlayer.Time;
             var streamUrl = IsLive ? Media.Mrl : await GenerateStreamUrl();
@@ -456,19 +480,12 @@ namespace RaceControl.ViewModels
             StopPlayback();
             RemoveMedia();
             CreateMedia(streamUrl);
-            StartPlayback(SelectedRendererItem);
+            StartPlayback(renderer);
 
             if (!IsLive)
             {
                 SetMediaPlayerTime(streamTime);
             }
-
-            IsCasting = true;
-        }
-
-        private async Task<string> GenerateStreamUrl()
-        {
-            return await _apiService.GetTokenisedUrlAsync(_token, _contentType, _contentUrl);
         }
 
         private void SetWindowed()
@@ -518,12 +535,7 @@ namespace RaceControl.ViewModels
         private void StartPlayback(RendererItem renderer = null)
         {
             AudioTrackDescriptions.Clear();
-
-            if (renderer != null)
-            {
-                MediaPlayer.SetRenderer(renderer);
-            }
-
+            MediaPlayer.SetRenderer(renderer);
             MediaPlayer.Play(Media);
         }
 

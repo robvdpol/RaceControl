@@ -226,10 +226,15 @@
                         </TextBlock>
                     </Grid>
                     <Button
-                        Command="{Binding CastVideoCommand}"
+                        Command="{Binding StartCastVideoCommand}"
                         Content="Cast"
                         Style="{StaticResource ControlBarButtonStyle}"
                         ToolTip="Cast stream to selected Chromecast device" />
+                    <Button
+                        Command="{Binding StopCastVideoCommand}"
+                        Content="Stop"
+                        Style="{StaticResource ControlBarButtonStyle}"
+                        ToolTip="Stop casting and resume stream in window" />
                 </StackPanel>
             </Grid>
         </Grid>
