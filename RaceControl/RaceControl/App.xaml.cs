@@ -30,11 +30,11 @@ namespace RaceControl
             containerRegistry.RegisterDialog<VideoDialog, VideoDialogViewModel>();
 
             containerRegistry.RegisterSingleton<LibVLC>();
+            containerRegistry.RegisterSingleton<IStreamlinkLauncher, StreamlinkLauncher>();
             containerRegistry.RegisterSingleton<IRestClient, RestClient>();
             containerRegistry.RegisterSingleton<IAuthorizationService, AuthorizationService>();
             containerRegistry.RegisterSingleton<IApiService, ApiService>();
             containerRegistry.Register<IF1TVClient, F1TVClient>();
-            containerRegistry.RegisterSingleton<IStreamlinkLauncher, StreamlinkLauncher>();
         }
 
         private void PrismApplication_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)

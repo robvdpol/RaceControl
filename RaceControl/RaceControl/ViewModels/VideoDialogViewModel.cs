@@ -5,6 +5,7 @@ using Prism.Events;
 using Prism.Services.Dialogs;
 using RaceControl.Core.Mvvm;
 using RaceControl.Events;
+using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Streamlink;
 using System;
 using System.Collections.ObjectModel;
@@ -21,6 +22,7 @@ namespace RaceControl.ViewModels
     public class VideoDialogViewModel : DialogViewModelBase
     {
         private readonly IEventAggregator _eventAggregator;
+        private readonly IApiService _apiService;
         private readonly IStreamlinkLauncher _streamlinkLauncher;
         private readonly LibVLC _libVLC;
         private readonly Timer _showControlsTimer = new Timer(2000) { AutoReset = false };
@@ -41,13 +43,14 @@ namespace RaceControl.ViewModels
         private ICommand _castVideoCommand;
 
         private Guid _uniqueIdentifier = Guid.NewGuid();
-        private Process _streamlinkProcess;
-        private Func<string, Task<string>> _contentUrlFunc;
+        private string _token;
+        private ContentType _contentType;
         private string _contentUrl;
         private string _syncUID;
         private string _title;
         private bool _isLive;
         private bool _isCasting;
+        private Process _streamlinkProcess;
         private MediaPlayer _mediaPlayer;
         private Media _media;
         private ObservableCollection<TrackDescription> _audioTrackDescriptions;
@@ -63,9 +66,10 @@ namespace RaceControl.ViewModels
         private ResizeMode _resizeMode = ResizeMode.CanResize;
         private WindowState _windowState = WindowState.Normal;
 
-        public VideoDialogViewModel(IEventAggregator eventAggregator, IStreamlinkLauncher streamlinkLauncher, LibVLC libVLC)
+        public VideoDialogViewModel(IEventAggregator eventAggregator, IApiService apiService, IStreamlinkLauncher streamlinkLauncher, LibVLC libVLC)
         {
             _eventAggregator = eventAggregator;
+            _apiService = apiService;
             _streamlinkLauncher = streamlinkLauncher;
             _libVLC = libVLC;
         }
@@ -84,24 +88,6 @@ namespace RaceControl.ViewModels
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
         public ICommand ScanChromecastCommand => _scanChromecastCommand ??= new DelegateCommand(ScanChromecastExecute, CanScanChromecastExecute).ObservesProperty(() => RendererDiscoverer);
         public ICommand CastVideoCommand => _castVideoCommand ??= new DelegateCommand(CastVideoExecute, CanCastVideoExecute).ObservesProperty(() => SelectedRendererItem);
-
-        public Func<string, Task<string>> ContentUrlFunc
-        {
-            get => _contentUrlFunc;
-            set => SetProperty(ref _contentUrlFunc, value);
-        }
-
-        public string ContentUrl
-        {
-            get => _contentUrl;
-            set => SetProperty(ref _contentUrl, value);
-        }
-
-        public string SyncUID
-        {
-            get => _syncUID;
-            set => SetProperty(ref _syncUID, value);
-        }
 
         public override string Title
         {
@@ -215,13 +201,14 @@ namespace RaceControl.ViewModels
         {
             base.OnDialogOpened(parameters);
 
-            ContentUrlFunc = parameters.GetValue<Func<string, Task<string>>>(ParameterNames.ContentUrlFunc);
-            ContentUrl = parameters.GetValue<string>(ParameterNames.ContentUrl);
-            SyncUID = parameters.GetValue<string>(ParameterNames.SyncUID);
+            _token = parameters.GetValue<string>(ParameterNames.Token);
+            _contentType = parameters.GetValue<ContentType>(ParameterNames.ContentType);
+            _contentUrl = parameters.GetValue<string>(ParameterNames.ContentUrl);
+            _syncUID = parameters.GetValue<string>(ParameterNames.SyncUID);
             Title = parameters.GetValue<string>(ParameterNames.Title);
             IsLive = parameters.GetValue<bool>(ParameterNames.IsLive);
 
-            var streamUrl = await ContentUrlFunc.Invoke(ContentUrl);
+            var streamUrl = await GenerateStreamUrl();
 
             if (IsLive)
             {
@@ -389,14 +376,14 @@ namespace RaceControl.ViewModels
         {
             if (MediaPlayer.IsPlaying)
             {
-                var payload = new SyncStreamsEventPayload(_uniqueIdentifier, SyncUID, MediaPlayer.Time);
+                var payload = new SyncStreamsEventPayload(_uniqueIdentifier, _syncUID, MediaPlayer.Time);
                 _eventAggregator.GetEvent<SyncStreamsEvent>().Publish(payload);
             }
         }
 
         private void OnSyncSession(SyncStreamsEventPayload payload)
         {
-            if (SyncUID == payload.SyncUID && _uniqueIdentifier != payload.RequesterIdentifier)
+            if (_uniqueIdentifier != payload.RequesterIdentifier && _syncUID == payload.SyncUID)
             {
                 SetMediaPlayerTime(payload.Time, true);
             }
@@ -443,7 +430,7 @@ namespace RaceControl.ViewModels
         private async void CastVideoExecute()
         {
             var streamTime = MediaPlayer.Time;
-            var streamUrl = IsLive ? Media.Mrl : await ContentUrlFunc.Invoke(ContentUrl);
+            var streamUrl = IsLive ? Media.Mrl : await GenerateStreamUrl();
 
             StopPlayback();
             RemoveMedia();
@@ -456,6 +443,11 @@ namespace RaceControl.ViewModels
             }
 
             IsCasting = true;
+        }
+
+        private async Task<string> GenerateStreamUrl()
+        {
+            return await _apiService.GetTokenisedUrlAsync(_token, _contentType, _contentUrl);
         }
 
         private void SetWindowed()

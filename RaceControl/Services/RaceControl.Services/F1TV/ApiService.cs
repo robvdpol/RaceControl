@@ -145,5 +145,19 @@ namespace RaceControl.Services.F1TV
         {
             return (await _f1tvClient.GetTokenisedUrlForAssetAsync(token, assetUrl)).Objects.First().TokenisedUrl.Url;
         }
+
+        public async Task<string> GetTokenisedUrlAsync(string token, ContentType contentType, string contentUrl)
+        {
+            switch (contentType)
+            {
+                case ContentType.Channel:
+                    return await GetTokenisedUrlForChannelAsync(token, contentUrl);
+
+                case ContentType.Asset:
+                    return await GetTokenisedUrlForAssetAsync(token, contentUrl);
+            }
+
+            throw new ArgumentException($"Could not generate tokenised URL for content type '{contentType}'", nameof(contentType));
+        }
     }
 }

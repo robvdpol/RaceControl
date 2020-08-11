@@ -2,7 +2,8 @@
 {
     public static class ParameterNames
     {
-        public const string ContentUrlFunc = "ContentUrlFunc";
+        public const string Token = "Token";
+        public const string ContentType = "ContentType";
         public const string ContentUrl = "ContentUrl";
         public const string SyncUID = "SyncUID";
         public const string Title = "Title";

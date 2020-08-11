@@ -317,12 +317,12 @@ namespace RaceControl.ViewModels
 
         private void WatchChannelExecute(Channel channel)
         {
-            Func<string, Task<string>> contentUrlFunc = (channelUrl) => GetTokenisedUrlForChannelAsync(channelUrl);
             var session = CurrentSession;
 
             var parameters = new DialogParameters
             {
-                { ParameterNames.ContentUrlFunc, contentUrlFunc },
+                { ParameterNames.Token, _token },
+                { ParameterNames.ContentType, ContentType.Channel },
                 { ParameterNames.ContentUrl, channel.Self },
                 { ParameterNames.SyncUID, session.UID },
                 { ParameterNames.Title, $"{session} - {channel}" },
@@ -334,11 +334,10 @@ namespace RaceControl.ViewModels
 
         private void WatchEpisodeExecute(Episode episode)
         {
-            Func<string, Task<string>> contentUrlFunc = (assetUrl) => GetTokenisedUrlForAssetAsync(assetUrl);
-
             var parameters = new DialogParameters
             {
-                { ParameterNames.ContentUrlFunc, contentUrlFunc },
+                { ParameterNames.Token, _token },
+                { ParameterNames.ContentType, ContentType.Asset },
                 { ParameterNames.ContentUrl, episode.Items.First() },
                 { ParameterNames.SyncUID, episode.UID },
                 { ParameterNames.Title, episode.ToString() },
@@ -355,7 +354,7 @@ namespace RaceControl.ViewModels
 
         private async void WatchVlcChannelExecute(Channel channel)
         {
-            var url = await GetTokenisedUrlForChannelAsync(channel.Self);
+            var url = await _apiService.GetTokenisedUrlForChannelAsync(_token, channel.Self);
             var title = $"{CurrentSession} - {channel}";
             var isLive = CurrentSession.IsLive;
 
@@ -376,7 +375,7 @@ namespace RaceControl.ViewModels
 
         private async void WatchVlcEpisodeExecute(Episode episode)
         {
-            var url = await GetTokenisedUrlForAssetAsync(episode.Items.First());
+            var url = await _apiService.GetTokenisedUrlForAssetAsync(_token, episode.Items.First());
             var title = episode.ToString();
 
             try
@@ -391,8 +390,8 @@ namespace RaceControl.ViewModels
 
         private async void WatchMpvChannelExecute(Channel channel)
         {
+            var url = await _apiService.GetTokenisedUrlForChannelAsync(_token, channel.Self);
             var title = $"{CurrentSession} - {channel}";
-            var url = await GetTokenisedUrlForChannelAsync(channel.Self);
 
             try
             {
@@ -406,8 +405,8 @@ namespace RaceControl.ViewModels
 
         private async void WatchMpvEpisodeExecute(Episode episode)
         {
+            var url = await _apiService.GetTokenisedUrlForAssetAsync(_token, episode.Items.First());
             var title = episode.ToString();
-            var url = await GetTokenisedUrlForAssetAsync(episode.Items.First());
 
             try
             {
@@ -421,13 +420,13 @@ namespace RaceControl.ViewModels
 
         private async void CopyUrlChannelExecute(Channel channel)
         {
-            var url = await GetTokenisedUrlForChannelAsync(channel.Self);
+            var url = await _apiService.GetTokenisedUrlForChannelAsync(_token, channel.Self);
             Clipboard.SetText(url);
         }
 
         private async void CopyUrlEpisodeExecute(Episode episode)
         {
-            var url = await GetTokenisedUrlForAssetAsync(episode.Items.First());
+            var url = await _apiService.GetTokenisedUrlForAssetAsync(_token, episode.Items.First());
             Clipboard.SetText(url);
         }
 
@@ -484,16 +483,6 @@ namespace RaceControl.ViewModels
             {
                 Process.Start(VlcExeLocation, $"{url} --meta-title=\"{title}\"");
             }
-        }
-
-        private async Task<string> GetTokenisedUrlForChannelAsync(string channelUrl)
-        {
-            return await _apiService.GetTokenisedUrlForChannelAsync(_token, channelUrl);
-        }
-
-        private async Task<string> GetTokenisedUrlForAssetAsync(string assetUrl)
-        {
-            return await _apiService.GetTokenisedUrlForAssetAsync(_token, assetUrl);
         }
 
         private void ClearEvents()
