@@ -294,7 +294,11 @@ namespace RaceControl.ViewModels
 
         private void ShowControlsTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            ShowControls = false;
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                ShowControls = false;
+                Mouse.OverrideCursor = Cursors.None;
+            });
         }
 
         private void RendererDiscoverer_ItemAdded(object sender, RendererDiscovererItemAddedEventArgs e)
@@ -337,7 +341,13 @@ namespace RaceControl.ViewModels
         private void MouseEnterOrLeaveOrMoveVideoExecute()
         {
             _showControlsTimer.Stop();
-            ShowControls = true;
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                ShowControls = true;
+                Mouse.OverrideCursor = null;
+            });
+
             _showControlsTimer.Start();
         }
 

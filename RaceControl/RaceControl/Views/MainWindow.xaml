@@ -22,7 +22,10 @@
             <i:InvokeCommandAction Command="{Binding LoadedCommand}" PassEventArgsToCommand="True" />
         </i:EventTrigger>
         <i:EventTrigger EventName="Closing">
-            <i:InvokeCommandAction Command="{Binding ClosingCommand}" PassEventArgsToCommand="False" />
+            <i:InvokeCommandAction Command="{Binding ClosingCommand}" />
+        </i:EventTrigger>
+        <i:EventTrigger EventName="MouseMove">
+            <i:InvokeCommandAction Command="{Binding MouseMoveCommand}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Grid Margin="2">

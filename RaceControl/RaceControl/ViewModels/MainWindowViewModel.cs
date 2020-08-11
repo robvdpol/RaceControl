@@ -33,6 +33,7 @@ namespace RaceControl.ViewModels
 
         private ICommand _loadedCommand;
         private ICommand _closingCommand;
+        private ICommand _mouseMoveCommand;
         private ICommand _seasonSelectionChangedCommand;
         private ICommand _eventSelectionChangedCommand;
         private ICommand _liveSessionSelectionChangedCommand;
@@ -73,6 +74,7 @@ namespace RaceControl.ViewModels
 
         public ICommand LoadedCommand => _loadedCommand ??= new DelegateCommand<RoutedEventArgs>(LoadedExecute);
         public ICommand ClosingCommand => _closingCommand ??= new DelegateCommand(ClosingExecute);
+        public ICommand MouseMoveCommand => _mouseMoveCommand ??= new DelegateCommand(MouseMoveExecute);
         public ICommand SeasonSelectionChangedCommand => _seasonSelectionChangedCommand ??= new DelegateCommand(SeasonSelectionChangedExecute);
         public ICommand EventSelectionChangedCommand => _eventSelectionChangedCommand ??= new DelegateCommand(EventSelectionChangedExecute);
         public ICommand LiveSessionSelectionChangedCommand => _liveSessionSelectionChangedCommand ??= new DelegateCommand(LiveSessionSelectionChangedExecute);
@@ -220,6 +222,17 @@ namespace RaceControl.ViewModels
             _refreshLiveEventsTimer.Elapsed -= RefreshLiveEventsTimer_Elapsed;
             _refreshLiveEventsTimer.Stop();
             _refreshLiveEventsTimer.Dispose();
+        }
+
+        private void MouseMoveExecute()
+        {
+            if (Mouse.OverrideCursor != null)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    Mouse.OverrideCursor = null;
+                });
+            }
         }
 
         private async void SeasonSelectionChangedExecute()
