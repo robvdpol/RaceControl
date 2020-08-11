@@ -221,11 +221,6 @@ namespace RaceControl.ViewModels
             Title = parameters.GetValue<string>(ParameterNames.Title);
             IsLive = parameters.GetValue<bool>(ParameterNames.IsLive);
 
-//#if DEBUG
-//            // to test streamlink
-//            IsLive = true;
-//#endif
-
             var streamUrl = await ContentUrlFunc.Invoke(ContentUrl);
 
             if (IsLive)
