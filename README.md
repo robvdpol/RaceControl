@@ -1,12 +1,12 @@
 # Race Control
-Race Control is a standalone, open source F1TV client for Windows.
+Race Control is a standalone, open source [F1TV](https://f1tv.formula1.com) client for Windows. It can be used to watch F1TV content (both live streams and video on demand) in the highest quality available, using one of three supported video players. This project was started out of frustration over the mediocre official F1TV website and apps, and the lack of development of those platforms.
 
 ## Features
 * Fast and user-friendly user interface
-* Watch F1TV streams in the highest quality available, either fullscreen or windowed
-* No limit to the amount of streams that can be watched simultaneously
-* Cast to your Chromecast with a single click of a button
-* Experimental automatic synchronization of streams
+* Watch F1TV live streams in the highest quality available (currently 1080p)
+* Supports three different video players (internal player, VLC and MPV)
+* Open as many streams as you like, using the layout that you like
+* Cast to your Chromecast with a single click of a button (internal player and VLC only)
 
 ## Installation
 * Download the latest release and extract it to a location of your choice
@@ -19,6 +19,9 @@ You need an F1TV account to watch F1TV VODs. If you want to watch race replays, 
 
 #### What happens with my credentials when I login?
 You F1TV login credentials are stored locally in the Windows Credential Manager, so you don't have to login every time you start the application. If you wish to switch to a different F1TV account, open the Credential Manager, go to 'Windows Credentials' and under 'Generic Credentials' find the entry called 'RaceControlF1TV'. If you delete the entry, you will be asked to login again when you start the application.
+
+#### Why is the VLC button disabled?
+You need to have VLC media player installed on your machine. The location of your VLC installation will be detected automatically by Race Control.
 
 ## Acknowledgements
 * [f1viewer](https://github.com/SoMuchForSubtlety/f1viewer) for showing how to use the F1TV API.
