@@ -1,11 +1,11 @@
 ﻿using LibVLCSharp.Shared;
 using Microsoft.Win32;
 using Prism.Commands;
-using Prism.Mvvm;
 using Prism.Services.Dialogs;
 using RaceControl.Common.Utils;
 using RaceControl.Comparers;
 using RaceControl.Core.Helpers;
+using RaceControl.Core.Mvvm;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Api;
 using RaceControl.Streamlink;
@@ -23,7 +23,7 @@ using System.Windows.Input;
 
 namespace RaceControl.ViewModels
 {
-    public class MainWindowViewModel : BindableBase
+    public class MainWindowViewModel : ViewModelBase
     {
         private readonly IDialogService _dialogService;
         private readonly IApiService _apiService;
@@ -210,11 +210,13 @@ namespace RaceControl.ViewModels
 
         private async Task Initialize()
         {
+            IsBusy = true;
             Seasons.AddRange((await _apiService.GetRaceSeasonsAsync()).Where(s => s.EventOccurrenceUrls.Any()));
             VodTypes.AddRange((await _apiService.GetVodTypesAsync()).Where(v => v.ContentUrls.Any()));
             await RefreshLiveEvents();
             _refreshLiveEventsTimer.Elapsed += RefreshLiveEventsTimer_Elapsed;
             _refreshLiveEventsTimer.Start();
+            IsBusy = false;
         }
 
         private void ClosingExecute()
@@ -237,6 +239,7 @@ namespace RaceControl.ViewModels
 
         private async void SeasonSelectionChangedExecute()
         {
+            IsBusy = true;
             ClearEvents();
 
             if (SelectedSeason != null && SelectedSeason.EventOccurrenceUrls.Any())
@@ -249,10 +252,13 @@ namespace RaceControl.ViewModels
                 await Task.WhenAll(tasks);
                 Events.AddRange(events.OrderBy(e => e.StartDate));
             }
+
+            IsBusy = false;
         }
 
         private async void EventSelectionChangedExecute()
         {
+            IsBusy = true;
             ClearSessions();
 
             if (SelectedEvent != null && SelectedEvent.SessionOccurrenceUrls.Any())
@@ -265,14 +271,18 @@ namespace RaceControl.ViewModels
                 await Task.WhenAll(tasks);
                 Sessions.AddRange(sessions.Where(s => s.IsLive || s.IsReplay).OrderBy(s => s.StartTime));
             }
+
+            IsBusy = false;
         }
 
         private async void LiveSessionSelectionChangedExecute()
         {
             if (SelectedLiveSession != null)
             {
+                IsBusy = true;
                 SelectedSession = null;
                 await SelectSession(SelectedLiveSession);
+                IsBusy = false;
             }
         }
 
@@ -280,8 +290,10 @@ namespace RaceControl.ViewModels
         {
             if (SelectedSession != null)
             {
+                IsBusy = true;
                 SelectedLiveSession = null;
                 await SelectSession(SelectedSession);
+                IsBusy = false;
             }
         }
 
@@ -310,6 +322,7 @@ namespace RaceControl.ViewModels
         {
             if (SelectedVodType != null)
             {
+                IsBusy = true;
                 SelectedLiveSession = null;
                 SelectedSession = null;
                 ClearChannels();
@@ -325,6 +338,8 @@ namespace RaceControl.ViewModels
                     await Task.WhenAll(tasks);
                     Episodes.AddRange(episodes.OrderBy(e => e.Title));
                 }
+
+                IsBusy = false;
             }
         }
 
@@ -433,14 +448,18 @@ namespace RaceControl.ViewModels
 
         private async void CopyUrlChannelExecute(Channel channel)
         {
+            IsBusy = true;
             var url = await _apiService.GetTokenisedUrlForChannelAsync(_token, channel.Self);
             Clipboard.SetText(url);
+            IsBusy = false;
         }
 
         private async void CopyUrlEpisodeExecute(Episode episode)
         {
+            IsBusy = true;
             var url = await _apiService.GetTokenisedUrlForAssetAsync(_token, episode.Items.First());
             Clipboard.SetText(url);
+            IsBusy = false;
         }
 
         private async void RefreshLiveEventsTimer_Elapsed(object sender, ElapsedEventArgs e)

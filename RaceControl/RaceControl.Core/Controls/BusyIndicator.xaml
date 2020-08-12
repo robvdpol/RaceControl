@@ -1,0 +1,125 @@
+﻿<UserControl
+    x:Class="RaceControl.Core.Controls.BusyIndicator"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    HorizontalAlignment="Stretch"
+    VerticalAlignment="Stretch"
+    Background="#40D3D3D3">
+    <Viewbox
+        Width="50"
+        Height="50"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center">
+        <Grid
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Background="Transparent"
+            ToolTip="Searching....">
+            <Canvas
+                Name="Canvas1"
+                Width="120"
+                Height="120"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                RenderTransformOrigin="0.5,0.5">
+                <Canvas.RenderTransform>
+                    <RotateTransform Angle="0" />
+                </Canvas.RenderTransform>
+                <Canvas.Style>
+                    <Style TargetType="Canvas">
+                        <Style.Triggers>
+                            <Trigger Property="IsVisible" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard Name="Storyboard_Rotate">
+                                        <Storyboard RepeatBehavior="Forever">
+                                            <DoubleAnimation
+                                                Storyboard.TargetProperty="RenderTransform.Angle"
+                                                From="0"
+                                                To="360"
+                                                Duration="0:0:2" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <StopStoryboard BeginStoryboardName="Storyboard_Rotate" />
+                                </Trigger.ExitActions>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Canvas.Style>
+                <Ellipse
+                    Canvas.Left="50"
+                    Canvas.Top="0"
+                    Width="20"
+                    Height="20"
+                    Fill="Black"
+                    Opacity="1.0"
+                    Stretch="Fill" />
+                <Ellipse
+                    Canvas.Left="20.6107373853764"
+                    Canvas.Top="9.54915028125262"
+                    Width="20"
+                    Height="20"
+                    Fill="Black"
+                    Opacity="0.9"
+                    Stretch="Fill" />
+                <Ellipse
+                    Canvas.Left="2.44717418524233"
+                    Canvas.Top="34.5491502812526"
+                    Width="20"
+                    Height="20"
+                    Fill="Black"
+                    Opacity="0.8"
+                    Stretch="Fill" />
+                <Ellipse
+                    Canvas.Left="2.44717418524232"
+                    Canvas.Top="65.4508497187474"
+                    Width="20"
+                    Height="20"
+                    Fill="Black"
+                    Opacity="0.7"
+                    Stretch="Fill" />
+                <Ellipse
+                    Canvas.Left="20.6107373853763"
+                    Canvas.Top="90.4508497187474"
+                    Width="20"
+                    Height="20"
+                    Fill="Black"
+                    Opacity="0.6"
+                    Stretch="Fill" />
+                <Ellipse
+                    Canvas.Left="50"
+                    Canvas.Top="100"
+                    Width="20"
+                    Height="20"
+                    Fill="Black"
+                    Opacity="0.5"
+                    Stretch="Fill" />
+                <Ellipse
+                    Canvas.Left="79.3892626146236"
+                    Canvas.Top="90.4508497187474"
+                    Width="20"
+                    Height="20"
+                    Fill="Black"
+                    Opacity="0.4"
+                    Stretch="Fill" />
+                <Ellipse
+                    Canvas.Left="97.5528258147577"
+                    Canvas.Top="65.4508497187474"
+                    Width="20"
+                    Height="20"
+                    Fill="Black"
+                    Opacity="0.3"
+                    Stretch="Fill" />
+                <Ellipse
+                    Canvas.Left="97.5528258147577"
+                    Canvas.Top="34.5491502812526"
+                    Width="20"
+                    Height="20"
+                    Fill="Black"
+                    Opacity="0.2"
+                    Stretch="Fill" />
+            </Canvas>
+        </Grid>
+    </Viewbox>
+</UserControl>  

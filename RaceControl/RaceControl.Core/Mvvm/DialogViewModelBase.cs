@@ -1,12 +1,11 @@
 ﻿using Prism.Commands;
-using Prism.Mvvm;
 using Prism.Services.Dialogs;
 using System;
 using System.Windows.Input;
 
 namespace RaceControl.Core.Mvvm
 {
-    public abstract class DialogViewModelBase : BindableBase, IDialogAware
+    public abstract class DialogViewModelBase : ViewModelBase, IDialogAware
     {
         private ICommand _closeWindowCommand;
 
