@@ -24,10 +24,10 @@ You F1TV login credentials are stored locally in the Windows Credential Manager,
 You need to have VLC media player installed on your machine. The location of your VLC installation will be automatically detected by Race Control.
 
 ## Acknowledgements
-* [f1viewer](https://github.com/SoMuchForSubtlety/f1viewer) for showing how to use the F1TV API.
-* [VLC](https://www.videolan.org/vlc) for providing an excellent video player and .NET library.
-* [MPV](https://mpv.io) for providing a video player that can reliably play F1TV live streams without needing workarounds.
-* [Streamlink](https://streamlink.github.io) for providing a flexible stream extractor/transporter.
+* [f1viewer](https://github.com/SoMuchForSubtlety/f1viewer) for showing how to use the F1TV API
+* [VLC](https://www.videolan.org/vlc) for providing an excellent video player and .NET library
+* [MPV](https://mpv.io) for providing a video player that can reliably play F1TV live streams without needing workarounds
+* [Streamlink](https://streamlink.github.io) for providing a flexible stream extractor/transporter
 * [Prism Library](https://prismlibrary.com)
 * [Newtonsoft Json.NET](https://www.newtonsoft.com/json)
 * [CredentialManagement.Standard NuGet package](https://www.nuget.org/packages/CredentialManagement.Standard)
