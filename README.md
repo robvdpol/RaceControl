@@ -19,3 +19,9 @@ You need an F1TV account to watch F1TV VODs. If you want to watch race replays, 
 
 #### What happens with my credentials when I login?
 You F1TV login credentials are stored locally in the Windows Credential Manager, so you don't have to login every time you start the application. If you wish to switch to a different F1TV account, open the Credential Manager, go to 'Windows Credentials' and under 'Generic Credentials' find the entry called 'RaceControlF1TV'. If you delete the entry, you will be asked to login again when you start the application.
+
+## Acknowledgements
+* [f1viewer](https://github.com/SoMuchForSubtlety/f1viewer) for showing how to use the F1TV API.
+* [VLC](https://www.videolan.org/vlc) for providing an excellent video player and .NET library.
+* [MPV](https://mpv.io) for providing a video player that can reliably play F1TV live streams without needing workarounds.
+* [Streamlink](https://streamlink.github.io) for providing a flexible stream extractor/transporter.
