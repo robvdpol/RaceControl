@@ -31,6 +31,12 @@
         <i:EventTrigger EventName="MouseMove">
             <i:InvokeCommandAction Command="{Binding MouseMoveCommand}" />
         </i:EventTrigger>
+        <i:EventTrigger EventName="PreviewKeyDown">
+            <i:InvokeCommandAction Command="{Binding PreviewKeyDownCommand}" PassEventArgsToCommand="True" />
+        </i:EventTrigger>
+        <i:EventTrigger EventName="KeyDown">
+            <i:InvokeCommandAction Command="{Binding KeyDownCommand}" PassEventArgsToCommand="True" />
+        </i:EventTrigger>
     </i:Interaction.Triggers>
     <Grid IsHitTestVisible="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}">
         <ctrls:BusyIndicator Panel.ZIndex="1000" Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
