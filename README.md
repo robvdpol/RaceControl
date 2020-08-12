@@ -21,7 +21,7 @@ You need an F1TV account to watch F1TV VODs. If you want to watch race replays, 
 You F1TV login credentials are stored locally in the Windows Credential Manager, so you don't have to login every time you start the application. If you wish to switch to a different F1TV account, open the Credential Manager, go to 'Windows Credentials' and under 'Generic Credentials' find the entry called 'RaceControlF1TV'. If you delete the entry, you will be asked to login again when you start the application.
 
 #### Why is the VLC button disabled?
-You need to have VLC media player installed on your machine. The location of your VLC installation will be detected automatically by Race Control.
+You need to have VLC media player installed on your machine. The location of your VLC installation will be automatically detected by Race Control.
 
 ## Acknowledgements
 * [f1viewer](https://github.com/SoMuchForSubtlety/f1viewer) for showing how to use the F1TV API.
