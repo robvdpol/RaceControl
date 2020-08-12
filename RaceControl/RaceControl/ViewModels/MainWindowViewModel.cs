@@ -193,9 +193,20 @@ namespace RaceControl.ViewModels
                     return;
                 }
 
-                SetVlcExeLocation();
                 await Initialize();
             }
+        }
+
+        private async Task Initialize()
+        {
+            IsBusy = true;
+            SetVlcExeLocation();
+            Seasons.AddRange((await _apiService.GetRaceSeasonsAsync()).Where(s => s.EventOccurrenceUrls.Any()));
+            VodTypes.AddRange((await _apiService.GetVodTypesAsync()).Where(v => v.ContentUrls.Any()));
+            await RefreshLiveEvents();
+            _refreshLiveEventsTimer.Elapsed += RefreshLiveEventsTimer_Elapsed;
+            _refreshLiveEventsTimer.Start();
+            IsBusy = false;
         }
 
         private void SetVlcExeLocation()
@@ -206,17 +217,6 @@ namespace RaceControl.ViewModels
             {
                 VlcExeLocation = vlcRegistryKey.GetValue(null) as string;
             }
-        }
-
-        private async Task Initialize()
-        {
-            IsBusy = true;
-            Seasons.AddRange((await _apiService.GetRaceSeasonsAsync()).Where(s => s.EventOccurrenceUrls.Any()));
-            VodTypes.AddRange((await _apiService.GetVodTypesAsync()).Where(v => v.ContentUrls.Any()));
-            await RefreshLiveEvents();
-            _refreshLiveEventsTimer.Elapsed += RefreshLiveEventsTimer_Elapsed;
-            _refreshLiveEventsTimer.Start();
-            IsBusy = false;
         }
 
         private void ClosingExecute()
