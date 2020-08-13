@@ -28,11 +28,15 @@ You need to have VLC media player installed on your machine. The location of you
 #### Do I need to install MPV separately to use it with Race Control?
 No, Race Control comes with a recent version of MPV included in the release.
 
+#### Can you add support for my favourite media player?
+Maybe, please create an issue (feature request) and I will consider it. As a workaround, you can use the Copy-button to generate a tokenized link to the stream that is copied to your clipboard. Open the link with a media player of your choice to watch the stream.
+
 ## Acknowledgements
 * [f1viewer](https://github.com/SoMuchForSubtlety/f1viewer) for showing how to use the F1TV API
 * [VLC](https://www.videolan.org/vlc) for providing an excellent video player and .NET library
 * [MPV](https://mpv.io) for providing a video player that can reliably play F1TV live streams without needing workarounds
 * [Streamlink](https://streamlink.github.io) for providing a flexible stream extractor/transporter
+* [Flaticon](https://www.flaticon.com) for providing the application icon
 * [Prism Library](https://prismlibrary.com)
 * [Newtonsoft Json.NET](https://www.newtonsoft.com/json)
 * [CredentialManagement.Standard NuGet package](https://www.nuget.org/packages/CredentialManagement.Standard)
