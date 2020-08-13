@@ -33,6 +33,7 @@ No, Race Control comes with a recent version of MPV included in the release.
 * [VLC](https://www.videolan.org/vlc) for providing an excellent video player and .NET library
 * [MPV](https://mpv.io) for providing a video player that can reliably play F1TV live streams without needing workarounds
 * [Streamlink](https://streamlink.github.io) for providing a flexible stream extractor/transporter
+* [Flaticon](https://www.flaticon.com) for providing the application icon
 * [Prism Library](https://prismlibrary.com)
 * [Newtonsoft Json.NET](https://www.newtonsoft.com/json)
 * [CredentialManagement.Standard NuGet package](https://www.nuget.org/packages/CredentialManagement.Standard)
