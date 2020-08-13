@@ -28,7 +28,10 @@ namespace RaceControl.ViewModels
             _authorizationService = authorizationService;
         }
 
-        public ICommand LoginCommand => _loginCommand ??= new DelegateCommand(LoginExecute, CanLoginExecute).ObservesProperty(() => Email).ObservesProperty(() => Password);
+        public ICommand LoginCommand => _loginCommand ??= new DelegateCommand(LoginExecute, CanLoginExecute)
+            .ObservesProperty(() => Email)
+            .ObservesProperty(() => Password)
+            .ObservesProperty(() => IsBusy);
 
         public override string Title
         {
@@ -68,11 +71,12 @@ namespace RaceControl.ViewModels
 
         private bool CanLoginExecute()
         {
-            return !string.IsNullOrWhiteSpace(Email) && !string.IsNullOrWhiteSpace(Password);
+            return !string.IsNullOrWhiteSpace(Email) && !string.IsNullOrWhiteSpace(Password) && !IsBusy;
         }
 
         private async void LoginExecute()
         {
+            IsBusy = true;
             Error = null;
             TokenResponse token;
 
@@ -83,10 +87,12 @@ namespace RaceControl.ViewModels
             catch (Exception ex)
             {
                 Error = ex.Message;
+                IsBusy = false;
                 return;
             }
 
             SaveCredential();
+            IsBusy = false;
             RaiseRequestClose(new DialogResult(ButtonResult.OK, new DialogParameters
             {
                 { "token", token.Token }
