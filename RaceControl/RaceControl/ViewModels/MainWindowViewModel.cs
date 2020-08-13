@@ -25,7 +25,7 @@ namespace RaceControl.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        private readonly IDialogService _dialogService;
+        private readonly IExtendedDialogService _dialogService;
         private readonly IApiService _apiService;
         private readonly IStreamlinkLauncher _streamlinkLauncher;
         private readonly LibVLC _libVLC;
@@ -64,7 +64,7 @@ namespace RaceControl.ViewModels
         private Session _selectedSession;
         private VodType _selectedVodType;
 
-        public MainWindowViewModel(IDialogService dialogService, IApiService apiService, IStreamlinkLauncher streamlinkLauncher, LibVLC libVLC)
+        public MainWindowViewModel(IExtendedDialogService dialogService, IApiService apiService, IStreamlinkLauncher streamlinkLauncher, LibVLC libVLC)
         {
             _dialogService = dialogService;
             _apiService = apiService;
@@ -203,10 +203,11 @@ namespace RaceControl.ViewModels
             SetVlcExeLocation();
             Seasons.AddRange((await _apiService.GetRaceSeasonsAsync()).Where(s => s.EventOccurrenceUrls.Any()));
             VodTypes.AddRange((await _apiService.GetVodTypesAsync()).Where(v => v.ContentUrls.Any()));
+            IsBusy = false;
+
             await RefreshLiveEvents();
             _refreshLiveEventsTimer.Elapsed += RefreshLiveEventsTimer_Elapsed;
             _refreshLiveEventsTimer.Start();
-            IsBusy = false;
         }
 
         private void SetVlcExeLocation()
@@ -357,7 +358,7 @@ namespace RaceControl.ViewModels
                 { ParameterNames.IsLive, session.IsLive }
             };
 
-            _dialogService.Show(nameof(VideoDialog), parameters, null);
+            _dialogService.Show(nameof(VideoDialog), parameters, null, false);
         }
 
         private void WatchEpisodeExecute(Episode episode)
@@ -372,7 +373,7 @@ namespace RaceControl.ViewModels
                 { ParameterNames.IsLive, false }
             };
 
-            _dialogService.Show(nameof(VideoDialog), parameters, null);
+            _dialogService.Show(nameof(VideoDialog), parameters, null, false);
         }
 
         private bool CanWatchVlcChannelExecute(Channel channel)

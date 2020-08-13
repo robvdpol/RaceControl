@@ -12,10 +12,10 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CredentialManagement.Standard" Version="1.0.4" />
-    <PackageReference Include="LibVLCSharp" Version="3.4.6" />
-    <PackageReference Include="LibVLCSharp.WPF" Version="3.4.6" />
+    <PackageReference Include="LibVLCSharp" Version="3.4.7" />
+    <PackageReference Include="LibVLCSharp.WPF" Version="3.4.7" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.19" />
-    <PackageReference Include="Prism.DryIoc" Version="7.2.0.1422" />
+    <PackageReference Include="Prism.DryIoc" Version="8.0.0.1740-pre" />
     <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.11" />
   </ItemGroup>
   <ItemGroup>

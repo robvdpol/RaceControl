@@ -2,6 +2,7 @@
 using Prism.Ioc;
 using RaceControl.Common;
 using RaceControl.Core.Helpers;
+using RaceControl.Core.Mvvm;
 using RaceControl.Services;
 using RaceControl.Services.F1TV;
 using RaceControl.Services.Interfaces;
@@ -31,6 +32,7 @@ namespace RaceControl
             containerRegistry.RegisterDialog<LoginDialog, LoginDialogViewModel>();
             containerRegistry.RegisterDialog<VideoDialog, VideoDialogViewModel>();
 
+            containerRegistry.RegisterSingleton<IExtendedDialogService, ExtendedDialogService>();
             containerRegistry.RegisterSingleton<LibVLC>();
             containerRegistry.RegisterSingleton<IChildProcessTracker, ChildProcessTracker>();
             containerRegistry.RegisterSingleton<IRestClient, RestClient>();
