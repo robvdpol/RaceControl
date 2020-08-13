@@ -41,5 +41,6 @@ Maybe, please create an issue (feature request) and I will consider it. As a wor
 * [Newtonsoft Json.NET](https://www.newtonsoft.com/json)
 * [CredentialManagement.Standard NuGet package](https://www.nuget.org/packages/CredentialManagement.Standard)
 
+## Screenshots
 ![preview image](https://i.imgur.com/BjYFQOv.png)
 ![preview image](https://i.imgur.com/QeWXnn7.png)
