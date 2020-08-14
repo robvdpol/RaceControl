@@ -43,4 +43,5 @@ Maybe, please create an issue (feature request) and I will consider it. As a wor
 
 ## Screenshots
 ![preview image](https://i.imgur.com/BjYFQOv.png)
+
 ![preview image](https://i.imgur.com/QeWXnn7.png)
