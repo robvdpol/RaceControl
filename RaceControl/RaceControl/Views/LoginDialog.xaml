@@ -12,7 +12,10 @@
             <Setter Property="SizeToContent" Value="WidthAndHeight" />
         </Style>
     </prism:Dialog.WindowStyle>
-    <Grid Margin="2" FocusManager.FocusedElement="{Binding ElementName=TextBoxEmail}">
+    <Grid
+        Width="400"
+        Margin="10,0"
+        FocusManager.FocusedElement="{Binding ElementName=TextBoxEmail}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -20,14 +23,14 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="160" />
-            <ColumnDefinition Width="220" />
+            <ColumnDefinition Width="175" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <TextBlock
             Grid.Row="0"
             Grid.Column="0"
             Grid.ColumnSpan="2"
-            Margin="5"
+            Margin="5,0"
             Text="Please enter your F1TV credentials to login. Your credentials will only be stored locally."
             TextWrapping="Wrap" />
         <Label
@@ -38,7 +41,7 @@
             Name="TextBoxEmail"
             Grid.Row="1"
             Grid.Column="1"
-            Margin="4,2"
+            Margin="0,2"
             Text="{Binding Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <Label
             Grid.Row="2"
@@ -47,24 +50,34 @@
         <PasswordBox
             Grid.Row="2"
             Grid.Column="1"
-            Margin="4,2"
+            Margin="0,2"
             mvvm:PasswordBoxAssistant.BindPassword="True"
             mvvm:PasswordBoxAssistant.BoundPassword="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-        <TextBlock
+        <Grid
             Grid.Row="3"
             Grid.Column="0"
-            Margin="5,2"
-            Foreground="Red"
-            Text="{Binding Error}"
-            TextWrapping="Wrap" />
-        <Button
-            Grid.Row="3"
-            Grid.Column="1"
-            Height="26"
-            Margin="4,2,4,4"
-            VerticalAlignment="Top"
-            Command="{Binding LoginCommand}"
-            Content="Login"
-            IsDefault="True" />
+            Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock
+                Grid.Column="0"
+                MaxHeight="50"
+                Margin="5,0"
+                Foreground="Red"
+                Text="{Binding Error}"
+                TextWrapping="Wrap" />
+            <Button
+                Grid.Column="1"
+                Width="100"
+                Height="24"
+                Margin="0,10"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Command="{Binding LoginCommand}"
+                Content="Login"
+                IsDefault="True" />
+        </Grid>
     </Grid>
 </UserControl>

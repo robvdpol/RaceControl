@@ -9,9 +9,15 @@ namespace RaceControl.Core.Mvvm
     {
         private ICommand _closeWindowCommand;
 
-        public abstract string Title { get; set; }
+        private string _title;
 
         public ICommand CloseWindowCommand => _closeWindowCommand ??= new DelegateCommand(CloseWindowExecute);
+
+        public string Title
+        {
+            get => _title;
+            set => SetProperty(ref _title, value);
+        }
 
         public event Action<IDialogResult> RequestClose;
 

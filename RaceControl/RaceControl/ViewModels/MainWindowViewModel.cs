@@ -8,14 +8,15 @@ using RaceControl.Core.Helpers;
 using RaceControl.Core.Mvvm;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Api;
+using RaceControl.Services.Interfaces.Github;
 using RaceControl.Streamlink;
 using RaceControl.Views;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -27,6 +28,7 @@ namespace RaceControl.ViewModels
     {
         private readonly IExtendedDialogService _dialogService;
         private readonly IApiService _apiService;
+        private readonly IGithubService _githubService;
         private readonly IStreamlinkLauncher _streamlinkLauncher;
         private readonly LibVLC _libVLC;
         private readonly Timer _refreshLiveEventsTimer = new Timer(60000) { AutoReset = false };
@@ -64,10 +66,11 @@ namespace RaceControl.ViewModels
         private Session _selectedSession;
         private VodType _selectedVodType;
 
-        public MainWindowViewModel(IExtendedDialogService dialogService, IApiService apiService, IStreamlinkLauncher streamlinkLauncher, LibVLC libVLC)
+        public MainWindowViewModel(IExtendedDialogService dialogService, IApiService apiService, IGithubService githubService, IStreamlinkLauncher streamlinkLauncher, LibVLC libVLC)
         {
             _dialogService = dialogService;
             _apiService = apiService;
+            _githubService = githubService;
             _streamlinkLauncher = streamlinkLauncher;
             _libVLC = libVLC;
         }
@@ -200,6 +203,16 @@ namespace RaceControl.ViewModels
         private async Task Initialize()
         {
             IsBusy = true;
+
+            try
+            {
+                await CheckForUpdates();
+            }
+            catch
+            {
+                // todo: log error silently
+            }
+
             SetVlcExeLocation();
             Seasons.AddRange((await _apiService.GetRaceSeasonsAsync()).Where(s => s.EventOccurrenceUrls.Any()));
             VodTypes.AddRange((await _apiService.GetVodTypesAsync()).Where(v => v.ContentUrls.Any()));
@@ -208,6 +221,32 @@ namespace RaceControl.ViewModels
             await RefreshLiveEvents();
             _refreshLiveEventsTimer.Elapsed += RefreshLiveEventsTimer_Elapsed;
             _refreshLiveEventsTimer.Start();
+        }
+
+        private async Task CheckForUpdates()
+        {
+            var release = await _githubService.GetLatestRelease();
+
+            if (release != null && !release.PreRelease && !release.Draft && Version.TryParse(release.TagName, out var latestVersion))
+            {
+                var currentVersion = Assembly.GetEntryAssembly().GetName().Version;
+
+                if (latestVersion > currentVersion)
+                {
+                    var parameters = new DialogParameters
+                    {
+                        { ParameterNames.Release, release }
+                    };
+
+                    _dialogService.ShowDialog(nameof(UpgradeDialog), parameters, dialogResult =>
+                    {
+                        if (dialogResult.Result == ButtonResult.OK)
+                        {
+                            ProcessUtils.BrowseToUrl(release.HtmlUrl);
+                        }
+                    });
+                }
+            }
         }
 
         private void SetVlcExeLocation()
@@ -424,7 +463,7 @@ namespace RaceControl.ViewModels
 
             try
             {
-                Process.Start(@".\mpv\mpv.exe", $"{url} --title=\"{title}\"");
+                ProcessUtils.StartProcess(@".\mpv\mpv.exe", $"{url} --title=\"{title}\"");
             }
             catch (Exception ex)
             {
@@ -439,7 +478,7 @@ namespace RaceControl.ViewModels
 
             try
             {
-                Process.Start(@".\mpv\mpv.exe", $"{url} --title=\"{title}\"");
+                ProcessUtils.StartProcess(@".\mpv\mpv.exe", $"{url} --title=\"{title}\"");
             }
             catch (Exception ex)
             {
@@ -514,7 +553,7 @@ namespace RaceControl.ViewModels
             }
             else
             {
-                Process.Start(VlcExeLocation, $"{url} --meta-title=\"{title}\"");
+                ProcessUtils.StartProcess(VlcExeLocation, $"{url} --meta-title=\"{title}\"");
             }
         }
 

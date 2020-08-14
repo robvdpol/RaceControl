@@ -18,7 +18,6 @@ namespace RaceControl.ViewModels
 
         private ICommand _loginCommand;
 
-        private string _title;
         private string _email;
         private string _password;
         private string _error;
@@ -32,12 +31,6 @@ namespace RaceControl.ViewModels
             .ObservesProperty(() => Email)
             .ObservesProperty(() => Password)
             .ObservesProperty(() => IsBusy);
-
-        public override string Title
-        {
-            get => _title;
-            set => SetProperty(ref _title, value);
-        }
 
         public string Email
         {

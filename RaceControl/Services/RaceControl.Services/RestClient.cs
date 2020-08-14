@@ -20,9 +20,16 @@ namespace RaceControl.Services
             _httpClient = httpClient;
         }
 
-        public async Task<TResponse> GetAsJsonAsync<TResponse>(string url)
+        public async Task<TResponse> GetAsJsonAsync<TResponse>(string url, string userAgent = null)
         {
-            var httpResponse = await _httpClient.GetAsync(url);
+            HttpResponseMessage httpResponse;
+
+            using (var requestMessage = new HttpRequestMessage(HttpMethod.Get, url))
+            {
+                requestMessage.Headers.Accept.ParseAdd(mediaTypeJson);
+                requestMessage.Headers.UserAgent.ParseAdd("RaceControl");
+                httpResponse = await _httpClient.SendAsync(requestMessage);
+            }
 
             if (!httpResponse.IsSuccessStatusCode)
             {

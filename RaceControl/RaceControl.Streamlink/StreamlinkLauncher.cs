@@ -16,13 +16,11 @@ namespace RaceControl.Streamlink
         public Process StartStreamlinkExternal(string streamUrl, out string streamlinkUrl)
         {
             var port = SocketUtils.GetFreePort();
-            var process = Process.Start(new ProcessStartInfo
-            {
-                FileName = @".\streamlink\streamlink.bat",
-                Arguments = $"--player-external-http --player-external-http-port {port} --hls-audio-select * \"{streamUrl}\" best",
-                UseShellExecute = false,
-                CreateNoWindow = true
-            });
+            var process = ProcessUtils.StartProcess(
+                @".\streamlink\streamlink.bat",
+                $"--player-external-http --player-external-http-port {port} --hls-audio-select * \"{streamUrl}\" best",
+                false,
+                true);
 
             _childProcessTracker.AddProcess(process);
             streamlinkUrl = $"http://127.0.0.1:{port}";
@@ -32,15 +30,11 @@ namespace RaceControl.Streamlink
 
         public Process StartStreamlinkVLC(string vlcExeLocation, string streamUrl)
         {
-            var process = Process.Start(new ProcessStartInfo
-            {
-                FileName = @".\streamlink\streamlink.bat",
-                Arguments = $"--player \"{vlcExeLocation} --file-caching=2000 --network-caching=4000\" --hls-audio-select * \"{streamUrl}\" best",
-                UseShellExecute = false,
-                CreateNoWindow = true
-            });
-
-            return process;
+            return ProcessUtils.StartProcess(
+                @".\streamlink\streamlink.bat",
+                $"--player \"{vlcExeLocation} --file-caching=2000 --network-caching=4000\" --hls-audio-select * \"{streamUrl}\" best",
+                false,
+                true);
         }
     }
 }

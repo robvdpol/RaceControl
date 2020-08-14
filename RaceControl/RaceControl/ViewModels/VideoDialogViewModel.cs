@@ -48,7 +48,6 @@ namespace RaceControl.ViewModels
         private ContentType _contentType;
         private string _contentUrl;
         private string _syncUID;
-        private string _title;
         private bool _isLive;
         private bool _isCasting;
         private Process _streamlinkProcess;
@@ -89,12 +88,6 @@ namespace RaceControl.ViewModels
         public ICommand ScanChromecastCommand => _scanChromecastCommand ??= new DelegateCommand(ScanChromecastExecute, CanScanChromecastExecute).ObservesProperty(() => RendererDiscoverer);
         public ICommand StartCastVideoCommand => _startCastVideoCommand ??= new DelegateCommand(StartCastVideoExecute, CanStartCastVideoExecute).ObservesProperty(() => SelectedRendererItem);
         public ICommand StopCastVideoCommand => _stopCastVideoCommand ??= new DelegateCommand(StopCastVideoExecute, CanStopCastVideoExecute).ObservesProperty(() => IsCasting);
-
-        public override string Title
-        {
-            get => _title;
-            set => SetProperty(ref _title, value);
-        }
 
         public bool IsLive
         {

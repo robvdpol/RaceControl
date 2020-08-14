@@ -5,8 +5,10 @@ using RaceControl.Core.Helpers;
 using RaceControl.Core.Mvvm;
 using RaceControl.Services;
 using RaceControl.Services.F1TV;
+using RaceControl.Services.Github;
 using RaceControl.Services.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
+using RaceControl.Services.Interfaces.Github;
 using RaceControl.Services.Interfaces.Lark;
 using RaceControl.Services.Lark;
 using RaceControl.Streamlink;
@@ -30,6 +32,7 @@ namespace RaceControl
         {
             containerRegistry.RegisterDialogWindow<DialogWindow>();
             containerRegistry.RegisterDialog<LoginDialog, LoginDialogViewModel>();
+            containerRegistry.RegisterDialog<UpgradeDialog, UpgradeDialogViewModel>();
             containerRegistry.RegisterDialog<VideoDialog, VideoDialogViewModel>();
 
             containerRegistry.RegisterSingleton<IExtendedDialogService, ExtendedDialogService>();
@@ -39,6 +42,7 @@ namespace RaceControl
             containerRegistry.Register<IAuthorizationService, AuthorizationService>();
             containerRegistry.Register<IF1TVClient, F1TVClient>();
             containerRegistry.Register<IApiService, ApiService>();
+            containerRegistry.Register<IGithubService, GithubService>();
             containerRegistry.Register<IStreamlinkLauncher, StreamlinkLauncher>();
         }
 
