@@ -39,7 +39,7 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Grid IsHitTestVisible="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}">
-        <ctrls:BusyIndicator Panel.ZIndex="1000" Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
+        <ctrls:BusyIndicator Panel.ZIndex="1000" Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}" />
         <Grid Margin="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -48,10 +48,10 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" MaxWidth="250" />
-                <ColumnDefinition Width="*" MaxWidth="250" />
-                <ColumnDefinition Width="*" MaxWidth="300" />
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="3*" />
             </Grid.ColumnDefinitions>
             <Label
                 Grid.Row="0"
@@ -159,6 +159,7 @@
                 Grid.Column="3"
                 HorizontalContentAlignment="Stretch"
                 ItemsSource="{Binding Channels}"
+                ScrollViewer.VerticalScrollBarVisibility="Visible"
                 SelectionMode="Single"
                 Style="{StaticResource ContentListViewStyle}">
                 <ListView.ItemTemplate>
@@ -211,13 +212,42 @@
             <Label
                 Grid.Row="2"
                 Grid.Column="0"
-                Grid.ColumnSpan="2"
+                Content="Options"
+                Style="{StaticResource HeaderLabelStyle}" />
+            <Border
+                Grid.Row="3"
+                Grid.Column="0"
+                Margin="2"
+                BorderBrush="#ABADB3"
+                BorderThickness="1"
+                UseLayoutRounding="True">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <CheckBox
+                        Grid.Row="0"
+                        Margin="3"
+                        Content="Force lower quality on live streams"
+                        IsChecked="{Binding LowQualityMode}"
+                        ToolTip="Note: only works for internal player and VLC. Use in case of low bandwidth connection." />
+                    <CheckBox
+                        Grid.Row="1"
+                        Margin="3"
+                        Content="Use alternative live stream"
+                        IsChecked="{Binding UseAlternativeStream}"
+                        ToolTip="Note: only works for internal player and VLC. Use in case the regular live stream does not work." />
+                </Grid>
+            </Border>
+            <Label
+                Grid.Row="2"
+                Grid.Column="1"
                 Content="Video On Demand"
                 Style="{StaticResource HeaderLabelStyle}" />
             <ListView
                 Grid.Row="3"
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
+                Grid.Column="1"
                 ItemsSource="{Binding VodTypes}"
                 SelectedItem="{Binding SelectedVodType}"
                 SelectionMode="Single"
@@ -240,6 +270,7 @@
                 Grid.ColumnSpan="2"
                 HorizontalContentAlignment="Stretch"
                 ItemsSource="{Binding Episodes}"
+                ScrollViewer.VerticalScrollBarVisibility="Visible"
                 SelectionMode="Single"
                 Style="{StaticResource ContentListViewStyle}">
                 <ListView.ItemTemplate>

@@ -195,12 +195,14 @@ namespace RaceControl.ViewModels
             _syncUID = parameters.GetValue<string>(ParameterNames.SyncUID);
             Title = parameters.GetValue<string>(ParameterNames.Title);
             IsLive = parameters.GetValue<bool>(ParameterNames.IsLive);
+            var lowQualityMode = parameters.GetValue<bool>(ParameterNames.LowQualityMode);
+            var useAlternativeStream = parameters.GetValue<bool>(ParameterNames.UseAlternativeStream);
 
             var streamUrl = await GenerateStreamUrl();
 
             if (IsLive)
             {
-                _streamlinkProcess = _streamlinkLauncher.StartStreamlinkExternal(streamUrl, out streamUrl);
+                _streamlinkProcess = _streamlinkLauncher.StartStreamlinkExternal(streamUrl, out streamUrl, lowQualityMode, useAlternativeStream);
             }
 
             CreateMedia(streamUrl);

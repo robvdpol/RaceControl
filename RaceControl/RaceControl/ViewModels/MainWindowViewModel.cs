@@ -53,6 +53,8 @@ namespace RaceControl.ViewModels
         private bool _loaded;
         private string _token;
         private string _vlcExeLocation;
+        private bool _lowQualityMode;
+        private bool _useAlternativeStream;
         private ObservableCollection<Season> _seasons;
         private ObservableCollection<Event> _events;
         private ObservableCollection<Session> _sessions;
@@ -96,6 +98,18 @@ namespace RaceControl.ViewModels
         {
             get => _vlcExeLocation;
             set => SetProperty(ref _vlcExeLocation, value);
+        }
+
+        public bool LowQualityMode
+        {
+            get => _lowQualityMode;
+            set => SetProperty(ref _lowQualityMode, value);
+        }
+
+        public bool UseAlternativeStream
+        {
+            get => _useAlternativeStream;
+            set => SetProperty(ref _useAlternativeStream, value);
         }
 
         public ObservableCollection<Season> Seasons
@@ -394,7 +408,9 @@ namespace RaceControl.ViewModels
                 { ParameterNames.ContentUrl, channel.Self },
                 { ParameterNames.SyncUID, session.UID },
                 { ParameterNames.Title, $"{session} - {channel}" },
-                { ParameterNames.IsLive, session.IsLive }
+                { ParameterNames.IsLive, session.IsLive },
+                { ParameterNames.LowQualityMode, LowQualityMode },
+                { ParameterNames.UseAlternativeStream, UseAlternativeStream }
             };
 
             _dialogService.Show(nameof(VideoDialog), parameters, null, false);
@@ -409,7 +425,9 @@ namespace RaceControl.ViewModels
                 { ParameterNames.ContentUrl, episode.Items.First() },
                 { ParameterNames.SyncUID, episode.UID },
                 { ParameterNames.Title, episode.ToString() },
-                { ParameterNames.IsLive, false }
+                { ParameterNames.IsLive, false },
+                { ParameterNames.LowQualityMode, false },
+                { ParameterNames.UseAlternativeStream, false }
             };
 
             _dialogService.Show(nameof(VideoDialog), parameters, null, false);
@@ -549,7 +567,7 @@ namespace RaceControl.ViewModels
         {
             if (isLive)
             {
-                _streamlinkLauncher.StartStreamlinkVLC(VlcExeLocation, url);
+                _streamlinkLauncher.StartStreamlinkVLC(VlcExeLocation, url, LowQualityMode, UseAlternativeStream);
             }
             else
             {

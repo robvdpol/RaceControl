@@ -8,6 +8,8 @@
         public const string SyncUID = "SyncUID";
         public const string Title = "Title";
         public const string IsLive = "IsLive";
+        public const string LowQualityMode = "LowQualityMode";
+        public const string UseAlternativeStream = "UseAlternativeStream";
         public const string Release = "Release";
     }
 }
