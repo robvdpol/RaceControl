@@ -1,4 +1,5 @@
-﻿using Prism.Commands;
+﻿using NLog;
+using Prism.Commands;
 using Prism.Services.Dialogs;
 using RaceControl.Core.Mvvm;
 using RaceControl.Services.Interfaces.Credential;
@@ -12,6 +13,7 @@ namespace RaceControl.ViewModels
 {
     public class LoginDialogViewModel : DialogViewModelBase
     {
+        private readonly ILogger _logger;
         private readonly IAuthorizationService _authorizationService;
         private readonly ICredentialService _credentialService;
 
@@ -21,8 +23,9 @@ namespace RaceControl.ViewModels
         private string _password;
         private string _error;
 
-        public LoginDialogViewModel(IAuthorizationService authorizationService, ICredentialService credentialService)
+        public LoginDialogViewModel(ILogger logger, IAuthorizationService authorizationService, ICredentialService credentialService)
         {
+            _logger = logger;
             _authorizationService = authorizationService;
             _credentialService = credentialService;
         }
@@ -81,21 +84,21 @@ namespace RaceControl.ViewModels
 
             try
             {
+                _logger.Info("Attempting to login...");
                 token = await _authorizationService.LoginAsync(Email, Password);
+                _logger.Info("Login successful.");
             }
             catch (Exception ex)
             {
+                _logger.Error(ex, "Login failed.");
                 Error = ex.Message;
                 IsBusy = false;
                 return;
             }
 
             _credentialService.SaveCredential(Email, Password);
+            RaiseRequestClose(new DialogResult(ButtonResult.OK, new DialogParameters { { "token", token.Token } }));
             IsBusy = false;
-            RaiseRequestClose(new DialogResult(ButtonResult.OK, new DialogParameters
-            {
-                { "token", token.Token }
-            }));
         }
     }
 }

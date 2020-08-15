@@ -1,4 +1,10 @@
-﻿using LibVLCSharp.Shared;
+﻿using DryIoc;
+using LibVLCSharp.Shared;
+using NLog;
+using NLog.Config;
+using NLog.Layouts;
+using NLog.Targets;
+using Prism.DryIoc;
 using Prism.Ioc;
 using RaceControl.Common;
 using RaceControl.Core.Helpers;
@@ -18,6 +24,7 @@ using RaceControl.ViewModels;
 using RaceControl.Views;
 using System.Windows;
 using System.Windows.Threading;
+using LogLevel = NLog.LogLevel;
 
 namespace RaceControl
 {
@@ -25,6 +32,7 @@ namespace RaceControl
     {
         protected override Window CreateShell()
         {
+            InitializeLogging();
             LibVLCSharp.Shared.Core.Initialize();
 
             return Container.Resolve<MainWindow>();
@@ -32,6 +40,8 @@ namespace RaceControl
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            containerRegistry.GetContainer().Register(Made.Of<ILogger>(() => LogManager.GetLogger(Arg.Index<string>(0)), request => request.Parent.ImplementationType.Name));
+
             containerRegistry.RegisterDialogWindow<DialogWindow>();
             containerRegistry.RegisterDialog<LoginDialog, LoginDialogViewModel>();
             containerRegistry.RegisterDialog<UpgradeDialog, UpgradeDialogViewModel>();
@@ -47,6 +57,18 @@ namespace RaceControl
             containerRegistry.Register<IGithubService, GithubService>();
             containerRegistry.Register<ICredentialService, CredentialService>();
             containerRegistry.Register<IStreamlinkLauncher, StreamlinkLauncher>();
+        }
+
+        private void InitializeLogging()
+        {
+            var config = new LoggingConfiguration();
+            var logfile = new FileTarget("logfile")
+            {
+                FileName = "RaceControl.log",
+                Layout = Layout.FromString("${longdate} ${uppercase:${level}} ${message}${onexception:inner=${newline}${exception:format=tostring}}")
+            };
+            config.AddRule(LogLevel.Info, LogLevel.Fatal, logfile);
+            LogManager.Configuration = config;
         }
 
         private void PrismApplication_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)

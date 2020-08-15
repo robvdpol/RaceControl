@@ -1,5 +1,6 @@
 ﻿using LibVLCSharp.Shared;
 using Microsoft.Win32;
+using NLog;
 using Prism.Commands;
 using Prism.Services.Dialogs;
 using RaceControl.Common.Utils;
@@ -27,6 +28,7 @@ namespace RaceControl.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
+        private readonly ILogger _logger;
         private readonly IExtendedDialogService _dialogService;
         private readonly IApiService _apiService;
         private readonly IGithubService _githubService;
@@ -53,7 +55,6 @@ namespace RaceControl.ViewModels
         private ICommand _copyUrlEpisodeCommand;
         private ICommand _deleteCredentialCommand;
 
-        private bool _loaded;
         private string _token;
         private string _vlcExeLocation;
         private bool _lowQualityMode;
@@ -72,6 +73,7 @@ namespace RaceControl.ViewModels
         private VodType _selectedVodType;
 
         public MainWindowViewModel(
+            ILogger logger,
             IExtendedDialogService dialogService,
             IApiService apiService,
             IGithubService githubService,
@@ -79,6 +81,7 @@ namespace RaceControl.ViewModels
             IStreamlinkLauncher streamlinkLauncher,
             LibVLC libVLC)
         {
+            _logger = logger;
             _dialogService = dialogService;
             _apiService = apiService;
             _githubService = githubService;
@@ -197,45 +200,35 @@ namespace RaceControl.ViewModels
 
         public Session CurrentSession => SelectedLiveSession ?? SelectedSession;
 
-        private async void LoadedExecute(RoutedEventArgs args)
+        private void LoadedExecute(RoutedEventArgs args)
         {
-            if (!_loaded)
+            _dialogService.ShowDialog(nameof(LoginDialog), null, async dialogResult =>
             {
-                _loaded = true;
-
-                _dialogService.ShowDialog(nameof(LoginDialog), null, dialogResult =>
+                if (dialogResult.Result == ButtonResult.OK)
                 {
-                    if (dialogResult.Result == ButtonResult.OK)
-                    {
-                        _token = dialogResult.Parameters.GetValue<string>("token");
-                    }
-                });
-
-                if (string.IsNullOrWhiteSpace(_token))
-                {
-                    if (args.Source is Window window)
-                    {
-                        window.Close();
-                    }
-
-                    return;
+                    var token = dialogResult.Parameters.GetValue<string>("token");
+                    await Initialize(token);
                 }
-
-                await Initialize();
-            }
+                else
+                {
+                    _logger.Info("Login cancelled by user.");
+                    Application.Current.Shutdown();
+                }
+            });
         }
 
-        private async Task Initialize()
+        private async Task Initialize(string token)
         {
             IsBusy = true;
+            SetToken(token);
 
             try
             {
                 await CheckForUpdates();
             }
-            catch
+            catch (Exception ex)
             {
-                // todo: log error silently
+                _logger.Error(ex, "An exception occured while checking for updates.");
             }
 
             SetVlcExeLocation();
@@ -246,6 +239,11 @@ namespace RaceControl.ViewModels
             await RefreshLiveEvents();
             _refreshLiveEventsTimer.Elapsed += RefreshLiveEventsTimer_Elapsed;
             _refreshLiveEventsTimer.Start();
+        }
+
+        private void SetToken(string token)
+        {
+            _token = token;
         }
 
         private async Task CheckForUpdates()
@@ -281,6 +279,11 @@ namespace RaceControl.ViewModels
             if (vlcRegistryKey != null)
             {
                 VlcExeLocation = vlcRegistryKey.GetValue(null) as string;
+                _logger.Info($"Found VLC installation: '{VlcExeLocation}'.");
+            }
+            else
+            {
+                _logger.Info("Could not find VLC installation.");
             }
         }
 
@@ -561,6 +564,7 @@ namespace RaceControl.ViewModels
 
         private async Task RefreshLiveEvents()
         {
+            _logger.Info("Refreshing live events...");
             var liveEvents = await _apiService.GetLiveEventsAsync();
             var liveSessions = new List<Session>();
 
@@ -593,6 +597,8 @@ namespace RaceControl.ViewModels
                     LiveSessions.AddRange(sessionsToAdd);
                 }
             });
+
+            _logger.Info("Done refreshing live events.");
         }
 
         private void WatchStreamInVlc(string url, string title, bool isLive)
