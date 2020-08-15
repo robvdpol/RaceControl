@@ -1,7 +1,7 @@
-﻿using CredentialManagement;
-using Prism.Commands;
+﻿using Prism.Commands;
 using Prism.Services.Dialogs;
 using RaceControl.Core.Mvvm;
+using RaceControl.Services.Interfaces.Credential;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Authorization;
 using System;
@@ -12,9 +12,8 @@ namespace RaceControl.ViewModels
 {
     public class LoginDialogViewModel : DialogViewModelBase
     {
-        private const string RaceControlF1TV = "RaceControlF1TV";
-
         private readonly IAuthorizationService _authorizationService;
+        private readonly ICredentialService _credentialService;
 
         private ICommand _loginCommand;
 
@@ -22,9 +21,10 @@ namespace RaceControl.ViewModels
         private string _password;
         private string _error;
 
-        public LoginDialogViewModel(IAuthorizationService authorizationService)
+        public LoginDialogViewModel(IAuthorizationService authorizationService, ICredentialService credentialService)
         {
             _authorizationService = authorizationService;
+            _credentialService = credentialService;
         }
 
         public ICommand LoginCommand => _loginCommand ??= new DelegateCommand(LoginExecute, CanLoginExecute)
@@ -56,9 +56,15 @@ namespace RaceControl.ViewModels
 
             Title = "Login";
 
-            if (LoadCredential() && LoginCommand.CanExecute(null))
+            if (_credentialService.LoadCredential(out var email, out var password))
             {
-                LoginCommand.Execute(null);
+                Email = email;
+                Password = password;
+
+                if (LoginCommand.CanExecute(null))
+                {
+                    LoginCommand.Execute(null);
+                }
             }
         }
 
@@ -84,44 +90,12 @@ namespace RaceControl.ViewModels
                 return;
             }
 
-            SaveCredential();
+            _credentialService.SaveCredential(Email, Password);
             IsBusy = false;
             RaiseRequestClose(new DialogResult(ButtonResult.OK, new DialogParameters
             {
                 { "token", token.Token }
             }));
-        }
-
-        private bool LoadCredential()
-        {
-            using (var credential = new Credential())
-            {
-                credential.Target = RaceControlF1TV;
-
-                var loaded = credential.Load();
-
-                if (loaded)
-                {
-                    Email = credential.Username;
-                    Password = credential.Password;
-                }
-
-                return loaded;
-            }
-        }
-
-        private bool SaveCredential()
-        {
-            using (var credential = new Credential())
-            {
-                credential.Target = RaceControlF1TV;
-                credential.Type = CredentialType.Generic;
-                credential.PersistanceType = PersistanceType.LocalComputer;
-                credential.Username = Email;
-                credential.Password = Password;
-
-                return credential.Save();
-            }
         }
     }
 }

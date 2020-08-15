@@ -6,6 +6,7 @@ using RaceControl.Common.Utils;
 using RaceControl.Comparers;
 using RaceControl.Core.Helpers;
 using RaceControl.Core.Mvvm;
+using RaceControl.Services.Interfaces.Credential;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Api;
 using RaceControl.Services.Interfaces.Github;
@@ -29,6 +30,7 @@ namespace RaceControl.ViewModels
         private readonly IExtendedDialogService _dialogService;
         private readonly IApiService _apiService;
         private readonly IGithubService _githubService;
+        private readonly ICredentialService _credentialService;
         private readonly IStreamlinkLauncher _streamlinkLauncher;
         private readonly LibVLC _libVLC;
         private readonly Timer _refreshLiveEventsTimer = new Timer(60000) { AutoReset = false };
@@ -49,6 +51,7 @@ namespace RaceControl.ViewModels
         private ICommand _watchMpvEpisodeCommand;
         private ICommand _copyUrlChannelCommand;
         private ICommand _copyUrlEpisodeCommand;
+        private ICommand _deleteCredentialCommand;
 
         private bool _loaded;
         private string _token;
@@ -68,11 +71,18 @@ namespace RaceControl.ViewModels
         private Session _selectedSession;
         private VodType _selectedVodType;
 
-        public MainWindowViewModel(IExtendedDialogService dialogService, IApiService apiService, IGithubService githubService, IStreamlinkLauncher streamlinkLauncher, LibVLC libVLC)
+        public MainWindowViewModel(
+            IExtendedDialogService dialogService,
+            IApiService apiService,
+            IGithubService githubService,
+            ICredentialService credentialService,
+            IStreamlinkLauncher streamlinkLauncher,
+            LibVLC libVLC)
         {
             _dialogService = dialogService;
             _apiService = apiService;
             _githubService = githubService;
+            _credentialService = credentialService;
             _streamlinkLauncher = streamlinkLauncher;
             _libVLC = libVLC;
         }
@@ -93,6 +103,7 @@ namespace RaceControl.ViewModels
         public ICommand WatchMpvEpisodeCommand => _watchMpvEpisodeCommand ??= new DelegateCommand<Episode>(WatchMpvEpisodeExecute);
         public ICommand CopyUrlChannelCommand => _copyUrlChannelCommand ??= new DelegateCommand<Channel>(CopyUrlChannelExecute);
         public ICommand CopyUrlEpisodeCommand => _copyUrlEpisodeCommand ??= new DelegateCommand<Episode>(CopyUrlEpisodeExecute);
+        public ICommand DeleteCredentialCommand => _deleteCredentialCommand ??= new DelegateCommand(DeleteCredentialExecute);
 
         public string VlcExeLocation
         {
@@ -517,6 +528,27 @@ namespace RaceControl.ViewModels
             IsBusy = true;
             var url = await _apiService.GetTokenisedUrlForAssetAsync(_token, episode.Items.First());
             Clipboard.SetText(url);
+            IsBusy = false;
+        }
+
+        private async void DeleteCredentialExecute()
+        {
+            IsBusy = true;
+
+            if (MessageBoxHelper.AskQuestion("Are you sure you want to delete your credentials from this system?"))
+            {
+                var deleted = await Task.Run(() => _credentialService.DeleteCredential());
+
+                if (deleted)
+                {
+                    MessageBoxHelper.ShowInfo("Your credentials have been successfully deleted from this system.");
+                }
+                else
+                {
+                    MessageBoxHelper.ShowError("Your credentials have already been deleted from this system.");
+                }
+            }
+
             IsBusy = false;
         }
 

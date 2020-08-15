@@ -225,6 +225,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <CheckBox
                         Grid.Row="0"
@@ -238,6 +239,13 @@
                         Content="Use alternative live stream"
                         IsChecked="{Binding UseAlternativeStream}"
                         ToolTip="Note: only works for internal player and VLC. Use in case the regular live stream does not work." />
+                    <Button
+                        Grid.Row="2"
+                        Height="24"
+                        Margin="3"
+                        Command="{Binding DeleteCredentialCommand}"
+                        Content="Delete saved credentials"
+                        ToolTip="Deletes your saved credentials from this system. Use this if you want to use different credentials to login." />
                 </Grid>
             </Border>
             <Label

@@ -11,7 +11,6 @@
     <ApplicationIcon>f1.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CredentialManagement.Standard" Version="1.0.4" />
     <PackageReference Include="LibVLCSharp" Version="3.4.7" />
     <PackageReference Include="LibVLCSharp.WPF" Version="3.4.7" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.19" />

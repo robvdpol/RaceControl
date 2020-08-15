@@ -4,9 +4,11 @@ using RaceControl.Common;
 using RaceControl.Core.Helpers;
 using RaceControl.Core.Mvvm;
 using RaceControl.Services;
+using RaceControl.Services.Credential;
 using RaceControl.Services.F1TV;
 using RaceControl.Services.Github;
 using RaceControl.Services.Interfaces;
+using RaceControl.Services.Interfaces.Credential;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.Github;
 using RaceControl.Services.Interfaces.Lark;
@@ -43,6 +45,7 @@ namespace RaceControl
             containerRegistry.Register<IF1TVClient, F1TVClient>();
             containerRegistry.Register<IApiService, ApiService>();
             containerRegistry.Register<IGithubService, GithubService>();
+            containerRegistry.Register<ICredentialService, CredentialService>();
             containerRegistry.Register<IStreamlinkLauncher, StreamlinkLauncher>();
         }
 
