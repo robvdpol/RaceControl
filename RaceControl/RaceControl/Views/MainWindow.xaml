@@ -232,13 +232,13 @@
                         Margin="3"
                         Content="Force lower quality on live streams"
                         IsChecked="{Binding LowQualityMode}"
-                        ToolTip="Note: only works for internal player and VLC. Use in case of low bandwidth connection." />
+                        ToolTip="Only works for internal player and VLC. Use in case of low bandwidth connection." />
                     <CheckBox
                         Grid.Row="1"
                         Margin="3"
                         Content="Use alternative live stream"
                         IsChecked="{Binding UseAlternativeStream}"
-                        ToolTip="Note: only works for internal player and VLC. Use in case the regular live stream does not work." />
+                        ToolTip="Only works for internal player and VLC. Use in case the regular live stream does not work." />
                     <Button
                         Grid.Row="2"
                         Height="24"
