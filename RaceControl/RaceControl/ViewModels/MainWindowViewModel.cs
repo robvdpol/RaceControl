@@ -220,7 +220,6 @@ namespace RaceControl.ViewModels
         private async Task Initialize(string token)
         {
             IsBusy = true;
-            SetToken(token);
 
             try
             {
@@ -231,6 +230,7 @@ namespace RaceControl.ViewModels
                 _logger.Error(ex, "An exception occurred while checking for updates.");
             }
 
+            SetToken(token);
             SetVlcExeLocation();
             Seasons.AddRange((await _apiService.GetRaceSeasonsAsync()).Where(s => s.EventOccurrenceUrls.Any()));
             VodTypes.AddRange((await _apiService.GetVodTypesAsync()).Where(v => v.ContentUrls.Any()));

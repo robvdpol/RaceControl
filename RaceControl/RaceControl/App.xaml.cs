@@ -24,6 +24,7 @@ using RaceControl.ViewModels;
 using RaceControl.Views;
 using System.Windows;
 using System.Windows.Threading;
+using LibVLCSharpCore = LibVLCSharp.Shared.Core;
 using LogLevel = NLog.LogLevel;
 
 namespace RaceControl
@@ -32,10 +33,14 @@ namespace RaceControl
     {
         protected override Window CreateShell()
         {
-            InitializeLogging();
-            LibVLCSharp.Shared.Core.Initialize();
-
             return Container.Resolve<MainWindow>();
+        }
+
+        protected override void Initialize()
+        {
+            LibVLCSharpCore.Initialize();
+            InitializeLogging();
+            base.Initialize();
         }
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
