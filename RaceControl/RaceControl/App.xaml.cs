@@ -73,6 +73,7 @@ namespace RaceControl
 
         private void PrismApplication_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
+            LogManager.GetCurrentClassLogger().Error(e.Exception, "An unhandled exception occurred.");
             MessageBoxHelper.ShowError(e.Exception.Message);
             e.Handled = true;
         }

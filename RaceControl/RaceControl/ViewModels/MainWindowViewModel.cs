@@ -198,7 +198,7 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _selectedVodType, value);
         }
 
-        public Session CurrentSession => SelectedLiveSession ?? SelectedSession;
+        private Session GetCurrentSession() => SelectedLiveSession ?? SelectedSession;
 
         private void LoadedExecute(RoutedEventArgs args)
         {
@@ -228,7 +228,7 @@ namespace RaceControl.ViewModels
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "An exception occured while checking for updates.");
+                _logger.Error(ex, "An exception occurred while checking for updates.");
             }
 
             SetVlcExeLocation();
@@ -248,6 +248,8 @@ namespace RaceControl.ViewModels
 
         private async Task CheckForUpdates()
         {
+            _logger.Info("Checking for updates...");
+
             var release = await _githubService.GetLatestRelease();
 
             if (release != null && !release.PreRelease && !release.Draft && Version.TryParse(release.TagName, out var latestVersion))
@@ -256,6 +258,8 @@ namespace RaceControl.ViewModels
 
                 if (latestVersion > currentVersion)
                 {
+                    _logger.Info($"Found new release '{release.Name}'.");
+
                     var parameters = new DialogParameters
                     {
                         { ParameterNames.Release, release }
@@ -270,6 +274,8 @@ namespace RaceControl.ViewModels
                     });
                 }
             }
+
+            _logger.Info("Done checking for updates.");
         }
 
         private void SetVlcExeLocation()
@@ -279,7 +285,7 @@ namespace RaceControl.ViewModels
             if (vlcRegistryKey != null)
             {
                 VlcExeLocation = vlcRegistryKey.GetValue(null) as string;
-                _logger.Info($"Found VLC installation: '{VlcExeLocation}'.");
+                _logger.Info($"Found VLC installation at '{VlcExeLocation}'.");
             }
             else
             {
@@ -413,8 +419,7 @@ namespace RaceControl.ViewModels
 
         private void WatchChannelExecute(Channel channel)
         {
-            var session = CurrentSession;
-
+            var session = GetCurrentSession();
             var parameters = new DialogParameters
             {
                 { ParameterNames.Token, _token },
@@ -427,6 +432,7 @@ namespace RaceControl.ViewModels
                 { ParameterNames.UseAlternativeStream, UseAlternativeStream }
             };
 
+            _logger.Info($"Starting internal player for channel with parameters: '{parameters}'.");
             _dialogService.Show(nameof(VideoDialog), parameters, null, false);
         }
 
@@ -444,93 +450,131 @@ namespace RaceControl.ViewModels
                 { ParameterNames.UseAlternativeStream, false }
             };
 
+            _logger.Info($"Starting internal player for episode with parameters: '{parameters}'.");
             _dialogService.Show(nameof(VideoDialog), parameters, null, false);
         }
 
         private bool CanWatchVlcChannelExecute(Channel channel)
         {
-            return channel != null && !string.IsNullOrWhiteSpace(VlcExeLocation);
+            return !string.IsNullOrWhiteSpace(VlcExeLocation);
         }
 
         private async void WatchVlcChannelExecute(Channel channel)
         {
-            var url = await _apiService.GetTokenisedUrlForChannelAsync(_token, channel.Self);
-            var title = $"{CurrentSession} - {channel}";
-            var isLive = CurrentSession.IsLive;
+            IsBusy = true;
+            var session = GetCurrentSession();
+            var title = $"{session} - {channel}";
 
             try
             {
-                WatchStreamInVlc(url, title, isLive);
+                var url = await _apiService.GetTokenisedUrlForChannelAsync(_token, channel.Self);
+                WatchStreamInVlc(url, title, session.IsLive);
             }
             catch (Exception ex)
             {
+                _logger.Error(ex, "An exception occurred while trying to watch a channel in VLC.");
                 MessageBoxHelper.ShowError(ex.Message);
             }
+
+            IsBusy = false;
         }
 
         private bool CanWatchVlcEpisodeExecute(Episode episode)
         {
-            return episode != null && !string.IsNullOrWhiteSpace(VlcExeLocation);
+            return !string.IsNullOrWhiteSpace(VlcExeLocation);
         }
 
         private async void WatchVlcEpisodeExecute(Episode episode)
         {
-            var url = await _apiService.GetTokenisedUrlForAssetAsync(_token, episode.Items.First());
+            IsBusy = true;
             var title = episode.ToString();
 
             try
             {
+                var url = await _apiService.GetTokenisedUrlForAssetAsync(_token, episode.Items.First());
                 WatchStreamInVlc(url, title, false);
             }
             catch (Exception ex)
             {
+                _logger.Error(ex, "An exception occurred while trying to watch an episode in VLC.");
                 MessageBoxHelper.ShowError(ex.Message);
             }
+
+            IsBusy = false;
         }
 
         private async void WatchMpvChannelExecute(Channel channel)
         {
-            var url = await _apiService.GetTokenisedUrlForChannelAsync(_token, channel.Self);
-            var title = $"{CurrentSession} - {channel}";
+            IsBusy = true;
+            var session = GetCurrentSession();
+            var title = $"{session} - {channel}";
 
             try
             {
+                var url = await _apiService.GetTokenisedUrlForChannelAsync(_token, channel.Self);
                 ProcessUtils.StartProcess(@".\mpv\mpv.exe", $"{url} --title=\"{title}\"");
             }
             catch (Exception ex)
             {
+                _logger.Error(ex, "An exception occurred while trying to watch a channel in MPV.");
                 MessageBoxHelper.ShowError(ex.Message);
             }
+
+            IsBusy = false;
         }
 
         private async void WatchMpvEpisodeExecute(Episode episode)
         {
-            var url = await _apiService.GetTokenisedUrlForAssetAsync(_token, episode.Items.First());
+            IsBusy = true;
             var title = episode.ToString();
 
             try
             {
+                var url = await _apiService.GetTokenisedUrlForAssetAsync(_token, episode.Items.First());
                 ProcessUtils.StartProcess(@".\mpv\mpv.exe", $"{url} --title=\"{title}\"");
             }
             catch (Exception ex)
             {
+                _logger.Error(ex, "An exception occurred while trying to watch an episode in MPV.");
                 MessageBoxHelper.ShowError(ex.Message);
             }
+
+            IsBusy = false;
         }
 
         private async void CopyUrlChannelExecute(Channel channel)
         {
             IsBusy = true;
-            var url = await _apiService.GetTokenisedUrlForChannelAsync(_token, channel.Self);
-            Clipboard.SetText(url);
+
+            try
+            {
+                var url = await _apiService.GetTokenisedUrlForChannelAsync(_token, channel.Self);
+                Clipboard.SetText(url);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "An exception occurred while copying a channel-URL to the clipboard.");
+                MessageBoxHelper.ShowError(ex.Message);
+            }
+
             IsBusy = false;
         }
 
         private async void CopyUrlEpisodeExecute(Episode episode)
         {
             IsBusy = true;
-            var url = await _apiService.GetTokenisedUrlForAssetAsync(_token, episode.Items.First());
-            Clipboard.SetText(url);
+
+            try
+            {
+                var url = await _apiService.GetTokenisedUrlForAssetAsync(_token, episode.Items.First());
+                Clipboard.SetText(url);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "An exception occurred while copying an episode-URL to the clipboard.");
+                MessageBoxHelper.ShowError(ex.Message);
+            }
+
             IsBusy = false;
         }
 
