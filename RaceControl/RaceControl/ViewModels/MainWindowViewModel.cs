@@ -17,6 +17,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -57,6 +58,7 @@ namespace RaceControl.ViewModels
 
         private string _token;
         private string _vlcExeLocation;
+        private string _mpvExeLocation;
         private bool _lowQualityMode;
         private bool _useAlternativeStream;
         private ObservableCollection<Season> _seasons;
@@ -102,8 +104,8 @@ namespace RaceControl.ViewModels
         public ICommand WatchEpisodeCommand => _watchEpisodeCommand ??= new DelegateCommand<Episode>(WatchEpisodeExecute);
         public ICommand WatchVlcChannelCommand => _watchVlcChannelCommand ??= new DelegateCommand<Channel>(WatchVlcChannelExecute, CanWatchVlcChannelExecute).ObservesProperty(() => VlcExeLocation);
         public ICommand WatchVlcEpisodeCommand => _watchVlcEpisodeCommand ??= new DelegateCommand<Episode>(WatchVlcEpisodeExecute, CanWatchVlcEpisodeExecute).ObservesProperty(() => VlcExeLocation);
-        public ICommand WatchMpvChannelCommand => _watchMpvChannelCommand ??= new DelegateCommand<Channel>(WatchMpvChannelExecute);
-        public ICommand WatchMpvEpisodeCommand => _watchMpvEpisodeCommand ??= new DelegateCommand<Episode>(WatchMpvEpisodeExecute);
+        public ICommand WatchMpvChannelCommand => _watchMpvChannelCommand ??= new DelegateCommand<Channel>(WatchMpvChannelExecute, CanWatchMpvChannelExecute).ObservesProperty(() => MpvExeLocation);
+        public ICommand WatchMpvEpisodeCommand => _watchMpvEpisodeCommand ??= new DelegateCommand<Episode>(WatchMpvEpisodeExecute, CanWatchMpvEpisodeExecute).ObservesProperty(() => MpvExeLocation);
         public ICommand CopyUrlChannelCommand => _copyUrlChannelCommand ??= new DelegateCommand<Channel>(CopyUrlChannelExecute);
         public ICommand CopyUrlEpisodeCommand => _copyUrlEpisodeCommand ??= new DelegateCommand<Episode>(CopyUrlEpisodeExecute);
         public ICommand DeleteCredentialCommand => _deleteCredentialCommand ??= new DelegateCommand(DeleteCredentialExecute);
@@ -112,6 +114,12 @@ namespace RaceControl.ViewModels
         {
             get => _vlcExeLocation;
             set => SetProperty(ref _vlcExeLocation, value);
+        }
+
+        public string MpvExeLocation
+        {
+            get => _mpvExeLocation;
+            set => SetProperty(ref _mpvExeLocation, value);
         }
 
         public bool LowQualityMode
@@ -232,6 +240,7 @@ namespace RaceControl.ViewModels
 
             SetToken(token);
             SetVlcExeLocation();
+            SetMpvExeLocation();
             Seasons.AddRange((await _apiService.GetRaceSeasonsAsync()).Where(s => s.EventOccurrenceUrls.Any()));
             VodTypes.AddRange((await _apiService.GetVodTypesAsync()).Where(v => v.ContentUrls.Any()));
             IsBusy = false;
@@ -282,14 +291,29 @@ namespace RaceControl.ViewModels
         {
             var vlcRegistryKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\VideoLAN\VLC") ?? Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\VideoLAN\VLC");
 
-            if (vlcRegistryKey != null)
+            if (vlcRegistryKey != null && vlcRegistryKey.GetValue(null) is string vlcExeLocation && File.Exists(vlcExeLocation))
             {
-                VlcExeLocation = vlcRegistryKey.GetValue(null) as string;
-                _logger.Info($"Found VLC installation at '{VlcExeLocation}'.");
+                VlcExeLocation = vlcExeLocation;
+                _logger.Info($"Found VLC installation at '{vlcExeLocation}'.");
             }
             else
             {
                 _logger.Info("Could not find VLC installation.");
+            }
+        }
+
+        private void SetMpvExeLocation()
+        {
+            var mpvExeLocation = Path.Combine(Environment.CurrentDirectory, @"mpv\mpv.exe");
+
+            if (File.Exists(mpvExeLocation))
+            {
+                MpvExeLocation = mpvExeLocation;
+                _logger.Info($"Found MPV installation at '{mpvExeLocation}'.");
+            }
+            else
+            {
+                _logger.Info("Could not find MPV installation.");
             }
         }
 
@@ -456,7 +480,7 @@ namespace RaceControl.ViewModels
 
         private bool CanWatchVlcChannelExecute(Channel channel)
         {
-            return !string.IsNullOrWhiteSpace(VlcExeLocation);
+            return !string.IsNullOrWhiteSpace(VlcExeLocation) && File.Exists(VlcExeLocation);
         }
 
         private async void WatchVlcChannelExecute(Channel channel)
@@ -481,7 +505,7 @@ namespace RaceControl.ViewModels
 
         private bool CanWatchVlcEpisodeExecute(Episode episode)
         {
-            return !string.IsNullOrWhiteSpace(VlcExeLocation);
+            return !string.IsNullOrWhiteSpace(VlcExeLocation) && File.Exists(VlcExeLocation);
         }
 
         private async void WatchVlcEpisodeExecute(Episode episode)
@@ -503,6 +527,11 @@ namespace RaceControl.ViewModels
             IsBusy = false;
         }
 
+        private bool CanWatchMpvChannelExecute(Channel channel)
+        {
+            return !string.IsNullOrWhiteSpace(MpvExeLocation) && File.Exists(MpvExeLocation);
+        }
+
         private async void WatchMpvChannelExecute(Channel channel)
         {
             IsBusy = true;
@@ -512,7 +541,7 @@ namespace RaceControl.ViewModels
             try
             {
                 var url = await _apiService.GetTokenisedUrlForChannelAsync(_token, channel.Self);
-                ProcessUtils.StartProcess(@".\mpv\mpv.exe", $"{url} --title=\"{title}\"");
+                WatchStreamInMpv(url, title, session.IsLive);
             }
             catch (Exception ex)
             {
@@ -523,6 +552,11 @@ namespace RaceControl.ViewModels
             IsBusy = false;
         }
 
+        private bool CanWatchMpvEpisodeExecute(Episode episode)
+        {
+            return !string.IsNullOrWhiteSpace(MpvExeLocation) && File.Exists(MpvExeLocation);
+        }
+
         private async void WatchMpvEpisodeExecute(Episode episode)
         {
             IsBusy = true;
@@ -531,7 +565,7 @@ namespace RaceControl.ViewModels
             try
             {
                 var url = await _apiService.GetTokenisedUrlForAssetAsync(_token, episode.Items.First());
-                ProcessUtils.StartProcess(@".\mpv\mpv.exe", $"{url} --title=\"{title}\"");
+                WatchStreamInMpv(url, title, false);
             }
             catch (Exception ex)
             {
@@ -649,11 +683,23 @@ namespace RaceControl.ViewModels
         {
             if (isLive)
             {
-                _streamlinkLauncher.StartStreamlinkVLC(VlcExeLocation, url, LowQualityMode, UseAlternativeStream);
+                _streamlinkLauncher.StartStreamlinkVlc(VlcExeLocation, url, LowQualityMode, UseAlternativeStream);
             }
             else
             {
                 ProcessUtils.StartProcess(VlcExeLocation, $"{url} --meta-title=\"{title}\"");
+            }
+        }
+
+        private void WatchStreamInMpv(string url, string title, bool isLive)
+        {
+            if (isLive)
+            {
+                _streamlinkLauncher.StartStreamlinkMpv(MpvExeLocation, url, LowQualityMode, UseAlternativeStream);
+            }
+            else
+            {
+                ProcessUtils.StartProcess(MpvExeLocation, $"{url} --title=\"{title}\"");
             }
         }
 

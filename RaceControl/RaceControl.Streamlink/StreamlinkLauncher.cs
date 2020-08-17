@@ -19,12 +19,12 @@ namespace RaceControl.Streamlink
         public Process StartStreamlinkExternal(string streamUrl, out string streamlinkUrl, bool lowQualityMode, bool useAlternativeStream)
         {
             var port = SocketUtils.GetFreePort();
-            var stream = GetStreamIdentifier(lowQualityMode, useAlternativeStream);
-            _logger.Info($"Starting external Streamlink-instance for stream-URL '{streamUrl}' on port '{port}' with identifier '{stream}'.");
+            var streamIdentifier = GetStreamIdentifier(lowQualityMode, useAlternativeStream);
+            _logger.Info($"Starting external Streamlink-instance for stream-URL '{streamUrl}' on port '{port}' with identifier '{streamIdentifier}'...");
 
             var process = ProcessUtils.StartProcess(
                 @".\streamlink\streamlink.bat",
-                $"--player-external-http --player-external-http-port {port} --hls-audio-select * \"{streamUrl}\" {stream}",
+                $"--player-external-http --player-external-http-port {port} --hls-audio-select * \"{streamUrl}\" {streamIdentifier}",
                 false,
                 true);
 
@@ -34,14 +34,26 @@ namespace RaceControl.Streamlink
             return process;
         }
 
-        public Process StartStreamlinkVLC(string vlcExeLocation, string streamUrl, bool lowQualityMode, bool useAlternativeStream)
+        public Process StartStreamlinkVlc(string vlcExeLocation, string streamUrl, bool lowQualityMode, bool useAlternativeStream)
         {
-            var stream = GetStreamIdentifier(lowQualityMode, useAlternativeStream);
-            _logger.Info($"Starting VLC Streamlink-instance for stream-URL '{streamUrl}' with identifier '{stream}'.");
+            var streamIdentifier = GetStreamIdentifier(lowQualityMode, useAlternativeStream);
+            _logger.Info($"Starting VLC Streamlink-instance for stream-URL '{streamUrl}' with identifier '{streamIdentifier}'...");
 
             return ProcessUtils.StartProcess(
                 @".\streamlink\streamlink.bat",
-                $"--player \"{vlcExeLocation} --file-caching=2000 --network-caching=4000\" --hls-audio-select * \"{streamUrl}\" {stream}",
+                $"--player \"{vlcExeLocation} --file-caching=2000 --network-caching=4000\" --hls-audio-select * \"{streamUrl}\" {streamIdentifier}",
+                false,
+                true);
+        }
+
+        public Process StartStreamlinkMpv(string mpvExeLocation, string streamUrl, bool lowQualityMode, bool useAlternativeStream)
+        {
+            var streamIdentifier = GetStreamIdentifier(lowQualityMode, useAlternativeStream);
+            _logger.Info($"Starting MPV Streamlink-instance for stream-URL '{streamUrl}' with identifier '{streamIdentifier}'...");
+
+            return ProcessUtils.StartProcess(
+                @".\streamlink\streamlink.bat",
+                $"--player \"{mpvExeLocation}\" --hls-audio-select * \"{streamUrl}\" {streamIdentifier}",
                 false,
                 true);
         }
