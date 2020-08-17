@@ -10,6 +10,7 @@
         public const string IsLive = "IsLive";
         public const string LowQualityMode = "LowQualityMode";
         public const string UseAlternativeStream = "UseAlternativeStream";
+        public const string EnableRecording = "EnableRecording";
         public const string Release = "Release";
     }
 }

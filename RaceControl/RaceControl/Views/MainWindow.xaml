@@ -226,27 +226,43 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <CheckBox
+                    <GroupBox
                         Grid.Row="0"
-                        Margin="3"
-                        Content="Force lower quality on live streams"
-                        IsChecked="{Binding LowQualityMode}"
-                        ToolTip="Only works for internal player and VLC. Use in case of low bandwidth connection." />
-                    <CheckBox
+                        Margin="5,3"
+                        Header="Live streaming">
+                        <StackPanel Orientation="Vertical">
+                            <CheckBox
+                                Margin="3"
+                                Content="Force lower quality live streams"
+                                IsChecked="{Binding LowQualityMode}"
+                                ToolTip="Use in case of stuttering caused by low bandwidth connection." />
+                            <CheckBox
+                                Margin="3"
+                                Content="Use alternative CDN for live streams"
+                                IsChecked="{Binding UseAlternativeStream}"
+                                ToolTip="Use when regular live streams do not work." />
+                            <CheckBox
+                                Margin="3"
+                                Content="Record live streams to file system"
+                                IsChecked="{Binding EnableRecording}"
+                                ToolTip="Saves a copy of watched live streams to the file system." />
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox
                         Grid.Row="1"
-                        Margin="3"
-                        Content="Use alternative live stream"
-                        IsChecked="{Binding UseAlternativeStream}"
-                        ToolTip="Only works for internal player and VLC. Use in case the regular live stream does not work." />
-                    <Button
-                        Grid.Row="2"
-                        Height="24"
-                        Margin="3"
-                        Command="{Binding DeleteCredentialCommand}"
-                        Content="Delete saved credentials"
-                        ToolTip="Deletes your saved credentials from this system. Use this if you want to use different credentials to login." />
+                        Margin="5,3"
+                        Header="Credentials">
+                        <StackPanel Orientation="Vertical">
+                            <Button
+                                Grid.Row="2"
+                                Height="24"
+                                Margin="3"
+                                Command="{Binding DeleteCredentialCommand}"
+                                Content="Delete saved credentials"
+                                ToolTip="Deletes your saved credentials from this system. Use this if you want to use different credentials to login." />
+                        </StackPanel>
+                    </GroupBox>
                 </Grid>
             </Border>
             <Label

@@ -61,6 +61,7 @@ namespace RaceControl.ViewModels
         private string _mpvExeLocation;
         private bool _lowQualityMode;
         private bool _useAlternativeStream;
+        private bool _enableRecording;
         private ObservableCollection<Season> _seasons;
         private ObservableCollection<Event> _events;
         private ObservableCollection<Session> _sessions;
@@ -132,6 +133,12 @@ namespace RaceControl.ViewModels
         {
             get => _useAlternativeStream;
             set => SetProperty(ref _useAlternativeStream, value);
+        }
+
+        public bool EnableRecording
+        {
+            get => _enableRecording;
+            set => SetProperty(ref _enableRecording, value);
         }
 
         public ObservableCollection<Season> Seasons
@@ -453,7 +460,8 @@ namespace RaceControl.ViewModels
                 { ParameterNames.Title, $"{session} - {channel}" },
                 { ParameterNames.IsLive, session.IsLive },
                 { ParameterNames.LowQualityMode, LowQualityMode },
-                { ParameterNames.UseAlternativeStream, UseAlternativeStream }
+                { ParameterNames.UseAlternativeStream, UseAlternativeStream },
+                { ParameterNames.EnableRecording, EnableRecording }
             };
 
             _logger.Info($"Starting internal player for channel with parameters: '{parameters}'.");
@@ -470,8 +478,9 @@ namespace RaceControl.ViewModels
                 { ParameterNames.SyncUID, episode.UID },
                 { ParameterNames.Title, episode.ToString() },
                 { ParameterNames.IsLive, false },
-                { ParameterNames.LowQualityMode, false },
-                { ParameterNames.UseAlternativeStream, false }
+                { ParameterNames.LowQualityMode, LowQualityMode },
+                { ParameterNames.UseAlternativeStream, UseAlternativeStream },
+                { ParameterNames.EnableRecording, EnableRecording }
             };
 
             _logger.Info($"Starting internal player for episode with parameters: '{parameters}'.");
@@ -683,7 +692,7 @@ namespace RaceControl.ViewModels
         {
             if (isLive)
             {
-                _streamlinkLauncher.StartStreamlinkVlc(VlcExeLocation, url, LowQualityMode, UseAlternativeStream);
+                _streamlinkLauncher.StartStreamlinkVlc(VlcExeLocation, url, LowQualityMode, UseAlternativeStream, EnableRecording, title);
             }
             else
             {
@@ -695,7 +704,7 @@ namespace RaceControl.ViewModels
         {
             if (isLive)
             {
-                _streamlinkLauncher.StartStreamlinkMpv(MpvExeLocation, url, LowQualityMode, UseAlternativeStream);
+                _streamlinkLauncher.StartStreamlinkMpv(MpvExeLocation, url, LowQualityMode, UseAlternativeStream, EnableRecording, title);
             }
             else
             {

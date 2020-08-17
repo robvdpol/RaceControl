@@ -197,12 +197,12 @@ namespace RaceControl.ViewModels
             IsLive = parameters.GetValue<bool>(ParameterNames.IsLive);
             var lowQualityMode = parameters.GetValue<bool>(ParameterNames.LowQualityMode);
             var useAlternativeStream = parameters.GetValue<bool>(ParameterNames.UseAlternativeStream);
-
+            var enableRecording = parameters.GetValue<bool>(ParameterNames.EnableRecording);
             var streamUrl = await GenerateStreamUrl();
 
             if (IsLive)
             {
-                _streamlinkProcess = _streamlinkLauncher.StartStreamlinkExternal(streamUrl, out streamUrl, lowQualityMode, useAlternativeStream);
+                _streamlinkProcess = _streamlinkLauncher.StartStreamlinkExternal(streamUrl, out streamUrl, lowQualityMode, useAlternativeStream, enableRecording, Title);
             }
 
             CreateMedia(streamUrl);
