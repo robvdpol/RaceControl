@@ -305,7 +305,7 @@ namespace RaceControl.ViewModels
             }
             else
             {
-                _logger.Info("Could not find VLC installation.");
+                _logger.Warn("Could not find VLC installation.");
             }
         }
 
@@ -320,7 +320,7 @@ namespace RaceControl.ViewModels
             }
             else
             {
-                _logger.Info("Could not find MPV installation.");
+                _logger.Warn("Could not find MPV installation.");
             }
         }
 
