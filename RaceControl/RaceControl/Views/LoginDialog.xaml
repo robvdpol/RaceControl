@@ -64,7 +64,7 @@
             <TextBlock
                 Grid.Column="0"
                 MaxHeight="50"
-                Margin="5,0"
+                Margin="5"
                 Foreground="Red"
                 Text="{Binding Error}"
                 TextWrapping="Wrap" />
