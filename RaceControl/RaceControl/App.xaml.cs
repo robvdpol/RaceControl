@@ -71,9 +71,9 @@ namespace RaceControl
             {
                 FileName = "RaceControl.log",
                 Layout = Layout.FromString("${longdate} ${uppercase:${level}} ${message}${onexception:inner=${newline}${exception:format=tostring}}"),
-                ArchiveAboveSize = 10 * 1024 * 1024,
+                ArchiveAboveSize = 5 * 1024 * 1024,
                 ArchiveNumbering = ArchiveNumberingMode.Rolling,
-                MaxArchiveFiles = 1
+                MaxArchiveFiles = 2
             };
             config.AddRule(LogLevel.Info, LogLevel.Fatal, logfile);
             LogManager.Configuration = config;
