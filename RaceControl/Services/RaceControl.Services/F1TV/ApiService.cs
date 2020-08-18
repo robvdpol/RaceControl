@@ -40,7 +40,6 @@ namespace RaceControl.Services.F1TV
                 .WithField(Season.NameField)
                 .WithField(Season.HasContentField)
                 .WithField(Season.YearField)
-                .WithField(Season.EventOccurrenceUrlsField)
                 .WithFilter(Season.YearField, LarkFilterType.GreaterThan, "2017")
                 .WithFilter(Season.HasContentField, LarkFilterType.Equals, "true")
                 .OrderBy(Season.YearField, LarkSortDirection.Descending)
