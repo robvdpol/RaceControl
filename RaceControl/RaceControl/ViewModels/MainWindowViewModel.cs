@@ -346,14 +346,9 @@ namespace RaceControl.ViewModels
             IsBusy = true;
             ClearEvents();
 
-            if (SelectedSeason != null && SelectedSeason.EventOccurrenceUrls.Any())
+            if (SelectedSeason != null)
             {
-                var events = new ConcurrentBag<Event>();
-                var tasks = SelectedSeason.EventOccurrenceUrls.Select(async eventUrl =>
-                {
-                    events.Add(await _apiService.GetEventAsync(eventUrl.GetUID()));
-                });
-                await Task.WhenAll(tasks);
+                var events = await _apiService.GetEventsForRaceSeasonAsync(SelectedSeason.UID);
                 Events.AddRange(events.OrderBy(e => e.StartDate));
             }
 

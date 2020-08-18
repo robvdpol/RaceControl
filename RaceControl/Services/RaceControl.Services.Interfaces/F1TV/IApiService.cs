@@ -10,6 +10,8 @@ namespace RaceControl.Services.Interfaces.F1TV
 
         Task<List<Event>> GetLiveEventsAsync();
 
+        Task<List<Event>> GetEventsForRaceSeasonAsync(string raceSeasonUID);
+
         Task<Event> GetEventAsync(string eventUID);
 
         Task<Session> GetSessionAsync(string sessionUID);

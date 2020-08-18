@@ -78,6 +78,28 @@ namespace RaceControl.Services.F1TV
             return events;
         }
 
+        public async Task<List<Event>> GetEventsForRaceSeasonAsync(string raceSeasonUID)
+        {
+            _logger.Info($"Querying events for race season with UID '{raceSeasonUID}'...");
+
+            var request = _f1tvClient
+                    .NewRequest(EventOccurrence)
+                    .WithField(Event.UIDField)
+                    .WithField(Event.NameField)
+                    .WithField(Event.OfficialNameField)
+                    .WithField(Event.SessionOccurrenceUrlsField)
+                    .WithField(Event.StartDateField)
+                    .WithField(Event.EndDateField)
+                    .WithField(Event.RaceSeasonUrlField)
+                    .WithFilter(Event.RaceSeasonUrlField, LarkFilterType.Equals, raceSeasonUID)
+                ;
+
+            var events = (await _f1tvClient.GetCollectionAsync<Event>(request)).Objects;
+            _logger.Info($"Found {events.Count} events.");
+
+            return events;
+        }
+
         public async Task<Event> GetEventAsync(string eventUID)
         {
             _logger.Info($"Querying event with UID '{eventUID}'...");
@@ -90,6 +112,7 @@ namespace RaceControl.Services.F1TV
                 .WithField(Event.SessionOccurrenceUrlsField)
                 .WithField(Event.StartDateField)
                 .WithField(Event.EndDateField)
+                .WithField(Event.RaceSeasonUrlField)
                 ;
 
             var evt = await _f1tvClient.GetItemAsync<Event>(request);
