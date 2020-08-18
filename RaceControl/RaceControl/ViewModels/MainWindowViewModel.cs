@@ -247,7 +247,7 @@ namespace RaceControl.ViewModels
             SetToken(token);
             SetVlcExeLocation();
             SetMpvExeLocation();
-            Seasons.AddRange((await _apiService.GetRaceSeasonsAsync()).Where(s => s.EventOccurrenceUrls.Any()));
+            Seasons.AddRange(await _apiService.GetRaceSeasonsAsync());
             VodTypes.AddRange((await _apiService.GetVodTypesAsync()).Where(v => v.ContentUrls.Any()));
             IsBusy = false;
 

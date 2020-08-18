@@ -42,7 +42,8 @@ namespace RaceControl.Services.F1TV
                 .WithField(Season.YearField)
                 .WithField(Season.EventOccurrenceUrlsField)
                 .WithFilter(Season.YearField, LarkFilterType.GreaterThan, "2017")
-                .OrderBy(Season.YearField, LarkSortDirection.Ascending)
+                .WithFilter(Season.HasContentField, LarkFilterType.Equals, "true")
+                .OrderBy(Season.YearField, LarkSortDirection.Descending)
                 ;
 
             var seasons = (await _f1tvClient.GetCollectionAsync<Season>(request)).Objects;
