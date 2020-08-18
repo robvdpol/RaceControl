@@ -270,7 +270,7 @@ namespace RaceControl.ViewModels
 
             if (release != null && !release.PreRelease && !release.Draft && Version.TryParse(release.TagName, out var latestVersion))
             {
-                var currentVersion = Assembly.GetEntryAssembly().GetName().Version;
+                var currentVersion = Assembly.GetEntryAssembly()?.GetName().Version;
 
                 if (latestVersion > currentVersion)
                 {
@@ -331,7 +331,7 @@ namespace RaceControl.ViewModels
             _refreshLiveEventsTimer.Dispose();
         }
 
-        private void MouseMoveExecute()
+        private static void MouseMoveExecute()
         {
             if (Mouse.OverrideCursor != null)
             {
@@ -669,8 +669,8 @@ namespace RaceControl.ViewModels
                 }
             }
 
-            var sessionsToRemove = LiveSessions.Where(existingLiveSession => !liveSessions.Any(liveSession => liveSession.UID == existingLiveSession.UID)).ToList();
-            var sessionsToAdd = liveSessions.Where(newLiveSession => !LiveSessions.Any(liveSession => liveSession.UID == newLiveSession.UID)).ToList();
+            var sessionsToRemove = LiveSessions.Where(existingLiveSession => liveSessions.All(liveSession => liveSession.UID != existingLiveSession.UID)).ToList();
+            var sessionsToAdd = liveSessions.Where(newLiveSession => LiveSessions.All(liveSession => liveSession.UID != newLiveSession.UID)).ToList();
 
             Application.Current.Dispatcher.Invoke(() =>
             {

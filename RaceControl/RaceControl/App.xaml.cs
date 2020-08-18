@@ -64,7 +64,7 @@ namespace RaceControl
             containerRegistry.Register<IStreamlinkLauncher, StreamlinkLauncher>();
         }
 
-        private void InitializeLogging()
+        private static void InitializeLogging()
         {
             var config = new LoggingConfiguration();
             var logfile = new FileTarget("logfile")

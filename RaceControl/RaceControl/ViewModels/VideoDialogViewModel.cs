@@ -26,6 +26,7 @@ namespace RaceControl.ViewModels
         private readonly IStreamlinkLauncher _streamlinkLauncher;
         private readonly LibVLC _libVLC;
         private readonly Timer _showControlsTimer = new Timer(2000) { AutoReset = false };
+        private readonly Guid _uniqueIdentifier = Guid.NewGuid();
 
         private ICommand _mouseDownVideoCommand;
         private ICommand _mouseMoveVideoCommand;
@@ -43,7 +44,6 @@ namespace RaceControl.ViewModels
         private ICommand _startCastVideoCommand;
         private ICommand _stopCastVideoCommand;
 
-        private Guid _uniqueIdentifier = Guid.NewGuid();
         private string _token;
         private ContentType _contentType;
         private string _contentUrl;
@@ -236,10 +236,7 @@ namespace RaceControl.ViewModels
                 RendererDiscoverer.Dispose();
             }
 
-            if (_streamlinkProcess != null)
-            {
-                _streamlinkProcess.Kill(true);
-            }
+            _streamlinkProcess?.Kill(true);
         }
 
         private void Media_DurationChanged(object sender, MediaDurationChangedEventArgs e)
@@ -318,11 +315,7 @@ namespace RaceControl.ViewModels
                     if (args.Source is DependencyObject dependencyObject)
                     {
                         var window = Window.GetWindow(dependencyObject);
-
-                        if (window != null && window.Owner is Window dialogWindow)
-                        {
-                            dialogWindow.DragMove();
-                        }
+                        window?.Owner?.DragMove();
                     }
                 }
                 else if (args.ClickCount == 2)
@@ -380,7 +373,7 @@ namespace RaceControl.ViewModels
         {
             if (int.TryParse(value, out var seconds))
             {
-                var time = MediaPlayer.Time + (seconds * 1000);
+                var time = MediaPlayer.Time + seconds * 1000;
                 SetMediaPlayerTime(time);
             }
         }
@@ -421,9 +414,8 @@ namespace RaceControl.ViewModels
 
         private void AudioTrackSelectionChangedExecute(SelectionChangedEventArgs args)
         {
-            if (args.AddedItems.Count > 0)
+            if (args.AddedItems.Count > 0 && args.AddedItems[0] is TrackDescription trackDescription)
             {
-                var trackDescription = (TrackDescription)args.AddedItems[0];
                 MediaPlayer.SetAudioTrack(trackDescription.Id);
             }
         }
