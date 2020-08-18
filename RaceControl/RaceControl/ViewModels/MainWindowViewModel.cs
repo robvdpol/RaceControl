@@ -723,6 +723,7 @@ namespace RaceControl.ViewModels
             SelectedLiveSession = null;
             Sessions.Clear();
             ClearChannels();
+            ClearEpisodes();
         }
 
         private void ClearChannels()
