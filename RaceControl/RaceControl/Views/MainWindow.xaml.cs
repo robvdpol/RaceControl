@@ -1,5 +1,5 @@
-﻿using System;
-using System.Reflection;
+﻿using RaceControl.Common.Utils;
+using System;
 using System.Windows;
 
 namespace RaceControl.Views
@@ -15,8 +15,8 @@ namespace RaceControl.Views
         {
             base.OnInitialized(e);
 
-            var version = Assembly.GetExecutingAssembly().GetName().Version;
-            Title = $"Race Control v{version.Major}.{version.Minor} - An open source F1TV client";
+            var version = AssemblyUtils.GetApplicationVersion();
+            Title = $"Race Control {version.Major}.{version.Minor} - An open source F1TV client";
         }
     }
 }

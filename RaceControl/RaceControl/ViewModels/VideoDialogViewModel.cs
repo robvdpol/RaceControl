@@ -317,23 +317,28 @@ namespace RaceControl.ViewModels
 
         private void MouseDownVideoExecute(MouseButtonEventArgs args)
         {
-            if (args.ChangedButton == MouseButton.Left)
+            if (args.ChangedButton != MouseButton.Left)
             {
-                if (args.ClickCount == 1)
-                {
+                return;
+            }
+
+            switch (args.ClickCount)
+            {
+                case 1:
                     if (args.Source is DependencyObject dependencyObject)
                     {
-                        var window = Window.GetWindow(dependencyObject);
-                        window?.Owner?.DragMove();
+                        Window.GetWindow(dependencyObject)?.Owner?.DragMove();
                     }
-                }
-                else if (args.ClickCount == 2)
-                {
+
+                    break;
+
+                case 2:
                     if (ToggleFullScreenCommand.CanExecute(null))
                     {
                         ToggleFullScreenCommand.Execute(null);
                     }
-                }
+
+                    break;
             }
         }
 

@@ -4,6 +4,6 @@ namespace RaceControl.Services.Interfaces.Lark
 {
     public interface ILarkCollection<TResponse>
     {
-        List<TResponse> Objects { get; set; }
+        List<TResponse> Objects { get; }
     }
 }

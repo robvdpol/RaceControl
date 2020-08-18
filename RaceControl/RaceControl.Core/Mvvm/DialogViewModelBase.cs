@@ -16,7 +16,7 @@ namespace RaceControl.Core.Mvvm
         public string Title
         {
             get => _title;
-            set => SetProperty(ref _title, value);
+            protected set => SetProperty(ref _title, value);
         }
 
         public event Action<IDialogResult> RequestClose;
@@ -34,7 +34,7 @@ namespace RaceControl.Core.Mvvm
         {
         }
 
-        protected virtual void RaiseRequestClose(IDialogResult dialogResult)
+        protected void RaiseRequestClose(IDialogResult dialogResult)
         {
             RequestClose?.Invoke(dialogResult);
         }

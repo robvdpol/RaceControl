@@ -46,14 +46,14 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         [JsonIgnore]
         public bool IsReplay => Status == "replay";
 
-        public static string UIDField => JsonUtils.GetJsonPropertyName<Session>((s) => s.UID);
-        public static string NameField => JsonUtils.GetJsonPropertyName<Session>((s) => s.Name);
-        public static string SessionNameField => JsonUtils.GetJsonPropertyName<Session>((s) => s.SessionName);
-        public static string StatusField => JsonUtils.GetJsonPropertyName<Session>((s) => s.Status);
-        public static string ContentUrlsField => JsonUtils.GetJsonPropertyName<Session>((s) => s.ContentUrls);
-        public static string ChannelUrlsField => JsonUtils.GetJsonPropertyName<Session>((s) => s.ChannelUrls);
-        public static string StartTimeField => JsonUtils.GetJsonPropertyName<Session>((s) => s.StartTime);
-        public static string EndTimeField => JsonUtils.GetJsonPropertyName<Session>((s) => s.EndTime);
+        public static string UIDField => JsonUtils.GetJsonPropertyName<Session>(s => s.UID);
+        public static string NameField => JsonUtils.GetJsonPropertyName<Session>(s => s.Name);
+        public static string SessionNameField => JsonUtils.GetJsonPropertyName<Session>(s => s.SessionName);
+        public static string StatusField => JsonUtils.GetJsonPropertyName<Session>(s => s.Status);
+        public static string ContentUrlsField => JsonUtils.GetJsonPropertyName<Session>(s => s.ContentUrls);
+        public static string ChannelUrlsField => JsonUtils.GetJsonPropertyName<Session>(s => s.ChannelUrls);
+        public static string StartTimeField => JsonUtils.GetJsonPropertyName<Session>(s => s.StartTime);
+        public static string EndTimeField => JsonUtils.GetJsonPropertyName<Session>(s => s.EndTime);
 
         public override string ToString()
         {

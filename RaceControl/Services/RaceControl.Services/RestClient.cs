@@ -54,9 +54,9 @@ namespace RaceControl.Services
 
             if (requestHeaders != null)
             {
-                foreach (var requestHeader in requestHeaders)
+                foreach (var (name, value) in requestHeaders)
                 {
-                    requestContent.Headers.Add(requestHeader.Key, requestHeader.Value);
+                    requestContent.Headers.Add(name, value);
                 }
             }
 

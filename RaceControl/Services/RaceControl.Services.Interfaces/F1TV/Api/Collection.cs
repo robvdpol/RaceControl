@@ -21,10 +21,10 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         [JsonProperty("summary")]
         public string Summary { get; set; }
 
-        public static string UIDField => JsonUtils.GetJsonPropertyName<Collection>((c) => c.UID);
-        public static string TitleField => JsonUtils.GetJsonPropertyName<Collection>((c) => c.Title);
-        public static string UniqueItemsField => JsonUtils.GetJsonPropertyName<Collection>((c) => c.UniqueItems);
-        public static string ItemsField => JsonUtils.GetJsonPropertyName<Collection>((c) => c.Items);
-        public static string SummaryField => JsonUtils.GetJsonPropertyName<Collection>((c) => c.Summary);
+        public static string UIDField => JsonUtils.GetJsonPropertyName<Collection>(c => c.UID);
+        public static string TitleField => JsonUtils.GetJsonPropertyName<Collection>(c => c.Title);
+        public static string UniqueItemsField => JsonUtils.GetJsonPropertyName<Collection>(c => c.UniqueItems);
+        public static string ItemsField => JsonUtils.GetJsonPropertyName<Collection>(c => c.Items);
+        public static string SummaryField => JsonUtils.GetJsonPropertyName<Collection>(c => c.Summary);
     }
 }

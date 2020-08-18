@@ -12,10 +12,6 @@ namespace RaceControl.ViewModels
 
         private Release _release;
 
-        public UpgradeDialogViewModel()
-        {
-        }
-
         public ICommand CloseCommand => _closeCommand ??= new DelegateCommand<bool?>(CloseExecute);
 
         public Release Release

@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -270,7 +269,7 @@ namespace RaceControl.ViewModels
 
             if (release != null && !release.PreRelease && !release.Draft && Version.TryParse(release.TagName, out var latestVersion))
             {
-                var currentVersion = Assembly.GetEntryAssembly()?.GetName().Version;
+                var currentVersion = AssemblyUtils.GetApplicationVersion();
 
                 if (latestVersion > currentVersion)
                 {
