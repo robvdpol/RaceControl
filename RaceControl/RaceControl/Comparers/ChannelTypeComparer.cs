@@ -1,49 +1,47 @@
-﻿using RaceControl.Services.Interfaces.F1TV.Api;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace RaceControl.Comparers
 {
-    public class ChannelComparer : IComparer<string>
+    public class ChannelTypeComparer : IComparer<string>
     {
+        private const string Wif = "wif";
+        private const string Driver = "driver";
+        private const string Other = "other";
+
         public int Compare([AllowNull] string x, [AllowNull] string y)
         {
-            if (x == Channel.WIF)
+            if (x == y)
+            {
+                return 0;
+            }
+
+            if (x == Wif)
             {
                 return -1;
             }
 
-            if (y == Channel.WIF)
+            if (y == Wif)
             {
                 return 1;
             }
 
-            if (x == Channel.PitLane)
+            if (x == Other)
             {
                 return -1;
             }
 
-            if (y == Channel.PitLane)
+            if (y == Other)
             {
                 return 1;
             }
 
-            if (x == Channel.Driver)
+            if (x == Driver)
             {
                 return -1;
             }
 
-            if (y == Channel.Driver)
-            {
-                return 1;
-            }
-
-            if (x == Channel.Data)
-            {
-                return -1;
-            }
-
-            if (y == Channel.Data)
+            if (y == Driver)
             {
                 return 1;
             }

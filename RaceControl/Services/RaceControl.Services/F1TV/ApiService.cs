@@ -1,5 +1,4 @@
 ﻿using NLog;
-using RaceControl.Common.Utils;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Api;
 using RaceControl.Services.Interfaces.Lark;
@@ -16,10 +15,6 @@ namespace RaceControl.Services.F1TV
         private const string EventOccurrence = "event-occurrence";
         private const string SessionOccurrence = "session-occurrence";
         private const string VodTypeTag = "vod-type-tag";
-        private const string Episodes = "episodes";
-        private const string Sets = "sets";
-        private const string Slug = "slug";
-        private const string GrandPrixWeekendLiveSlug = "grand-prix-weekend-live";
 
         private readonly ILogger _logger;
         private readonly IF1TVClient _f1tvClient;
@@ -30,9 +25,33 @@ namespace RaceControl.Services.F1TV
             _f1tvClient = f1tvClient;
         }
 
-        public async Task<List<Season>> GetRaceSeasonsAsync()
+        public async Task<List<Session>> GetLiveSessionsAsync()
         {
-            _logger.Info("Querying race seasons...");
+            _logger.Info("Querying live sessions...");
+
+            var request = _f1tvClient
+                .NewRequest(SessionOccurrence)
+                .WithField(Session.UIDField)
+                .WithField(Session.NameField)
+                .WithField(Session.SessionNameField)
+                .WithField(Session.StatusField)
+                .WithField(Session.StartTimeField)
+                .WithField(Session.EndTimeField)
+                .WithField(Session.EventOccurrenceUrlField)
+                .WithFilter(Session.StartTimeField, LarkFilterType.GreaterThan, DateTime.Today.ToString("yyyy-MM-dd"))
+                .WithFilter(Session.EndTimeField, LarkFilterType.LessThan, DateTime.Today.AddDays(1).ToString("yyyy-MM-dd"))
+                .OrderBy(Session.StartTimeField, LarkSortDirection.Descending)
+                ;
+
+            var sessions = (await _f1tvClient.GetCollectionAsync<Session>(request)).Objects;
+            _logger.Info($"Found {sessions.Count} live sessions.");
+
+            return sessions;
+        }
+
+        public async Task<List<Season>> GetSeasonsAsync()
+        {
+            _logger.Info("Querying seasons...");
 
             var request = _f1tvClient
                 .NewRequest(RaceSeason)
@@ -40,139 +59,15 @@ namespace RaceControl.Services.F1TV
                 .WithField(Season.NameField)
                 .WithField(Season.HasContentField)
                 .WithField(Season.YearField)
-                .WithFilter(Season.YearField, LarkFilterType.GreaterThan, "2017")
-                .WithFilter(Season.HasContentField, LarkFilterType.Equals, "true")
+                .WithFilter(Season.YearField, LarkFilterType.GreaterThan, 2017.ToString())
+                .WithFilter(Season.HasContentField, LarkFilterType.Equals, true.ToString().ToLower())
                 .OrderBy(Season.YearField, LarkSortDirection.Descending)
                 ;
 
             var seasons = (await _f1tvClient.GetCollectionAsync<Season>(request)).Objects;
-            _logger.Info($"Found {seasons.Count} race seasons.");
+            _logger.Info($"Found {seasons.Count} seasons.");
 
             return seasons;
-        }
-
-        public async Task<List<Event>> GetLiveEventsAsync()
-        {
-            _logger.Info("Querying live events...");
-
-            var request = _f1tvClient
-                .NewRequest(Sets)
-                .WithField(Collection.ItemsField)
-                .WithFilter(Slug, LarkFilterType.Equals, GrandPrixWeekendLiveSlug)
-                ;
-
-            var collectionList = await _f1tvClient.GetCollectionAsync<Collection>(request);
-            var events = new List<Event>();
-
-            foreach (var collection in collectionList.Objects)
-            {
-                foreach (var collectionItem in collection.Items)
-                {
-                    events.Add(await GetEventAsync(collectionItem.ContentURL.GetUID()));
-                }
-            }
-
-            _logger.Info($"Found {events.Count} live events.");
-
-            return events;
-        }
-
-        public async Task<List<Event>> GetEventsForRaceSeasonAsync(string raceSeasonUID)
-        {
-            _logger.Info($"Querying events for race season with UID '{raceSeasonUID}'...");
-
-            var request = _f1tvClient
-                    .NewRequest(EventOccurrence)
-                    .WithField(Event.UIDField)
-                    .WithField(Event.NameField)
-                    .WithField(Event.OfficialNameField)
-                    .WithField(Event.SessionOccurrenceUrlsField)
-                    .WithField(Event.StartDateField)
-                    .WithField(Event.EndDateField)
-                    .WithField(Event.RaceSeasonUrlField)
-                    .WithFilter(Event.RaceSeasonUrlField, LarkFilterType.Equals, raceSeasonUID)
-                ;
-
-            var events = (await _f1tvClient.GetCollectionAsync<Event>(request)).Objects;
-            _logger.Info($"Found {events.Count} events.");
-
-            return events;
-        }
-
-        public async Task<Event> GetEventAsync(string eventUID)
-        {
-            _logger.Info($"Querying event with UID '{eventUID}'...");
-
-            var request = _f1tvClient
-                .NewRequest(EventOccurrence, eventUID)
-                .WithField(Event.UIDField)
-                .WithField(Event.NameField)
-                .WithField(Event.OfficialNameField)
-                .WithField(Event.SessionOccurrenceUrlsField)
-                .WithField(Event.StartDateField)
-                .WithField(Event.EndDateField)
-                .WithField(Event.RaceSeasonUrlField)
-                ;
-
-            var evt = await _f1tvClient.GetItemAsync<Event>(request);
-
-            if (evt != null)
-            {
-                _logger.Info($"Found event '{evt}'.");
-            }
-            else
-            {
-                _logger.Info("Event not found.");
-            }
-
-            return evt;
-        }
-
-        public async Task<Session> GetSessionAsync(string sessionUID)
-        {
-            _logger.Info($"Querying session with UID '{sessionUID}'...");
-
-            var request = _f1tvClient
-                .NewRequest(SessionOccurrence, sessionUID)
-                .WithField(Session.UIDField)
-                .WithField(Session.NameField)
-                .WithField(Session.SessionNameField)
-                .WithField(Session.StatusField)
-                .WithField(Session.ContentUrlsField)
-                .WithField(Session.StartTimeField)
-                .WithField(Session.EndTimeField)
-                ;
-
-            var session = await _f1tvClient.GetItemAsync<Session>(request);
-
-            if (session != null)
-            {
-                _logger.Info($"Found session '{session}'.");
-            }
-            else
-            {
-                _logger.Info("Session not found.");
-            }
-
-            return session;
-        }
-
-        public async Task<List<Channel>> GetChannelsAsync(string sessionUID)
-        {
-            _logger.Info($"Querying channels for session with UID '{sessionUID}'...");
-
-            var request = _f1tvClient
-                .NewRequest(SessionOccurrence, sessionUID)
-                .WithField(Session.ChannelUrlsField, true)
-                .WithSubField(Session.ChannelUrlsField, Channel.UIDField)
-                .WithSubField(Session.ChannelUrlsField, Channel.SelfField)
-                .WithSubField(Session.ChannelUrlsField, Channel.NameField)
-                ;
-
-            var channels = (await _f1tvClient.GetItemAsync<Session>(request)).ChannelUrls;
-            _logger.Info($"Found {channels.Count} channels.");
-
-            return channels;
         }
 
         public async Task<List<VodType>> GetVodTypesAsync()
@@ -183,7 +78,6 @@ namespace RaceControl.Services.F1TV
                 .NewRequest(VodTypeTag)
                 .WithField(VodType.UIDField)
                 .WithField(VodType.NameField)
-                .WithField(VodType.ContentUrlsField)
                 ;
 
             var vodTypes = (await _f1tvClient.GetCollectionAsync<VodType>(request)).Objects;
@@ -192,31 +86,103 @@ namespace RaceControl.Services.F1TV
             return vodTypes;
         }
 
-        public async Task<Episode> GetEpisodeAsync(string episodeUID)
+        public async Task<List<Event>> GetEventsForSeasonAsync(string seasonUID)
         {
-            _logger.Info($"Querying episode with UID '{episodeUID}'...");
+            _logger.Info($"Querying events for season with UID '{seasonUID}'...");
 
             var request = _f1tvClient
-                .NewRequest(Episodes, episodeUID)
-                .WithField(Episode.UIDField)
-                .WithField(Episode.TitleField)
-                .WithField(Episode.SubtitleField)
-                .WithField(Episode.DataSourceIDField)
-                .WithField(Episode.ItemsField)
+                .NewRequest(EventOccurrence)
+                .WithField(Event.UIDField)
+                .WithField(Event.NameField)
+                .WithField(Event.OfficialNameField)
+                .WithField(Event.StartDateField)
+                .WithField(Event.EndDateField)
+                .WithFilter(Event.RaceSeasonUrlField, LarkFilterType.Equals, seasonUID)
+                .OrderBy(Event.StartDateField, LarkSortDirection.Ascending)
                 ;
 
-            var episode = await _f1tvClient.GetItemAsync<Episode>(request);
+            var events = (await _f1tvClient.GetCollectionAsync<Event>(request)).Objects;
+            _logger.Info($"Found {events.Count} events.");
 
-            if (episode != null)
-            {
-                _logger.Info($"Found episode '{episode}'.");
-            }
-            else
-            {
-                _logger.Info("Episode not found.");
-            }
+            return events;
+        }
 
-            return episode;
+        public async Task<List<Session>> GetSessionsForEventAsync(string eventUID)
+        {
+            _logger.Info($"Querying sessions for event with UID '{eventUID}'...");
+
+            var request = _f1tvClient
+                .NewRequest(SessionOccurrence)
+                .WithField(Session.UIDField)
+                .WithField(Session.NameField)
+                .WithField(Session.SessionNameField)
+                .WithField(Session.StatusField)
+                .WithField(Session.StartTimeField)
+                .WithField(Session.EndTimeField)
+                .WithField(Session.EventOccurrenceUrlField)
+                .WithFilter(Session.EventOccurrenceUrlField, LarkFilterType.Equals, eventUID)
+                .OrderBy(Session.StartTimeField, LarkSortDirection.Ascending)
+                ;
+
+            var sessions = (await _f1tvClient.GetCollectionAsync<Session>(request)).Objects;
+            _logger.Info($"Found {sessions.Count} sessions.");
+
+            return sessions;
+        }
+
+        public async Task<List<Channel>> GetChannelsForSessionAsync(string sessionUID)
+        {
+            _logger.Info($"Querying channels for session with UID '{sessionUID}'...");
+
+            var request = _f1tvClient
+                .NewRequest(SessionOccurrence, sessionUID)
+                .WithField(Session.ChannelUrlsField, true)
+                .WithSubField(Session.ChannelUrlsField, Channel.UIDField)
+                .WithSubField(Session.ChannelUrlsField, Channel.SelfField)
+                .WithSubField(Session.ChannelUrlsField, Channel.NameField)
+                .WithSubField(Session.ChannelUrlsField, Channel.ChannelTypeField)
+                ;
+
+            var channels = (await _f1tvClient.GetItemAsync<Session>(request)).ChannelUrls;
+            _logger.Info($"Found {channels.Count} channels.");
+
+            return channels;
+        }
+
+        public async Task<List<Episode>> GetEpisodesForSessionAsync(string sessionUID)
+        {
+            _logger.Info($"Querying episodes for session with UID '{sessionUID}'...");
+
+            var request = _f1tvClient
+                .NewRequest(SessionOccurrence, sessionUID)
+                .WithField(Session.ContentUrlsField, true)
+                .WithSubField(Session.ContentUrlsField, Episode.UIDField)
+                .WithSubField(Session.ContentUrlsField, Episode.TitleField)
+                .WithSubField(Session.ContentUrlsField, Episode.ItemsField)
+                ;
+
+            var episodes = (await _f1tvClient.GetItemAsync<Session>(request)).ContentUrls;
+            _logger.Info($"Found {episodes.Count} episodes.");
+
+            return episodes;
+        }
+
+        public async Task<List<Episode>> GetEpisodesForVodTypeAsync(string vodTypeUID)
+        {
+            _logger.Info($"Querying episodes for VOD type with UID '{vodTypeUID}'...");
+
+            var request = _f1tvClient
+                .NewRequest(VodTypeTag, vodTypeUID)
+                .WithField(VodType.ContentUrlsField, true)
+                .WithSubField(VodType.ContentUrlsField, Episode.UIDField)
+                .WithSubField(VodType.ContentUrlsField, Episode.TitleField)
+                .WithSubField(VodType.ContentUrlsField, Episode.ItemsField)
+                ;
+
+            var episodes = (await _f1tvClient.GetItemAsync<VodType>(request)).ContentUrls;
+            _logger.Info($"Found {episodes.Count} episodes.");
+
+            return episodes;
         }
 
         public async Task<string> GetTokenisedUrlForChannelAsync(string token, string channelUrl)

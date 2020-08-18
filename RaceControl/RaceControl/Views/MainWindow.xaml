@@ -114,6 +114,7 @@
                 <ListView
                     x:Name="LvLiveSessions"
                     Grid.Row="1"
+                    DisplayMemberPath="SessionName"
                     ItemsSource="{Binding LiveSessions}"
                     SelectedItem="{Binding SelectedLiveSession}"
                     SelectionMode="Single"

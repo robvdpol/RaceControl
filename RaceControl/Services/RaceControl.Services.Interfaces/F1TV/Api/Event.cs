@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using RaceControl.Common.Utils;
 using System;
-using System.Collections.Generic;
 
 namespace RaceControl.Services.Interfaces.F1TV.Api
 {
@@ -16,9 +15,6 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         [JsonProperty("official_name")]
         public string OfficialName { get; set; }
 
-        [JsonProperty("sessionoccurrence_urls")]
-        public List<string> SessionOccurrenceUrls { get; set; }
-
         [JsonProperty("start_date")]
         public DateTime? StartDate { get; set; }
 
@@ -31,7 +27,6 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         public static string UIDField => JsonUtils.GetJsonPropertyName<Event>(s => s.UID);
         public static string NameField => JsonUtils.GetJsonPropertyName<Event>(s => s.Name);
         public static string OfficialNameField => JsonUtils.GetJsonPropertyName<Event>(s => s.OfficialName);
-        public static string SessionOccurrenceUrlsField => JsonUtils.GetJsonPropertyName<Event>(s => s.SessionOccurrenceUrls);
         public static string StartDateField => JsonUtils.GetJsonPropertyName<Event>(s => s.StartDate);
         public static string EndDateField => JsonUtils.GetJsonPropertyName<Event>(s => s.EndDate);
         public static string RaceSeasonUrlField => JsonUtils.GetJsonPropertyName<Event>(s => s.RaceSeasonUrl);

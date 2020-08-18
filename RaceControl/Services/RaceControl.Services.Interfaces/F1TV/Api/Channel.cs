@@ -5,11 +5,6 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
 {
     public class Channel
     {
-        public const string WIF = "WIF";
-        public const string PitLane = "pit lane";
-        public const string Driver = "driver";
-        public const string Data = "data";
-
         [JsonProperty("uid")]
         public string UID { get; set; }
 
@@ -19,25 +14,29 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         [JsonProperty("name")]
         public string Name { get; set; }
 
+        [JsonProperty("channel_type")]
+        public string ChannelType { get; set; }
+
         public static string UIDField => JsonUtils.GetJsonPropertyName<Channel>(s => s.UID);
         public static string SelfField => JsonUtils.GetJsonPropertyName<Channel>(s => s.Self);
         public static string NameField => JsonUtils.GetJsonPropertyName<Channel>(s => s.Name);
+        public static string ChannelTypeField => JsonUtils.GetJsonPropertyName<Channel>(s => s.ChannelType);
 
         public override string ToString()
         {
             switch (Name)
             {
-                case WIF:
+                case "WIF":
                     return "World Feed";
 
-                case PitLane:
+                case "pit lane":
                     return "Pit Lane";
 
-                case Driver:
+                case "driver":
                     return "Driver Tracker";
 
-                case Data:
-                    return "Data";
+                case "data":
+                    return "Live Timing";
             }
 
             return Name;

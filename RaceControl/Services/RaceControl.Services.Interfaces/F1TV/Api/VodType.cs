@@ -13,7 +13,7 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         public string Name { get; set; }
 
         [JsonProperty("content_urls")]
-        public List<string> ContentUrls { get; set; }
+        public List<Episode> ContentUrls { get; set; }
 
         public static string UIDField => JsonUtils.GetJsonPropertyName<VodType>(v => v.UID);
         public static string NameField => JsonUtils.GetJsonPropertyName<VodType>(v => v.Name);

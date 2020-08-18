@@ -14,8 +14,6 @@ using RaceControl.Services.Interfaces.Github;
 using RaceControl.Streamlink;
 using RaceControl.Views;
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -35,7 +33,7 @@ namespace RaceControl.ViewModels
         private readonly ICredentialService _credentialService;
         private readonly IStreamlinkLauncher _streamlinkLauncher;
         private readonly LibVLC _libVLC;
-        private readonly Timer _refreshLiveEventsTimer = new Timer(60000) { AutoReset = false };
+        private readonly Timer _refreshLiveSessionsTimer = new Timer(60000) { AutoReset = false };
 
         private ICommand _loadedCommand;
         private ICommand _closingCommand;
@@ -247,13 +245,13 @@ namespace RaceControl.ViewModels
             SetToken(token);
             SetVlcExeLocation();
             SetMpvExeLocation();
-            Seasons.AddRange(await _apiService.GetRaceSeasonsAsync());
-            VodTypes.AddRange((await _apiService.GetVodTypesAsync()).Where(v => v.ContentUrls.Any()));
+            Seasons.AddRange(await _apiService.GetSeasonsAsync());
+            VodTypes.AddRange(await _apiService.GetVodTypesAsync());
             IsBusy = false;
 
-            await RefreshLiveEvents();
-            _refreshLiveEventsTimer.Elapsed += RefreshLiveEventsTimer_Elapsed;
-            _refreshLiveEventsTimer.Start();
+            await RefreshLiveSessions();
+            _refreshLiveSessionsTimer.Elapsed += RefreshLiveSessionsTimer_Elapsed;
+            _refreshLiveSessionsTimer.Start();
         }
 
         private void SetToken(string token)
@@ -325,9 +323,9 @@ namespace RaceControl.ViewModels
 
         private void ClosingExecute()
         {
-            _refreshLiveEventsTimer.Elapsed -= RefreshLiveEventsTimer_Elapsed;
-            _refreshLiveEventsTimer.Stop();
-            _refreshLiveEventsTimer.Dispose();
+            _refreshLiveSessionsTimer.Elapsed -= RefreshLiveSessionsTimer_Elapsed;
+            _refreshLiveSessionsTimer.Stop();
+            _refreshLiveSessionsTimer.Dispose();
         }
 
         private static void MouseMoveExecute()
@@ -348,8 +346,8 @@ namespace RaceControl.ViewModels
 
             if (SelectedSeason != null)
             {
-                var events = await _apiService.GetEventsForRaceSeasonAsync(SelectedSeason.UID);
-                Events.AddRange(events.OrderBy(e => e.StartDate));
+                var events = await _apiService.GetEventsForSeasonAsync(SelectedSeason.UID);
+                Events.AddRange(events);
             }
 
             IsBusy = false;
@@ -360,15 +358,10 @@ namespace RaceControl.ViewModels
             IsBusy = true;
             ClearSessions();
 
-            if (SelectedEvent != null && SelectedEvent.SessionOccurrenceUrls.Any())
+            if (SelectedEvent != null)
             {
-                var sessions = new ConcurrentBag<Session>();
-                var tasks = SelectedEvent.SessionOccurrenceUrls.Select(async sessionUrl =>
-                {
-                    sessions.Add(await _apiService.GetSessionAsync(sessionUrl.GetUID()));
-                });
-                await Task.WhenAll(tasks);
-                Sessions.AddRange(sessions.Where(s => s.IsLive || s.IsReplay).OrderBy(s => s.StartTime));
+                var sessions = await _apiService.GetSessionsForEventAsync(SelectedEvent.UID);
+                Sessions.AddRange(sessions.Where(s => s.IsLive || s.IsReplay));
             }
 
             IsBusy = false;
@@ -402,19 +395,11 @@ namespace RaceControl.ViewModels
             ClearChannels();
             ClearEpisodes();
 
-            var channels = await _apiService.GetChannelsAsync(session.UID);
-            Channels.AddRange(channels.OrderBy(c => c.Name, new ChannelComparer()));
+            var channels = await _apiService.GetChannelsForSessionAsync(session.UID);
+            Channels.AddRange(channels.OrderBy(c => c.ChannelType, new ChannelTypeComparer()));
 
-            if (session.ContentUrls.Any())
-            {
-                var episodes = new ConcurrentBag<Episode>();
-                var tasks = session.ContentUrls.Select(async episodeUrl =>
-                {
-                    episodes.Add(await _apiService.GetEpisodeAsync(episodeUrl.GetUID()));
-                });
-                await Task.WhenAll(tasks);
-                Episodes.AddRange(episodes.OrderBy(e => e.Title));
-            }
+            var episodes = await _apiService.GetEpisodesForSessionAsync(session.UID);
+            Episodes.AddRange(episodes.OrderBy(e => e.Title));
         }
 
         private async void VodTypeSelectionChangedExecute()
@@ -427,16 +412,8 @@ namespace RaceControl.ViewModels
                 ClearChannels();
                 ClearEpisodes();
 
-                if (SelectedVodType.ContentUrls.Any())
-                {
-                    var episodes = new ConcurrentBag<Episode>();
-                    var tasks = SelectedVodType.ContentUrls.Select(async episodeUrl =>
-                    {
-                        episodes.Add(await _apiService.GetEpisodeAsync(episodeUrl.GetUID()));
-                    });
-                    await Task.WhenAll(tasks);
-                    Episodes.AddRange(episodes.OrderBy(e => e.Title));
-                }
+                var episodes = await _apiService.GetEpisodesForVodTypeAsync(SelectedVodType.UID);
+                Episodes.AddRange(episodes.OrderBy(e => e.Title));
 
                 IsBusy = false;
             }
@@ -636,33 +613,18 @@ namespace RaceControl.ViewModels
             IsBusy = false;
         }
 
-        private async void RefreshLiveEventsTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private async void RefreshLiveSessionsTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            _refreshLiveEventsTimer.Stop();
-            await RefreshLiveEvents();
-            _refreshLiveEventsTimer.Start();
+            _refreshLiveSessionsTimer.Stop();
+            await RefreshLiveSessions();
+            _refreshLiveSessionsTimer.Start();
         }
 
-        private async Task RefreshLiveEvents()
+        private async Task RefreshLiveSessions()
         {
-            _logger.Info("Refreshing live events...");
-            var liveEvents = await _apiService.GetLiveEventsAsync();
-            var liveSessions = new List<Session>();
+            _logger.Info("Refreshing live sessions...");
 
-            foreach (var liveEvent in liveEvents)
-            {
-                foreach (var liveSessionUrl in liveEvent.SessionOccurrenceUrls)
-                {
-                    var liveSession = await _apiService.GetSessionAsync(liveSessionUrl.GetUID());
-
-                    if (liveSession.IsLive)
-                    {
-                        liveSession.PrettyName = $"{liveEvent.Name} - {liveSession.Name}";
-                        liveSessions.Add(liveSession);
-                    }
-                }
-            }
-
+            var liveSessions = (await _apiService.GetLiveSessionsAsync()).Where(session => session.IsLive).ToList();
             var sessionsToRemove = LiveSessions.Where(existingLiveSession => liveSessions.All(liveSession => liveSession.UID != existingLiveSession.UID)).ToList();
             var sessionsToAdd = liveSessions.Where(newLiveSession => LiveSessions.All(liveSession => liveSession.UID != newLiveSession.UID)).ToList();
 
@@ -679,7 +641,7 @@ namespace RaceControl.ViewModels
                 }
             });
 
-            _logger.Info("Done refreshing live events.");
+            _logger.Info("Done refreshing live sessions.");
         }
 
         private void WatchStreamInVlc(string url, string title, bool isLive)
