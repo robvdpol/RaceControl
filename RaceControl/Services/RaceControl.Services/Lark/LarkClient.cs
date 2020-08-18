@@ -4,34 +4,34 @@ using System.Threading.Tasks;
 
 namespace RaceControl.Services.Lark
 {
-    public class LarkClient : ILarkClient
+    public abstract class LarkClient : ILarkClient
     {
-        protected readonly IRestClient _restClient;
-        protected readonly string _endpoint;
+        protected readonly IRestClient RestClient;
+        protected readonly string Endpoint;
 
-        public LarkClient(IRestClient restClient, string endpoint)
+        protected LarkClient(IRestClient restClient, string endpoint)
         {
-            _restClient = restClient;
-            _endpoint = endpoint;
+            RestClient = restClient;
+            Endpoint = endpoint;
         }
 
         public ILarkRequest NewRequest(string collection, string id = null)
         {
-            return new LarkRequest(_endpoint, collection, id);
+            return new LarkRequest(Endpoint, collection, id);
         }
 
         public async Task<TResponse> GetItemAsync<TResponse>(ILarkRequest request)
         {
             var url = request.GetURL();
 
-            return await _restClient.GetAsJsonAsync<TResponse>(url);
+            return await RestClient.GetAsJsonAsync<TResponse>(url);
         }
 
         public async Task<ILarkCollection<TResponse>> GetCollectionAsync<TResponse>(ILarkRequest request)
         {
             var url = request.GetURL();
 
-            return await _restClient.GetAsJsonAsync<LarkCollection<TResponse>>(url);
+            return await RestClient.GetAsJsonAsync<LarkCollection<TResponse>>(url);
         }
     }
 }

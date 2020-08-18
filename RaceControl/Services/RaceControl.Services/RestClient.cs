@@ -11,9 +11,9 @@ namespace RaceControl.Services
 {
     public class RestClient : IRestClient
     {
-        private const string mediaTypeJson = @"application/json";
+        private const string MediaTypeJson = @"application/json";
 
-        protected readonly HttpClient _httpClient;
+        private readonly HttpClient _httpClient;
 
         public RestClient(HttpClient httpClient)
         {
@@ -26,8 +26,13 @@ namespace RaceControl.Services
 
             using (var requestMessage = new HttpRequestMessage(HttpMethod.Get, url))
             {
-                requestMessage.Headers.Accept.ParseAdd(mediaTypeJson);
-                requestMessage.Headers.UserAgent.ParseAdd("RaceControl");
+                requestMessage.Headers.Accept.ParseAdd(MediaTypeJson);
+
+                if (!string.IsNullOrWhiteSpace(userAgent))
+                {
+                    requestMessage.Headers.UserAgent.ParseAdd(userAgent);
+                }
+
                 httpResponse = await _httpClient.SendAsync(requestMessage);
             }
 
@@ -45,7 +50,7 @@ namespace RaceControl.Services
         public async Task<TResponse> PostAsJsonAsync<TRequest, TResponse>(string url, TRequest requestObject, IDictionary<string, string> requestHeaders = null, string token = null)
         {
             var requestJson = JsonConvert.SerializeObject(requestObject);
-            var requestContent = new StringContent(requestJson, Encoding.UTF8, mediaTypeJson);
+            var requestContent = new StringContent(requestJson, Encoding.UTF8, MediaTypeJson);
 
             if (requestHeaders != null)
             {
@@ -63,7 +68,7 @@ namespace RaceControl.Services
 
                 if (!string.IsNullOrWhiteSpace(token))
                 {
-                    requestMessage.Headers.Authorization = CreateJWTAuthorizationHeader(token);
+                    requestMessage.Headers.Authorization = CreateJwtAuthorizationHeader(token);
                 }
 
                 httpResponse = await _httpClient.SendAsync(requestMessage);
@@ -80,7 +85,7 @@ namespace RaceControl.Services
             return response;
         }
 
-        private AuthenticationHeaderValue CreateJWTAuthorizationHeader(string token)
+        private static AuthenticationHeaderValue CreateJwtAuthorizationHeader(string token)
         {
             return new AuthenticationHeaderValue("JWT", token);
         }

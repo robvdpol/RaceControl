@@ -14,7 +14,12 @@ namespace RaceControl.Core.Converters
                 throw new InvalidOperationException("The target must be a boolean");
             }
 
-            return !(bool)value;
+            if (value is bool boolValue)
+            {
+                return !boolValue;
+            }
+
+            return null;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

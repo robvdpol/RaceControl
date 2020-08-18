@@ -27,7 +27,7 @@ namespace RaceControl.Common
             }
 
             // The job name is optional (and can be null) but it helps with diagnostics. If it's not null, it has to be unique.
-            string jobName = $"ChildProcessTracker_{Process.GetCurrentProcess().Id}";
+            var jobName = $"ChildProcessTracker_{Process.GetCurrentProcess().Id}";
             _jobHandle = CreateJobObject(IntPtr.Zero, jobName);
 
             var info = new JOBOBJECT_BASIC_LIMIT_INFORMATION
@@ -41,8 +41,8 @@ namespace RaceControl.Common
                 BasicLimitInformation = info
             };
 
-            int length = Marshal.SizeOf(typeof(JOBOBJECT_EXTENDED_LIMIT_INFORMATION));
-            IntPtr extendedInfoPtr = Marshal.AllocHGlobal(length);
+            var length = Marshal.SizeOf(typeof(JOBOBJECT_EXTENDED_LIMIT_INFORMATION));
+            var extendedInfoPtr = Marshal.AllocHGlobal(length);
 
             try
             {
@@ -68,7 +68,7 @@ namespace RaceControl.Common
         {
             if (_jobHandle != IntPtr.Zero)
             {
-                bool success = AssignProcessToJobObject(_jobHandle, process.Handle);
+                var success = AssignProcessToJobObject(_jobHandle, process.Handle);
 
                 if (!success && !process.HasExited)
                 {

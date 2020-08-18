@@ -32,7 +32,7 @@ namespace RaceControl.Common.Utils
             return attribute.PropertyName;
         }
 
-        public static T GetAttribute<T>(this ICustomAttributeProvider provider) where T : Attribute
+        private static T GetAttribute<T>(this ICustomAttributeProvider provider) where T : Attribute
         {
             return provider.GetCustomAttributes(typeof(T), true).FirstOrDefault() as T;
         }

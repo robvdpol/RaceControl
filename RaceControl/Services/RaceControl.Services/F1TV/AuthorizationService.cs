@@ -9,32 +9,16 @@ namespace RaceControl.Services.F1TV
 {
     public class AuthorizationService : IAuthorizationService
     {
-        private const string _authUrl = @"https://api.formula1.com/v2/account/subscriber/authenticate/by-password";
-        private const string _tokenUrl = @"https://f1tv-api.formula1.com/agl/1.0/unk/en/all_devices/global/authenticate";
-        private const string _apiKey = @"fCUCjWrKPu9ylJwRAv8BpGLEgiAuThx7";
-        private const string _identityProvider = @"/api/identity-providers/iden_732298a17f9c458890a1877880d140f3/";
+        private const string AuthUrl = @"https://api.formula1.com/v2/account/subscriber/authenticate/by-password";
+        private const string TokenUrl = @"https://f1tv-api.formula1.com/agl/1.0/unk/en/all_devices/global/authenticate";
+        private const string ApiKey = @"fCUCjWrKPu9ylJwRAv8BpGLEgiAuThx7";
+        private const string IdentityProvider = @"/api/identity-providers/iden_732298a17f9c458890a1877880d140f3/";
 
         private readonly IRestClient _restClient;
 
         public AuthorizationService(IRestClient restClient)
         {
             _restClient = restClient;
-        }
-
-        public async Task<AuthResponse> AuthenticateAsync(string login, string password)
-        {
-            var authRequest = new AuthRequest
-            {
-                Login = login,
-                Password = password
-            };
-
-            var headers = new Dictionary<string, string>
-            {
-                { "apiKey", _apiKey }
-            };
-
-            return await _restClient.PostAsJsonAsync<AuthRequest, AuthResponse>(_authUrl, authRequest, headers);
         }
 
         public async Task<TokenResponse> LoginAsync(string login, string password)
@@ -49,10 +33,26 @@ namespace RaceControl.Services.F1TV
             var tokenRequest = new TokenRequest
             {
                 AccessToken = authResponse.Data.SubscriptionToken,
-                IdentityProviderUrl = _identityProvider
+                IdentityProviderUrl = IdentityProvider
             };
 
-            return await _restClient.PostAsJsonAsync<TokenRequest, TokenResponse>(_tokenUrl, tokenRequest);
+            return await _restClient.PostAsJsonAsync<TokenRequest, TokenResponse>(TokenUrl, tokenRequest);
+        }
+
+        private async Task<AuthResponse> AuthenticateAsync(string login, string password)
+        {
+            var authRequest = new AuthRequest
+            {
+                Login = login,
+                Password = password
+            };
+
+            var headers = new Dictionary<string, string>
+            {
+                { "apiKey", ApiKey }
+            };
+
+            return await _restClient.PostAsJsonAsync<AuthRequest, AuthResponse>(AuthUrl, authRequest, headers);
         }
     }
 }

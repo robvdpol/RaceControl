@@ -17,7 +17,7 @@ namespace RaceControl.Services.Github
 
         public async Task<Release> GetLatestRelease()
         {
-            return await _restClient.GetAsJsonAsync<Release>(RaceControlLatestReleaseUrl);
+            return await _restClient.GetAsJsonAsync<Release>(RaceControlLatestReleaseUrl, nameof(RaceControl));
         }
     }
 }

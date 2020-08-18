@@ -99,7 +99,7 @@ namespace RaceControl.Services.F1TV
             }
             else
             {
-                _logger.Info($"Event not found.");
+                _logger.Info("Event not found.");
             }
 
             return evt;
@@ -128,7 +128,7 @@ namespace RaceControl.Services.F1TV
             }
             else
             {
-                _logger.Info($"Session not found.");
+                _logger.Info("Session not found.");
             }
 
             return session;
@@ -190,7 +190,7 @@ namespace RaceControl.Services.F1TV
             }
             else
             {
-                _logger.Info($"Episode not found.");
+                _logger.Info("Episode not found.");
             }
 
             return episode;
