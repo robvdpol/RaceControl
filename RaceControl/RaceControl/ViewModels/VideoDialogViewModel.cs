@@ -51,6 +51,7 @@ namespace RaceControl.ViewModels
         private bool _isLive;
         private bool _isCasting;
         private Process _streamlinkProcess;
+        private Process _streamlingRecordingProcess;
         private MediaPlayer _mediaPlayer;
         private Media _media;
         private ObservableCollection<TrackDescription> _audioTrackDescriptions;
@@ -197,12 +198,19 @@ namespace RaceControl.ViewModels
             IsLive = parameters.GetValue<bool>(ParameterNames.IsLive);
             var lowQualityMode = parameters.GetValue<bool>(ParameterNames.LowQualityMode);
             var useAlternativeStream = parameters.GetValue<bool>(ParameterNames.UseAlternativeStream);
-            //var enableRecording = parameters.GetValue<bool>(ParameterNames.EnableRecording);
+            var enableRecording = parameters.GetValue<bool>(ParameterNames.EnableRecording);
+
             var streamUrl = await GenerateStreamUrl();
 
             if (IsLive)
             {
                 _streamlinkProcess = _streamlinkLauncher.StartStreamlinkExternal(streamUrl, out streamUrl, lowQualityMode, useAlternativeStream);
+
+                if (enableRecording)
+                {
+                    var recordingStreamUrl = await GenerateStreamUrl();
+                    _streamlingRecordingProcess = _streamlinkLauncher.StartStreamlinkRecording(recordingStreamUrl, lowQualityMode, useAlternativeStream, Title);
+                }
             }
 
             CreateMedia(streamUrl);
@@ -237,6 +245,7 @@ namespace RaceControl.ViewModels
             }
 
             _streamlinkProcess?.Kill(true);
+            _streamlingRecordingProcess?.Kill(true);
         }
 
         private void Media_DurationChanged(object sender, MediaDurationChangedEventArgs e)
