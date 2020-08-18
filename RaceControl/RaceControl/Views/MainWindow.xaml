@@ -104,7 +104,7 @@
                     <Label.Style>
                         <Style BasedOn="{StaticResource HeaderLabelStyle}" TargetType="Label">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding HasItems, ElementName=lvLiveSessions}" Value="True">
+                                <DataTrigger Binding="{Binding HasItems, ElementName=LvLiveSessions}" Value="True">
                                     <Setter Property="Background" Value="LightGreen" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -112,7 +112,7 @@
                     </Label.Style>
                 </Label>
                 <ListView
-                    x:Name="lvLiveSessions"
+                    x:Name="LvLiveSessions"
                     Grid.Row="1"
                     ItemsSource="{Binding LiveSessions}"
                     SelectedItem="{Binding SelectedLiveSession}"
@@ -252,10 +252,9 @@
                     <GroupBox
                         Grid.Row="1"
                         Margin="5,3"
-                        Header="Credentials">
+                        Header="Account">
                         <StackPanel Orientation="Vertical">
                             <Button
-                                Grid.Row="2"
                                 Height="24"
                                 Margin="3"
                                 Command="{Binding DeleteCredentialCommand}"

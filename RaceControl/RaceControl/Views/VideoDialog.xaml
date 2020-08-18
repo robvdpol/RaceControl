@@ -127,7 +127,6 @@
                     Margin="2"
                     Orientation="Horizontal">
                     <Button
-                        Margin="2"
                         Command="{Binding TogglePauseCommand}"
                         Content="Pause"
                         Style="{StaticResource ControlBarButtonStyle}"
