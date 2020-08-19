@@ -200,7 +200,7 @@ namespace RaceControl.ViewModels
             var useAlternativeStream = parameters.GetValue<bool>(ParameterNames.USE_ALTERNATIVE_STREAM);
             var enableRecording = parameters.GetValue<bool>(ParameterNames.ENABLE_RECORDING);
 
-            var streamUrl = await GenerateStreamUrl();
+            var streamUrl = await GenerateStreamUrlAsync();
 
             if (IsLive)
             {
@@ -208,7 +208,7 @@ namespace RaceControl.ViewModels
 
                 if (enableRecording)
                 {
-                    var recordingStreamUrl = await GenerateStreamUrl();
+                    var recordingStreamUrl = await GenerateStreamUrlAsync();
                     _streamlingRecordingProcess = _streamlinkLauncher.StartStreamlinkRecording(recordingStreamUrl, lowQualityMode, useAlternativeStream, Title);
                 }
             }
@@ -453,7 +453,7 @@ namespace RaceControl.ViewModels
 
         private async void StartCastVideoExecute()
         {
-            await ChangeRenderer(SelectedRendererItem);
+            await ChangeRendererAsync(SelectedRendererItem);
             IsCasting = true;
         }
 
@@ -464,19 +464,19 @@ namespace RaceControl.ViewModels
 
         private async void StopCastVideoExecute()
         {
-            await ChangeRenderer(null);
+            await ChangeRendererAsync(null);
             IsCasting = false;
         }
 
-        private async Task<string> GenerateStreamUrl()
+        private async Task<string> GenerateStreamUrlAsync()
         {
             return await _apiService.GetTokenisedUrlAsync(_token, _contentType, _contentUrl);
         }
 
-        private async Task ChangeRenderer(RendererItem renderer)
+        private async Task ChangeRendererAsync(RendererItem renderer)
         {
             var streamTime = MediaPlayer.Time;
-            var streamUrl = IsLive ? Media.Mrl : await GenerateStreamUrl();
+            var streamUrl = IsLive ? Media.Mrl : await GenerateStreamUrlAsync();
 
             StopPlayback();
             RemoveMedia();
