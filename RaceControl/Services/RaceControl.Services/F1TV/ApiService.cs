@@ -29,6 +29,8 @@ namespace RaceControl.Services.F1TV
         {
             _logger.Info("Querying live sessions...");
 
+            var utcNow = DateTime.UtcNow;
+
             var request = _f1tvClient
                 .NewRequest(SessionOccurrence)
                 .WithField(Session.UIDField)
@@ -38,8 +40,8 @@ namespace RaceControl.Services.F1TV
                 .WithField(Session.StartTimeField)
                 .WithField(Session.EndTimeField)
                 .WithField(Session.EventOccurrenceUrlField)
-                .WithFilter(Session.StartTimeField, LarkFilterType.GreaterThan, DateTime.Today.ToString("yyyy-MM-dd"))
-                .WithFilter(Session.EndTimeField, LarkFilterType.LessThan, DateTime.Today.AddDays(1).ToString("yyyy-MM-dd"))
+                .WithFilter(Session.StartTimeField, LarkFilterType.LessThan, utcNow.AddDays(2).ToString("yyyy-MM-ddTHH:mm:ss"))
+                .WithFilter(Session.EndTimeField, LarkFilterType.GreaterThan, utcNow.AddDays(-2).ToString("yyyy-MM-ddTHH:mm:ss"))
                 .OrderBy(Session.StartTimeField, LarkSortDirection.Descending)
                 ;
 
