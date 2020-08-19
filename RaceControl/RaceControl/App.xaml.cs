@@ -52,8 +52,8 @@ namespace RaceControl
             containerRegistry.RegisterDialog<UpgradeDialog, UpgradeDialogViewModel>();
             containerRegistry.RegisterDialog<VideoDialog, VideoDialogViewModel>();
 
+            containerRegistry.RegisterInstance(new LibVLC());
             containerRegistry.RegisterSingleton<IExtendedDialogService, ExtendedDialogService>();
-            containerRegistry.RegisterSingleton<LibVLC>();
             containerRegistry.RegisterSingleton<IChildProcessTracker, ChildProcessTracker>();
             containerRegistry.RegisterSingleton<IRestClient, RestClient>();
             containerRegistry.Register<IAuthorizationService, AuthorizationService>();
