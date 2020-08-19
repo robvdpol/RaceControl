@@ -13,11 +13,11 @@ using RaceControl.Services.Interfaces.Github;
 using RaceControl.Streamlink;
 using RaceControl.Views;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using System.Timers;
 using System.Windows;
 using System.Windows.Input;
@@ -311,13 +311,24 @@ namespace RaceControl.ViewModels
 
                 if (SelectedVodType.ContentUrls.Any())
                 {
-                    var episodes = new ConcurrentBag<Episode>();
-                    var tasks = SelectedVodType.ContentUrls.Select(async episodeUrl =>
+                    // Limit number of concurrent requests to 50
+                    var options = new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 50 };
+                    var downloader = new TransformBlock<string, Episode>(episodeUID => _apiService.GetEpisodeAsync(episodeUID), options);
+                    var buffer = new BufferBlock<Episode>();
+                    downloader.LinkTo(buffer);
+
+                    foreach (var contentUrl in SelectedVodType.ContentUrls)
                     {
-                        episodes.Add(await _apiService.GetEpisodeAsync(episodeUrl.GetUID()));
-                    });
-                    await Task.WhenAll(tasks);
-                    Episodes.AddRange(episodes.OrderBy(e => e.Title));
+                        await downloader.SendAsync(contentUrl.GetUID());
+                    }
+
+                    downloader.Complete();
+                    await downloader.Completion;
+
+                    if (buffer.TryReceiveAll(out var episodes))
+                    {
+                        Episodes.AddRange(episodes.OrderBy(e => e.Title));
+                    }
                 }
 
                 IsBusy = false;
