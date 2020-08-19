@@ -10,12 +10,17 @@ using RaceControl.Streamlink;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Windows.Input;
+using Application = System.Windows.Application;
+using Cursors = System.Windows.Input.Cursors;
+using Timer = System.Timers.Timer;
 
 namespace RaceControl.ViewModels
 {
@@ -39,6 +44,7 @@ namespace RaceControl.ViewModels
         private ICommand _fastForwardCommand;
         private ICommand _syncSessionCommand;
         private ICommand _toggleFullScreenCommand;
+        private ICommand _moveAndResizeCommand;
         private ICommand _audioTrackSelectionChangedCommand;
         private ICommand _scanChromecastCommand;
         private ICommand _startCastVideoCommand;
@@ -63,6 +69,10 @@ namespace RaceControl.ViewModels
         private RendererItem _selectedRendererItem;
         private bool _showControls;
         private bool _fullScreen;
+        private double _top;
+        private double _left;
+        private double _width = 1200;
+        private double _height = 705;
         private ResizeMode _resizeMode = ResizeMode.CanResize;
         private WindowState _windowState = WindowState.Normal;
 
@@ -85,6 +95,7 @@ namespace RaceControl.ViewModels
         public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<string>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => IsLive);
         public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => IsLive);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand(ToggleFullScreenExecute);
+        public ICommand MoveAndResizeCommand => _moveAndResizeCommand ??= new DelegateCommand<string>(MoveAndResizeExecute, CanMoveAndResizeExecute).ObservesProperty(() => FullScreen);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
         public ICommand ScanChromecastCommand => _scanChromecastCommand ??= new DelegateCommand(ScanChromecastExecute, CanScanChromecastExecute).ObservesProperty(() => RendererDiscoverer);
         public ICommand StartCastVideoCommand => _startCastVideoCommand ??= new DelegateCommand(StartCastVideoExecute, CanStartCastVideoExecute).ObservesProperty(() => SelectedRendererItem);
@@ -172,6 +183,30 @@ namespace RaceControl.ViewModels
         {
             get => _fullScreen;
             set => SetProperty(ref _fullScreen, value);
+        }
+
+        public double Top
+        {
+            get => _top;
+            set => SetProperty(ref _top, value);
+        }
+
+        public double Left
+        {
+            get => _left;
+            set => SetProperty(ref _left, value);
+        }
+
+        public double Width
+        {
+            get => _width;
+            set => SetProperty(ref _width, value);
+        }
+
+        public double Height
+        {
+            get => _height;
+            set => SetProperty(ref _height, value);
         }
 
         public ResizeMode ResizeMode
@@ -423,6 +458,25 @@ namespace RaceControl.ViewModels
             else
             {
                 SetWindowed();
+            }
+        }
+
+        private bool CanMoveAndResizeExecute(string location)
+        {
+            return !FullScreen;
+        }
+
+        private void MoveAndResizeExecute(string location)
+        {
+            var screen = Screen.FromRectangle(new Rectangle((int)Left, (int)Top, (int)Width, (int)Height));
+            var scaleRatio = Math.Max(Screen.PrimaryScreen.WorkingArea.Width / SystemParameters.PrimaryScreenWidth, Screen.PrimaryScreen.WorkingArea.Height / SystemParameters.PrimaryScreenHeight);
+            Width = screen.WorkingArea.Width / 2D / scaleRatio;
+            Height = screen.WorkingArea.Height / 2D / scaleRatio;
+
+            if (location == "TL")
+            {
+                Top = screen.WorkingArea.Top / scaleRatio;
+                Left = screen.WorkingArea.Left / scaleRatio;
             }
         }
 

@@ -23,8 +23,10 @@
             <Setter Property="WindowState" Value="{Binding WindowState}" />
             <Setter Property="ResizeMode" Value="{Binding ResizeMode}" />
             <Setter Property="ShowInTaskbar" Value="True" />
-            <Setter Property="Width" Value="1200" />
-            <Setter Property="Height" Value="705" />
+            <Setter Property="Top" Value="{Binding Top, Mode=TwoWay}" />
+            <Setter Property="Left" Value="{Binding Left, Mode=TwoWay}" />
+            <Setter Property="Width" Value="{Binding Width, Mode=TwoWay}" />
+            <Setter Property="Height" Value="{Binding Height, Mode=TwoWay}" />
         </Style>
     </prism:Dialog.WindowStyle>
     <vlc:VideoView MediaPlayer="{Binding MediaPlayer}">
@@ -170,6 +172,12 @@
                         Content="Fullscreen"
                         Style="{StaticResource ControlBarButtonStyle}"
                         ToolTip="Toggle fullscreen mode" />
+                    <Button
+                        Command="{Binding MoveAndResizeCommand}"
+                        CommandParameter="TL"
+                        Content="Top left"
+                        Style="{StaticResource ControlBarButtonStyle}"
+                        ToolTip="Move window to top left of current screen" />
                     <TextBlock
                         Margin="5,2"
                         VerticalAlignment="Center"
