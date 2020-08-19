@@ -232,7 +232,7 @@
                     <GroupBox
                         Grid.Row="0"
                         Margin="5,3"
-                        Header="Live streams">
+                        Header="Live broadcasts">
                         <StackPanel Orientation="Vertical">
                             <CheckBox
                                 Margin="3"
