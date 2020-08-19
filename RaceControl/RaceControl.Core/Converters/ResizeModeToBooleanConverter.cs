@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 
 namespace RaceControl.Core.Converters
 {
-    [ValueConversion(typeof(bool), typeof(bool))]
-    public class InverseBooleanConverter : IValueConverter
+    [ValueConversion(typeof(ResizeMode), typeof(bool))]
+    public class ResizeModeToBooleanConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -14,9 +15,9 @@ namespace RaceControl.Core.Converters
                 throw new InvalidOperationException("The target must be a boolean");
             }
 
-            if (value is bool boolValue)
+            if (value is ResizeMode resizeMode)
             {
-                return !boolValue;
+                return resizeMode == ResizeMode.CanResize;
             }
 
             return null;
@@ -24,7 +25,17 @@ namespace RaceControl.Core.Converters
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotSupportedException();
+            if (targetType != typeof(ResizeMode))
+            {
+                throw new InvalidOperationException("The target must be a ResizeMode");
+            }
+
+            if (value is bool boolValue)
+            {
+                return boolValue ? ResizeMode.CanResize : ResizeMode.NoResize;
+            }
+
+            return null;
         }
     }
 }

@@ -567,7 +567,6 @@ namespace RaceControl.ViewModels
         private void SetWindowed()
         {
             FullScreen = false;
-            ResizeMode = ResizeMode.CanResize;
             WindowState = WindowState.Normal;
         }
 

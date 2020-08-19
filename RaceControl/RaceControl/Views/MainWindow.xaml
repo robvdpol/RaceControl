@@ -57,7 +57,7 @@
             <Label
                 Grid.Row="0"
                 Grid.Column="0"
-                Content="Seasons"
+                Content="Race Seasons"
                 Style="{StaticResource HeaderLabelStyle}" />
             <ListView
                 Grid.Row="1"

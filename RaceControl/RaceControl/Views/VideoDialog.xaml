@@ -11,6 +11,7 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <core:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <core:ResizeModeToBooleanConverter x:Key="ResizeModeToBooleanConverter" />
         <Style x:Key="ControlBarButtonStyle" TargetType="Button">
             <Setter Property="Margin" Value="2" />
             <Setter Property="Width" Value="Auto" />
@@ -48,16 +49,6 @@
                 Visibility="{Binding IsCasting, Converter={StaticResource BooleanToVisibilityConverter}}" />
             <!--  Non-transparent background is required to capture mouse events  -->
             <Grid Grid.Row="0" Background="#01000000">
-                <Button
-                    Height="22"
-                    Margin="4"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Top"
-                    Command="{Binding CloseWindowCommand}"
-                    Content="Close"
-                    Style="{StaticResource ControlBarButtonStyle}"
-                    ToolTip="Close window"
-                    Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}" />
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseDown">
                         <i:InvokeCommandAction Command="{Binding MouseDownVideoCommand}" PassEventArgsToCommand="True" />
@@ -86,20 +77,11 @@
                         <i:InvokeCommandAction Command="{Binding MouseLeaveControlBarCommand}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <Grid
-                    Grid.Row="0"
-                    Grid.Column="0"
-                    Grid.ColumnSpan="3"
-                    Margin="2">
+                <Grid Grid.Row="0" Margin="2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
@@ -127,15 +109,20 @@
                         TickPlacement="BottomRight"
                         Value="{Binding SliderTime}" />
                 </Grid>
-                <Grid
-                    Grid.Row="1"
-                    Grid.Column="0"
-                    Margin="2">
+                <Grid Grid.Row="1" Margin="2">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <StackPanel Grid.Row="0" Orientation="Horizontal">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Orientation="Horizontal">
                         <Button
                             Command="{Binding TogglePauseCommand}"
                             Content="Pause"
@@ -176,7 +163,7 @@
                             Style="{StaticResource ControlBarButtonStyle}"
                             ToolTip="Synchronize playback across players *experimental*" />
                     </StackPanel>
-                    <Grid Grid.Row="1">
+                    <Grid Grid.Row="1" Grid.Column="0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
@@ -198,78 +185,88 @@
                             </i:Interaction.Triggers>
                         </ComboBox>
                     </Grid>
-                </Grid>
-                <Grid
-                    Grid.Row="1"
-                    Grid.Column="1"
-                    Margin="2"
-                    HorizontalAlignment="Center">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <Button
+                    <Grid
                         Grid.Row="0"
                         Grid.RowSpan="2"
-                        Grid.Column="0"
-                        MinWidth="60"
-                        Command="{Binding ToggleFullScreenCommand}"
-                        Content="Fullscreen"
-                        Style="{StaticResource ControlBarButtonStyle}"
-                        ToolTip="Toggle fullscreen mode" />
-                    <Button
-                        Grid.Row="0"
                         Grid.Column="1"
-                        MinWidth="25"
-                        Command="{Binding MoveAndResizeCommand}"
-                        CommandParameter="{x:Static enums:WindowLocation.TopLeft}"
-                        Content="TL"
-                        Style="{StaticResource ControlBarButtonStyle}"
-                        ToolTip="Move window to top left corner of current screen" />
-                    <Button
+                        HorizontalAlignment="Center">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Button
+                            Grid.Row="0"
+                            Grid.RowSpan="2"
+                            Grid.Column="0"
+                            MinWidth="60"
+                            Command="{Binding ToggleFullScreenCommand}"
+                            Content="Fullscreen"
+                            Style="{StaticResource ControlBarButtonStyle}"
+                            ToolTip="Toggle fullscreen mode" />
+                        <Button
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            MinWidth="25"
+                            Command="{Binding MoveAndResizeCommand}"
+                            CommandParameter="{x:Static enums:WindowLocation.TopLeft}"
+                            Content="TL"
+                            Style="{StaticResource ControlBarButtonStyle}"
+                            ToolTip="Move window to top left corner of current screen" />
+                        <Button
+                            Grid.Row="0"
+                            Grid.Column="2"
+                            MinWidth="25"
+                            Command="{Binding MoveAndResizeCommand}"
+                            CommandParameter="{x:Static enums:WindowLocation.TopRight}"
+                            Content="TR"
+                            Style="{StaticResource ControlBarButtonStyle}"
+                            ToolTip="Move window to top right corner of current screen" />
+                        <Button
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            MinWidth="25"
+                            Command="{Binding MoveAndResizeCommand}"
+                            CommandParameter="{x:Static enums:WindowLocation.BottomLeft}"
+                            Content="BL"
+                            Style="{StaticResource ControlBarButtonStyle}"
+                            ToolTip="Move window to bottom left corner of current screen" />
+                        <Button
+                            Grid.Row="1"
+                            Grid.Column="2"
+                            MinWidth="25"
+                            Command="{Binding MoveAndResizeCommand}"
+                            CommandParameter="{x:Static enums:WindowLocation.BottomRight}"
+                            Content="BR"
+                            Style="{StaticResource ControlBarButtonStyle}"
+                            ToolTip="Move window to bottom right corner of current screen" />
+                        <Button
+                            Grid.Row="0"
+                            Grid.RowSpan="2"
+                            Grid.Column="3"
+                            MinWidth="60"
+                            Command="{Binding CloseWindowCommand}"
+                            Content="Close"
+                            Style="{StaticResource ControlBarButtonStyle}"
+                            ToolTip="Close window (Esc)"
+                            Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    </Grid>
+                    <CheckBox
                         Grid.Row="0"
                         Grid.Column="2"
-                        MinWidth="25"
-                        Command="{Binding MoveAndResizeCommand}"
-                        CommandParameter="{x:Static enums:WindowLocation.TopRight}"
-                        Content="TR"
-                        Style="{StaticResource ControlBarButtonStyle}"
-                        ToolTip="Move window to top right corner of current screen" />
-                    <Button
-                        Grid.Row="1"
-                        Grid.Column="1"
-                        MinWidth="25"
-                        Command="{Binding MoveAndResizeCommand}"
-                        CommandParameter="{x:Static enums:WindowLocation.BottomLeft}"
-                        Content="BL"
-                        Style="{StaticResource ControlBarButtonStyle}"
-                        ToolTip="Move window to bottom left corner of current screen" />
-                    <Button
-                        Grid.Row="1"
-                        Grid.Column="2"
-                        MinWidth="25"
-                        Command="{Binding MoveAndResizeCommand}"
-                        CommandParameter="{x:Static enums:WindowLocation.BottomRight}"
-                        Content="BR"
-                        Style="{StaticResource ControlBarButtonStyle}"
-                        ToolTip="Move window to bottom right corner of current screen" />
-                </Grid>
-                <Grid
-                    Grid.Row="1"
-                    Grid.Column="2"
-                    Margin="2">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
+                        Margin="2"
+                        VerticalAlignment="Center"
+                        Content="Resizable window (uncheck to hide borders)"
+                        IsChecked="{Binding ResizeMode, Converter={StaticResource ResizeModeToBooleanConverter}}"
+                        IsEnabled="{Binding FullScreen, Converter={StaticResource InverseBooleanConverter}}" />
                     <StackPanel
                         Grid.Row="1"
-                        Margin="2"
+                        Grid.Column="2"
                         Orientation="Horizontal">
                         <Button
                             Command="{Binding ScanChromecastCommand}"
