@@ -13,6 +13,7 @@ using RaceControl.Services.Interfaces.Github;
 using RaceControl.Streamlink;
 using RaceControl.Views;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -308,8 +309,16 @@ namespace RaceControl.ViewModels
                 ClearChannels();
                 ClearEpisodes();
 
-                var episodes = await _apiService.GetEpisodesForVodTypeAsync(SelectedVodType.UID);
-                Episodes.AddRange(episodes.OrderBy(e => e.Title));
+                if (SelectedVodType.ContentUrls.Any())
+                {
+                    var episodes = new ConcurrentBag<Episode>();
+                    var tasks = SelectedVodType.ContentUrls.Select(async episodeUrl =>
+                    {
+                        episodes.Add(await _apiService.GetEpisodeAsync(episodeUrl.GetUID()));
+                    });
+                    await Task.WhenAll(tasks);
+                    Episodes.AddRange(episodes.OrderBy(e => e.Title));
+                }
 
                 IsBusy = false;
             }

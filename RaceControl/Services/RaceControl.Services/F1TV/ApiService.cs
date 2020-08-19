@@ -15,6 +15,7 @@ namespace RaceControl.Services.F1TV
         private const string EventOccurrence = "event-occurrence";
         private const string SessionOccurrence = "session-occurrence";
         private const string VodTypeTag = "vod-type-tag";
+        private const string Episodes = "episodes";
 
         private readonly ILogger _logger;
         private readonly IF1TVClient _client;
@@ -80,6 +81,7 @@ namespace RaceControl.Services.F1TV
                 .NewRequest(VodTypeTag)
                 .WithField(VodType.UIDField)
                 .WithField(VodType.NameField)
+                .WithField(VodType.ContentUrlsField)
                 ;
 
             var vodTypes = (await _client.GetCollectionAsync<VodType>(request)).Objects;
@@ -169,22 +171,18 @@ namespace RaceControl.Services.F1TV
             return episodes;
         }
 
-        public async Task<List<Episode>> GetEpisodesForVodTypeAsync(string vodTypeUID)
+        public async Task<Episode> GetEpisodeAsync(string episodeUID)
         {
-            _logger.Info($"Querying episodes for VOD type with UID '{vodTypeUID}'...");
+            _logger.Info($"Querying episode with UID '{episodeUID}'...");
 
             var request = _client
-                .NewRequest(VodTypeTag, vodTypeUID)
-                .WithField(VodType.ContentUrlsField, true)
-                .WithSubField(VodType.ContentUrlsField, Episode.UIDField)
-                .WithSubField(VodType.ContentUrlsField, Episode.TitleField)
-                .WithSubField(VodType.ContentUrlsField, Episode.ItemsField)
+                .NewRequest(Episodes, episodeUID)
+                .WithField(Episode.UIDField)
+                .WithField(Episode.TitleField)
+                .WithField(Episode.ItemsField)
                 ;
 
-            var episodes = (await _client.GetItemAsync<VodType>(request)).ContentUrls;
-            _logger.Info($"Found {episodes.Count} episodes.");
-
-            return episodes;
+            return await _client.GetItemAsync<Episode>(request);
         }
 
         public async Task<string> GetTokenisedUrlForChannelAsync(string token, string channelUrl)
