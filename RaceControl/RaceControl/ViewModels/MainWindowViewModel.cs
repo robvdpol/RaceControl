@@ -206,7 +206,12 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _selectedVodType, value);
         }
 
-        private Session GetCurrentSession() => SelectedLiveSession ?? SelectedSession;
+        private async void RefreshLiveSessionsTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            _refreshLiveSessionsTimer.Stop();
+            await RefreshLiveSessionsAsync();
+            _refreshLiveSessionsTimer.Start();
+        }
 
         private void LoadedExecute(RoutedEventArgs args)
         {
@@ -215,112 +220,20 @@ namespace RaceControl.ViewModels
                 if (dialogResult.Result == ButtonResult.OK)
                 {
                     var token = dialogResult.Parameters.GetValue<string>("token");
-                    await Initialize(token);
+                    await InitializeAsync(token);
                 }
                 else
                 {
-                    _logger.Info("Login cancelled by user.");
+                    _logger.Info("Login cancelled by user, shutting down...");
                     Application.Current.Shutdown();
                 }
             });
         }
 
-        private async Task Initialize(string token)
-        {
-            IsBusy = true;
-
-            try
-            {
-                await CheckForUpdates();
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, "An exception occurred while checking for updates.");
-            }
-
-            SetToken(token);
-            SetVlcExeLocation();
-            SetMpvExeLocation();
-            Seasons.AddRange(await _apiService.GetSeasonsAsync());
-            VodTypes.AddRange(await _apiService.GetVodTypesAsync());
-            await RefreshLiveSessions();
-            IsBusy = false;
-
-            _refreshLiveSessionsTimer.Elapsed += RefreshLiveSessionsTimer_Elapsed;
-            _refreshLiveSessionsTimer.Start();
-        }
-
-        private async Task CheckForUpdates()
-        {
-            _logger.Info("Checking for updates...");
-
-            var release = await _githubService.GetLatestRelease();
-
-            if (release != null && !release.PreRelease && !release.Draft && Version.TryParse(release.TagName, out var latestVersion))
-            {
-                var currentVersion = AssemblyUtils.GetApplicationVersion();
-
-                if (latestVersion > currentVersion)
-                {
-                    _logger.Info($"Found new release '{release.Name}'.");
-
-                    var parameters = new DialogParameters
-                    {
-                        { ParameterNames.RELEASE, release }
-                    };
-
-                    _dialogService.ShowDialog(nameof(UpgradeDialog), parameters, dialogResult =>
-                    {
-                        if (dialogResult.Result == ButtonResult.OK)
-                        {
-                            ProcessUtils.BrowseToUrl(release.HtmlUrl);
-                        }
-                    });
-                }
-            }
-
-            _logger.Info("Done checking for updates.");
-        }
-
-        private void SetToken(string token)
-        {
-            _token = token;
-        }
-
-        private void SetVlcExeLocation()
-        {
-            var vlcRegistryKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\VideoLAN\VLC") ?? Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\VideoLAN\VLC");
-
-            if (vlcRegistryKey != null && vlcRegistryKey.GetValue(null) is string vlcExeLocation && File.Exists(vlcExeLocation))
-            {
-                VlcExeLocation = vlcExeLocation;
-                _logger.Info($"Found VLC installation at '{vlcExeLocation}'.");
-            }
-            else
-            {
-                _logger.Warn("Could not find VLC installation.");
-            }
-        }
-
-        private void SetMpvExeLocation()
-        {
-            var mpvExeLocation = Path.Combine(Environment.CurrentDirectory, @"mpv\mpv.exe");
-
-            if (File.Exists(mpvExeLocation))
-            {
-                MpvExeLocation = mpvExeLocation;
-                _logger.Info($"Found MPV installation at '{mpvExeLocation}'.");
-            }
-            else
-            {
-                _logger.Warn("Could not find MPV installation.");
-            }
-        }
-
         private void ClosingExecute()
         {
-            _refreshLiveSessionsTimer.Elapsed -= RefreshLiveSessionsTimer_Elapsed;
             _refreshLiveSessionsTimer.Stop();
+            _refreshLiveSessionsTimer.Elapsed -= RefreshLiveSessionsTimer_Elapsed;
             _refreshLiveSessionsTimer.Dispose();
         }
 
@@ -369,7 +282,7 @@ namespace RaceControl.ViewModels
             {
                 IsBusy = true;
                 SelectedSession = null;
-                await SelectSession(SelectedLiveSession);
+                await SelectSessionAsync(SelectedLiveSession);
                 IsBusy = false;
             }
         }
@@ -380,22 +293,9 @@ namespace RaceControl.ViewModels
             {
                 IsBusy = true;
                 SelectedLiveSession = null;
-                await SelectSession(SelectedSession);
+                await SelectSessionAsync(SelectedSession);
                 IsBusy = false;
             }
-        }
-
-        private async Task SelectSession(Session session)
-        {
-            SelectedVodType = null;
-            ClearChannels();
-            ClearEpisodes();
-
-            var channels = await _apiService.GetChannelsForSessionAsync(session.UID);
-            Channels.AddRange(channels.OrderBy(c => c.ChannelType, new ChannelTypeComparer()));
-
-            var episodes = await _apiService.GetEpisodesForSessionAsync(session.UID);
-            Episodes.AddRange(episodes.OrderBy(e => e.Title));
         }
 
         private async void VodTypeSelectionChangedExecute()
@@ -609,14 +509,117 @@ namespace RaceControl.ViewModels
             IsBusy = false;
         }
 
-        private async void RefreshLiveSessionsTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private async Task InitializeAsync(string token)
         {
-            _refreshLiveSessionsTimer.Stop();
-            await RefreshLiveSessions();
+            IsBusy = true;
+
+            try
+            {
+                await CheckForUpdatesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "An exception occurred while checking for updates.");
+            }
+
+            SetToken(token);
+            SetVlcExeLocation();
+            SetMpvExeLocation();
+            await LoadInitialDataAsync();
+            IsBusy = false;
+
+            _refreshLiveSessionsTimer.Elapsed += RefreshLiveSessionsTimer_Elapsed;
             _refreshLiveSessionsTimer.Start();
         }
 
-        private async Task RefreshLiveSessions()
+        private async Task CheckForUpdatesAsync()
+        {
+            _logger.Info("Checking for updates...");
+
+            var release = await _githubService.GetLatestRelease();
+
+            if (release != null && !release.PreRelease && !release.Draft && Version.TryParse(release.TagName, out var latestVersion))
+            {
+                var currentVersion = AssemblyUtils.GetApplicationVersion();
+
+                if (latestVersion > currentVersion)
+                {
+                    _logger.Info($"Found new release '{release.Name}'.");
+
+                    var parameters = new DialogParameters
+                    {
+                        { ParameterNames.RELEASE, release }
+                    };
+
+                    _dialogService.ShowDialog(nameof(UpgradeDialog), parameters, dialogResult =>
+                    {
+                        if (dialogResult.Result == ButtonResult.OK)
+                        {
+                            ProcessUtils.BrowseToUrl(release.HtmlUrl);
+                        }
+                    });
+                }
+            }
+
+            _logger.Info("Done checking for updates.");
+        }
+
+        private void SetToken(string token)
+        {
+            _token = token;
+        }
+
+        private void SetVlcExeLocation()
+        {
+            var vlcRegistryKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\VideoLAN\VLC") ?? Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\VideoLAN\VLC");
+
+            if (vlcRegistryKey != null && vlcRegistryKey.GetValue(null) is string vlcExeLocation && File.Exists(vlcExeLocation))
+            {
+                VlcExeLocation = vlcExeLocation;
+                _logger.Info($"Found VLC installation at '{vlcExeLocation}'.");
+            }
+            else
+            {
+                _logger.Warn("Could not find VLC installation.");
+            }
+        }
+
+        private void SetMpvExeLocation()
+        {
+            var mpvExeLocation = Path.Combine(Environment.CurrentDirectory, @"mpv\mpv.exe");
+
+            if (File.Exists(mpvExeLocation))
+            {
+                MpvExeLocation = mpvExeLocation;
+                _logger.Info($"Found MPV installation at '{mpvExeLocation}'.");
+            }
+            else
+            {
+                _logger.Warn("Could not find MPV installation.");
+            }
+        }
+
+        private async Task LoadInitialDataAsync()
+        {
+            await Task.WhenAll(
+                LoadSeasonsAsync(),
+                LoadVodTypesAsync(),
+                RefreshLiveSessionsAsync());
+        }
+
+        private async Task LoadSeasonsAsync()
+        {
+            var seasons = await _apiService.GetSeasonsAsync();
+            Seasons.AddRange(seasons);
+        }
+
+        private async Task LoadVodTypesAsync()
+        {
+            var vodTypes = await _apiService.GetVodTypesAsync();
+            VodTypes.AddRange(vodTypes);
+        }
+
+        private async Task RefreshLiveSessionsAsync()
         {
             _logger.Info("Refreshing live sessions...");
 
@@ -638,6 +641,29 @@ namespace RaceControl.ViewModels
             });
 
             _logger.Info("Done refreshing live sessions.");
+        }
+
+        private async Task SelectSessionAsync(Session session)
+        {
+            SelectedVodType = null;
+            ClearChannels();
+            ClearEpisodes();
+
+            await Task.WhenAll(
+                LoadChannelsForSessionAsync(session.UID),
+                LoadEpisodesForSessionAsync(session.UID));
+        }
+
+        private async Task LoadChannelsForSessionAsync(string sessionUID)
+        {
+            var channels = await _apiService.GetChannelsForSessionAsync(sessionUID);
+            Channels.AddRange(channels.OrderBy(c => c.ChannelType, new ChannelTypeComparer()));
+        }
+
+        private async Task LoadEpisodesForSessionAsync(string sessionUID)
+        {
+            var episodes = await _apiService.GetEpisodesForSessionAsync(sessionUID);
+            Episodes.AddRange(episodes.OrderBy(e => e.Title));
         }
 
         private void WatchStreamInVlc(string url, string title, bool isLive)
@@ -687,5 +713,7 @@ namespace RaceControl.ViewModels
         {
             Episodes.Clear();
         }
+
+        private Session GetCurrentSession() => SelectedLiveSession ?? SelectedSession;
     }
 }

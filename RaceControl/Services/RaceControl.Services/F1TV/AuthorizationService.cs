@@ -1,4 +1,5 @@
-﻿using RaceControl.Services.Interfaces;
+﻿using NLog;
+using RaceControl.Services.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Authorization;
 using System;
@@ -14,10 +15,12 @@ namespace RaceControl.Services.F1TV
         private const string ApiKey = @"fCUCjWrKPu9ylJwRAv8BpGLEgiAuThx7";
         private const string IdentityProvider = @"/api/identity-providers/iden_732298a17f9c458890a1877880d140f3/";
 
+        private readonly ILogger _logger;
         private readonly IRestClient _restClient;
 
-        public AuthorizationService(IRestClient restClient)
+        public AuthorizationService(ILogger logger, IRestClient restClient)
         {
+            _logger = logger;
             _restClient = restClient;
         }
 
@@ -36,7 +39,11 @@ namespace RaceControl.Services.F1TV
                 IdentityProviderUrl = IdentityProvider
             };
 
-            return await _restClient.PostAsJsonAsync<TokenRequest, TokenResponse>(TokenUrl, tokenRequest);
+            _logger.Info("Sending token request...");
+            var tokenResponse = await _restClient.PostAsJsonAsync<TokenRequest, TokenResponse>(TokenUrl, tokenRequest);
+            _logger.Info("Received token response.");
+
+            return tokenResponse;
         }
 
         private async Task<AuthResponse> AuthenticateAsync(string login, string password)
@@ -47,12 +54,16 @@ namespace RaceControl.Services.F1TV
                 Password = password
             };
 
-            var headers = new Dictionary<string, string>
+            var requestHeaders = new Dictionary<string, string>
             {
                 { "apiKey", ApiKey }
             };
 
-            return await _restClient.PostAsJsonAsync<AuthRequest, AuthResponse>(AuthUrl, authRequest, headers);
+            _logger.Info($"Sending authorization request for login '{authRequest.Login}'...");
+            var authResponse = await _restClient.PostAsJsonAsync<AuthRequest, AuthResponse>(AuthUrl, authRequest, requestHeaders);
+            _logger.Info("Received authorization response.");
+
+            return authResponse;
         }
     }
 }
