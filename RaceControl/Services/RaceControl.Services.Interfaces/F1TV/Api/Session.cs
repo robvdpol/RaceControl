@@ -58,7 +58,7 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
 
         public override string ToString()
         {
-            return IsLive ? $"{Name} - LIVE" : Name;
+            return Name;
         }
     }
 }

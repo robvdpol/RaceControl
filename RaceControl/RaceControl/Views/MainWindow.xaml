@@ -6,8 +6,8 @@
     xmlns:ctrls="clr-namespace:RaceControl.Core.Controls;assembly=RaceControl.Core"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:prism="http://prismlibrary.com/"
-    Width="1200"
-    Height="760"
+    Width="1250"
+    Height="780"
     prism:ViewModelLocator.AutoWireViewModel="True"
     WindowStartupLocation="CenterScreen">
     <Window.Resources>
@@ -49,9 +49,9 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*" />
-                <ColumnDefinition Width="2*" />
-                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" MinWidth="250" />
+                <ColumnDefinition Width="2*" MinWidth="250" />
+                <ColumnDefinition Width="3*" />
                 <ColumnDefinition Width="3*" />
             </Grid.ColumnDefinitions>
             <Label
@@ -116,6 +116,7 @@
                     Grid.Row="1"
                     DisplayMemberPath="SessionName"
                     ItemsSource="{Binding LiveSessions}"
+                    ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                     SelectedItem="{Binding SelectedLiveSession}"
                     SelectionMode="Single"
                     Style="{StaticResource ContentListViewStyle}">
