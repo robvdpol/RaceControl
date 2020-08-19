@@ -1,5 +1,4 @@
-﻿using LibVLCSharp.Shared;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using NLog;
 using Prism.Commands;
 using Prism.Services.Dialogs;
@@ -32,7 +31,6 @@ namespace RaceControl.ViewModels
         private readonly IGithubService _githubService;
         private readonly ICredentialService _credentialService;
         private readonly IStreamlinkLauncher _streamlinkLauncher;
-        private readonly LibVLC _libVLC;
         private readonly Timer _refreshLiveSessionsTimer = new Timer(60000) { AutoReset = false };
 
         private ICommand _loadedCommand;
@@ -78,8 +76,7 @@ namespace RaceControl.ViewModels
             IApiService apiService,
             IGithubService githubService,
             ICredentialService credentialService,
-            IStreamlinkLauncher streamlinkLauncher,
-            LibVLC libVLC)
+            IStreamlinkLauncher streamlinkLauncher)
         {
             _logger = logger;
             _dialogService = dialogService;
@@ -87,7 +84,6 @@ namespace RaceControl.ViewModels
             _githubService = githubService;
             _credentialService = credentialService;
             _streamlinkLauncher = streamlinkLauncher;
-            _libVLC = libVLC;
         }
 
         public ICommand LoadedCommand => _loadedCommand ??= new DelegateCommand<RoutedEventArgs>(LoadedExecute);
@@ -247,16 +243,11 @@ namespace RaceControl.ViewModels
             SetMpvExeLocation();
             Seasons.AddRange(await _apiService.GetSeasonsAsync());
             VodTypes.AddRange(await _apiService.GetVodTypesAsync());
+            await RefreshLiveSessions();
             IsBusy = false;
 
-            await RefreshLiveSessions();
             _refreshLiveSessionsTimer.Elapsed += RefreshLiveSessionsTimer_Elapsed;
             _refreshLiveSessionsTimer.Start();
-        }
-
-        private void SetToken(string token)
-        {
-            _token = token;
         }
 
         private async Task CheckForUpdates()
@@ -275,7 +266,7 @@ namespace RaceControl.ViewModels
 
                     var parameters = new DialogParameters
                     {
-                        { ParameterNames.Release, release }
+                        { ParameterNames.RELEASE, release }
                     };
 
                     _dialogService.ShowDialog(nameof(UpgradeDialog), parameters, dialogResult =>
@@ -289,6 +280,11 @@ namespace RaceControl.ViewModels
             }
 
             _logger.Info("Done checking for updates.");
+        }
+
+        private void SetToken(string token)
+        {
+            _token = token;
         }
 
         private void SetVlcExeLocation()
@@ -424,15 +420,15 @@ namespace RaceControl.ViewModels
             var session = GetCurrentSession();
             var parameters = new DialogParameters
             {
-                { ParameterNames.Token, _token },
-                { ParameterNames.ContentType, ContentType.Channel },
-                { ParameterNames.ContentUrl, channel.Self },
-                { ParameterNames.SyncUID, session.UID },
-                { ParameterNames.Title, $"{session} - {channel}" },
-                { ParameterNames.IsLive, session.IsLive },
-                { ParameterNames.LowQualityMode, LowQualityMode },
-                { ParameterNames.UseAlternativeStream, UseAlternativeStream },
-                { ParameterNames.EnableRecording, EnableRecording }
+                { ParameterNames.TOKEN, _token },
+                { ParameterNames.CONTENT_TYPE, ContentType.Channel },
+                { ParameterNames.CONTENT_URL, channel.Self },
+                { ParameterNames.SYNC_UID, session.UID },
+                { ParameterNames.TITLE, $"{session} - {channel}" },
+                { ParameterNames.IS_LIVE, session.IsLive },
+                { ParameterNames.LOW_QUALITY_MODE, LowQualityMode },
+                { ParameterNames.USE_ALTERNATIVE_STREAM, UseAlternativeStream },
+                { ParameterNames.ENABLE_RECORDING, EnableRecording }
             };
 
             _logger.Info($"Starting internal player for channel with parameters: '{parameters}'.");
@@ -443,15 +439,15 @@ namespace RaceControl.ViewModels
         {
             var parameters = new DialogParameters
             {
-                { ParameterNames.Token, _token },
-                { ParameterNames.ContentType, ContentType.Asset },
-                { ParameterNames.ContentUrl, episode.Items.First() },
-                { ParameterNames.SyncUID, episode.UID },
-                { ParameterNames.Title, episode.ToString() },
-                { ParameterNames.IsLive, false },
-                { ParameterNames.LowQualityMode, LowQualityMode },
-                { ParameterNames.UseAlternativeStream, UseAlternativeStream },
-                { ParameterNames.EnableRecording, EnableRecording }
+                { ParameterNames.TOKEN, _token },
+                { ParameterNames.CONTENT_TYPE, ContentType.Asset },
+                { ParameterNames.CONTENT_URL, episode.Items.First() },
+                { ParameterNames.SYNC_UID, episode.UID },
+                { ParameterNames.TITLE, episode.ToString() },
+                { ParameterNames.IS_LIVE, false },
+                { ParameterNames.LOW_QUALITY_MODE, LowQualityMode },
+                { ParameterNames.USE_ALTERNATIVE_STREAM, UseAlternativeStream },
+                { ParameterNames.ENABLE_RECORDING, EnableRecording }
             };
 
             _logger.Info($"Starting internal player for episode with parameters: '{parameters}'.");

@@ -190,15 +190,15 @@ namespace RaceControl.ViewModels
         {
             base.OnDialogOpened(parameters);
 
-            _token = parameters.GetValue<string>(ParameterNames.Token);
-            _contentType = parameters.GetValue<ContentType>(ParameterNames.ContentType);
-            _contentUrl = parameters.GetValue<string>(ParameterNames.ContentUrl);
-            _syncUID = parameters.GetValue<string>(ParameterNames.SyncUID);
-            Title = parameters.GetValue<string>(ParameterNames.Title);
-            IsLive = parameters.GetValue<bool>(ParameterNames.IsLive);
-            var lowQualityMode = parameters.GetValue<bool>(ParameterNames.LowQualityMode);
-            var useAlternativeStream = parameters.GetValue<bool>(ParameterNames.UseAlternativeStream);
-            var enableRecording = parameters.GetValue<bool>(ParameterNames.EnableRecording);
+            _token = parameters.GetValue<string>(ParameterNames.TOKEN);
+            _contentType = parameters.GetValue<ContentType>(ParameterNames.CONTENT_TYPE);
+            _contentUrl = parameters.GetValue<string>(ParameterNames.CONTENT_URL);
+            _syncUID = parameters.GetValue<string>(ParameterNames.SYNC_UID);
+            Title = parameters.GetValue<string>(ParameterNames.TITLE);
+            IsLive = parameters.GetValue<bool>(ParameterNames.IS_LIVE);
+            var lowQualityMode = parameters.GetValue<bool>(ParameterNames.LOW_QUALITY_MODE);
+            var useAlternativeStream = parameters.GetValue<bool>(ParameterNames.USE_ALTERNATIVE_STREAM);
+            var enableRecording = parameters.GetValue<bool>(ParameterNames.ENABLE_RECORDING);
 
             var streamUrl = await GenerateStreamUrl();
 

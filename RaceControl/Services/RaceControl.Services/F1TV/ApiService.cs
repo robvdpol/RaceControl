@@ -17,12 +17,12 @@ namespace RaceControl.Services.F1TV
         private const string VodTypeTag = "vod-type-tag";
 
         private readonly ILogger _logger;
-        private readonly IF1TVClient _f1tvClient;
+        private readonly IF1TVClient _client;
 
-        public ApiService(ILogger logger, IF1TVClient f1tvClient)
+        public ApiService(ILogger logger, IF1TVClient client)
         {
             _logger = logger;
-            _f1tvClient = f1tvClient;
+            _client = client;
         }
 
         public async Task<List<Session>> GetLiveSessionsAsync()
@@ -31,7 +31,7 @@ namespace RaceControl.Services.F1TV
 
             var utcNow = DateTime.UtcNow;
 
-            var request = _f1tvClient
+            var request = _client
                 .NewRequest(SessionOccurrence)
                 .WithField(Session.UIDField)
                 .WithField(Session.NameField)
@@ -45,7 +45,7 @@ namespace RaceControl.Services.F1TV
                 .OrderBy(Session.StartTimeField, LarkSortDirection.Descending)
                 ;
 
-            var sessions = (await _f1tvClient.GetCollectionAsync<Session>(request)).Objects;
+            var sessions = (await _client.GetCollectionAsync<Session>(request)).Objects;
             _logger.Info($"Found {sessions.Count} live sessions.");
 
             return sessions;
@@ -55,7 +55,7 @@ namespace RaceControl.Services.F1TV
         {
             _logger.Info("Querying seasons...");
 
-            var request = _f1tvClient
+            var request = _client
                 .NewRequest(RaceSeason)
                 .WithField(Season.UIDField)
                 .WithField(Season.NameField)
@@ -66,7 +66,7 @@ namespace RaceControl.Services.F1TV
                 .OrderBy(Season.YearField, LarkSortDirection.Descending)
                 ;
 
-            var seasons = (await _f1tvClient.GetCollectionAsync<Season>(request)).Objects;
+            var seasons = (await _client.GetCollectionAsync<Season>(request)).Objects;
             _logger.Info($"Found {seasons.Count} seasons.");
 
             return seasons;
@@ -76,13 +76,13 @@ namespace RaceControl.Services.F1TV
         {
             _logger.Info("Querying VOD types...");
 
-            var request = _f1tvClient
+            var request = _client
                 .NewRequest(VodTypeTag)
                 .WithField(VodType.UIDField)
                 .WithField(VodType.NameField)
                 ;
 
-            var vodTypes = (await _f1tvClient.GetCollectionAsync<VodType>(request)).Objects;
+            var vodTypes = (await _client.GetCollectionAsync<VodType>(request)).Objects;
             _logger.Info($"Found {vodTypes.Count} VOD types.");
 
             return vodTypes;
@@ -92,7 +92,7 @@ namespace RaceControl.Services.F1TV
         {
             _logger.Info($"Querying events for season with UID '{seasonUID}'...");
 
-            var request = _f1tvClient
+            var request = _client
                 .NewRequest(EventOccurrence)
                 .WithField(Event.UIDField)
                 .WithField(Event.NameField)
@@ -103,7 +103,7 @@ namespace RaceControl.Services.F1TV
                 .OrderBy(Event.StartDateField, LarkSortDirection.Ascending)
                 ;
 
-            var events = (await _f1tvClient.GetCollectionAsync<Event>(request)).Objects;
+            var events = (await _client.GetCollectionAsync<Event>(request)).Objects;
             _logger.Info($"Found {events.Count} events.");
 
             return events;
@@ -113,7 +113,7 @@ namespace RaceControl.Services.F1TV
         {
             _logger.Info($"Querying sessions for event with UID '{eventUID}'...");
 
-            var request = _f1tvClient
+            var request = _client
                 .NewRequest(SessionOccurrence)
                 .WithField(Session.UIDField)
                 .WithField(Session.NameField)
@@ -126,7 +126,7 @@ namespace RaceControl.Services.F1TV
                 .OrderBy(Session.StartTimeField, LarkSortDirection.Ascending)
                 ;
 
-            var sessions = (await _f1tvClient.GetCollectionAsync<Session>(request)).Objects;
+            var sessions = (await _client.GetCollectionAsync<Session>(request)).Objects;
             _logger.Info($"Found {sessions.Count} sessions.");
 
             return sessions;
@@ -136,7 +136,7 @@ namespace RaceControl.Services.F1TV
         {
             _logger.Info($"Querying channels for session with UID '{sessionUID}'...");
 
-            var request = _f1tvClient
+            var request = _client
                 .NewRequest(SessionOccurrence, sessionUID)
                 .WithField(Session.ChannelUrlsField, true)
                 .WithSubField(Session.ChannelUrlsField, Channel.UIDField)
@@ -145,7 +145,7 @@ namespace RaceControl.Services.F1TV
                 .WithSubField(Session.ChannelUrlsField, Channel.ChannelTypeField)
                 ;
 
-            var channels = (await _f1tvClient.GetItemAsync<Session>(request)).ChannelUrls;
+            var channels = (await _client.GetItemAsync<Session>(request)).ChannelUrls;
             _logger.Info($"Found {channels.Count} channels.");
 
             return channels;
@@ -155,7 +155,7 @@ namespace RaceControl.Services.F1TV
         {
             _logger.Info($"Querying episodes for session with UID '{sessionUID}'...");
 
-            var request = _f1tvClient
+            var request = _client
                 .NewRequest(SessionOccurrence, sessionUID)
                 .WithField(Session.ContentUrlsField, true)
                 .WithSubField(Session.ContentUrlsField, Episode.UIDField)
@@ -163,7 +163,7 @@ namespace RaceControl.Services.F1TV
                 .WithSubField(Session.ContentUrlsField, Episode.ItemsField)
                 ;
 
-            var episodes = (await _f1tvClient.GetItemAsync<Session>(request)).ContentUrls;
+            var episodes = (await _client.GetItemAsync<Session>(request)).ContentUrls;
             _logger.Info($"Found {episodes.Count} episodes.");
 
             return episodes;
@@ -173,7 +173,7 @@ namespace RaceControl.Services.F1TV
         {
             _logger.Info($"Querying episodes for VOD type with UID '{vodTypeUID}'...");
 
-            var request = _f1tvClient
+            var request = _client
                 .NewRequest(VodTypeTag, vodTypeUID)
                 .WithField(VodType.ContentUrlsField, true)
                 .WithSubField(VodType.ContentUrlsField, Episode.UIDField)
@@ -181,7 +181,7 @@ namespace RaceControl.Services.F1TV
                 .WithSubField(VodType.ContentUrlsField, Episode.ItemsField)
                 ;
 
-            var episodes = (await _f1tvClient.GetItemAsync<VodType>(request)).ContentUrls;
+            var episodes = (await _client.GetItemAsync<VodType>(request)).ContentUrls;
             _logger.Info($"Found {episodes.Count} episodes.");
 
             return episodes;
@@ -190,7 +190,7 @@ namespace RaceControl.Services.F1TV
         public async Task<string> GetTokenisedUrlForChannelAsync(string token, string channelUrl)
         {
             _logger.Info($"Getting tokenised URL for channel with URL '{channelUrl}' using token '{token}'...");
-            var url = (await _f1tvClient.GetTokenisedUrlForChannelAsync(token, channelUrl)).Url;
+            var url = (await _client.GetTokenisedUrlForChannelAsync(token, channelUrl)).Url;
             _logger.Info($"Got tokenised URL '{url}'.");
 
             return url;
@@ -199,7 +199,7 @@ namespace RaceControl.Services.F1TV
         public async Task<string> GetTokenisedUrlForAssetAsync(string token, string assetUrl)
         {
             _logger.Info($"Getting tokenised URL for asset with URL '{assetUrl}' using token '{token}'...");
-            var url = (await _f1tvClient.GetTokenisedUrlForAssetAsync(token, assetUrl)).Objects.First().TokenisedUrl.Url;
+            var url = (await _client.GetTokenisedUrlForAssetAsync(token, assetUrl)).Objects.First().TokenisedUrl.Url;
             _logger.Info($"Got tokenised URL '{url}'.");
 
             return url;

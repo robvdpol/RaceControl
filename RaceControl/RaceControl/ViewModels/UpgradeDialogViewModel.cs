@@ -23,7 +23,7 @@ namespace RaceControl.ViewModels
         public override void OnDialogOpened(IDialogParameters parameters)
         {
             base.OnDialogOpened(parameters);
-            Release = parameters.GetValue<Release>(ParameterNames.Release);
+            Release = parameters.GetValue<Release>(ParameterNames.RELEASE);
             Title = Release.Name;
         }
 
