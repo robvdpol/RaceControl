@@ -4,6 +4,7 @@ using Prism.Commands;
 using Prism.Events;
 using Prism.Services.Dialogs;
 using RaceControl.Core.Mvvm;
+using RaceControl.Enums;
 using RaceControl.Events;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Streamlink;
@@ -95,7 +96,7 @@ namespace RaceControl.ViewModels
         public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<string>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => IsLive);
         public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => IsLive);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand(ToggleFullScreenExecute);
-        public ICommand MoveAndResizeCommand => _moveAndResizeCommand ??= new DelegateCommand<string>(MoveAndResizeExecute, CanMoveAndResizeExecute).ObservesProperty(() => FullScreen);
+        public ICommand MoveAndResizeCommand => _moveAndResizeCommand ??= new DelegateCommand<WindowLocation?>(MoveAndResizeExecute, CanMoveAndResizeExecute).ObservesProperty(() => FullScreen);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
         public ICommand ScanChromecastCommand => _scanChromecastCommand ??= new DelegateCommand(ScanChromecastExecute, CanScanChromecastExecute).ObservesProperty(() => RendererDiscoverer);
         public ICommand StartCastVideoCommand => _startCastVideoCommand ??= new DelegateCommand(StartCastVideoExecute, CanStartCastVideoExecute).ObservesProperty(() => SelectedRendererItem);
@@ -461,22 +462,42 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private bool CanMoveAndResizeExecute(string location)
+        private bool CanMoveAndResizeExecute(WindowLocation? location)
         {
             return !FullScreen;
         }
 
-        private void MoveAndResizeExecute(string location)
+        private void MoveAndResizeExecute(WindowLocation? location)
         {
-            var screen = Screen.FromRectangle(new Rectangle((int)Left, (int)Top, (int)Width, (int)Height));
-            var scaleRatio = Math.Max(Screen.PrimaryScreen.WorkingArea.Width / SystemParameters.PrimaryScreenWidth, Screen.PrimaryScreen.WorkingArea.Height / SystemParameters.PrimaryScreenHeight);
-            Width = screen.WorkingArea.Width / 2D / scaleRatio;
-            Height = screen.WorkingArea.Height / 2D / scaleRatio;
+            ResizeMode = ResizeMode.NoResize;
 
-            if (location == "TL")
+            var screen = Screen.FromRectangle(new Rectangle((int)Left, (int)Top, (int)Width, (int)Height));
+            var scale = Math.Max(Screen.PrimaryScreen.WorkingArea.Width / SystemParameters.PrimaryScreenWidth, Screen.PrimaryScreen.WorkingArea.Height / SystemParameters.PrimaryScreenHeight);
+
+            Width = screen.WorkingArea.Width / scale / 2D;
+            Height = screen.WorkingArea.Height / scale / 2D;
+
+            switch (location)
             {
-                Top = screen.WorkingArea.Top / scaleRatio;
-                Left = screen.WorkingArea.Left / scaleRatio;
+                case WindowLocation.TopLeft:
+                    Top = screen.WorkingArea.Top / scale;
+                    Left = screen.WorkingArea.Left / scale;
+                    break;
+
+                case WindowLocation.TopRight:
+                    Top = screen.WorkingArea.Top / scale;
+                    Left = (screen.WorkingArea.Left + (screen.WorkingArea.Width / 2D)) / scale;
+                    break;
+
+                case WindowLocation.BottomLeft:
+                    Top = (screen.WorkingArea.Top + (screen.WorkingArea.Height / 2D)) / scale;
+                    Left = screen.WorkingArea.Left / scale;
+                    break;
+
+                case WindowLocation.BottomRight:
+                    Top = (screen.WorkingArea.Top + (screen.WorkingArea.Height / 2D)) / scale;
+                    Left = (screen.WorkingArea.Left + (screen.WorkingArea.Width / 2D)) / scale;
+                    break;
             }
         }
 

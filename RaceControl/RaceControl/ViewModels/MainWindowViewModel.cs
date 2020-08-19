@@ -636,7 +636,7 @@ namespace RaceControl.ViewModels
         private async Task LoadVodTypesAsync()
         {
             var vodTypes = await _apiService.GetVodTypesAsync();
-            VodTypes.AddRange(vodTypes);
+            VodTypes.AddRange(vodTypes.Where(vt => vt.ContentUrls.Any()));
         }
 
         private async Task RefreshLiveSessionsAsync()
