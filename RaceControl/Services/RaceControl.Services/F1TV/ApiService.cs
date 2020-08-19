@@ -62,7 +62,7 @@ namespace RaceControl.Services.F1TV
                 .WithField(Season.HasContentField)
                 .WithField(Season.YearField)
                 .WithFilter(Season.YearField, LarkFilterType.GreaterThan, 2017.ToString())
-                .WithFilter(Season.HasContentField, LarkFilterType.Equals, true.ToString().ToLower())
+                .WithFilter(Season.HasContentField, LarkFilterType.Equals, bool.TrueString.ToLower())
                 .OrderBy(Season.YearField, LarkSortDirection.Descending)
                 ;
 
@@ -96,9 +96,9 @@ namespace RaceControl.Services.F1TV
                 .NewRequest(EventOccurrence)
                 .WithField(Event.UIDField)
                 .WithField(Event.NameField)
-                .WithField(Event.OfficialNameField)
                 .WithField(Event.StartDateField)
                 .WithField(Event.EndDateField)
+                .WithField(Event.RaceSeasonUrlField)
                 .WithFilter(Event.RaceSeasonUrlField, LarkFilterType.Equals, seasonUID)
                 .OrderBy(Event.StartDateField, LarkSortDirection.Ascending)
                 ;

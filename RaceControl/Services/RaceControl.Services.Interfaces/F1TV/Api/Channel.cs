@@ -37,9 +37,10 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
 
                 case "data":
                     return "Live Timing";
-            }
 
-            return Name;
+                default:
+                    return Name;
+            }
         }
     }
 }
