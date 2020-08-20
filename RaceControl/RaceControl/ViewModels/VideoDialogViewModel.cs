@@ -38,6 +38,7 @@ namespace RaceControl.ViewModels
         private ICommand _mouseMoveVideoCommand;
         private ICommand _mouseEnterVideoCommand;
         private ICommand _mouseLeaveVideoCommand;
+        private ICommand _mouseMoveControlBarCommand;
         private ICommand _mouseEnterControlBarCommand;
         private ICommand _mouseLeaveControlBarCommand;
         private ICommand _togglePauseCommand;
@@ -88,6 +89,7 @@ namespace RaceControl.ViewModels
         public ICommand MouseMoveVideoCommand => _mouseMoveVideoCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveVideoExecute);
         public ICommand MouseEnterVideoCommand => _mouseEnterVideoCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveVideoExecute);
         public ICommand MouseLeaveVideoCommand => _mouseLeaveVideoCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveVideoExecute);
+        public ICommand MouseMoveControlBarCommand => _mouseMoveControlBarCommand ??= new DelegateCommand(MouseMoveControlBarExecute);
         public ICommand MouseEnterControlBarCommand => _mouseEnterControlBarCommand ??= new DelegateCommand(MouseEnterControlBarExecute);
         public ICommand MouseLeaveControlBarCommand => _mouseLeaveControlBarCommand ??= new DelegateCommand(MouseLeaveControlBarExecute);
         public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute);
@@ -382,6 +384,14 @@ namespace RaceControl.ViewModels
             });
 
             _showControlsTimer.Start();
+        }
+
+        private static void MouseMoveControlBarExecute()
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Mouse.OverrideCursor = null;
+            });
         }
 
         private void MouseEnterControlBarExecute()

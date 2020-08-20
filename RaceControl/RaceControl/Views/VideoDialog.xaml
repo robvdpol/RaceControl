@@ -71,6 +71,9 @@
                 Background="White"
                 Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseMove">
+                        <i:InvokeCommandAction Command="{Binding MouseMoveControlBarCommand}" />
+                    </i:EventTrigger>
                     <i:EventTrigger EventName="MouseEnter">
                         <i:InvokeCommandAction Command="{Binding MouseEnterControlBarCommand}" />
                     </i:EventTrigger>
