@@ -11,6 +11,7 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <core:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <core:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
         <core:ResizeModeToBooleanConverter x:Key="ResizeModeToBooleanConverter" />
         <Style x:Key="ControlBarButtonStyle" TargetType="Button">
             <Setter Property="Margin" Value="2" />
@@ -263,7 +264,7 @@
                         VerticalAlignment="Center"
                         Content="Resizable window (uncheck to hide borders)"
                         IsChecked="{Binding ResizeMode, Converter={StaticResource ResizeModeToBooleanConverter}}"
-                        IsEnabled="{Binding FullScreen, Converter={StaticResource InverseBooleanConverter}}" />
+                        IsEnabled="{Binding WindowState, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static WindowState.Normal}}" />
                     <StackPanel
                         Grid.Row="1"
                         Grid.Column="2"

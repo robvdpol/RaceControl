@@ -69,7 +69,6 @@ namespace RaceControl.ViewModels
         private ObservableCollection<RendererItem> _rendererItems;
         private RendererItem _selectedRendererItem;
         private bool _showControls;
-        private bool _fullScreen;
         private double _top;
         private double _left;
         private double _width = 1200;
@@ -96,7 +95,7 @@ namespace RaceControl.ViewModels
         public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<string>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => IsLive);
         public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => IsLive);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand(ToggleFullScreenExecute);
-        public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => FullScreen);
+        public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => WindowState);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
         public ICommand ScanChromecastCommand => _scanChromecastCommand ??= new DelegateCommand(ScanChromecastExecute, CanScanChromecastExecute).ObservesProperty(() => RendererDiscoverer);
         public ICommand StartCastVideoCommand => _startCastVideoCommand ??= new DelegateCommand(StartCastVideoExecute, CanStartCastVideoExecute).ObservesProperty(() => SelectedRendererItem);
@@ -178,12 +177,6 @@ namespace RaceControl.ViewModels
         {
             get => _showControls;
             set => SetProperty(ref _showControls, value);
-        }
-
-        public bool FullScreen
-        {
-            get => _fullScreen;
-            set => SetProperty(ref _fullScreen, value);
         }
 
         public double Top
@@ -452,7 +445,7 @@ namespace RaceControl.ViewModels
 
         private void ToggleFullScreenExecute()
         {
-            if (!FullScreen)
+            if (WindowState != WindowState.Maximized)
             {
                 SetFullScreen();
             }
@@ -464,7 +457,7 @@ namespace RaceControl.ViewModels
 
         private bool CanMoveToCornerExecute(WindowLocation? location)
         {
-            return !FullScreen;
+            return WindowState != WindowState.Maximized && location != null;
         }
 
         private void MoveToCornerExecute(WindowLocation? location)
@@ -569,13 +562,11 @@ namespace RaceControl.ViewModels
 
         private void SetWindowed()
         {
-            FullScreen = false;
             WindowState = WindowState.Normal;
         }
 
         private void SetFullScreen()
         {
-            FullScreen = true;
             ResizeMode = ResizeMode.NoResize;
             WindowState = WindowState.Maximized;
         }
