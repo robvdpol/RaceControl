@@ -32,7 +32,6 @@ namespace RaceControl.ViewModels
         private readonly IGithubService _githubService;
         private readonly ICredentialService _credentialService;
         private readonly IStreamlinkLauncher _streamlinkLauncher;
-        private readonly Timer _refreshLiveSessionsTimer = new Timer(60000) { AutoReset = false };
 
         private ICommand _loadedCommand;
         private ICommand _closingCommand;
@@ -70,6 +69,7 @@ namespace RaceControl.ViewModels
         private Session _selectedLiveSession;
         private Session _selectedSession;
         private VodType _selectedVodType;
+        private Timer _refreshLiveSessionsTimer;
 
         public MainWindowViewModel(
             ILogger logger,
@@ -209,9 +209,9 @@ namespace RaceControl.ViewModels
 
         private async void RefreshLiveSessionsTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            _refreshLiveSessionsTimer.Stop();
+            _refreshLiveSessionsTimer?.Stop();
             await RefreshLiveSessionsAsync();
-            _refreshLiveSessionsTimer.Start();
+            _refreshLiveSessionsTimer?.Start();
         }
 
         private async void LoadedExecute(RoutedEventArgs args)
@@ -245,6 +245,7 @@ namespace RaceControl.ViewModels
             _refreshLiveSessionsTimer.Stop();
             _refreshLiveSessionsTimer.Elapsed -= RefreshLiveSessionsTimer_Elapsed;
             _refreshLiveSessionsTimer.Dispose();
+            _refreshLiveSessionsTimer = null;
         }
 
         private static void MouseMoveExecute()
@@ -547,6 +548,7 @@ namespace RaceControl.ViewModels
             await LoadInitialDataAsync();
             IsBusy = false;
 
+            _refreshLiveSessionsTimer = new Timer(60000) { AutoReset = false };
             _refreshLiveSessionsTimer.Elapsed += RefreshLiveSessionsTimer_Elapsed;
             _refreshLiveSessionsTimer.Start();
         }

@@ -31,7 +31,6 @@ namespace RaceControl.ViewModels
         private readonly IApiService _apiService;
         private readonly IStreamlinkLauncher _streamlinkLauncher;
         private readonly LibVLC _libVLC;
-        private readonly Timer _showControlsTimer = new Timer(2000) { AutoReset = false };
         private readonly Guid _uniqueIdentifier = Guid.NewGuid();
 
         private ICommand _mouseDownVideoCommand;
@@ -69,6 +68,7 @@ namespace RaceControl.ViewModels
         private RendererDiscoverer _rendererDiscoverer;
         private ObservableCollection<RendererItem> _rendererItems;
         private RendererItem _selectedRendererItem;
+        private Timer _showControlsTimer;
         private bool _showControls;
         private double _top;
         private double _left;
@@ -248,8 +248,8 @@ namespace RaceControl.ViewModels
             CreateMediaPlayer();
             StartPlayback();
 
+            _showControlsTimer = new Timer(2000) { AutoReset = false };
             _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
-            _showControlsTimer.Start();
 
             _eventAggregator.GetEvent<SyncStreamsEvent>().Subscribe(OnSyncSession);
         }
@@ -263,6 +263,7 @@ namespace RaceControl.ViewModels
             _showControlsTimer.Stop();
             _showControlsTimer.Elapsed -= ShowControlsTimer_Elapsed;
             _showControlsTimer.Dispose();
+            _showControlsTimer = null;
 
             StopPlayback();
             RemoveMediaPlayer();
@@ -375,7 +376,7 @@ namespace RaceControl.ViewModels
 
         private void MouseEnterOrLeaveOrMoveVideoExecute()
         {
-            _showControlsTimer.Stop();
+            _showControlsTimer?.Stop();
 
             Application.Current.Dispatcher.Invoke(() =>
             {
@@ -383,7 +384,7 @@ namespace RaceControl.ViewModels
                 Mouse.OverrideCursor = null;
             });
 
-            _showControlsTimer.Start();
+            _showControlsTimer?.Start();
         }
 
         private static void MouseMoveControlBarExecute()
@@ -396,12 +397,12 @@ namespace RaceControl.ViewModels
 
         private void MouseEnterControlBarExecute()
         {
-            _showControlsTimer.Stop();
+            _showControlsTimer?.Stop();
         }
 
         private void MouseLeaveControlBarExecute()
         {
-            _showControlsTimer.Start();
+            _showControlsTimer?.Start();
         }
 
         private void TogglePauseExecute()
