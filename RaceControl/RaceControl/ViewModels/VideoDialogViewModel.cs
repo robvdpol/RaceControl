@@ -45,7 +45,7 @@ namespace RaceControl.ViewModels
         private ICommand _fastForwardCommand;
         private ICommand _syncSessionCommand;
         private ICommand _toggleFullScreenCommand;
-        private ICommand _moveAndResizeCommand;
+        private ICommand _moveToCornerCommand;
         private ICommand _audioTrackSelectionChangedCommand;
         private ICommand _scanChromecastCommand;
         private ICommand _startCastVideoCommand;
@@ -96,7 +96,7 @@ namespace RaceControl.ViewModels
         public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<string>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => IsLive);
         public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => IsLive);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand(ToggleFullScreenExecute);
-        public ICommand MoveAndResizeCommand => _moveAndResizeCommand ??= new DelegateCommand<WindowLocation?>(MoveAndResizeExecute, CanMoveAndResizeExecute).ObservesProperty(() => FullScreen);
+        public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => FullScreen);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
         public ICommand ScanChromecastCommand => _scanChromecastCommand ??= new DelegateCommand(ScanChromecastExecute, CanScanChromecastExecute).ObservesProperty(() => RendererDiscoverer);
         public ICommand StartCastVideoCommand => _startCastVideoCommand ??= new DelegateCommand(StartCastVideoExecute, CanStartCastVideoExecute).ObservesProperty(() => SelectedRendererItem);
@@ -462,43 +462,46 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private bool CanMoveAndResizeExecute(WindowLocation? location)
+        private bool CanMoveToCornerExecute(WindowLocation? location)
         {
             return !FullScreen;
         }
 
-        private void MoveAndResizeExecute(WindowLocation? location)
+        private void MoveToCornerExecute(WindowLocation? location)
         {
-            ResizeMode = ResizeMode.NoResize;
-
             var screen = Screen.FromRectangle(new Rectangle((int)Left, (int)Top, (int)Width, (int)Height));
             var scale = Math.Max(Screen.PrimaryScreen.WorkingArea.Width / SystemParameters.PrimaryScreenWidth, Screen.PrimaryScreen.WorkingArea.Height / SystemParameters.PrimaryScreenHeight);
-
-            Width = screen.WorkingArea.Width / scale / 2D;
-            Height = screen.WorkingArea.Height / scale / 2D;
+            var top = screen.WorkingArea.Top / scale;
+            var left = screen.WorkingArea.Left / scale;
+            var width = screen.WorkingArea.Width / 2D / scale;
+            var height = screen.WorkingArea.Height / 2D / scale;
 
             switch (location)
             {
                 case WindowLocation.TopLeft:
-                    Top = screen.WorkingArea.Top / scale;
-                    Left = screen.WorkingArea.Left / scale;
+                    Top = top;
+                    Left = left;
                     break;
 
                 case WindowLocation.TopRight:
-                    Top = screen.WorkingArea.Top / scale;
-                    Left = (screen.WorkingArea.Left + (screen.WorkingArea.Width / 2D)) / scale;
+                    Top = top;
+                    Left = left + width;
                     break;
 
                 case WindowLocation.BottomLeft:
-                    Top = (screen.WorkingArea.Top + (screen.WorkingArea.Height / 2D)) / scale;
-                    Left = screen.WorkingArea.Left / scale;
+                    Top = top + height;
+                    Left = left;
                     break;
 
                 case WindowLocation.BottomRight:
-                    Top = (screen.WorkingArea.Top + (screen.WorkingArea.Height / 2D)) / scale;
-                    Left = (screen.WorkingArea.Left + (screen.WorkingArea.Width / 2D)) / scale;
+                    Top = top + height;
+                    Left = left + width;
                     break;
             }
+
+            Width = width;
+            Height = height;
+            ResizeMode = ResizeMode.NoResize;
         }
 
         private void AudioTrackSelectionChangedExecute(SelectionChangedEventArgs args)
