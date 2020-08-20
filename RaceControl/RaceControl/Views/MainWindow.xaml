@@ -248,7 +248,7 @@
                                 ToolTip="Use when regular live streams do not work" />
                             <CheckBox
                                 Margin="3"
-                                Content="Record live streams to file system"
+                                Content="Record live streams"
                                 IsChecked="{Binding VideoSettings.EnableRecording}"
                                 ToolTip="Save a copy of watched live streams to the file system" />
                             <TextBlock Margin="3" Text="Recording location:" />

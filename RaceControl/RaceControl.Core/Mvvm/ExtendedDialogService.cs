@@ -1,4 +1,5 @@
-﻿using Prism.Ioc;
+﻿using Microsoft.WindowsAPICodePack.Dialogs;
+using Prism.Ioc;
 using Prism.Services.Dialogs;
 using System;
 
@@ -8,6 +9,30 @@ namespace RaceControl.Core.Mvvm
     {
         public ExtendedDialogService(IContainerExtension containerExtension) : base(containerExtension)
         {
+        }
+
+        public bool SelectFolder(string title, string initialDirectory, out string folder)
+        {
+            folder = null;
+
+            var dialog = new CommonOpenFileDialog
+            {
+                Title = title,
+                DefaultDirectory = initialDirectory,
+                InitialDirectory = initialDirectory,
+                IsFolderPicker = true,
+                Multiselect = false,
+                AllowNonFileSystemItems = true
+            };
+
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                folder = dialog.FileName;
+
+                return true;
+            }
+
+            return false;
         }
 
         public void Show(string name, IDialogParameters parameters, Action<IDialogResult> callback, bool hasOwner)

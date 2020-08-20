@@ -9,5 +9,9 @@
         bool EnableRecording { get; set; }
 
         string RecordingLocation { get; set; }
+
+        void Load();
+
+        void Save();
     }
 }

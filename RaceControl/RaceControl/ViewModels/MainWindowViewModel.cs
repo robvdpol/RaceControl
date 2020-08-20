@@ -207,6 +207,8 @@ namespace RaceControl.ViewModels
 
         private async void LoadedExecute(RoutedEventArgs args)
         {
+            VideoSettings.Load();
+
             try
             {
                 await CheckForUpdatesAsync();
@@ -237,6 +239,8 @@ namespace RaceControl.ViewModels
             _refreshLiveSessionsTimer.Elapsed -= RefreshLiveSessionsTimer_Elapsed;
             _refreshLiveSessionsTimer.Dispose();
             _refreshLiveSessionsTimer = null;
+
+            VideoSettings.Save();
         }
 
         private static void MouseMoveExecute()
@@ -505,7 +509,10 @@ namespace RaceControl.ViewModels
 
         private void SetRecordingLocationExecute()
         {
-            // todo
+            if (_dialogService.SelectFolder("Select a recording location", VideoSettings.RecordingLocation, out var recordingLocation))
+            {
+                VideoSettings.RecordingLocation = recordingLocation;
+            }
         }
 
         private async void DeleteCredentialExecute()
