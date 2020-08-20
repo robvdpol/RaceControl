@@ -214,8 +214,17 @@ namespace RaceControl.ViewModels
             _refreshLiveSessionsTimer.Start();
         }
 
-        private void LoadedExecute(RoutedEventArgs args)
+        private async void LoadedExecute(RoutedEventArgs args)
         {
+            try
+            {
+                await CheckForUpdatesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "An exception occurred while checking for updates.");
+            }
+
             _dialogService.ShowDialog(nameof(LoginDialog), null, async dialogResult =>
             {
                 if (dialogResult.Result == ButtonResult.OK)
@@ -532,16 +541,6 @@ namespace RaceControl.ViewModels
         private async Task InitializeAsync(string token)
         {
             IsBusy = true;
-
-            try
-            {
-                await CheckForUpdatesAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, "An exception occurred while checking for updates.");
-            }
-
             SetToken(token);
             SetVlcExeLocation();
             SetMpvExeLocation();
