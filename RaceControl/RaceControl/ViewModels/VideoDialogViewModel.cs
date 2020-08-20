@@ -462,6 +462,8 @@ namespace RaceControl.ViewModels
 
         private void MoveToCornerExecute(WindowLocation? location)
         {
+            ResizeMode = ResizeMode.NoResize;
+
             var screen = Screen.FromRectangle(new Rectangle((int)Left, (int)Top, (int)Width, (int)Height));
             var scale = Math.Max(Screen.PrimaryScreen.WorkingArea.Width / SystemParameters.PrimaryScreenWidth, Screen.PrimaryScreen.WorkingArea.Height / SystemParameters.PrimaryScreenHeight);
             var top = screen.WorkingArea.Top / scale;
@@ -494,7 +496,6 @@ namespace RaceControl.ViewModels
 
             Width = width;
             Height = height;
-            ResizeMode = ResizeMode.NoResize;
         }
 
         private void AudioTrackSelectionChangedExecute(SelectionChangedEventArgs args)
@@ -560,15 +561,15 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void SetWindowed()
-        {
-            WindowState = WindowState.Normal;
-        }
-
         private void SetFullScreen()
         {
             ResizeMode = ResizeMode.NoResize;
             WindowState = WindowState.Maximized;
+        }
+
+        private void SetWindowed()
+        {
+            WindowState = WindowState.Normal;
         }
 
         private void SetMediaPlayerTime(long time, bool mustBePlaying = false)
