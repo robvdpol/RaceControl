@@ -16,7 +16,9 @@
         <Style x:Key="HeaderLabelStyle" TargetType="Label">
             <Setter Property="Margin" Value="2" />
             <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="Background" Value="LightGray" />
+            <Setter Property="Background" Value="#DDDDDD" />
+            <Setter Property="BorderBrush" Value="#ABADB3" />
+            <Setter Property="BorderThickness" Value="1" />
         </Style>
         <Style x:Key="ContentListViewStyle" TargetType="ListView">
             <Setter Property="Margin" Value="2" />

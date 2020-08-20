@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     HorizontalAlignment="Stretch"
     VerticalAlignment="Stretch"
-    Background="#40D3D3D3">
+    Background="#60DDDDDD">
     <Viewbox
         Width="50"
         Height="50"
