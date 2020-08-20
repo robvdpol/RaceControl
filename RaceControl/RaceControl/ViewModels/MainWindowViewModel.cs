@@ -344,7 +344,7 @@ namespace RaceControl.ViewModels
                 { ParameterNames.CONTENT_TYPE, ContentType.Channel },
                 { ParameterNames.CONTENT_URL, channel.Self },
                 { ParameterNames.SYNC_UID, session.UID },
-                { ParameterNames.TITLE, $"{session} - {channel}" },
+                { ParameterNames.TITLE, GetTitle(session, channel) },
                 { ParameterNames.IS_LIVE, session.IsLive },
                 { ParameterNames.LOW_QUALITY_MODE, LowQualityMode },
                 { ParameterNames.USE_ALTERNATIVE_STREAM, UseAlternativeStream },
@@ -363,7 +363,7 @@ namespace RaceControl.ViewModels
                 { ParameterNames.CONTENT_TYPE, ContentType.Asset },
                 { ParameterNames.CONTENT_URL, episode.Items.First() },
                 { ParameterNames.SYNC_UID, episode.UID },
-                { ParameterNames.TITLE, episode.ToString() },
+                { ParameterNames.TITLE, GetTitle(episode) },
                 { ParameterNames.IS_LIVE, false },
                 { ParameterNames.LOW_QUALITY_MODE, LowQualityMode },
                 { ParameterNames.USE_ALTERNATIVE_STREAM, UseAlternativeStream },
@@ -383,7 +383,7 @@ namespace RaceControl.ViewModels
         {
             IsBusy = true;
             var session = GetCurrentSession();
-            var title = $"{session} - {channel}";
+            var title = GetTitle(session, channel);
 
             try
             {
@@ -407,7 +407,7 @@ namespace RaceControl.ViewModels
         private async void WatchVlcEpisodeExecute(Episode episode)
         {
             IsBusy = true;
-            var title = episode.ToString();
+            var title = GetTitle(episode);
 
             try
             {
@@ -432,7 +432,7 @@ namespace RaceControl.ViewModels
         {
             IsBusy = true;
             var session = GetCurrentSession();
-            var title = $"{session} - {channel}";
+            var title = GetTitle(session, channel);
 
             try
             {
@@ -456,7 +456,7 @@ namespace RaceControl.ViewModels
         private async void WatchMpvEpisodeExecute(Episode episode)
         {
             IsBusy = true;
-            var title = episode.ToString();
+            var title = GetTitle(episode);
 
             try
             {
@@ -735,5 +735,9 @@ namespace RaceControl.ViewModels
         }
 
         private Session GetCurrentSession() => SelectedLiveSession ?? SelectedSession;
+
+        private static string GetTitle(Session session, Channel channel) => $"{session.SessionName} - {channel}";
+
+        private static string GetTitle(Episode episode) => $"{episode}";
     }
 }
