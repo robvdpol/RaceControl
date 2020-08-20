@@ -2,6 +2,7 @@
 using NLog;
 using Prism.Commands;
 using Prism.Services.Dialogs;
+using RaceControl.Common.Settings;
 using RaceControl.Common.Utils;
 using RaceControl.Comparers;
 using RaceControl.Core.Helpers;
@@ -51,12 +52,10 @@ namespace RaceControl.ViewModels
         private ICommand _copyUrlEpisodeCommand;
         private ICommand _deleteCredentialCommand;
 
+        private IVideoSettings _videoSettings;
         private string _token;
         private string _vlcExeLocation;
         private string _mpvExeLocation;
-        private bool _lowQualityMode;
-        private bool _useAlternativeStream;
-        private bool _enableRecording;
         private ObservableCollection<Season> _seasons;
         private ObservableCollection<Event> _events;
         private ObservableCollection<Session> _sessions;
@@ -77,7 +76,8 @@ namespace RaceControl.ViewModels
             IApiService apiService,
             IGithubService githubService,
             ICredentialService credentialService,
-            IStreamlinkLauncher streamlinkLauncher)
+            IStreamlinkLauncher streamlinkLauncher,
+            IVideoSettings videoSettings)
         {
             _logger = logger;
             _dialogService = dialogService;
@@ -85,6 +85,7 @@ namespace RaceControl.ViewModels
             _githubService = githubService;
             _credentialService = credentialService;
             _streamlinkLauncher = streamlinkLauncher;
+            _videoSettings = videoSettings;
         }
 
         public ICommand LoadedCommand => _loadedCommand ??= new DelegateCommand<RoutedEventArgs>(LoadedExecute);
@@ -105,6 +106,12 @@ namespace RaceControl.ViewModels
         public ICommand CopyUrlEpisodeCommand => _copyUrlEpisodeCommand ??= new DelegateCommand<Episode>(CopyUrlEpisodeExecute);
         public ICommand DeleteCredentialCommand => _deleteCredentialCommand ??= new DelegateCommand(DeleteCredentialExecute);
 
+        public IVideoSettings VideoSettings
+        {
+            get => _videoSettings;
+            set => SetProperty(ref _videoSettings, value);
+        }
+
         public string VlcExeLocation
         {
             get => _vlcExeLocation;
@@ -115,24 +122,6 @@ namespace RaceControl.ViewModels
         {
             get => _mpvExeLocation;
             set => SetProperty(ref _mpvExeLocation, value);
-        }
-
-        public bool LowQualityMode
-        {
-            get => _lowQualityMode;
-            set => SetProperty(ref _lowQualityMode, value);
-        }
-
-        public bool UseAlternativeStream
-        {
-            get => _useAlternativeStream;
-            set => SetProperty(ref _useAlternativeStream, value);
-        }
-
-        public bool EnableRecording
-        {
-            get => _enableRecording;
-            set => SetProperty(ref _enableRecording, value);
         }
 
         public ObservableCollection<Season> Seasons
@@ -355,10 +344,7 @@ namespace RaceControl.ViewModels
                 { ParameterNames.CONTENT_URL, channel.Self },
                 { ParameterNames.SYNC_UID, session.UID },
                 { ParameterNames.TITLE, GetTitle(session, channel) },
-                { ParameterNames.IS_LIVE, session.IsLive },
-                { ParameterNames.LOW_QUALITY_MODE, LowQualityMode },
-                { ParameterNames.USE_ALTERNATIVE_STREAM, UseAlternativeStream },
-                { ParameterNames.ENABLE_RECORDING, EnableRecording }
+                { ParameterNames.IS_LIVE, session.IsLive }
             };
 
             _logger.Info($"Starting internal player for channel with parameters: '{parameters}'.");
@@ -374,10 +360,7 @@ namespace RaceControl.ViewModels
                 { ParameterNames.CONTENT_URL, episode.Items.First() },
                 { ParameterNames.SYNC_UID, episode.UID },
                 { ParameterNames.TITLE, GetTitle(episode) },
-                { ParameterNames.IS_LIVE, false },
-                { ParameterNames.LOW_QUALITY_MODE, LowQualityMode },
-                { ParameterNames.USE_ALTERNATIVE_STREAM, UseAlternativeStream },
-                { ParameterNames.ENABLE_RECORDING, EnableRecording }
+                { ParameterNames.IS_LIVE, false }
             };
 
             _logger.Info($"Starting internal player for episode with parameters: '{parameters}'.");
@@ -691,7 +674,7 @@ namespace RaceControl.ViewModels
         {
             if (isLive)
             {
-                _streamlinkLauncher.StartStreamlinkVlc(VlcExeLocation, url, LowQualityMode, UseAlternativeStream, EnableRecording, title);
+                _streamlinkLauncher.StartStreamlinkVlc(VlcExeLocation, url, title);
             }
             else
             {
@@ -703,7 +686,7 @@ namespace RaceControl.ViewModels
         {
             if (isLive)
             {
-                _streamlinkLauncher.StartStreamlinkMpv(MpvExeLocation, url, LowQualityMode, UseAlternativeStream, EnableRecording, title);
+                _streamlinkLauncher.StartStreamlinkMpv(MpvExeLocation, url, title);
             }
             else
             {

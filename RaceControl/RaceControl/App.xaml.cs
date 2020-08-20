@@ -7,6 +7,7 @@ using NLog.Targets;
 using Prism.DryIoc;
 using Prism.Ioc;
 using RaceControl.Common;
+using RaceControl.Common.Settings;
 using RaceControl.Core.Helpers;
 using RaceControl.Core.Mvvm;
 using RaceControl.Services;
@@ -56,6 +57,7 @@ namespace RaceControl
             containerRegistry.RegisterSingleton<IExtendedDialogService, ExtendedDialogService>();
             containerRegistry.RegisterSingleton<IChildProcessTracker, ChildProcessTracker>();
             containerRegistry.RegisterSingleton<IRestClient, RestClient>();
+            containerRegistry.RegisterSingleton<IVideoSettings, VideoSettings>();
             containerRegistry.Register<IAuthorizationService, AuthorizationService>();
             containerRegistry.Register<IF1TVClient, F1TVClient>();
             containerRegistry.Register<IApiService, ApiService>();

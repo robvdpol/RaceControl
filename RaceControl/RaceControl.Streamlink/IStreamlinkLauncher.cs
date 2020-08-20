@@ -4,12 +4,12 @@ namespace RaceControl.Streamlink
 {
     public interface IStreamlinkLauncher
     {
-        Process StartStreamlinkExternal(string streamUrl, out string streamlinkUrl, bool lowQualityMode, bool useAlternativeStream);
+        Process StartStreamlinkExternal(string streamUrl, out string streamlinkUrl);
 
-        Process StartStreamlinkRecording(string streamUrl, bool lowQualityMode, bool useAlternativeStream, string title);
+        Process StartStreamlinkRecording(string streamUrl, string title);
 
-        void StartStreamlinkVlc(string vlcExeLocation, string streamUrl, bool lowQualityMode, bool useAlternativeStream, bool enableRecording, string title);
+        void StartStreamlinkVlc(string vlcExeLocation, string streamUrl, string title);
 
-        void StartStreamlinkMpv(string mpvExeLocation, string streamUrl, bool lowQualityMode, bool useAlternativeStream, bool enableRecording, string title);
+        void StartStreamlinkMpv(string mpvExeLocation, string streamUrl, string title);
     }
 }

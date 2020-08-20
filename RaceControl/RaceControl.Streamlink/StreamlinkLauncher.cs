@@ -1,5 +1,6 @@
 ﻿using NLog;
 using RaceControl.Common;
+using RaceControl.Common.Settings;
 using RaceControl.Common.Utils;
 using System;
 using System.Diagnostics;
@@ -12,18 +13,20 @@ namespace RaceControl.Streamlink
         private static readonly string StreamlinkBatchLocation = Path.Combine(Environment.CurrentDirectory, @"streamlink\streamlink.bat");
 
         private readonly ILogger _logger;
+        private readonly IVideoSettings _videoSettings;
         private readonly IChildProcessTracker _childProcessTracker;
 
-        public StreamlinkLauncher(ILogger logger, IChildProcessTracker childProcessTracker)
+        public StreamlinkLauncher(ILogger logger, IVideoSettings videoSettings, IChildProcessTracker childProcessTracker)
         {
             _logger = logger;
+            _videoSettings = videoSettings;
             _childProcessTracker = childProcessTracker;
         }
 
-        public Process StartStreamlinkExternal(string streamUrl, out string streamlinkUrl, bool lowQualityMode, bool useAlternativeStream)
+        public Process StartStreamlinkExternal(string streamUrl, out string streamlinkUrl)
         {
             var port = SocketUtils.GetFreePort();
-            var streamIdentifier = GetStreamIdentifier(lowQualityMode, useAlternativeStream);
+            var streamIdentifier = GetStreamIdentifier();
             var streamlinkArguments = $"--player-external-http --player-external-http-port {port} --hls-audio-select * \"{streamUrl}\" {streamIdentifier}";
 
             _logger.Info($"Starting external Streamlink-instance for stream-URL '{streamUrl}' with identifier '{streamIdentifier}' on port '{port}'...");
@@ -35,9 +38,9 @@ namespace RaceControl.Streamlink
             return process;
         }
 
-        public Process StartStreamlinkRecording(string streamUrl, bool lowQualityMode, bool useAlternativeStream, string title)
+        public Process StartStreamlinkRecording(string streamUrl, string title)
         {
-            var streamIdentifier = GetStreamIdentifier(lowQualityMode, useAlternativeStream);
+            var streamIdentifier = GetStreamIdentifier();
             var recordingFilename = GetRecordingFilename(title);
             var streamlinkArguments = $"--output \"{recordingFilename}\" --force --hls-audio-select * \"{streamUrl}\" {streamIdentifier}";
 
@@ -46,10 +49,10 @@ namespace RaceControl.Streamlink
             return ProcessUtils.StartProcess(StreamlinkBatchLocation, streamlinkArguments, false, true);
         }
 
-        public void StartStreamlinkVlc(string vlcExeLocation, string streamUrl, bool lowQualityMode, bool useAlternativeStream, bool enableRecording, string title)
+        public void StartStreamlinkVlc(string vlcExeLocation, string streamUrl, string title)
         {
-            var streamIdentifier = GetStreamIdentifier(lowQualityMode, useAlternativeStream);
-            var recordingArguments = GetRecordingArguments(enableRecording, title);
+            var streamIdentifier = GetStreamIdentifier();
+            var recordingArguments = GetRecordingArguments(title);
             var streamlinkArguments = $"--player \"{vlcExeLocation} --file-caching=2000 --network-caching=4000\" --title \"{title}\" --hls-audio-select * {recordingArguments} \"{streamUrl}\" {streamIdentifier}";
 
             _logger.Info($"Starting VLC Streamlink-instance for stream-URL '{streamUrl}' with identifier '{streamIdentifier}'...");
@@ -57,10 +60,10 @@ namespace RaceControl.Streamlink
             ProcessUtils.StartProcess(StreamlinkBatchLocation, streamlinkArguments, false, true);
         }
 
-        public void StartStreamlinkMpv(string mpvExeLocation, string streamUrl, bool lowQualityMode, bool useAlternativeStream, bool enableRecording, string title)
+        public void StartStreamlinkMpv(string mpvExeLocation, string streamUrl, string title)
         {
-            var streamIdentifier = GetStreamIdentifier(lowQualityMode, useAlternativeStream);
-            var recordingArguments = GetRecordingArguments(enableRecording, title);
+            var streamIdentifier = GetStreamIdentifier();
+            var recordingArguments = GetRecordingArguments(title);
             var streamlinkArguments = $"--player \"{mpvExeLocation}\" --title \"{title}\" --hls-audio-select * {recordingArguments} \"{streamUrl}\" {streamIdentifier}";
 
             _logger.Info($"Starting MPV Streamlink-instance for stream-URL '{streamUrl}' with identifier '{streamIdentifier}'...");
@@ -68,19 +71,19 @@ namespace RaceControl.Streamlink
             ProcessUtils.StartProcess(StreamlinkBatchLocation, streamlinkArguments, false, true);
         }
 
-        private static string GetStreamIdentifier(bool lowQualityMode, bool useAlternativeStream)
+        private string GetStreamIdentifier()
         {
-            if (lowQualityMode)
+            if (_videoSettings.LowQualityMode)
             {
-                return !useAlternativeStream ? "576p" : "576p_alt";
+                return !_videoSettings.UseAlternativeStream ? "576p" : "576p_alt";
             }
 
-            return !useAlternativeStream ? "best" : "1080p_alt";
+            return !_videoSettings.UseAlternativeStream ? "best" : "1080p_alt";
         }
 
-        private string GetRecordingArguments(bool enableRecording, string title)
+        private string GetRecordingArguments(string title)
         {
-            if (!enableRecording)
+            if (!_videoSettings.EnableRecording)
             {
                 return null;
             }

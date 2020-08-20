@@ -3,6 +3,7 @@ using LibVLCSharp.Shared.Structures;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Services.Dialogs;
+using RaceControl.Common.Settings;
 using RaceControl.Core.Mvvm;
 using RaceControl.Enums;
 using RaceControl.Events;
@@ -30,6 +31,7 @@ namespace RaceControl.ViewModels
         private readonly IEventAggregator _eventAggregator;
         private readonly IApiService _apiService;
         private readonly IStreamlinkLauncher _streamlinkLauncher;
+        private readonly IVideoSettings _videoSettings;
         private readonly LibVLC _libVLC;
         private readonly Guid _uniqueIdentifier = Guid.NewGuid();
 
@@ -77,11 +79,17 @@ namespace RaceControl.ViewModels
         private ResizeMode _resizeMode = ResizeMode.CanResize;
         private WindowState _windowState = WindowState.Normal;
 
-        public VideoDialogViewModel(IEventAggregator eventAggregator, IApiService apiService, IStreamlinkLauncher streamlinkLauncher, LibVLC libVLC)
+        public VideoDialogViewModel(
+            IEventAggregator eventAggregator,
+            IApiService apiService,
+            IStreamlinkLauncher streamlinkLauncher,
+            IVideoSettings videoSettings,
+            LibVLC libVLC)
         {
             _eventAggregator = eventAggregator;
             _apiService = apiService;
             _streamlinkLauncher = streamlinkLauncher;
+            _videoSettings = videoSettings;
             _libVLC = libVLC;
         }
 
@@ -227,20 +235,17 @@ namespace RaceControl.ViewModels
             _syncUID = parameters.GetValue<string>(ParameterNames.SYNC_UID);
             Title = parameters.GetValue<string>(ParameterNames.TITLE);
             IsLive = parameters.GetValue<bool>(ParameterNames.IS_LIVE);
-            var lowQualityMode = parameters.GetValue<bool>(ParameterNames.LOW_QUALITY_MODE);
-            var useAlternativeStream = parameters.GetValue<bool>(ParameterNames.USE_ALTERNATIVE_STREAM);
-            var enableRecording = parameters.GetValue<bool>(ParameterNames.ENABLE_RECORDING);
 
             var streamUrl = await GenerateStreamUrlAsync();
 
             if (IsLive)
             {
-                _streamlinkProcess = _streamlinkLauncher.StartStreamlinkExternal(streamUrl, out streamUrl, lowQualityMode, useAlternativeStream);
+                _streamlinkProcess = _streamlinkLauncher.StartStreamlinkExternal(streamUrl, out streamUrl);
 
-                if (enableRecording)
+                if (_videoSettings.EnableRecording)
                 {
                     var recordingStreamUrl = await GenerateStreamUrlAsync();
-                    _streamlingRecordingProcess = _streamlinkLauncher.StartStreamlinkRecording(recordingStreamUrl, lowQualityMode, useAlternativeStream, Title);
+                    _streamlingRecordingProcess = _streamlinkLauncher.StartStreamlinkRecording(recordingStreamUrl, Title);
                 }
             }
 

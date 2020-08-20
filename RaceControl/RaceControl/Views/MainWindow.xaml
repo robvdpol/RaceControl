@@ -239,17 +239,17 @@
                             <CheckBox
                                 Margin="3"
                                 Content="Force lower quality live streams"
-                                IsChecked="{Binding LowQualityMode}"
+                                IsChecked="{Binding VideoSettings.LowQualityMode}"
                                 ToolTip="Use in case of stuttering caused by low bandwidth connection" />
                             <CheckBox
                                 Margin="3"
                                 Content="Use alternative CDN for live streams"
-                                IsChecked="{Binding UseAlternativeStream}"
+                                IsChecked="{Binding VideoSettings.UseAlternativeStream}"
                                 ToolTip="Use when regular live streams do not work" />
                             <CheckBox
                                 Margin="3"
                                 Content="Record live streams to file system"
-                                IsChecked="{Binding EnableRecording}"
+                                IsChecked="{Binding VideoSettings.EnableRecording}"
                                 ToolTip="Save a copy of watched live streams to the file system" />
                         </StackPanel>
                     </GroupBox>
