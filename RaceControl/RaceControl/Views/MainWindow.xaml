@@ -251,6 +251,17 @@
                                 Content="Record live streams to file system"
                                 IsChecked="{Binding VideoSettings.EnableRecording}"
                                 ToolTip="Save a copy of watched live streams to the file system" />
+                            <TextBlock Margin="3" Text="Recording location:" />
+                            <TextBlock
+                                Margin="3,0,3,3"
+                                Text="{Binding VideoSettings.RecordingLocation}"
+                                ToolTip="{Binding VideoSettings.RecordingLocation}" />
+                            <Button
+                                Height="24"
+                                Margin="3"
+                                Command="{Binding SetRecordingLocationCommand}"
+                                Content="Change recording location"
+                                ToolTip="Change the location where recordings of live streams are saved" />
                         </StackPanel>
                     </GroupBox>
                     <GroupBox

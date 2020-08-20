@@ -7,5 +7,7 @@
         bool UseAlternativeStream { get; set; }
 
         bool EnableRecording { get; set; }
+
+        string RecordingLocation { get; set; }
     }
 }

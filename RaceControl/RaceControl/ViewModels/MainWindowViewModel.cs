@@ -50,6 +50,7 @@ namespace RaceControl.ViewModels
         private ICommand _watchMpvEpisodeCommand;
         private ICommand _copyUrlChannelCommand;
         private ICommand _copyUrlEpisodeCommand;
+        private ICommand _setRecordingLocationCommand;
         private ICommand _deleteCredentialCommand;
 
         private IVideoSettings _videoSettings;
@@ -104,6 +105,7 @@ namespace RaceControl.ViewModels
         public ICommand WatchMpvEpisodeCommand => _watchMpvEpisodeCommand ??= new DelegateCommand<Episode>(WatchMpvEpisodeExecute, CanWatchMpvEpisodeExecute).ObservesProperty(() => MpvExeLocation);
         public ICommand CopyUrlChannelCommand => _copyUrlChannelCommand ??= new DelegateCommand<Channel>(CopyUrlChannelExecute);
         public ICommand CopyUrlEpisodeCommand => _copyUrlEpisodeCommand ??= new DelegateCommand<Episode>(CopyUrlEpisodeExecute);
+        public ICommand SetRecordingLocationCommand => _setRecordingLocationCommand ??= new DelegateCommand(SetRecordingLocationExecute);
         public ICommand DeleteCredentialCommand => _deleteCredentialCommand ??= new DelegateCommand(DeleteCredentialExecute);
 
         public IVideoSettings VideoSettings
@@ -499,6 +501,11 @@ namespace RaceControl.ViewModels
             }
 
             IsBusy = false;
+        }
+
+        private void SetRecordingLocationExecute()
+        {
+            // todo
         }
 
         private async void DeleteCredentialExecute()
