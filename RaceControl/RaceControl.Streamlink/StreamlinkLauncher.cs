@@ -85,42 +85,17 @@ namespace RaceControl.Streamlink
         {
             if (!_videoSettings.EnableRecording)
             {
-                return null;
+                return string.Empty;
             }
 
-            string recordingFilename;
-
-            try
-            {
-                recordingFilename = GetRecordingFilename(title);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex);
-
-                return null;
-            }
+            var recordingFilename = GetRecordingFilename(title);
 
             return $"--record \"{recordingFilename}\" --force";
         }
 
-        private static string GetRecordingFilename(string title)
+        private string GetRecordingFilename(string title)
         {
-            var recordingsDirectory = Path.Combine(Environment.CurrentDirectory, "Recordings");
-
-            if (!Directory.Exists(recordingsDirectory))
-            {
-                try
-                {
-                    Directory.CreateDirectory(recordingsDirectory);
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception($"Could not create recordings-directory '{recordingsDirectory}'.", ex);
-                }
-            }
-
-            return Path.Combine(recordingsDirectory, $"{DateTime.Now:yyyyMMddHHmmss} {title}.mkv");
+            return Path.Combine(_videoSettings.RecordingLocation, $"{DateTime.Now:yyyyMMddHHmmss} {title}.mkv");
         }
     }
 }
