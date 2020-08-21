@@ -14,6 +14,7 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <core:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <core:CollectionContainsConverter x:Key="CollectionContainsConverter" />
         <Style x:Key="HeaderLabelStyle" TargetType="Label">
             <Setter Property="Margin" Value="2" />
             <Setter Property="FontWeight" Value="Bold" />
@@ -97,22 +98,15 @@
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="{x:Type ListBoxItem}">
                             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="Focusable" Value="False" />
                         </Style>
                     </ListBox.ItemContainerStyle>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <CheckBox Content="{Binding}" Tag="{Binding}">
                                 <i:Interaction.Behaviors>
-                                    <behaviors:CheckBoxMultiSelectBehavior SelectedItems="{Binding DataContext.SelectedSeries, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}" />
+                                    <behaviors:CheckBoxMultiSelectBehavior SelectedItems="{Binding DataContext.SelectedSeries, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}" />
                                 </i:Interaction.Behaviors>
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="Checked">
-                                        <i:InvokeCommandAction Command="{Binding DataContext.SeriesCheckedCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}" PassEventArgsToCommand="True" />
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="Unchecked">
-                                        <i:InvokeCommandAction Command="{Binding DataContext.SeriesCheckedCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}" PassEventArgsToCommand="True" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
                             </CheckBox>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -181,9 +175,21 @@
                     Style="{StaticResource ContentListBoxStyle}">
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
+                            <Setter Property="Visibility" Value="Collapsed" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsLive}" Value="True">
                                     <Setter Property="Background" Value="LightGreen" />
+                                </DataTrigger>
+                                <DataTrigger Value="True">
+                                    <DataTrigger.Binding>
+                                        <MultiBinding Converter="{StaticResource CollectionContainsConverter}" ConverterParameter="Self">
+                                            <Binding Path="SeriesUrl" />
+                                            <Binding Path="DataContext.SelectedSeries" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ListBox}" />
+                                            <!--  Needed to trigger converter  -->
+                                            <Binding Path="DataContext.SelectedSeries.Count" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ListBox}" />
+                                        </MultiBinding>
+                                    </DataTrigger.Binding>
+                                    <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -222,7 +228,7 @@
                                 Grid.Column="1"
                                 Width="50"
                                 Margin="2,0"
-                                Command="{Binding DataContext.CopyUrlChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
+                                Command="{Binding DataContext.CopyUrlChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
                                 CommandParameter="{Binding}"
                                 Content="Copy"
                                 ToolTip="Copy URL to clipboard" />
@@ -230,7 +236,7 @@
                                 Grid.Column="2"
                                 Width="50"
                                 Margin="2,0"
-                                Command="{Binding DataContext.WatchVlcChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
+                                Command="{Binding DataContext.WatchVlcChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
                                 CommandParameter="{Binding}"
                                 Content="VLC"
                                 ToolTip="Watch with VLC media player" />
@@ -238,7 +244,7 @@
                                 Grid.Column="3"
                                 Width="50"
                                 Margin="2,0"
-                                Command="{Binding DataContext.WatchMpvChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
+                                Command="{Binding DataContext.WatchMpvChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
                                 CommandParameter="{Binding}"
                                 Content="MPV"
                                 ToolTip="Watch with MPV" />
@@ -246,7 +252,7 @@
                                 Grid.Column="4"
                                 Width="50"
                                 Margin="2,0,0,0"
-                                Command="{Binding DataContext.WatchChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
+                                Command="{Binding DataContext.WatchChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
                                 CommandParameter="{Binding}"
                                 Content="Watch"
                                 ToolTip="Watch with internal player" />
@@ -366,7 +372,7 @@
                                 Grid.Column="1"
                                 Width="50"
                                 Margin="2,0"
-                                Command="{Binding DataContext.CopyUrlEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
+                                Command="{Binding DataContext.CopyUrlEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
                                 CommandParameter="{Binding}"
                                 Content="Copy"
                                 ToolTip="Copy URL to clipboard" />
@@ -374,7 +380,7 @@
                                 Grid.Column="2"
                                 Width="50"
                                 Margin="2,0"
-                                Command="{Binding DataContext.WatchVlcEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
+                                Command="{Binding DataContext.WatchVlcEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
                                 CommandParameter="{Binding}"
                                 Content="VLC"
                                 ToolTip="Watch with VLC media player" />
@@ -382,7 +388,7 @@
                                 Grid.Column="3"
                                 Width="50"
                                 Margin="2,0"
-                                Command="{Binding DataContext.WatchMpvEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
+                                Command="{Binding DataContext.WatchMpvEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
                                 CommandParameter="{Binding}"
                                 Content="MPV"
                                 ToolTip="Watch with MPV" />
@@ -390,7 +396,7 @@
                                 Grid.Column="4"
                                 Width="50"
                                 Margin="2,0,0,0"
-                                Command="{Binding DataContext.WatchEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
+                                Command="{Binding DataContext.WatchEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
                                 CommandParameter="{Binding}"
                                 Content="Watch"
                                 ToolTip="Watch with internal player" />

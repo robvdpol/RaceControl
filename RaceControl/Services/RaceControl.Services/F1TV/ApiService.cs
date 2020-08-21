@@ -37,6 +37,7 @@ namespace RaceControl.Services.F1TV
                 .WithField(Session.StartTimeField)
                 .WithField(Session.EndTimeField)
                 .WithField(Session.EventOccurrenceUrlField)
+                .WithField(Session.SeriesUrlField)
                 .WithFilter(Session.StartTimeField, LarkFilterType.LessThan, utcNow.AddDays(2).ToString("yyyy-MM-ddTHH:mm:ss"))
                 .WithFilter(Session.EndTimeField, LarkFilterType.GreaterThan, utcNow.AddDays(-2).ToString("yyyy-MM-ddTHH:mm:ss"))
                 .OrderBy(Session.StartTimeField, LarkSortDirection.Descending)
@@ -78,6 +79,7 @@ namespace RaceControl.Services.F1TV
                 .WithField(Series.UIDField)
                 .WithField(Series.SelfField)
                 .WithField(Series.NameField)
+                .OrderBy(Series.NameField, LarkSortDirection.Ascending)
                 ;
 
             var series = (await _client.GetCollectionAsync<Series>(request)).Objects;
@@ -137,6 +139,7 @@ namespace RaceControl.Services.F1TV
                 .WithField(Session.StartTimeField)
                 .WithField(Session.EndTimeField)
                 .WithField(Session.EventOccurrenceUrlField)
+                .WithField(Session.SeriesUrlField)
                 .WithFilter(Session.EventOccurrenceUrlField, LarkFilterType.Equals, eventUID)
                 .OrderBy(Session.StartTimeField, LarkSortDirection.Ascending)
                 ;

@@ -27,6 +27,8 @@ namespace RaceControl.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
+        private const string Formula1SeriesUID = "seri_436bb431c3a24d7d8e200a74e1d11de4";
+
         private readonly ILogger _logger;
         private readonly IExtendedDialogService _dialogService;
         private readonly IApiService _apiService;
@@ -38,7 +40,6 @@ namespace RaceControl.ViewModels
         private ICommand _closingCommand;
         private ICommand _mouseMoveCommand;
         private ICommand _seasonSelectionChangedCommand;
-        private ICommand _seriesCheckedCommand;
         private ICommand _eventSelectionChangedCommand;
         private ICommand _liveSessionSelectionChangedCommand;
         private ICommand _sessionSelectionChangedCommand;
@@ -96,7 +97,6 @@ namespace RaceControl.ViewModels
         public ICommand ClosingCommand => _closingCommand ??= new DelegateCommand(ClosingExecute);
         public ICommand MouseMoveCommand => _mouseMoveCommand ??= new DelegateCommand(MouseMoveExecute);
         public ICommand SeasonSelectionChangedCommand => _seasonSelectionChangedCommand ??= new DelegateCommand(SeasonSelectionChangedExecute);
-        public ICommand SeriesCheckedCommand => _seriesCheckedCommand ??= new DelegateCommand<RoutedEventArgs>(SeriesCheckedExecute);
         public ICommand EventSelectionChangedCommand => _eventSelectionChangedCommand ??= new DelegateCommand(EventSelectionChangedExecute);
         public ICommand LiveSessionSelectionChangedCommand => _liveSessionSelectionChangedCommand ??= new DelegateCommand(LiveSessionSelectionChangedExecute);
         public ICommand SessionSelectionChangedCommand => _sessionSelectionChangedCommand ??= new DelegateCommand(SessionSelectionChangedExecute);
@@ -280,15 +280,6 @@ namespace RaceControl.ViewModels
                 var events = await _apiService.GetEventsForSeasonAsync(SelectedSeason.UID);
                 Events.AddRange(events);
             }
-
-            IsBusy = false;
-        }
-
-        private void SeriesCheckedExecute(RoutedEventArgs args)
-        {
-            IsBusy = true;
-
-            // todo: only show sessions for selected series
 
             IsBusy = false;
         }
@@ -661,6 +652,13 @@ namespace RaceControl.ViewModels
         {
             var series = await _apiService.GetSeriesAsync();
             Series.AddRange(series);
+
+            var formula1Series = series.FirstOrDefault(s => s.UID == Formula1SeriesUID);
+
+            if (formula1Series != null)
+            {
+                SelectedSeries.Add(formula1Series);
+            }
         }
 
         private async Task LoadVodTypesAsync()

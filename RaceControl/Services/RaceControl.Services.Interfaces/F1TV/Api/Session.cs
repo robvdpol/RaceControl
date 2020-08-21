@@ -28,6 +28,9 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         [JsonProperty("eventoccurrence_url")]
         public string EventOccurrenceUrl { get; set; }
 
+        [JsonProperty("series_url")]
+        public string SeriesUrl { get; set; }
+
         [JsonProperty("content_urls")]
         public List<Episode> ContentUrls { get; set; }
 
@@ -53,6 +56,7 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         public static string StartTimeField => JsonUtils.GetJsonPropertyName<Session>(s => s.StartTime);
         public static string EndTimeField => JsonUtils.GetJsonPropertyName<Session>(s => s.EndTime);
         public static string EventOccurrenceUrlField => JsonUtils.GetJsonPropertyName<Session>(s => s.EventOccurrenceUrl);
+        public static string SeriesUrlField => JsonUtils.GetJsonPropertyName<Session>(s => s.SeriesUrl);
         public static string ContentUrlsField => JsonUtils.GetJsonPropertyName<Session>(s => s.ContentUrls);
         public static string ChannelUrlsField => JsonUtils.GetJsonPropertyName<Session>(s => s.ChannelUrls);
 
