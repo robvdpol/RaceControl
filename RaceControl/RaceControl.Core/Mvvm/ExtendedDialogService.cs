@@ -35,6 +35,34 @@ namespace RaceControl.Core.Mvvm
             return false;
         }
 
+        public bool SelectFile(string title, string initialDirectory, string initialFilename, string defaultExtension, out string filename)
+        {
+            filename = null;
+
+            var dialog = new CommonSaveFileDialog
+            {
+                Title = title,
+                DefaultDirectory = initialDirectory,
+                InitialDirectory = initialDirectory,
+                DefaultFileName = initialFilename,
+                DefaultExtension = defaultExtension,
+                AlwaysAppendDefaultExtension = true,
+                OverwritePrompt = true,
+                IsExpandedMode = true
+            };
+
+            dialog.Filters.Add(new CommonFileDialogFilter($"{defaultExtension}-files", $"*{defaultExtension}"));
+
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                filename = dialog.FileName;
+
+                return true;
+            }
+
+            return false;
+        }
+
         public void Show(string name, IDialogParameters parameters, Action<IDialogResult> callback, bool hasOwner)
         {
             ShowDialogInternal(name, parameters, callback, false, hasOwner);

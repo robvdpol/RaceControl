@@ -52,6 +52,7 @@ namespace RaceControl.ViewModels
         private ICommand _watchMpvEpisodeCommand;
         private ICommand _copyUrlChannelCommand;
         private ICommand _copyUrlEpisodeCommand;
+        private ICommand _downloadChannelCommand;
         private ICommand _setRecordingLocationCommand;
         private ICommand _deleteCredentialCommand;
 
@@ -109,6 +110,7 @@ namespace RaceControl.ViewModels
         public ICommand WatchMpvEpisodeCommand => _watchMpvEpisodeCommand ??= new DelegateCommand<Episode>(WatchMpvEpisodeExecute, CanWatchMpvEpisodeExecute).ObservesProperty(() => MpvExeLocation);
         public ICommand CopyUrlChannelCommand => _copyUrlChannelCommand ??= new DelegateCommand<Channel>(CopyUrlChannelExecute);
         public ICommand CopyUrlEpisodeCommand => _copyUrlEpisodeCommand ??= new DelegateCommand<Episode>(CopyUrlEpisodeExecute);
+        public ICommand DownloadChannelCommand => _downloadChannelCommand ??= new DelegateCommand<Channel>(DownloadChannelExecute, CanDownloadChannelExecute).ObservesProperty(() => SelectedSession).ObservesProperty(() => SelectedLiveSession);
         public ICommand SetRecordingLocationCommand => _setRecordingLocationCommand ??= new DelegateCommand(SetRecordingLocationExecute);
         public ICommand DeleteCredentialCommand => _deleteCredentialCommand ??= new DelegateCommand(DeleteCredentialExecute);
 
@@ -523,6 +525,24 @@ namespace RaceControl.ViewModels
             IsBusy = false;
         }
 
+        private bool CanDownloadChannelExecute(Channel channel)
+        {
+            return !GetCurrentSession().IsLive;
+        }
+
+        private async void DownloadChannelExecute(Channel channel)
+        {
+            var session = GetCurrentSession();
+            var title = GetTitle(session, channel);
+            var defaultFilename = $"{title}.mkv".RemoveInvalidFileNameChars();
+
+            if (_dialogService.SelectFile("Select a filename", Settings.RecordingLocation, defaultFilename, ".mkv", out var filename))
+            {
+                var url = await _apiService.GetTokenisedUrlForChannelAsync(_token, channel.Self);
+                var process = _streamlinkLauncher.StartStreamlinkDownload(url, filename);
+            }
+        }
+
         private void SetRecordingLocationExecute()
         {
             if (_dialogService.SelectFolder("Select a recording location", Settings.RecordingLocation, out var recordingLocation))
@@ -722,7 +742,7 @@ namespace RaceControl.ViewModels
             }
             else
             {
-                ProcessUtils.StartProcess(VlcExeLocation, $"{url} --meta-title=\"{title}\"");
+                ProcessUtils.CreateProcess(VlcExeLocation, $"{url} --meta-title=\"{title}\"").Start();
             }
         }
 
@@ -734,7 +754,7 @@ namespace RaceControl.ViewModels
             }
             else
             {
-                ProcessUtils.StartProcess(MpvExeLocation, $"{url} --title=\"{title}\"");
+                ProcessUtils.CreateProcess(MpvExeLocation, $"{url} --title=\"{title}\"").Start();
             }
         }
 

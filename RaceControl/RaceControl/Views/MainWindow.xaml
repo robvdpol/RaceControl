@@ -53,10 +53,9 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*" MinWidth="255" />
-                <ColumnDefinition Width="2*" MinWidth="255" />
-                <ColumnDefinition Width="3*" />
-                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="6*" />
             </Grid.ColumnDefinitions>
             <Grid
                 Grid.Row="0"
@@ -139,7 +138,15 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <Label Grid.Row="0" Content="Live Now">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="2*" />
+                </Grid.ColumnDefinitions>
+                <Label
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Content="Live Now">
                     <Label.Style>
                         <Style BasedOn="{StaticResource HeaderLabelStyle}" TargetType="Label">
                             <Style.Triggers>
@@ -153,6 +160,8 @@
                 <ListBox
                     x:Name="LvLiveSessions"
                     Grid.Row="1"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
                     DisplayMemberPath="SessionName"
                     ItemsSource="{Binding LiveSessions}"
                     ScrollViewer.HorizontalScrollBarVisibility="Hidden"
@@ -166,10 +175,12 @@
                 </ListBox>
                 <Label
                     Grid.Row="2"
+                    Grid.Column="0"
                     Content="Sessions"
                     Style="{StaticResource HeaderLabelStyle}" />
                 <ListBox
                     Grid.Row="3"
+                    Grid.Column="0"
                     ItemsSource="{Binding Sessions}"
                     SelectedItem="{Binding SelectedSession}"
                     Style="{StaticResource ContentListBoxStyle}">
@@ -200,66 +211,76 @@
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </ListBox>
+                <Label
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    Content="Channels"
+                    Style="{StaticResource HeaderLabelStyle}" />
+                <ListBox
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    HorizontalContentAlignment="Stretch"
+                    ItemsSource="{Binding Channels}"
+                    ScrollViewer.VerticalScrollBarVisibility="Visible"
+                    Style="{StaticResource ContentListBoxStyle}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{Binding}" />
+                                <Button
+                                    Grid.Column="1"
+                                    Width="70"
+                                    Margin="2,0"
+                                    Command="{Binding DataContext.DownloadChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
+                                    CommandParameter="{Binding}"
+                                    Content="Download"
+                                    ToolTip="Save a copy to file system"
+                                    Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                <Button
+                                    Grid.Column="2"
+                                    Width="50"
+                                    Margin="2,0"
+                                    Command="{Binding DataContext.CopyUrlChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
+                                    CommandParameter="{Binding}"
+                                    Content="Copy"
+                                    ToolTip="Copy URL to clipboard" />
+                                <Button
+                                    Grid.Column="3"
+                                    Width="50"
+                                    Margin="2,0"
+                                    Command="{Binding DataContext.WatchVlcChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
+                                    CommandParameter="{Binding}"
+                                    Content="VLC"
+                                    ToolTip="Watch with VLC media player" />
+                                <Button
+                                    Grid.Column="4"
+                                    Width="50"
+                                    Margin="2,0"
+                                    Command="{Binding DataContext.WatchMpvChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
+                                    CommandParameter="{Binding}"
+                                    Content="MPV"
+                                    ToolTip="Watch with MPV" />
+                                <Button
+                                    Grid.Column="5"
+                                    Width="50"
+                                    Margin="2,0,0,0"
+                                    Command="{Binding DataContext.WatchChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
+                                    CommandParameter="{Binding}"
+                                    Content="Watch"
+                                    ToolTip="Watch with internal player" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
             </Grid>
-            <Label
-                Grid.Row="0"
-                Grid.Column="3"
-                Content="Channels"
-                Style="{StaticResource HeaderLabelStyle}" />
-            <ListBox
-                Grid.Row="1"
-                Grid.Column="3"
-                HorizontalContentAlignment="Stretch"
-                ItemsSource="{Binding Channels}"
-                ScrollViewer.VerticalScrollBarVisibility="Visible"
-                Style="{StaticResource ContentListBoxStyle}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="{Binding}" />
-                            <Button
-                                Grid.Column="1"
-                                Width="50"
-                                Margin="2,0"
-                                Command="{Binding DataContext.CopyUrlChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
-                                CommandParameter="{Binding}"
-                                Content="Copy"
-                                ToolTip="Copy URL to clipboard" />
-                            <Button
-                                Grid.Column="2"
-                                Width="50"
-                                Margin="2,0"
-                                Command="{Binding DataContext.WatchVlcChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
-                                CommandParameter="{Binding}"
-                                Content="VLC"
-                                ToolTip="Watch with VLC media player" />
-                            <Button
-                                Grid.Column="3"
-                                Width="50"
-                                Margin="2,0"
-                                Command="{Binding DataContext.WatchMpvChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
-                                CommandParameter="{Binding}"
-                                Content="MPV"
-                                ToolTip="Watch with MPV" />
-                            <Button
-                                Grid.Column="4"
-                                Width="50"
-                                Margin="2,0,0,0"
-                                Command="{Binding DataContext.WatchChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
-                                CommandParameter="{Binding}"
-                                Content="Watch"
-                                ToolTip="Watch with internal player" />
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
             <Label
                 Grid.Row="2"
                 Grid.Column="0"
@@ -346,13 +367,11 @@
             <Label
                 Grid.Row="2"
                 Grid.Column="2"
-                Grid.ColumnSpan="2"
                 Content="Episodes"
                 Style="{StaticResource HeaderLabelStyle}" />
             <ListBox
                 Grid.Row="3"
                 Grid.Column="2"
-                Grid.ColumnSpan="2"
                 HorizontalContentAlignment="Stretch"
                 ItemsSource="{Binding Episodes}"
                 ScrollViewer.VerticalScrollBarVisibility="Visible"

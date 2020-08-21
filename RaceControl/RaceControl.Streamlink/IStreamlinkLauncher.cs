@@ -8,6 +8,8 @@ namespace RaceControl.Streamlink
 
         Process StartStreamlinkRecording(string streamUrl, string title);
 
+        Process StartStreamlinkDownload(string streamUrl, string filename);
+
         void StartStreamlinkVlc(string vlcExeLocation, string streamUrl, string title);
 
         void StartStreamlinkMpv(string mpvExeLocation, string streamUrl, string title);

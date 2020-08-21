@@ -4,15 +4,20 @@ namespace RaceControl.Common.Utils
 {
     public static class ProcessUtils
     {
-        public static Process StartProcess(string filename, string arguments, bool useShellExecute = true, bool createNoWindow = false)
+        public static Process CreateProcess(string filename, string arguments, bool useShellExecute = true, bool createNoWindow = false, bool redirectOutput = false)
         {
-            return Process.Start(new ProcessStartInfo
+            return new Process
             {
-                FileName = filename,
-                Arguments = arguments,
-                UseShellExecute = useShellExecute,
-                CreateNoWindow = createNoWindow
-            });
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = filename,
+                    Arguments = arguments,
+                    UseShellExecute = useShellExecute,
+                    CreateNoWindow = createNoWindow,
+                    RedirectStandardOutput = redirectOutput,
+                    RedirectStandardError = redirectOutput
+                }
+            };
         }
 
         public static Process BrowseToUrl(string url)
