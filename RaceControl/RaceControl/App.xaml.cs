@@ -6,7 +6,7 @@ using NLog.Layouts;
 using NLog.Targets;
 using Prism.DryIoc;
 using Prism.Ioc;
-using RaceControl.Common;
+using RaceControl.Common.ProcessTracker;
 using RaceControl.Common.Settings;
 using RaceControl.Core.Helpers;
 using RaceControl.Core.Mvvm;

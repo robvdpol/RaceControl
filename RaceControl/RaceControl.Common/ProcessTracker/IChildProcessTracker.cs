@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace RaceControl.Common
+namespace RaceControl.Common.ProcessTracker
 {
     public interface IChildProcessTracker
     {
