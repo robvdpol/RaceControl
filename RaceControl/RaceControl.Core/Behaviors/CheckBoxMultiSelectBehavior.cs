@@ -51,14 +51,14 @@ namespace RaceControl.Core.Behaviors
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    if (e.NewItems.Contains(AssociatedObject.Content))
+                    if (e.NewItems.Contains(AssociatedObject.Tag))
                     {
                         AssociatedObject.IsChecked = true;
                     }
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-                    if (e.OldItems.Contains(AssociatedObject.Content))
+                    if (e.OldItems.Contains(AssociatedObject.Tag))
                     {
                         AssociatedObject.IsChecked = false;
                     }
@@ -79,7 +79,7 @@ namespace RaceControl.Core.Behaviors
                 UnsubscribeFromEvents(false, true);
 
                 var list = (IList)SelectedItems;
-                var item = checkBox.Content;
+                var item = checkBox.Tag;
 
                 if (checkBox.IsChecked == true && !list.Contains(item))
                 {

@@ -101,7 +101,7 @@
                     </ListBox.ItemContainerStyle>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <CheckBox Content="{Binding}">
+                            <CheckBox Content="{Binding}" Tag="{Binding}">
                                 <i:Interaction.Behaviors>
                                     <behaviors:CheckBoxMultiSelectBehavior SelectedItems="{Binding DataContext.SelectedSeries, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}" />
                                 </i:Interaction.Behaviors>
