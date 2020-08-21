@@ -51,29 +51,50 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*" MinWidth="250" />
-                <ColumnDefinition Width="2*" MinWidth="250" />
+                <ColumnDefinition Width="2*" MinWidth="255" />
+                <ColumnDefinition Width="2*" MinWidth="255" />
                 <ColumnDefinition Width="3*" />
                 <ColumnDefinition Width="3*" />
             </Grid.ColumnDefinitions>
-            <Label
+            <Grid
                 Grid.Row="0"
-                Grid.Column="0"
-                Content="Race Seasons"
-                Style="{StaticResource HeaderLabelStyle}" />
-            <ListView
-                Grid.Row="1"
-                Grid.Column="0"
-                ItemsSource="{Binding Seasons}"
-                SelectedItem="{Binding SelectedSeason}"
-                SelectionMode="Single"
-                Style="{StaticResource ContentListViewStyle}">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="SelectionChanged">
-                        <i:InvokeCommandAction Command="{Binding SeasonSelectionChangedCommand}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </ListView>
+                Grid.RowSpan="2"
+                Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="2*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="5*" />
+                </Grid.RowDefinitions>
+                <Label
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Content="Race Seasons"
+                    Style="{StaticResource HeaderLabelStyle}" />
+                <ListView
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    ItemsSource="{Binding Seasons}"
+                    SelectedItem="{Binding SelectedSeason}"
+                    SelectionMode="Single"
+                    Style="{StaticResource ContentListViewStyle}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SelectionChanged">
+                            <i:InvokeCommandAction Command="{Binding SeasonSelectionChangedCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ListView>
+                <Label
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    Content="Series"
+                    Style="{StaticResource HeaderLabelStyle}" />
+                <ListView
+                    Grid.Row="3"
+                    Grid.Column="0"
+                    ItemsSource="{Binding Series}"
+                    Style="{StaticResource ContentListViewStyle}" />
+            </Grid>
             <Label
                 Grid.Row="0"
                 Grid.Column="1"

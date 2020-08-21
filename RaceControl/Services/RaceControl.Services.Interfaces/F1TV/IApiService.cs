@@ -10,6 +10,8 @@ namespace RaceControl.Services.Interfaces.F1TV
 
         Task<List<Season>> GetSeasonsAsync();
 
+        Task<List<Series>> GetSeriesAsync();
+
         Task<List<VodType>> GetVodTypesAsync();
 
         Task<List<Event>> GetEventsForSeasonAsync(string seasonUID);

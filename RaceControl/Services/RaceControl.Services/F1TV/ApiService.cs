@@ -11,11 +11,7 @@ namespace RaceControl.Services.F1TV
 {
     public class ApiService : IApiService
     {
-        private const string RaceSeason = "race-season";
-        private const string EventOccurrence = "event-occurrence";
         private const string SessionOccurrence = "session-occurrence";
-        private const string VodTypeTag = "vod-type-tag";
-        private const string Episodes = "episodes";
 
         private readonly ILogger _logger;
         private readonly IF1TVClient _client;
@@ -57,7 +53,7 @@ namespace RaceControl.Services.F1TV
             _logger.Info("Querying seasons...");
 
             var request = _client
-                .NewRequest(RaceSeason)
+                .NewRequest("race-season")
                 .WithField(Season.UIDField)
                 .WithField(Season.NameField)
                 .WithField(Season.HasContentField)
@@ -73,12 +69,29 @@ namespace RaceControl.Services.F1TV
             return seasons;
         }
 
+        public async Task<List<Series>> GetSeriesAsync()
+        {
+            _logger.Info("Querying series...");
+
+            var request = _client
+                .NewRequest("series")
+                .WithField(Series.UIDField)
+                .WithField(Series.SelfField)
+                .WithField(Series.NameField)
+                ;
+
+            var series = (await _client.GetCollectionAsync<Series>(request)).Objects;
+            _logger.Info($"Found {series.Count} series.");
+
+            return series;
+        }
+
         public async Task<List<VodType>> GetVodTypesAsync()
         {
             _logger.Info("Querying VOD types...");
 
             var request = _client
-                .NewRequest(VodTypeTag)
+                .NewRequest("vod-type-tag")
                 .WithField(VodType.UIDField)
                 .WithField(VodType.NameField)
                 .WithField(VodType.ContentUrlsField)
@@ -95,7 +108,7 @@ namespace RaceControl.Services.F1TV
             _logger.Info($"Querying events for season with UID '{seasonUID}'...");
 
             var request = _client
-                .NewRequest(EventOccurrence)
+                .NewRequest("event-occurrence")
                 .WithField(Event.UIDField)
                 .WithField(Event.NameField)
                 .WithField(Event.StartDateField)
@@ -176,7 +189,7 @@ namespace RaceControl.Services.F1TV
             _logger.Info($"Querying episode with UID '{episodeUID}'...");
 
             var request = _client
-                .NewRequest(Episodes, episodeUID)
+                .NewRequest("episodes", episodeUID)
                 .WithField(Episode.UIDField)
                 .WithField(Episode.TitleField)
                 .WithField(Episode.ItemsField)

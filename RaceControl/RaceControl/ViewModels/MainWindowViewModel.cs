@@ -58,6 +58,7 @@ namespace RaceControl.ViewModels
         private string _vlcExeLocation;
         private string _mpvExeLocation;
         private ObservableCollection<Season> _seasons;
+        private ObservableCollection<Series> _series;
         private ObservableCollection<Event> _events;
         private ObservableCollection<Session> _sessions;
         private ObservableCollection<Session> _liveSessions;
@@ -130,6 +131,12 @@ namespace RaceControl.ViewModels
         {
             get => _seasons ??= new ObservableCollection<Season>();
             set => SetProperty(ref _seasons, value);
+        }
+
+        public ObservableCollection<Series> Series
+        {
+            get => _series ??= new ObservableCollection<Series>();
+            set => SetProperty(ref _series, value);
         }
 
         public ObservableCollection<Event> Events
@@ -621,6 +628,7 @@ namespace RaceControl.ViewModels
         {
             await Task.WhenAll(
                 LoadSeasonsAsync(),
+                LoadSeriesAsync(),
                 LoadVodTypesAsync(),
                 RefreshLiveSessionsAsync());
         }
@@ -629,6 +637,12 @@ namespace RaceControl.ViewModels
         {
             var seasons = await _apiService.GetSeasonsAsync();
             Seasons.AddRange(seasons);
+        }
+
+        private async Task LoadSeriesAsync()
+        {
+            var series = await _apiService.GetSeriesAsync();
+            Series.AddRange(series);
         }
 
         private async Task LoadVodTypesAsync()
