@@ -21,7 +21,6 @@ using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using System.Timers;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace RaceControl.ViewModels
@@ -61,6 +60,7 @@ namespace RaceControl.ViewModels
         private string _mpvExeLocation;
         private ObservableCollection<Season> _seasons;
         private ObservableCollection<Series> _series;
+        private ObservableCollection<Series> _selectedSeries;
         private ObservableCollection<Event> _events;
         private ObservableCollection<Session> _sessions;
         private ObservableCollection<Session> _liveSessions;
@@ -140,6 +140,12 @@ namespace RaceControl.ViewModels
         {
             get => _series ??= new ObservableCollection<Series>();
             set => SetProperty(ref _series, value);
+        }
+
+        public ObservableCollection<Series> SelectedSeries
+        {
+            get => _selectedSeries ??= new ObservableCollection<Series>();
+            set => SetProperty(ref _selectedSeries, value);
         }
 
         public ObservableCollection<Event> Events
@@ -282,10 +288,7 @@ namespace RaceControl.ViewModels
         {
             IsBusy = true;
 
-            if (args.Source is CheckBox checkBox && checkBox.Content is Series series)
-            {
-                // todo
-            }
+            // todo: only show sessions for selected series
 
             IsBusy = false;
         }
