@@ -20,7 +20,7 @@
             <Setter Property="BorderBrush" Value="#ABADB3" />
             <Setter Property="BorderThickness" Value="1" />
         </Style>
-        <Style x:Key="ContentListViewStyle" TargetType="ListView">
+        <Style x:Key="ContentListBoxStyle" TargetType="ListBox">
             <Setter Property="Margin" Value="2" />
         </Style>
     </Window.Resources>
@@ -71,48 +71,47 @@
                     Grid.Column="0"
                     Content="Race Seasons"
                     Style="{StaticResource HeaderLabelStyle}" />
-                <ListView
+                <ListBox
                     Grid.Row="1"
                     Grid.Column="0"
                     ItemsSource="{Binding Seasons}"
                     SelectedItem="{Binding SelectedSeason}"
-                    SelectionMode="Single"
-                    Style="{StaticResource ContentListViewStyle}">
+                    Style="{StaticResource ContentListBoxStyle}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="SelectionChanged">
                             <i:InvokeCommandAction Command="{Binding SeasonSelectionChangedCommand}" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
-                </ListView>
+                </ListBox>
                 <Label
                     Grid.Row="2"
                     Grid.Column="0"
                     Content="Series"
                     Style="{StaticResource HeaderLabelStyle}" />
-                <ListView
+                <ListBox
                     Grid.Row="3"
                     Grid.Column="0"
                     ItemsSource="{Binding Series}"
-                    Style="{StaticResource ContentListViewStyle}" />
+                    SelectionMode="Multiple"
+                    Style="{StaticResource ContentListBoxStyle}" />
             </Grid>
             <Label
                 Grid.Row="0"
                 Grid.Column="1"
                 Content="Events"
                 Style="{StaticResource HeaderLabelStyle}" />
-            <ListView
+            <ListBox
                 Grid.Row="1"
                 Grid.Column="1"
                 ItemsSource="{Binding Events}"
                 SelectedItem="{Binding SelectedEvent}"
-                SelectionMode="Single"
-                Style="{StaticResource ContentListViewStyle}">
+                Style="{StaticResource ContentListBoxStyle}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectionChanged">
                         <i:InvokeCommandAction Command="{Binding EventSelectionChangedCommand}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
-            </ListView>
+            </ListBox>
             <Grid
                 Grid.Row="0"
                 Grid.RowSpan="2"
@@ -134,61 +133,58 @@
                         </Style>
                     </Label.Style>
                 </Label>
-                <ListView
+                <ListBox
                     x:Name="LvLiveSessions"
                     Grid.Row="1"
                     DisplayMemberPath="SessionName"
                     ItemsSource="{Binding LiveSessions}"
                     ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                     SelectedItem="{Binding SelectedLiveSession}"
-                    SelectionMode="Single"
-                    Style="{StaticResource ContentListViewStyle}">
+                    Style="{StaticResource ContentListBoxStyle}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="SelectionChanged">
                             <i:InvokeCommandAction Command="{Binding LiveSessionSelectionChangedCommand}" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
-                </ListView>
+                </ListBox>
                 <Label
                     Grid.Row="2"
                     Content="Sessions"
                     Style="{StaticResource HeaderLabelStyle}" />
-                <ListView
+                <ListBox
                     Grid.Row="3"
                     ItemsSource="{Binding Sessions}"
                     SelectedItem="{Binding SelectedSession}"
-                    SelectionMode="Single"
-                    Style="{StaticResource ContentListViewStyle}">
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="ListViewItem">
+                    Style="{StaticResource ContentListBoxStyle}">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsLive}" Value="True">
                                     <Setter Property="Background" Value="LightGreen" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
-                    </ListView.ItemContainerStyle>
+                    </ListBox.ItemContainerStyle>
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="SelectionChanged">
                             <i:InvokeCommandAction Command="{Binding SessionSelectionChangedCommand}" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
-                </ListView>
+                </ListBox>
             </Grid>
             <Label
                 Grid.Row="0"
                 Grid.Column="3"
                 Content="Channels"
                 Style="{StaticResource HeaderLabelStyle}" />
-            <ListView
+            <ListBox
                 Grid.Row="1"
                 Grid.Column="3"
                 HorizontalContentAlignment="Stretch"
                 ItemsSource="{Binding Channels}"
                 ScrollViewer.VerticalScrollBarVisibility="Visible"
-                SelectionMode="Single"
-                Style="{StaticResource ContentListViewStyle}">
-                <ListView.ItemTemplate>
+                Style="{StaticResource ContentListBoxStyle}">
+                <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -203,7 +199,7 @@
                                 Grid.Column="1"
                                 Width="50"
                                 Margin="2,0"
-                                Command="{Binding DataContext.CopyUrlChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
+                                Command="{Binding DataContext.CopyUrlChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
                                 CommandParameter="{Binding}"
                                 Content="Copy"
                                 ToolTip="Copy URL to clipboard" />
@@ -211,7 +207,7 @@
                                 Grid.Column="2"
                                 Width="50"
                                 Margin="2,0"
-                                Command="{Binding DataContext.WatchVlcChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
+                                Command="{Binding DataContext.WatchVlcChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
                                 CommandParameter="{Binding}"
                                 Content="VLC"
                                 ToolTip="Watch with VLC media player" />
@@ -219,7 +215,7 @@
                                 Grid.Column="3"
                                 Width="50"
                                 Margin="2,0"
-                                Command="{Binding DataContext.WatchMpvChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
+                                Command="{Binding DataContext.WatchMpvChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
                                 CommandParameter="{Binding}"
                                 Content="MPV"
                                 ToolTip="Watch with MPV" />
@@ -227,14 +223,14 @@
                                 Grid.Column="4"
                                 Width="50"
                                 Margin="2,0,0,0"
-                                Command="{Binding DataContext.WatchChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
+                                Command="{Binding DataContext.WatchChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
                                 CommandParameter="{Binding}"
                                 Content="Watch"
                                 ToolTip="Watch with internal player" />
                         </Grid>
                     </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                </ListBox.ItemTemplate>
+            </ListBox>
             <Label
                 Grid.Row="2"
                 Grid.Column="0"
@@ -306,35 +302,33 @@
                 Grid.Column="1"
                 Content="Video On Demand"
                 Style="{StaticResource HeaderLabelStyle}" />
-            <ListView
+            <ListBox
                 Grid.Row="3"
                 Grid.Column="1"
                 ItemsSource="{Binding VodTypes}"
                 SelectedItem="{Binding SelectedVodType}"
-                SelectionMode="Single"
-                Style="{StaticResource ContentListViewStyle}">
+                Style="{StaticResource ContentListBoxStyle}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectionChanged">
                         <i:InvokeCommandAction Command="{Binding VodTypeSelectionChangedCommand}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
-            </ListView>
+            </ListBox>
             <Label
                 Grid.Row="2"
                 Grid.Column="2"
                 Grid.ColumnSpan="2"
                 Content="Episodes"
                 Style="{StaticResource HeaderLabelStyle}" />
-            <ListView
+            <ListBox
                 Grid.Row="3"
                 Grid.Column="2"
                 Grid.ColumnSpan="2"
                 HorizontalContentAlignment="Stretch"
                 ItemsSource="{Binding Episodes}"
                 ScrollViewer.VerticalScrollBarVisibility="Visible"
-                SelectionMode="Single"
-                Style="{StaticResource ContentListViewStyle}">
-                <ListView.ItemTemplate>
+                Style="{StaticResource ContentListBoxStyle}">
+                <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -349,7 +343,7 @@
                                 Grid.Column="1"
                                 Width="50"
                                 Margin="2,0"
-                                Command="{Binding DataContext.CopyUrlEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
+                                Command="{Binding DataContext.CopyUrlEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
                                 CommandParameter="{Binding}"
                                 Content="Copy"
                                 ToolTip="Copy URL to clipboard" />
@@ -357,7 +351,7 @@
                                 Grid.Column="2"
                                 Width="50"
                                 Margin="2,0"
-                                Command="{Binding DataContext.WatchVlcEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
+                                Command="{Binding DataContext.WatchVlcEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
                                 CommandParameter="{Binding}"
                                 Content="VLC"
                                 ToolTip="Watch with VLC media player" />
@@ -365,7 +359,7 @@
                                 Grid.Column="3"
                                 Width="50"
                                 Margin="2,0"
-                                Command="{Binding DataContext.WatchMpvEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
+                                Command="{Binding DataContext.WatchMpvEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
                                 CommandParameter="{Binding}"
                                 Content="MPV"
                                 ToolTip="Watch with MPV" />
@@ -373,14 +367,14 @@
                                 Grid.Column="4"
                                 Width="50"
                                 Margin="2,0,0,0"
-                                Command="{Binding DataContext.WatchEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
+                                Command="{Binding DataContext.WatchEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
                                 CommandParameter="{Binding}"
                                 Content="Watch"
                                 ToolTip="Watch with internal player" />
                         </Grid>
                     </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </Grid>
     </Grid>
 </Window>
