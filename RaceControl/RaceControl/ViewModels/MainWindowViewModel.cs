@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using System.Timers;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace RaceControl.ViewModels
@@ -38,6 +39,7 @@ namespace RaceControl.ViewModels
         private ICommand _closingCommand;
         private ICommand _mouseMoveCommand;
         private ICommand _seasonSelectionChangedCommand;
+        private ICommand _seriesCheckedCommand;
         private ICommand _eventSelectionChangedCommand;
         private ICommand _liveSessionSelectionChangedCommand;
         private ICommand _sessionSelectionChangedCommand;
@@ -94,6 +96,7 @@ namespace RaceControl.ViewModels
         public ICommand ClosingCommand => _closingCommand ??= new DelegateCommand(ClosingExecute);
         public ICommand MouseMoveCommand => _mouseMoveCommand ??= new DelegateCommand(MouseMoveExecute);
         public ICommand SeasonSelectionChangedCommand => _seasonSelectionChangedCommand ??= new DelegateCommand(SeasonSelectionChangedExecute);
+        public ICommand SeriesCheckedCommand => _seriesCheckedCommand ??= new DelegateCommand<RoutedEventArgs>(SeriesCheckedExecute);
         public ICommand EventSelectionChangedCommand => _eventSelectionChangedCommand ??= new DelegateCommand(EventSelectionChangedExecute);
         public ICommand LiveSessionSelectionChangedCommand => _liveSessionSelectionChangedCommand ??= new DelegateCommand(LiveSessionSelectionChangedExecute);
         public ICommand SessionSelectionChangedCommand => _sessionSelectionChangedCommand ??= new DelegateCommand(SessionSelectionChangedExecute);
@@ -270,6 +273,18 @@ namespace RaceControl.ViewModels
             {
                 var events = await _apiService.GetEventsForSeasonAsync(SelectedSeason.UID);
                 Events.AddRange(events);
+            }
+
+            IsBusy = false;
+        }
+
+        private void SeriesCheckedExecute(RoutedEventArgs args)
+        {
+            IsBusy = true;
+
+            if (args.Source is CheckBox checkBox && checkBox.Content is Series series)
+            {
+                // todo
             }
 
             IsBusy = false;

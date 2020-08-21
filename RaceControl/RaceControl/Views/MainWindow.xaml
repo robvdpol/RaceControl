@@ -92,8 +92,27 @@
                     Grid.Row="3"
                     Grid.Column="0"
                     ItemsSource="{Binding Series}"
-                    SelectionMode="Multiple"
-                    Style="{StaticResource ContentListBoxStyle}" />
+                    Style="{StaticResource ContentListBoxStyle}">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListBoxItem}">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox Content="{Binding}" IsChecked="{Binding IsChecked}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Checked">
+                                        <i:InvokeCommandAction Command="{Binding DataContext.SeriesCheckedCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}" PassEventArgsToCommand="True" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="Unchecked">
+                                        <i:InvokeCommandAction Command="{Binding DataContext.SeriesCheckedCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}" PassEventArgsToCommand="True" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </CheckBox>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
             </Grid>
             <Label
                 Grid.Row="0"
