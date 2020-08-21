@@ -5,9 +5,9 @@ using System.IO;
 
 namespace RaceControl.Common.Settings
 {
-    public class VideoSettings : BindableBase, IVideoSettings
+    public class Settings : BindableBase, ISettings
     {
-        private const string FILENAME = "settings.json";
+        private const string Filename = "RaceControl.settings.json";
 
         private readonly ILogger _logger;
 
@@ -16,7 +16,7 @@ namespace RaceControl.Common.Settings
         private bool _enableRecording;
         private string _recordingLocation = Environment.CurrentDirectory;
 
-        public VideoSettings(ILogger logger)
+        public Settings(ILogger logger)
         {
             _logger = logger;
         }
@@ -49,14 +49,14 @@ namespace RaceControl.Common.Settings
         {
             _logger.Info("Loading video settings...");
 
-            if (!File.Exists(FILENAME))
+            if (!File.Exists(Filename))
             {
                 return;
             }
 
             try
             {
-                using (var file = File.OpenText(FILENAME))
+                using (var file = File.OpenText(Filename))
                 {
                     new JsonSerializer().Populate(file, this);
                 }
@@ -75,7 +75,7 @@ namespace RaceControl.Common.Settings
 
             try
             {
-                using (var file = File.CreateText(FILENAME))
+                using (var file = File.CreateText(Filename))
                 {
                     new JsonSerializer().Serialize(file, this);
                 }

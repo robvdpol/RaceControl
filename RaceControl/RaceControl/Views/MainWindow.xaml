@@ -239,23 +239,24 @@
                             <CheckBox
                                 Margin="3"
                                 Content="Force lower quality live streams"
-                                IsChecked="{Binding VideoSettings.LowQualityMode}"
+                                IsChecked="{Binding Settings.LowQualityMode}"
                                 ToolTip="Use in case of stuttering caused by low bandwidth connection" />
                             <CheckBox
                                 Margin="3"
                                 Content="Use alternative CDN for live streams"
-                                IsChecked="{Binding VideoSettings.UseAlternativeStream}"
+                                IsChecked="{Binding Settings.UseAlternativeStream}"
                                 ToolTip="Use when regular live streams do not work" />
                             <CheckBox
                                 Margin="3"
                                 Content="Record live streams"
-                                IsChecked="{Binding VideoSettings.EnableRecording}"
+                                IsChecked="{Binding Settings.EnableRecording}"
                                 ToolTip="Save a copy of watched live streams to the file system" />
                             <TextBlock Margin="3" Text="Recording location:" />
                             <TextBlock
                                 Margin="3,0,3,3"
-                                Text="{Binding VideoSettings.RecordingLocation}"
-                                ToolTip="{Binding VideoSettings.RecordingLocation}" />
+                                Text="{Binding Settings.RecordingLocation}"
+                                TextWrapping="Wrap"
+                                ToolTip="{Binding Settings.RecordingLocation}" />
                             <Button
                                 Height="24"
                                 Margin="3"

@@ -53,7 +53,7 @@ namespace RaceControl.ViewModels
         private ICommand _setRecordingLocationCommand;
         private ICommand _deleteCredentialCommand;
 
-        private IVideoSettings _videoSettings;
+        private ISettings _settings;
         private string _token;
         private string _vlcExeLocation;
         private string _mpvExeLocation;
@@ -78,7 +78,7 @@ namespace RaceControl.ViewModels
             IGithubService githubService,
             ICredentialService credentialService,
             IStreamlinkLauncher streamlinkLauncher,
-            IVideoSettings videoSettings)
+            ISettings settings)
         {
             _logger = logger;
             _dialogService = dialogService;
@@ -86,7 +86,7 @@ namespace RaceControl.ViewModels
             _githubService = githubService;
             _credentialService = credentialService;
             _streamlinkLauncher = streamlinkLauncher;
-            _videoSettings = videoSettings;
+            _settings = settings;
         }
 
         public ICommand LoadedCommand => _loadedCommand ??= new DelegateCommand<RoutedEventArgs>(LoadedExecute);
@@ -108,10 +108,10 @@ namespace RaceControl.ViewModels
         public ICommand SetRecordingLocationCommand => _setRecordingLocationCommand ??= new DelegateCommand(SetRecordingLocationExecute);
         public ICommand DeleteCredentialCommand => _deleteCredentialCommand ??= new DelegateCommand(DeleteCredentialExecute);
 
-        public IVideoSettings VideoSettings
+        public ISettings Settings
         {
-            get => _videoSettings;
-            set => SetProperty(ref _videoSettings, value);
+            get => _settings;
+            set => SetProperty(ref _settings, value);
         }
 
         public string VlcExeLocation
@@ -207,7 +207,7 @@ namespace RaceControl.ViewModels
 
         private async void LoadedExecute(RoutedEventArgs args)
         {
-            VideoSettings.Load();
+            Settings.Load();
 
             try
             {
@@ -240,7 +240,7 @@ namespace RaceControl.ViewModels
             _refreshLiveSessionsTimer.Dispose();
             _refreshLiveSessionsTimer = null;
 
-            VideoSettings.Save();
+            Settings.Save();
         }
 
         private static void MouseMoveExecute()
@@ -509,9 +509,9 @@ namespace RaceControl.ViewModels
 
         private void SetRecordingLocationExecute()
         {
-            if (_dialogService.SelectFolder("Select a recording location", VideoSettings.RecordingLocation, out var recordingLocation))
+            if (_dialogService.SelectFolder("Select a recording location", Settings.RecordingLocation, out var recordingLocation))
             {
-                VideoSettings.RecordingLocation = recordingLocation;
+                Settings.RecordingLocation = recordingLocation;
             }
         }
 

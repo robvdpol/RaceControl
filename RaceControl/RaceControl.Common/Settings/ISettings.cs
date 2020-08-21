@@ -1,6 +1,6 @@
 ﻿namespace RaceControl.Common.Settings
 {
-    public interface IVideoSettings
+    public interface ISettings
     {
         bool LowQualityMode { get; set; }
 

@@ -31,7 +31,7 @@ namespace RaceControl.ViewModels
         private readonly IEventAggregator _eventAggregator;
         private readonly IApiService _apiService;
         private readonly IStreamlinkLauncher _streamlinkLauncher;
-        private readonly IVideoSettings _videoSettings;
+        private readonly ISettings _settings;
         private readonly LibVLC _libVLC;
         private readonly Guid _uniqueIdentifier = Guid.NewGuid();
 
@@ -83,13 +83,13 @@ namespace RaceControl.ViewModels
             IEventAggregator eventAggregator,
             IApiService apiService,
             IStreamlinkLauncher streamlinkLauncher,
-            IVideoSettings videoSettings,
+            ISettings settings,
             LibVLC libVLC)
         {
             _eventAggregator = eventAggregator;
             _apiService = apiService;
             _streamlinkLauncher = streamlinkLauncher;
-            _videoSettings = videoSettings;
+            _settings = settings;
             _libVLC = libVLC;
         }
 
@@ -242,7 +242,7 @@ namespace RaceControl.ViewModels
             {
                 _streamlinkProcess = _streamlinkLauncher.StartStreamlinkExternal(streamUrl, out streamUrl);
 
-                if (_videoSettings.EnableRecording)
+                if (_settings.EnableRecording)
                 {
                     var recordingStreamUrl = await GenerateStreamUrlAsync();
                     _streamlingRecordingProcess = _streamlinkLauncher.StartStreamlinkRecording(recordingStreamUrl, Title);

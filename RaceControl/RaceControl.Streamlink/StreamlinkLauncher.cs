@@ -13,13 +13,13 @@ namespace RaceControl.Streamlink
         private static readonly string StreamlinkBatchLocation = Path.Combine(Environment.CurrentDirectory, @"streamlink\streamlink.bat");
 
         private readonly ILogger _logger;
-        private readonly IVideoSettings _videoSettings;
+        private readonly ISettings _settings;
         private readonly IChildProcessTracker _childProcessTracker;
 
-        public StreamlinkLauncher(ILogger logger, IVideoSettings videoSettings, IChildProcessTracker childProcessTracker)
+        public StreamlinkLauncher(ILogger logger, ISettings videoSettings, IChildProcessTracker childProcessTracker)
         {
             _logger = logger;
-            _videoSettings = videoSettings;
+            _settings = videoSettings;
             _childProcessTracker = childProcessTracker;
         }
 
@@ -73,17 +73,17 @@ namespace RaceControl.Streamlink
 
         private string GetStreamIdentifier()
         {
-            if (_videoSettings.LowQualityMode)
+            if (_settings.LowQualityMode)
             {
-                return !_videoSettings.UseAlternativeStream ? "576p" : "576p_alt";
+                return !_settings.UseAlternativeStream ? "576p" : "576p_alt";
             }
 
-            return !_videoSettings.UseAlternativeStream ? "best" : "1080p_alt";
+            return !_settings.UseAlternativeStream ? "best" : "1080p_alt";
         }
 
         private string GetRecordingArguments(string title)
         {
-            if (!_videoSettings.EnableRecording)
+            if (!_settings.EnableRecording)
             {
                 return string.Empty;
             }
@@ -97,7 +97,7 @@ namespace RaceControl.Streamlink
         {
             var filename = $"{DateTime.Now:yyyyMMddHHmmss} {title}.mkv".RemoveInvalidFileNameChars(string.Empty);
 
-            return Path.Combine(_videoSettings.RecordingLocation, filename);
+            return Path.Combine(_settings.RecordingLocation, filename);
         }
     }
 }
