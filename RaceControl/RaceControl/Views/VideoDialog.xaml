@@ -67,116 +67,29 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </Grid>
-            <Grid
+            <Border
                 Grid.Row="1"
                 Height="Auto"
-                Background="White"
+                BorderBrush="#ABADB3"
+                BorderThickness="1"
                 Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="MouseMove">
-                        <i:InvokeCommandAction Command="{Binding MouseMoveControlBarCommand}" />
-                    </i:EventTrigger>
-                    <i:EventTrigger EventName="MouseEnter">
-                        <i:InvokeCommandAction Command="{Binding MouseEnterControlBarCommand}" />
-                    </i:EventTrigger>
-                    <i:EventTrigger EventName="MouseLeave">
-                        <i:InvokeCommandAction Command="{Binding MouseLeaveControlBarCommand}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <Grid Grid.Row="0" Margin="2">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock
-                        Grid.Column="0"
-                        Margin="4,2"
-                        VerticalAlignment="Center">
-                        <TextBlock.Text>
-                            <MultiBinding StringFormat="{}{0:00}:{1:00}:{2:00}">
-                                <Binding Path="DisplayTime.Hours" />
-                                <Binding Path="DisplayTime.Minutes" />
-                                <Binding Path="DisplayTime.Seconds" />
-                            </MultiBinding>
-                        </TextBlock.Text>
-                    </TextBlock>
-                    <Slider
-                        Grid.Column="1"
-                        Margin="2"
-                        IsEnabled="{Binding IsLive, Converter={StaticResource InverseBooleanConverter}}"
-                        IsMoveToPointEnabled="True"
-                        IsSnapToTickEnabled="False"
-                        Maximum="{Binding Duration}"
-                        TickPlacement="BottomRight"
-                        Value="{Binding SliderTime}">
-                        <Slider.TickFrequency>
-                            <Binding Converter="{StaticResource DivideDoubleConverter}" Path="Duration">
-                                <Binding.ConverterParameter>
-                                    <s:Double>100</s:Double>
-                                </Binding.ConverterParameter>
-                            </Binding>
-                        </Slider.TickFrequency>
-                    </Slider>
-                </Grid>
-                <Grid Grid.Row="1" Margin="2">
+                <Grid Background="White">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseMove">
+                            <i:InvokeCommandAction Command="{Binding MouseMoveControlBarCommand}" />
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="MouseEnter">
+                            <i:InvokeCommandAction Command="{Binding MouseEnterControlBarCommand}" />
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="MouseLeave">
+                            <i:InvokeCommandAction Command="{Binding MouseLeaveControlBarCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <StackPanel
-                        Grid.Row="0"
-                        Grid.Column="0"
-                        Orientation="Horizontal">
-                        <Button
-                            Command="{Binding TogglePauseCommand}"
-                            Content="Pause"
-                            Style="{StaticResource ControlBarButtonStyle}"
-                            ToolTip="Toggle pause" />
-                        <Button
-                            Command="{Binding ToggleMuteCommand}"
-                            Content="Mute"
-                            Style="{StaticResource ControlBarButtonStyle}"
-                            ToolTip="Toggle mute" />
-                        <Button
-                            Command="{Binding FastForwardCommand}"
-                            CommandParameter="-60"
-                            Content="-1 min"
-                            Style="{StaticResource ControlBarButtonStyle}"
-                            ToolTip="Rewind one minute" />
-                        <Button
-                            Command="{Binding FastForwardCommand}"
-                            CommandParameter="-10"
-                            Content="-10 sec"
-                            Style="{StaticResource ControlBarButtonStyle}"
-                            ToolTip="Rewind ten seconds" />
-                        <Button
-                            Command="{Binding FastForwardCommand}"
-                            CommandParameter="10"
-                            Content="+10 sec"
-                            Style="{StaticResource ControlBarButtonStyle}"
-                            ToolTip="Fast forward ten seconds" />
-                        <Button
-                            Command="{Binding FastForwardCommand}"
-                            CommandParameter="60"
-                            Content="+1 min"
-                            Style="{StaticResource ControlBarButtonStyle}"
-                            ToolTip="Fast forward one minute" />
-                        <Button
-                            Command="{Binding SyncSessionCommand}"
-                            Content="Sync"
-                            Style="{StaticResource ControlBarButtonStyle}"
-                            ToolTip="Synchronize playback across players *experimental*" />
-                    </StackPanel>
-                    <Grid Grid.Row="1" Grid.Column="0">
+                    <Grid Grid.Row="0" Margin="2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
@@ -184,148 +97,238 @@
                         <TextBlock
                             Grid.Column="0"
                             Margin="4,2"
-                            VerticalAlignment="Center"
-                            Text="Audio track:" />
-                        <ComboBox
+                            VerticalAlignment="Center">
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0:00}:{1:00}:{2:00}">
+                                    <Binding Path="DisplayTime.Hours" />
+                                    <Binding Path="DisplayTime.Minutes" />
+                                    <Binding Path="DisplayTime.Seconds" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                        <Slider
                             Grid.Column="1"
                             Margin="2"
-                            DisplayMemberPath="Name"
-                            ItemsSource="{Binding AudioTrackDescriptions}">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction Command="{Binding AudioTrackSelectionChangedCommand}" PassEventArgsToCommand="True" />
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-                        </ComboBox>
+                            IsEnabled="{Binding IsLive, Converter={StaticResource InverseBooleanConverter}}"
+                            IsMoveToPointEnabled="True"
+                            IsSnapToTickEnabled="False"
+                            Maximum="{Binding Duration}"
+                            TickPlacement="BottomRight"
+                            Value="{Binding SliderTime}">
+                            <Slider.TickFrequency>
+                                <Binding Converter="{StaticResource DivideDoubleConverter}" Path="Duration">
+                                    <Binding.ConverterParameter>
+                                        <s:Double>100</s:Double>
+                                    </Binding.ConverterParameter>
+                                </Binding>
+                            </Slider.TickFrequency>
+                        </Slider>
                     </Grid>
-                    <Grid
-                        Grid.Row="0"
-                        Grid.RowSpan="2"
-                        Grid.Column="1"
-                        HorizontalAlignment="Center">
+                    <Grid Grid.Row="1" Margin="2">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <Button
+                        <StackPanel
                             Grid.Row="0"
-                            Grid.RowSpan="2"
                             Grid.Column="0"
-                            MinWidth="55"
-                            Command="{Binding ToggleFullScreenCommand}"
-                            Content="Fullscreen"
-                            Style="{StaticResource ControlBarButtonStyle}"
-                            ToolTip="Toggle fullscreen mode" />
-                        <Button
-                            Grid.Row="0"
-                            Grid.Column="1"
-                            MinWidth="25"
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.TopLeft}"
-                            Content="TL"
-                            Style="{StaticResource ControlBarButtonStyle}"
-                            ToolTip="Move window to top left corner of current screen" />
-                        <Button
-                            Grid.Row="0"
-                            Grid.Column="2"
-                            MinWidth="25"
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.TopRight}"
-                            Content="TR"
-                            Style="{StaticResource ControlBarButtonStyle}"
-                            ToolTip="Move window to top right corner of current screen" />
-                        <Button
-                            Grid.Row="1"
-                            Grid.Column="1"
-                            MinWidth="25"
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.BottomLeft}"
-                            Content="BL"
-                            Style="{StaticResource ControlBarButtonStyle}"
-                            ToolTip="Move window to bottom left corner of current screen" />
-                        <Button
-                            Grid.Row="1"
-                            Grid.Column="2"
-                            MinWidth="25"
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.BottomRight}"
-                            Content="BR"
-                            Style="{StaticResource ControlBarButtonStyle}"
-                            ToolTip="Move window to bottom right corner of current screen" />
-                        <Button
-                            Grid.Row="0"
-                            Grid.RowSpan="2"
-                            Grid.Column="3"
-                            MinWidth="55"
-                            Command="{Binding CloseWindowCommand}"
-                            Content="Close"
-                            Style="{StaticResource ControlBarButtonStyle}"
-                            ToolTip="Close window (Esc)"
-                            Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                    </Grid>
-                    <CheckBox
-                        Grid.Row="0"
-                        Grid.Column="2"
-                        Margin="2"
-                        VerticalAlignment="Center"
-                        Content="Resizable window (uncheck to hide borders)"
-                        IsChecked="{Binding ResizeMode, Converter={StaticResource ResizeModeToBooleanConverter}}"
-                        IsEnabled="{Binding WindowState, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static WindowState.Normal}}" />
-                    <StackPanel
-                        Grid.Row="1"
-                        Grid.Column="2"
-                        Orientation="Horizontal">
-                        <Button
-                            Command="{Binding ScanChromecastCommand}"
-                            Content="Scan"
-                            Style="{StaticResource ControlBarButtonStyle}"
-                            ToolTip="Scan for Chromecast devices in local network" />
-                        <Grid>
+                            Orientation="Horizontal">
+                            <Button
+                                Command="{Binding TogglePauseCommand}"
+                                Content="Pause"
+                                Style="{StaticResource ControlBarButtonStyle}"
+                                ToolTip="Toggle pause" />
+                            <Button
+                                Command="{Binding ToggleMuteCommand}"
+                                Content="Mute"
+                                Style="{StaticResource ControlBarButtonStyle}"
+                                ToolTip="Toggle mute" />
+                            <Button
+                                Command="{Binding FastForwardCommand}"
+                                CommandParameter="-60"
+                                Content="-1 min"
+                                Style="{StaticResource ControlBarButtonStyle}"
+                                ToolTip="Rewind one minute" />
+                            <Button
+                                Command="{Binding FastForwardCommand}"
+                                CommandParameter="-10"
+                                Content="-10 sec"
+                                Style="{StaticResource ControlBarButtonStyle}"
+                                ToolTip="Rewind ten seconds" />
+                            <Button
+                                Command="{Binding FastForwardCommand}"
+                                CommandParameter="10"
+                                Content="+10 sec"
+                                Style="{StaticResource ControlBarButtonStyle}"
+                                ToolTip="Fast forward ten seconds" />
+                            <Button
+                                Command="{Binding FastForwardCommand}"
+                                CommandParameter="60"
+                                Content="+1 min"
+                                Style="{StaticResource ControlBarButtonStyle}"
+                                ToolTip="Fast forward one minute" />
+                            <Button
+                                Command="{Binding SyncSessionCommand}"
+                                Content="Sync"
+                                Style="{StaticResource ControlBarButtonStyle}"
+                                ToolTip="Synchronize playback across players *experimental*" />
+                        </StackPanel>
+                        <Grid Grid.Row="1" Grid.Column="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Grid.Column="0"
+                                Margin="4,2"
+                                VerticalAlignment="Center"
+                                Text="Audio track:" />
                             <ComboBox
-                                Width="170"
+                                Grid.Column="1"
                                 Margin="2"
                                 DisplayMemberPath="Name"
-                                IsEnabled="{Binding HasItems, RelativeSource={RelativeSource Self}}"
-                                ItemsSource="{Binding RendererItems}"
-                                SelectedItem="{Binding SelectedRendererItem}" />
-                            <TextBlock
-                                Width="170"
-                                Margin="2"
-                                Padding="6,0,0,2"
-                                VerticalAlignment="Center"
-                                IsHitTestVisible="False"
-                                Text="Select Chromecast device...">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Visibility" Value="Hidden" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding SelectedRendererItem}" Value="{x:Null}">
-                                                <Setter Property="Visibility" Value="Visible" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
+                                ItemsSource="{Binding AudioTrackDescriptions}">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="SelectionChanged">
+                                        <i:InvokeCommandAction Command="{Binding AudioTrackSelectionChangedCommand}" PassEventArgsToCommand="True" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </ComboBox>
                         </Grid>
-                        <Button
-                            Command="{Binding StartCastVideoCommand}"
-                            Content="Cast"
-                            Style="{StaticResource ControlBarButtonStyle}"
-                            ToolTip="Cast stream to selected Chromecast device" />
-                        <Button
-                            Command="{Binding StopCastVideoCommand}"
-                            Content="Stop"
-                            Style="{StaticResource ControlBarButtonStyle}"
-                            ToolTip="Stop casting and resume stream in window" />
-                    </StackPanel>
+                        <Grid
+                            Grid.Row="0"
+                            Grid.RowSpan="2"
+                            Grid.Column="1"
+                            HorizontalAlignment="Center">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Button
+                                Grid.Row="0"
+                                Grid.RowSpan="2"
+                                Grid.Column="0"
+                                MinWidth="55"
+                                Command="{Binding ToggleFullScreenCommand}"
+                                Content="Fullscreen"
+                                Style="{StaticResource ControlBarButtonStyle}"
+                                ToolTip="Toggle fullscreen mode" />
+                            <Button
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                MinWidth="25"
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.TopLeft}"
+                                Content="TL"
+                                Style="{StaticResource ControlBarButtonStyle}"
+                                ToolTip="Move window to top left corner of current screen" />
+                            <Button
+                                Grid.Row="0"
+                                Grid.Column="2"
+                                MinWidth="25"
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.TopRight}"
+                                Content="TR"
+                                Style="{StaticResource ControlBarButtonStyle}"
+                                ToolTip="Move window to top right corner of current screen" />
+                            <Button
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                MinWidth="25"
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.BottomLeft}"
+                                Content="BL"
+                                Style="{StaticResource ControlBarButtonStyle}"
+                                ToolTip="Move window to bottom left corner of current screen" />
+                            <Button
+                                Grid.Row="1"
+                                Grid.Column="2"
+                                MinWidth="25"
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.BottomRight}"
+                                Content="BR"
+                                Style="{StaticResource ControlBarButtonStyle}"
+                                ToolTip="Move window to bottom right corner of current screen" />
+                            <Button
+                                Grid.Row="0"
+                                Grid.RowSpan="2"
+                                Grid.Column="3"
+                                MinWidth="55"
+                                Command="{Binding CloseWindowCommand}"
+                                Content="Close"
+                                Style="{StaticResource ControlBarButtonStyle}"
+                                ToolTip="Close window (Esc)"
+                                Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        </Grid>
+                        <CheckBox
+                            Grid.Row="0"
+                            Grid.Column="2"
+                            Margin="2"
+                            VerticalAlignment="Center"
+                            Content="Resizable window (uncheck to hide borders)"
+                            IsChecked="{Binding ResizeMode, Converter={StaticResource ResizeModeToBooleanConverter}}"
+                            IsEnabled="{Binding WindowState, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static WindowState.Normal}}" />
+                        <StackPanel
+                            Grid.Row="1"
+                            Grid.Column="2"
+                            Orientation="Horizontal">
+                            <Button
+                                Command="{Binding ScanChromecastCommand}"
+                                Content="Scan"
+                                Style="{StaticResource ControlBarButtonStyle}"
+                                ToolTip="Scan for Chromecast devices in local network" />
+                            <Grid>
+                                <ComboBox
+                                    Width="170"
+                                    Margin="2"
+                                    DisplayMemberPath="Name"
+                                    IsEnabled="{Binding HasItems, RelativeSource={RelativeSource Self}}"
+                                    ItemsSource="{Binding RendererItems}"
+                                    SelectedItem="{Binding SelectedRendererItem}" />
+                                <TextBlock
+                                    Width="170"
+                                    Margin="2"
+                                    Padding="6,0,0,2"
+                                    VerticalAlignment="Center"
+                                    IsHitTestVisible="False"
+                                    Text="Select Chromecast device...">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Hidden" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SelectedRendererItem}" Value="{x:Null}">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Grid>
+                            <Button
+                                Command="{Binding StartCastVideoCommand}"
+                                Content="Cast"
+                                Style="{StaticResource ControlBarButtonStyle}"
+                                ToolTip="Cast stream to selected Chromecast device" />
+                            <Button
+                                Command="{Binding StopCastVideoCommand}"
+                                Content="Stop"
+                                Style="{StaticResource ControlBarButtonStyle}"
+                                ToolTip="Stop casting and resume stream in window" />
+                        </StackPanel>
+                    </Grid>
                 </Grid>
-            </Grid>
+            </Border>
         </Grid>
     </vlc:VideoView>
 </UserControl>
