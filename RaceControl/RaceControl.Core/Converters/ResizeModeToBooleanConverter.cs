@@ -20,7 +20,7 @@ namespace RaceControl.Core.Converters
                 return resizeMode == ResizeMode.CanResize;
             }
 
-            return null;
+            return DependencyProperty.UnsetValue;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -35,7 +35,7 @@ namespace RaceControl.Core.Converters
                 return boolValue ? ResizeMode.CanResize : ResizeMode.NoResize;
             }
 
-            return null;
+            return DependencyProperty.UnsetValue;
         }
     }
 }

@@ -6,6 +6,7 @@
     xmlns:enums="clr-namespace:RaceControl.Enums"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:prism="http://prismlibrary.com/"
+    xmlns:s="clr-namespace:System;assembly=mscorlib"
     xmlns:vlc="clr-namespace:LibVLCSharp.WPF;assembly=LibVLCSharp.WPF"
     prism:ViewModelLocator.AutoWireViewModel="True">
     <UserControl.Resources>
@@ -13,6 +14,7 @@
         <core:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <core:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
         <core:ResizeModeToBooleanConverter x:Key="ResizeModeToBooleanConverter" />
+        <core:DivideDoubleConverter x:Key="DivideDoubleConverter" />
         <Style x:Key="ControlBarButtonStyle" TargetType="Button">
             <Setter Property="Margin" Value="2" />
             <Setter Property="Width" Value="Auto" />
@@ -109,9 +111,16 @@
                         IsMoveToPointEnabled="True"
                         IsSnapToTickEnabled="False"
                         Maximum="{Binding Duration}"
-                        TickFrequency="60000"
                         TickPlacement="BottomRight"
-                        Value="{Binding SliderTime}" />
+                        Value="{Binding SliderTime}">
+                        <Slider.TickFrequency>
+                            <Binding Converter="{StaticResource DivideDoubleConverter}" Path="Duration">
+                                <Binding.ConverterParameter>
+                                    <s:Double>100</s:Double>
+                                </Binding.ConverterParameter>
+                            </Binding>
+                        </Slider.TickFrequency>
+                    </Slider>
                 </Grid>
                 <Grid Grid.Row="1" Margin="2">
                     <Grid.RowDefinitions>

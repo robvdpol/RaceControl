@@ -5,19 +5,24 @@ using System.Windows.Data;
 
 namespace RaceControl.Core.Converters
 {
-    [ValueConversion(typeof(Enum), typeof(bool))]
-    public class EnumToBooleanConverter : IValueConverter
+    [ValueConversion(typeof(double), typeof(double))]
+    public class DivideDoubleConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (targetType != typeof(bool) && targetType != typeof(bool?))
+            if (targetType != typeof(double) && targetType != typeof(double?))
             {
-                throw new InvalidOperationException("The target must be a boolean");
+                throw new InvalidOperationException("The target must be a double");
             }
 
-            if (value is Enum enumValue && parameter is Enum enumParameter)
+            if (value != null)
             {
-                return enumValue.Equals(enumParameter);
+                var dblValue = System.Convert.ToDouble(value);
+
+                if (parameter is double dblDivide)
+                {
+                    return dblValue / dblDivide;
+                }
             }
 
             return DependencyProperty.UnsetValue;

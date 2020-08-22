@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 
 namespace RaceControl.Core.Converters
@@ -19,7 +20,7 @@ namespace RaceControl.Core.Converters
                 return !boolValue;
             }
 
-            return null;
+            return DependencyProperty.UnsetValue;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
