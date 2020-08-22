@@ -39,20 +39,20 @@ namespace RaceControl.ViewModels
 
         public override void OnDialogOpened(IDialogParameters parameters)
         {
-            base.OnDialogOpened(parameters);
-
             Title = "Download";
             Name = parameters.GetValue<string>(ParameterNames.NAME);
             var streamUrl = parameters.GetValue<string>(ParameterNames.STREAM_URL);
             var filename = parameters.GetValue<string>(ParameterNames.FILENAME);
             _downloadProcess = _streamlinkLauncher.StartStreamlinkDownload(streamUrl, filename, DownloadProcess_Exited);
+
+            base.OnDialogOpened(parameters);
         }
 
         public override void OnDialogClosed()
         {
-            base.OnDialogClosed();
-
             CleanupProcess(_downloadProcess);
+
+            base.OnDialogClosed();
         }
 
         private void DownloadProcess_Exited(int exitCode)

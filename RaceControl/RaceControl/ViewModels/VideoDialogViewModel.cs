@@ -227,8 +227,6 @@ namespace RaceControl.ViewModels
 
         public override async void OnDialogOpened(IDialogParameters parameters)
         {
-            base.OnDialogOpened(parameters);
-
             _token = parameters.GetValue<string>(ParameterNames.TOKEN);
             _contentType = parameters.GetValue<ContentType>(ParameterNames.CONTENT_TYPE);
             _contentUrl = parameters.GetValue<string>(ParameterNames.CONTENT_URL);
@@ -255,14 +253,14 @@ namespace RaceControl.ViewModels
 
             _showControlsTimer = new Timer(2000) { AutoReset = false };
             _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
-
+            
             _eventAggregator.GetEvent<SyncStreamsEvent>().Subscribe(OnSyncSession);
+
+            base.OnDialogOpened(parameters);
         }
 
         public override void OnDialogClosed()
         {
-            base.OnDialogClosed();
-
             _eventAggregator.GetEvent<SyncStreamsEvent>().Unsubscribe(OnSyncSession);
 
             if (_showControlsTimer != null)
@@ -286,6 +284,8 @@ namespace RaceControl.ViewModels
 
             CleanupProcess(_streamlinkProcess);
             CleanupProcess(_streamlinkRecordingProcess);
+
+            base.OnDialogClosed();
         }
 
         private void Media_DurationChanged(object sender, MediaDurationChangedEventArgs e)

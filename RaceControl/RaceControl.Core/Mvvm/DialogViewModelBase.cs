@@ -9,6 +9,7 @@ namespace RaceControl.Core.Mvvm
     {
         private ICommand _closeWindowCommand;
 
+        private bool _opened;
         private string _title;
 
         public ICommand CloseWindowCommand => _closeWindowCommand ??= new DelegateCommand(CloseWindowExecute);
@@ -23,15 +24,17 @@ namespace RaceControl.Core.Mvvm
 
         public virtual bool CanCloseDialog()
         {
-            return true;
+            return _opened;
         }
 
         public virtual void OnDialogClosed()
         {
+            _opened = false;
         }
 
         public virtual void OnDialogOpened(IDialogParameters parameters)
         {
+            _opened = true;
         }
 
         protected void RaiseRequestClose(IDialogResult dialogResult)
@@ -41,7 +44,7 @@ namespace RaceControl.Core.Mvvm
 
         private void CloseWindowExecute()
         {
-            RaiseRequestClose(null);
+            RaiseRequestClose(new DialogResult(ButtonResult.None));
         }
     }
 }
