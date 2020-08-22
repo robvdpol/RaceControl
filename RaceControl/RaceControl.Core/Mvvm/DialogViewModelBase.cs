@@ -9,10 +9,10 @@ namespace RaceControl.Core.Mvvm
     {
         private ICommand _closeWindowCommand;
 
-        private bool _opened;
         private string _title;
+        private bool _opened;
 
-        public ICommand CloseWindowCommand => _closeWindowCommand ??= new DelegateCommand(CloseWindowExecute);
+        public ICommand CloseWindowCommand => _closeWindowCommand ??= new DelegateCommand(CloseWindowExecute, CanCloseDialog).ObservesProperty(() => Opened);
 
         public string Title
         {
@@ -20,21 +20,27 @@ namespace RaceControl.Core.Mvvm
             protected set => SetProperty(ref _title, value);
         }
 
+        public bool Opened
+        {
+            get => _opened;
+            private set => SetProperty(ref _opened, value);
+        }
+
         public event Action<IDialogResult> RequestClose;
 
         public virtual bool CanCloseDialog()
         {
-            return _opened;
+            return Opened;
         }
 
         public virtual void OnDialogClosed()
         {
-            _opened = false;
+            Opened = false;
         }
 
         public virtual void OnDialogOpened(IDialogParameters parameters)
         {
-            _opened = true;
+            Opened = true;
         }
 
         protected void RaiseRequestClose(IDialogResult dialogResult)

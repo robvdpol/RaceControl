@@ -253,8 +253,11 @@ namespace RaceControl.ViewModels
 
             _showControlsTimer = new Timer(2000) { AutoReset = false };
             _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
-            
+
             _eventAggregator.GetEvent<SyncStreamsEvent>().Subscribe(OnSyncSession);
+
+            // Prevent closing the dialog too soon, this causes problems with LibVLC
+            await Task.Delay(2000);
 
             base.OnDialogOpened(parameters);
         }
