@@ -53,6 +53,7 @@ namespace RaceControl.ViewModels
         private ICommand _copyUrlChannelCommand;
         private ICommand _copyUrlEpisodeCommand;
         private ICommand _downloadChannelCommand;
+        private ICommand _downloadEpisodeCommand;
         private ICommand _setRecordingLocationCommand;
         private ICommand _deleteCredentialCommand;
 
@@ -111,6 +112,7 @@ namespace RaceControl.ViewModels
         public ICommand CopyUrlChannelCommand => _copyUrlChannelCommand ??= new DelegateCommand<Channel>(CopyUrlChannelExecute);
         public ICommand CopyUrlEpisodeCommand => _copyUrlEpisodeCommand ??= new DelegateCommand<Episode>(CopyUrlEpisodeExecute);
         public ICommand DownloadChannelCommand => _downloadChannelCommand ??= new DelegateCommand<Channel>(DownloadChannelExecute, CanDownloadChannelExecute).ObservesProperty(() => SelectedSession).ObservesProperty(() => SelectedLiveSession);
+        public ICommand DownloadEpisodeCommand => _downloadEpisodeCommand ??= new DelegateCommand<Episode>(DownloadEpisodeExecute);
         public ICommand SetRecordingLocationCommand => _setRecordingLocationCommand ??= new DelegateCommand(SetRecordingLocationExecute);
         public ICommand DeleteCredentialCommand => _deleteCredentialCommand ??= new DelegateCommand(DeleteCredentialExecute);
 
@@ -225,6 +227,7 @@ namespace RaceControl.ViewModels
 
         private async void LoadedExecute(RoutedEventArgs args)
         {
+            IsBusy = true;
             Settings.Load();
 
             try
@@ -235,6 +238,8 @@ namespace RaceControl.ViewModels
             {
                 _logger.Error(ex, "An exception occurred while checking for updates.");
             }
+
+            IsBusy = false;
 
             _dialogService.ShowDialog(nameof(LoginDialog), null, async dialogResult =>
             {
@@ -253,10 +258,13 @@ namespace RaceControl.ViewModels
 
         private void ClosingExecute()
         {
-            _refreshLiveSessionsTimer.Stop();
-            _refreshLiveSessionsTimer.Elapsed -= RefreshLiveSessionsTimer_Elapsed;
-            _refreshLiveSessionsTimer.Dispose();
-            _refreshLiveSessionsTimer = null;
+            if (_refreshLiveSessionsTimer != null)
+            {
+                _refreshLiveSessionsTimer.Stop();
+                _refreshLiveSessionsTimer.Elapsed -= RefreshLiveSessionsTimer_Elapsed;
+                _refreshLiveSessionsTimer.Dispose();
+                _refreshLiveSessionsTimer = null;
+            }
 
             Settings.Save();
         }
@@ -539,7 +547,35 @@ namespace RaceControl.ViewModels
             if (_dialogService.SelectFile("Select a filename", Settings.RecordingLocation, defaultFilename, ".mkv", out var filename))
             {
                 var url = await _apiService.GetTokenisedUrlForChannelAsync(_token, channel.Self);
-                var process = _streamlinkLauncher.StartStreamlinkDownload(url, filename);
+                var parameters = new DialogParameters
+                {
+                    { ParameterNames.NAME, title },
+                    { ParameterNames.STREAM_URL, url },
+                    { ParameterNames.FILENAME, filename }
+                };
+
+                _logger.Info($"Starting download for channel with parameters: '{parameters}'.");
+                _dialogService.Show(nameof(DownloadDialog), parameters, null);
+            }
+        }
+
+        private async void DownloadEpisodeExecute(Episode episode)
+        {
+            var title = GetTitle(episode);
+            var defaultFilename = $"{title}.mkv".RemoveInvalidFileNameChars();
+
+            if (_dialogService.SelectFile("Select a filename", Settings.RecordingLocation, defaultFilename, ".mkv", out var filename))
+            {
+                var url = await _apiService.GetTokenisedUrlForAssetAsync(_token, episode.Items.First());
+                var parameters = new DialogParameters
+                {
+                    { ParameterNames.NAME, title },
+                    { ParameterNames.STREAM_URL, url },
+                    { ParameterNames.FILENAME, filename }
+                };
+
+                _logger.Info($"Starting download for episode with parameters: '{parameters}'.");
+                _dialogService.Show(nameof(DownloadDialog), parameters, null);
             }
         }
 

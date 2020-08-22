@@ -60,7 +60,7 @@ namespace RaceControl.ViewModels
         private bool _isLive;
         private bool _isCasting;
         private Process _streamlinkProcess;
-        private Process _streamlingRecordingProcess;
+        private Process _streamlinkRecordingProcess;
         private MediaPlayer _mediaPlayer;
         private Media _media;
         private ObservableCollection<TrackDescription> _audioTrackDescriptions;
@@ -245,7 +245,7 @@ namespace RaceControl.ViewModels
                 if (_settings.EnableRecording)
                 {
                     var recordingStreamUrl = await GenerateStreamUrlAsync();
-                    _streamlingRecordingProcess = _streamlinkLauncher.StartStreamlinkRecording(recordingStreamUrl, Title);
+                    _streamlinkRecordingProcess = _streamlinkLauncher.StartStreamlinkRecording(recordingStreamUrl, Title);
                 }
             }
 
@@ -265,10 +265,13 @@ namespace RaceControl.ViewModels
 
             _eventAggregator.GetEvent<SyncStreamsEvent>().Unsubscribe(OnSyncSession);
 
-            _showControlsTimer.Stop();
-            _showControlsTimer.Elapsed -= ShowControlsTimer_Elapsed;
-            _showControlsTimer.Dispose();
-            _showControlsTimer = null;
+            if (_showControlsTimer != null)
+            {
+                _showControlsTimer.Stop();
+                _showControlsTimer.Elapsed -= ShowControlsTimer_Elapsed;
+                _showControlsTimer.Dispose();
+                _showControlsTimer = null;
+            }
 
             StopPlayback();
             RemoveMediaPlayer();
@@ -281,8 +284,8 @@ namespace RaceControl.ViewModels
                 RendererDiscoverer.Dispose();
             }
 
-            _streamlinkProcess?.Kill(true);
-            _streamlingRecordingProcess?.Kill(true);
+            CleanupProcess(_streamlinkProcess);
+            CleanupProcess(_streamlinkRecordingProcess);
         }
 
         private void Media_DurationChanged(object sender, MediaDurationChangedEventArgs e)

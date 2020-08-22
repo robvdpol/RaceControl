@@ -20,9 +20,9 @@ namespace RaceControl.Common.Utils
             };
         }
 
-        public static Process BrowseToUrl(string url)
+        public static void BrowseToUrl(string url)
         {
-            return Process.Start("explorer.exe", url);
+            Process.Start("explorer.exe", url).Dispose();
         }
     }
 }

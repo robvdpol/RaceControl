@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 
 namespace RaceControl.Streamlink
 {
@@ -8,7 +9,7 @@ namespace RaceControl.Streamlink
 
         Process StartStreamlinkRecording(string streamUrl, string title);
 
-        Process StartStreamlinkDownload(string streamUrl, string filename);
+        Process StartStreamlinkDownload(string streamUrl, string filename, Action<int> exitAction);
 
         void StartStreamlinkVlc(string vlcExeLocation, string streamUrl, string title);
 

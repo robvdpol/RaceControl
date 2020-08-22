@@ -54,7 +54,7 @@ namespace RaceControl.Streamlink
             return process;
         }
 
-        public Process StartStreamlinkDownload(string streamUrl, string filename)
+        public Process StartStreamlinkDownload(string streamUrl, string filename, Action<int> exitAction)
         {
             var streamlinkArguments = $"--output \"{filename}\" --force --hls-audio-select * \"{streamUrl}\" best";
 
@@ -64,6 +64,7 @@ namespace RaceControl.Streamlink
             process.EnableRaisingEvents = true;
             process.OutputDataReceived += (sender, args) => _logger.Info(args.Data);
             process.ErrorDataReceived += (sender, args) => _logger.Error(args.Data);
+            process.Exited += (sender, args) => exitAction(process.ExitCode);
             process.Start();
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
@@ -80,7 +81,9 @@ namespace RaceControl.Streamlink
 
             _logger.Info($"Starting VLC Streamlink-instance for stream-URL '{streamUrl}' with identifier '{streamIdentifier}'...");
 
-            ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, false, true).Start();
+            var process = ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, false, true);
+            process.Start();
+            process.Dispose();
         }
 
         public void StartStreamlinkMpv(string mpvExeLocation, string streamUrl, string title)
@@ -91,7 +94,9 @@ namespace RaceControl.Streamlink
 
             _logger.Info($"Starting MPV Streamlink-instance for stream-URL '{streamUrl}' with identifier '{streamIdentifier}'...");
 
-            ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, false, true).Start();
+            var process = ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, false, true);
+            process.Start();
+            process.Dispose();
         }
 
         private string GetStreamIdentifier()

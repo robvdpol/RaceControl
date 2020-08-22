@@ -51,6 +51,7 @@ namespace RaceControl
             containerRegistry.RegisterDialogWindow<DialogWindow>();
             containerRegistry.RegisterDialog<LoginDialog, LoginDialogViewModel>();
             containerRegistry.RegisterDialog<UpgradeDialog, UpgradeDialogViewModel>();
+            containerRegistry.RegisterDialog<DownloadDialog, DownloadDialogViewModel>();
             containerRegistry.RegisterDialog<VideoDialog, VideoDialogViewModel>();
 
             containerRegistry.RegisterInstance(new LibVLC());

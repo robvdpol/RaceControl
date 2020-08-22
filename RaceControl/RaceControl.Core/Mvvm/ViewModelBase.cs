@@ -1,5 +1,6 @@
 ﻿using Prism.Commands;
 using Prism.Mvvm;
+using System.Diagnostics;
 using System.Windows.Input;
 
 namespace RaceControl.Core.Mvvm
@@ -19,6 +20,19 @@ namespace RaceControl.Core.Mvvm
 
         public ICommand PreviewKeyDownCommand => _previewKeyDownCommand ??= new DelegateCommand<KeyEventArgs>(PreviewKeyDownExecute);
         public ICommand KeyDownCommand => _keyDownCommand ??= new DelegateCommand<KeyEventArgs>(KeyDownExecute);
+
+        protected void CleanupProcess(Process process)
+        {
+            if (process != null)
+            {
+                if (!process.HasExited)
+                {
+                    process.Kill(true);
+                }
+
+                process.Dispose();
+            }
+        }
 
         private void PreviewKeyDownExecute(KeyEventArgs args)
         {
