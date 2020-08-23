@@ -79,6 +79,7 @@ namespace RaceControl.ViewModels
         private double _height = 705;
         private ResizeMode _resizeMode = ResizeMode.CanResize;
         private WindowState _windowState = WindowState.Normal;
+        private WindowStartupLocation _startupLocation = WindowStartupLocation.CenterOwner;
 
         public VideoDialogViewModel(
             IEventAggregator eventAggregator,
@@ -258,6 +259,12 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _windowState, value);
         }
 
+        public WindowStartupLocation StartupLocation
+        {
+            get => _startupLocation;
+            set => SetProperty(ref _startupLocation, value);
+        }
+
         public VideoDialogInstance GetVideoDialogInstance()
         {
             return new VideoDialogInstance
@@ -286,6 +293,7 @@ namespace RaceControl.ViewModels
 
             if (instance != null)
             {
+                StartupLocation = WindowStartupLocation.Manual;
                 ResizeMode = (ResizeMode)instance.ResizeMode;
                 WindowState = (WindowState)instance.WindowState;
                 Top = instance.Top;
@@ -296,6 +304,10 @@ namespace RaceControl.ViewModels
                     Width = instance.Width;
                     Height = instance.Height;
                 }
+            }
+            else
+            {
+                StartupLocation = WindowStartupLocation.CenterScreen;
             }
 
             var streamUrl = await GenerateStreamUrlAsync();
