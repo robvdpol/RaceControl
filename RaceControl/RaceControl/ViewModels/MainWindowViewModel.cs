@@ -248,7 +248,7 @@ namespace RaceControl.ViewModels
             {
                 if (dialogResult.Result == ButtonResult.OK)
                 {
-                    var token = dialogResult.Parameters.GetValue<string>("token");
+                    var token = dialogResult.Parameters.GetValue<string>(ParameterNames.TOKEN);
                     await InitializeAsync(token);
                 }
                 else

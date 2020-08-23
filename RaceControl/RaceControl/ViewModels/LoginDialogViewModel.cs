@@ -97,7 +97,11 @@ namespace RaceControl.ViewModels
             }
 
             _credentialService.SaveCredential(Email, Password);
-            RaiseRequestClose(new DialogResult(ButtonResult.OK, new DialogParameters { { "token", token.Token } }));
+            var parameters = new DialogParameters
+            {
+                { ParameterNames.TOKEN, token.Token }
+            };
+            RaiseRequestClose(new DialogResult(ButtonResult.OK, parameters));
             IsBusy = false;
         }
     }
