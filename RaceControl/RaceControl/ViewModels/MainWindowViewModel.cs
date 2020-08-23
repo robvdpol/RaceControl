@@ -655,7 +655,7 @@ namespace RaceControl.ViewModels
             {
                 var channel = Channels.FirstOrDefault(c => c.Name == instance.ChannelName);
 
-                if (channel != null)
+                if (channel != null && !VideoDialogViewModels.Any(viewModel => viewModel.ContentType == ContentType.Channel && viewModel.ContentUrl == channel.Self))
                 {
                     WatchChannel(channel, instance);
                 }

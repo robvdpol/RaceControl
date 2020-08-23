@@ -10,6 +10,8 @@ namespace RaceControl.Interfaces
 
         ContentType ContentType { get; }
 
+        string ContentUrl { get; }
+
         VideoDialogInstance GetVideoDialogInstance();
     }
 }
