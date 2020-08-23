@@ -22,6 +22,10 @@
             <Setter Property="BorderBrush" Value="#ABADB3" />
             <Setter Property="BorderThickness" Value="1" />
         </Style>
+        <Style x:Key="OptionButtonStyle" TargetType="Button">
+            <Setter Property="Margin" Value="3" />
+            <Setter Property="Height" Value="24" />
+        </Style>
         <Style x:Key="ContentListBoxStyle" TargetType="ListBox">
             <Setter Property="Margin" Value="2" />
         </Style>
@@ -326,29 +330,26 @@
                                 TextWrapping="Wrap"
                                 ToolTip="{Binding Settings.RecordingLocation}" />
                             <Button
-                                Height="24"
-                                Margin="3"
                                 Command="{Binding SetRecordingLocationCommand}"
                                 Content="Change recording location"
+                                Style="{StaticResource OptionButtonStyle}"
                                 ToolTip="Change the location where recordings of live streams are saved" />
                         </StackPanel>
                     </GroupBox>
                     <GroupBox
                         Grid.Row="1"
                         Margin="5,3"
-                        Header="Layout">
+                        Header="Video player">
                         <StackPanel Orientation="Vertical">
                             <Button
-                                Height="24"
-                                Margin="3"
                                 Command="{Binding SaveVideoDialogLayoutCommand}"
                                 Content="Save current layout"
+                                Style="{StaticResource OptionButtonStyle}"
                                 ToolTip="Saves the position and size of all currently open video players" />
                             <Button
-                                Height="24"
-                                Margin="3"
                                 Command="{Binding OpenVideoDialogLayoutCommand}"
                                 Content="Open saved layout"
+                                Style="{StaticResource OptionButtonStyle}"
                                 ToolTip="Watch the selected session in the previously saved layout" />
                         </StackPanel>
                     </GroupBox>
@@ -357,10 +358,9 @@
                         Margin="5,3"
                         Header="Account">
                         <Button
-                            Height="24"
-                            Margin="3"
                             Command="{Binding DeleteCredentialCommand}"
                             Content="Delete stored credentials"
+                            Style="{StaticResource OptionButtonStyle}"
                             ToolTip="Removes your credentials from the system, useful if you want to login with different credentials." />
                     </GroupBox>
                 </Grid>
