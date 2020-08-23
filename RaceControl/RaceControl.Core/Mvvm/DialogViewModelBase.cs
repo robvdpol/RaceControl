@@ -8,7 +8,6 @@ namespace RaceControl.Core.Mvvm
     public abstract class DialogViewModelBase : ViewModelBase, IDialogAware
     {
         private ICommand _closeWindowCommand;
-
         private string _title;
         private bool _opened;
 
@@ -43,14 +42,14 @@ namespace RaceControl.Core.Mvvm
             Opened = true;
         }
 
+        protected virtual void CloseWindowExecute()
+        {
+            RaiseRequestClose(new DialogResult(ButtonResult.None));
+        }
+
         protected void RaiseRequestClose(IDialogResult dialogResult)
         {
             RequestClose?.Invoke(dialogResult);
-        }
-
-        private void CloseWindowExecute()
-        {
-            RaiseRequestClose(new DialogResult(ButtonResult.None));
         }
     }
 }

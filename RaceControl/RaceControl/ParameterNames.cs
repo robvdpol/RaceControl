@@ -10,7 +10,7 @@
         public const string IS_LIVE = nameof(IS_LIVE);
         public const string RELEASE = nameof(RELEASE);
         public const string NAME = nameof(NAME);
-        public const string STREAM_URL = nameof(STREAM_URL);
         public const string FILENAME = nameof(FILENAME);
+        public const string UNIQUE_IDENTIFIER = nameof(UNIQUE_IDENTIFIER);
     }
 }

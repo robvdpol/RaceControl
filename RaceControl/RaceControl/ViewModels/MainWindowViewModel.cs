@@ -7,6 +7,7 @@ using RaceControl.Common.Utils;
 using RaceControl.Comparers;
 using RaceControl.Core.Helpers;
 using RaceControl.Core.Mvvm;
+using RaceControl.Interfaces;
 using RaceControl.Services.Interfaces.Credential;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Api;
@@ -14,6 +15,7 @@ using RaceControl.Services.Interfaces.Github;
 using RaceControl.Streamlink;
 using RaceControl.Views;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -35,6 +37,7 @@ namespace RaceControl.ViewModels
         private readonly IGithubService _githubService;
         private readonly ICredentialService _credentialService;
         private readonly IStreamlinkLauncher _streamlinkLauncher;
+        private readonly IList<IVideoDialogViewModel> _videoDialogViewModels = new List<IVideoDialogViewModel>();
 
         private ICommand _loadedCommand;
         private ICommand _closingCommand;
@@ -369,34 +372,53 @@ namespace RaceControl.ViewModels
         private void WatchChannelExecute(Channel channel)
         {
             var session = GetCurrentSession();
+            var title = GetTitle(session, channel);
             var parameters = new DialogParameters
             {
                 { ParameterNames.TOKEN, _token },
                 { ParameterNames.CONTENT_TYPE, ContentType.Channel },
                 { ParameterNames.CONTENT_URL, channel.Self },
                 { ParameterNames.SYNC_UID, session.UID },
-                { ParameterNames.TITLE, GetTitle(session, channel) },
+                { ParameterNames.TITLE, title },
                 { ParameterNames.IS_LIVE, session.IsLive }
             };
 
             _logger.Info($"Starting internal player for channel with parameters: '{parameters}'.");
-            _dialogService.Show(nameof(VideoDialog), parameters, null, false);
+            OpenVideoDialog(parameters);
         }
 
         private void WatchEpisodeExecute(Episode episode)
         {
+            var title = GetTitle(episode);
             var parameters = new DialogParameters
             {
                 { ParameterNames.TOKEN, _token },
                 { ParameterNames.CONTENT_TYPE, ContentType.Asset },
                 { ParameterNames.CONTENT_URL, episode.Items.First() },
                 { ParameterNames.SYNC_UID, episode.UID },
-                { ParameterNames.TITLE, GetTitle(episode) },
+                { ParameterNames.TITLE, title },
                 { ParameterNames.IS_LIVE, false }
             };
 
             _logger.Info($"Starting internal player for episode with parameters: '{parameters}'.");
-            _dialogService.Show(nameof(VideoDialog), parameters, null, false);
+            OpenVideoDialog(parameters);
+        }
+
+        private void OpenVideoDialog(IDialogParameters parameters)
+        {
+            var viewModel = (IVideoDialogViewModel)_dialogService.Show(nameof(VideoDialog), parameters, OnVideoDialogClosed, false);
+            _videoDialogViewModels.Add(viewModel);
+        }
+
+        private void OnVideoDialogClosed(IDialogResult result)
+        {
+            var uniqueIdentifier = result.Parameters.GetValue<Guid>(ParameterNames.UNIQUE_IDENTIFIER);
+            var viewModel = _videoDialogViewModels.FirstOrDefault(viewModel => viewModel.UniqueIdentifier == uniqueIdentifier);
+
+            if (viewModel != null)
+            {
+                _videoDialogViewModels.Remove(viewModel);
+            }
         }
 
         private bool CanWatchVlcChannelExecute(Channel channel)
@@ -538,43 +560,35 @@ namespace RaceControl.ViewModels
             return !GetCurrentSession().IsLive;
         }
 
-        private async void DownloadChannelExecute(Channel channel)
+        private void DownloadChannelExecute(Channel channel)
         {
             var session = GetCurrentSession();
             var title = GetTitle(session, channel);
-            var defaultFilename = $"{title}.mkv".RemoveInvalidFileNameChars();
-
-            if (_dialogService.SelectFile("Select a filename", Settings.RecordingLocation, defaultFilename, ".mkv", out var filename))
-            {
-                var url = await _apiService.GetTokenisedUrlForChannelAsync(_token, channel.Self);
-                var parameters = new DialogParameters
-                {
-                    { ParameterNames.NAME, title },
-                    { ParameterNames.STREAM_URL, url },
-                    { ParameterNames.FILENAME, filename }
-                };
-
-                _logger.Info($"Starting download for channel with parameters: '{parameters}'.");
-                _dialogService.Show(nameof(DownloadDialog), parameters, null);
-            }
+            PerformDownload(title, ContentType.Channel, channel.Self);
         }
 
-        private async void DownloadEpisodeExecute(Episode episode)
+        private void DownloadEpisodeExecute(Episode episode)
         {
             var title = GetTitle(episode);
+            PerformDownload(title, ContentType.Asset, episode.Items.First());
+        }
+
+        private void PerformDownload(string title, ContentType contentType, string contentUrl)
+        {
             var defaultFilename = $"{title}.mkv".RemoveInvalidFileNameChars();
 
             if (_dialogService.SelectFile("Select a filename", Settings.RecordingLocation, defaultFilename, ".mkv", out var filename))
             {
-                var url = await _apiService.GetTokenisedUrlForAssetAsync(_token, episode.Items.First());
                 var parameters = new DialogParameters
                 {
                     { ParameterNames.NAME, title },
-                    { ParameterNames.STREAM_URL, url },
-                    { ParameterNames.FILENAME, filename }
+                    { ParameterNames.FILENAME, filename },
+                    { ParameterNames.TOKEN, _token },
+                    { ParameterNames.CONTENT_TYPE, contentType },
+                    { ParameterNames.CONTENT_URL, contentUrl}
                 };
 
-                _logger.Info($"Starting download for episode with parameters: '{parameters}'.");
+                _logger.Info($"Starting download with parameters: '{parameters}'.");
                 _dialogService.Show(nameof(DownloadDialog), parameters, null);
             }
         }
@@ -727,7 +741,18 @@ namespace RaceControl.ViewModels
         {
             _logger.Info("Refreshing live sessions...");
 
-            var liveSessions = (await _apiService.GetLiveSessionsAsync()).Where(session => session.IsLive).ToList();
+            IList<Session> liveSessions;
+
+            try
+            {
+                liveSessions = (await _apiService.GetLiveSessionsAsync()).Where(session => session.IsLive).ToList();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "An exception occurred while refreshing live sessions.");
+                return;
+            }
+
             var sessionsToRemove = LiveSessions.Where(existingLiveSession => liveSessions.All(liveSession => liveSession.UID != existingLiveSession.UID)).ToList();
             var sessionsToAdd = liveSessions.Where(newLiveSession => LiveSessions.All(liveSession => liveSession.UID != newLiveSession.UID)).ToList();
 

@@ -12,67 +12,82 @@
             <Setter Property="ResizeMode" Value="CanMinimize" />
             <Setter Property="ShowInTaskbar" Value="True" />
             <Setter Property="SizeToContent" Value="Height" />
-            <Setter Property="Width" Value="500" />
-            <Setter Property="MinHeight" Value="140" />
+            <Setter Property="Width" Value="550" />
+            <Setter Property="MinHeight" Value="175" />
         </Style>
     </prism:Dialog.WindowStyle>
     <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <TextBlock
             Grid.Row="0"
-            Text="{Binding Name, StringFormat='Downloading {0}...'}"
-            TextWrapping="WrapWithOverflow">
-            <TextBlock.Style>
-                <Style TargetType="{x:Type TextBlock}">
-                    <Setter Property="Visibility" Value="Visible" />
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding HasExited}" Value="True">
-                            <Setter Property="Visibility" Value="Collapsed" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </TextBlock.Style>
+            Margin="2"
+            TextWrapping="Wrap">
+            <Run Text="Name:" />
+            <Run Text="{Binding Name}" />
         </TextBlock>
         <TextBlock
-            Grid.Row="0"
-            TextWrapping="WrapWithOverflow"
-            Visibility="{Binding HasExited, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <TextBlock.Style>
-                <Style TargetType="{x:Type TextBlock}">
+            Grid.Row="1"
+            Margin="2"
+            TextWrapping="Wrap">
+            <Run Text="Destination:" />
+            <Run Text="{Binding Filename}" />
+        </TextBlock>
+        <TextBlock
+            Grid.Row="2"
+            Margin="2"
+            TextWrapping="Wrap">
+            <Run Text="Status:" />
+            <Run FontWeight="Bold">
+                <Run.Style>
+                    <Style TargetType="{x:Type Run}">
+                        <Setter Property="Text" Value="Downloading..." />
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding HasExited}" Value="True" />
+                                    <Condition Binding="{Binding ExitCodeSuccess}" Value="True" />
+                                </MultiDataTrigger.Conditions>
+                                <MultiDataTrigger.Setters>
+                                    <Setter Property="Text" Value="Done" />
+                                </MultiDataTrigger.Setters>
+                            </MultiDataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding HasExited}" Value="True" />
+                                    <Condition Binding="{Binding ExitCodeSuccess}" Value="False" />
+                                </MultiDataTrigger.Conditions>
+                                <MultiDataTrigger.Setters>
+                                    <Setter Property="Text" Value="Failed (see log file for details)" />
+                                </MultiDataTrigger.Setters>
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Run.Style>
+            </Run>
+        </TextBlock>
+        <Button
+            Grid.Row="3"
+            Width="100"
+            Height="24"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom"
+            Command="{Binding CloseWindowCommand}"
+            IsDefault="True">
+            <Button.Style>
+                <Style TargetType="{x:Type Button}">
+                    <Setter Property="Content" Value="Cancel" />
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding ExitCodeSuccess}" Value="True">
-                            <Setter Property="Text" Value="Download finished successfully." />
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding ExitCodeSuccess}" Value="False">
-                            <Setter Property="Text" Value="Download failed, see log file for details." />
+                        <DataTrigger Binding="{Binding HasExited}" Value="True">
+                            <Setter Property="Content" Value="Close" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
-            </TextBlock.Style>
-        </TextBlock>
-        <StackPanel
-            Grid.Row="1"
-            HorizontalAlignment="Right"
-            Orientation="Horizontal">
-            <Button
-                Width="100"
-                Height="24"
-                Command="{Binding CloseWindowCommand}"
-                IsDefault="True">
-                <Button.Style>
-                    <Style TargetType="{x:Type Button}">
-                        <Setter Property="Content" Value="Cancel" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding HasExited}" Value="True">
-                                <Setter Property="Content" Value="Close" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-            </Button>
-        </StackPanel>
+            </Button.Style>
+        </Button>
     </Grid>
 </UserControl>

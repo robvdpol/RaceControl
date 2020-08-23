@@ -1,5 +1,6 @@
 ﻿using Prism.Services.Dialogs;
 using RaceControl.Core.Mvvm;
+using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Streamlink;
 using System.Diagnostics;
 
@@ -7,15 +8,18 @@ namespace RaceControl.ViewModels
 {
     public class DownloadDialogViewModel : DialogViewModelBase
     {
+        private readonly IApiService _apiService;
         private readonly IStreamlinkLauncher _streamlinkLauncher;
 
         private Process _downloadProcess;
         private string _name;
+        private string _filename;
         private bool _hasExited;
         private bool _exitCodeSuccess;
 
-        public DownloadDialogViewModel(IStreamlinkLauncher streamlinkLauncher)
+        public DownloadDialogViewModel(IApiService apiService, IStreamlinkLauncher streamlinkLauncher)
         {
+            _apiService = apiService;
             _streamlinkLauncher = streamlinkLauncher;
         }
 
@@ -23,6 +27,12 @@ namespace RaceControl.ViewModels
         {
             get => _name;
             set => SetProperty(ref _name, value);
+        }
+
+        public string Filename
+        {
+            get => _filename;
+            set => SetProperty(ref _filename, value);
         }
 
         public bool HasExited
@@ -37,13 +47,17 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _exitCodeSuccess, value);
         }
 
-        public override void OnDialogOpened(IDialogParameters parameters)
+        public override async void OnDialogOpened(IDialogParameters parameters)
         {
             Title = "Download";
             Name = parameters.GetValue<string>(ParameterNames.NAME);
-            var streamUrl = parameters.GetValue<string>(ParameterNames.STREAM_URL);
-            var filename = parameters.GetValue<string>(ParameterNames.FILENAME);
-            _downloadProcess = _streamlinkLauncher.StartStreamlinkDownload(streamUrl, filename, DownloadProcess_Exited);
+            Filename = parameters.GetValue<string>(ParameterNames.FILENAME);
+            var token = parameters.GetValue<string>(ParameterNames.TOKEN);
+            var contentType = parameters.GetValue<ContentType>(ParameterNames.CONTENT_TYPE);
+            var contentUrl = parameters.GetValue<string>(ParameterNames.CONTENT_URL);
+
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(token, contentType, contentUrl);
+            _downloadProcess = _streamlinkLauncher.StartStreamlinkDownload(streamUrl, Filename, DownloadProcess_Exited);
 
             base.OnDialogOpened(parameters);
         }

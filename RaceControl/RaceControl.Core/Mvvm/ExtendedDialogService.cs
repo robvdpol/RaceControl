@@ -63,12 +63,12 @@ namespace RaceControl.Core.Mvvm
             return false;
         }
 
-        public void Show(string name, IDialogParameters parameters, Action<IDialogResult> callback, bool hasOwner)
+        public object Show(string name, IDialogParameters parameters, Action<IDialogResult> callback, bool hasOwner)
         {
-            ShowDialogInternal(name, parameters, callback, false, hasOwner);
+            return ShowDialogInternal(name, parameters, callback, hasOwner);
         }
 
-        private void ShowDialogInternal(string name, IDialogParameters parameters, Action<IDialogResult> callback, bool isModal, bool hasOwner, string windowName = null)
+        private object ShowDialogInternal(string name, IDialogParameters parameters, Action<IDialogResult> callback, bool hasOwner, string windowName = null)
         {
             var dialogWindow = CreateDialogWindow(windowName);
             ConfigureDialogWindowEvents(dialogWindow, callback);
@@ -79,14 +79,9 @@ namespace RaceControl.Core.Mvvm
                 dialogWindow.Owner = null;
             }
 
-            if (isModal)
-            {
-                dialogWindow.ShowDialog();
-            }
-            else
-            {
-                dialogWindow.Show();
-            }
+            dialogWindow.Show();
+
+            return dialogWindow.DataContext;
         }
     }
 }

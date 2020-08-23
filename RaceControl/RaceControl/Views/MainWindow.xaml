@@ -341,8 +341,8 @@
                                 Height="24"
                                 Margin="3"
                                 Command="{Binding DeleteCredentialCommand}"
-                                Content="Delete saved credentials"
-                                ToolTip="Deletes your saved credentials from this system. Use this if you want to use different credentials to login." />
+                                Content="Delete stored credentials"
+                                ToolTip="Deletes your credentials from this system. Use this if you want to login with different credentials." />
                         </StackPanel>
                     </GroupBox>
                 </Grid>
