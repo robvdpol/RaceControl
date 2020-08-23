@@ -1,4 +1,6 @@
-﻿namespace RaceControl.Common.Settings
+﻿using System.Collections.ObjectModel;
+
+namespace RaceControl.Common.Settings
 {
     public interface ISettings
     {
@@ -9,6 +11,8 @@
         bool EnableRecording { get; set; }
 
         string RecordingLocation { get; set; }
+
+        ObservableCollection<string> SelectedSeries { get; set; }
 
         void Load();
 

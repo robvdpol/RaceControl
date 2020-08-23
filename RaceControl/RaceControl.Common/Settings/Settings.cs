@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using NLog;
 using System;
+using System.Collections.ObjectModel;
 using System.IO;
 
 namespace RaceControl.Common.Settings
@@ -15,6 +16,7 @@ namespace RaceControl.Common.Settings
         private bool _useAlternativeStream;
         private bool _enableRecording;
         private string _recordingLocation = Environment.CurrentDirectory;
+        private ObservableCollection<string> _selectedSeries;
 
         public Settings(ILogger logger)
         {
@@ -43,6 +45,12 @@ namespace RaceControl.Common.Settings
         {
             get => _recordingLocation;
             set => SetProperty(ref _recordingLocation, value);
+        }
+
+        public ObservableCollection<string> SelectedSeries
+        {
+            get => _selectedSeries ??= new ObservableCollection<string>();
+            set => SetProperty(ref _selectedSeries, value);
         }
 
         public void Load()
