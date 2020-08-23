@@ -10,19 +10,9 @@ namespace RaceControl.Core.Converters
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (values[0] is string identifier && values[1] is ICollection collection && parameter is string identifierName)
+            if (values[0] is string identifier && values[1] is ICollection collection)
             {
-                var list = collection.Cast<object>().ToList();
-
-                if (list.Any())
-                {
-                    var property = list.First().GetType().GetProperty(identifierName);
-
-                    if (property != null)
-                    {
-                        return list.Any(item => (string)property.GetValue(item) == identifier);
-                    }
-                }
+                return collection.Cast<string>().Any(item => item == identifier);
             }
 
             return false;

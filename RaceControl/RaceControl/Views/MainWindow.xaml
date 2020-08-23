@@ -106,7 +106,7 @@
                     </ListBox.ItemContainerStyle>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <CheckBox Content="{Binding}" Tag="{Binding}">
+                            <CheckBox Content="{Binding}" Tag="{Binding Self}">
                                 <i:Interaction.Behaviors>
                                     <behaviors:CheckBoxMultiSelectBehavior SelectedItems="{Binding DataContext.SelectedSeries, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}" />
                                 </i:Interaction.Behaviors>
@@ -197,7 +197,7 @@
                                 </DataTrigger>
                                 <DataTrigger Value="True">
                                     <DataTrigger.Binding>
-                                        <MultiBinding Converter="{StaticResource CollectionContainsConverter}" ConverterParameter="Self">
+                                        <MultiBinding Converter="{StaticResource CollectionContainsConverter}">
                                             <Binding Path="SeriesUrl" />
                                             <Binding Path="DataContext.SelectedSeries" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ListBox}" />
                                             <!--  Needed to trigger converter  -->

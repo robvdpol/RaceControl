@@ -69,7 +69,7 @@ namespace RaceControl.ViewModels
         private ObservableCollection<IVideoDialogViewModel> _videoDialogViewModels;
         private ObservableCollection<Season> _seasons;
         private ObservableCollection<Series> _series;
-        private ObservableCollection<Series> _selectedSeries;
+        private ObservableCollection<string> _selectedSeries;
         private ObservableCollection<Event> _events;
         private ObservableCollection<Session> _sessions;
         private ObservableCollection<Session> _liveSessions;
@@ -168,9 +168,9 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _series, value);
         }
 
-        public ObservableCollection<Series> SelectedSeries
+        public ObservableCollection<string> SelectedSeries
         {
-            get => _selectedSeries ??= new ObservableCollection<Series>();
+            get => _selectedSeries ??= new ObservableCollection<string>();
             set => SetProperty(ref _selectedSeries, value);
         }
 
@@ -792,7 +792,7 @@ namespace RaceControl.ViewModels
 
             if (formula1Series != null)
             {
-                SelectedSeries.Add(formula1Series);
+                SelectedSeries.Add(formula1Series.Self);
             }
         }
 
