@@ -8,7 +8,7 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:prism="http://prismlibrary.com/"
     Width="1250"
-    Height="780"
+    Height="800"
     prism:ViewModelLocator.AutoWireViewModel="True"
     WindowStartupLocation="CenterScreen">
     <Window.Resources>
@@ -361,7 +361,7 @@
                             Margin="3"
                             Command="{Binding DeleteCredentialCommand}"
                             Content="Delete stored credentials"
-                            ToolTip="Deletes your credentials from this system. Use this if you want to login with different credentials." />
+                            ToolTip="Removes your credentials from the system, useful if you want to login with different credentials." />
                     </GroupBox>
                 </Grid>
             </Border>
