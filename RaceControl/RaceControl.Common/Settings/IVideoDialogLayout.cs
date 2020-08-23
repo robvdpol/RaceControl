@@ -13,6 +13,6 @@ namespace RaceControl.Common.Settings
 
         void Load();
 
-        void Save();
+        bool Save();
     }
 }

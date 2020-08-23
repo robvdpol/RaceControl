@@ -442,7 +442,7 @@ namespace RaceControl.ViewModels
         private void OnVideoDialogClosed(IDialogResult result)
         {
             var uniqueIdentifier = result.Parameters.GetValue<Guid>(ParameterNames.UNIQUE_IDENTIFIER);
-            var viewModel = VideoDialogViewModels.FirstOrDefault(viewModel => viewModel.UniqueIdentifier == uniqueIdentifier);
+            var viewModel = VideoDialogViewModels.FirstOrDefault(vm => vm.UniqueIdentifier == uniqueIdentifier);
 
             if (viewModel != null)
             {
@@ -634,19 +634,23 @@ namespace RaceControl.ViewModels
 
         private bool CanSaveVideoDialogLayoutExecute()
         {
-            return VideoDialogViewModels.Any(viewModel => viewModel.ContentType == ContentType.Channel);
+            return VideoDialogViewModels.Any(vm => vm.ContentType == ContentType.Channel);
         }
 
         private void SaveVideoDialogLayoutExecute()
         {
             VideoDialogLayout.Clear();
             VideoDialogLayout.Add(VideoDialogViewModels.Where(vm => vm.ContentType == ContentType.Channel).Select(vm => vm.GetVideoDialogInstance()));
-            VideoDialogLayout.Save();
+
+            if (VideoDialogLayout.Save())
+            {
+                MessageBoxHelper.ShowInfo("The current window layout has been successfully saved.");
+            }
         }
 
         private bool CanOpenVideoDialogLayoutExecute()
         {
-            return VideoDialogLayout.Instances.Any() && Channels.Any();
+            return VideoDialogLayout.Instances.Any() && Channels.Count > 1;
         }
 
         private void OpenVideoDialogLayoutExecute()
@@ -655,7 +659,7 @@ namespace RaceControl.ViewModels
             {
                 var channel = Channels.FirstOrDefault(c => c.Name == instance.ChannelName);
 
-                if (channel != null && !VideoDialogViewModels.Any(viewModel => viewModel.ContentType == ContentType.Channel && viewModel.ContentUrl == channel.Self))
+                if (channel != null && !VideoDialogViewModels.Any(vm => vm.ContentType == ContentType.Channel && vm.ContentUrl == channel.Self))
                 {
                     WatchChannel(channel, instance);
                 }

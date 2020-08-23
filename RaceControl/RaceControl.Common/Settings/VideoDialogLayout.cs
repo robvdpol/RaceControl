@@ -63,7 +63,7 @@ namespace RaceControl.Common.Settings
             _logger.Info("Done loading video dialog layout.");
         }
 
-        public void Save()
+        public bool Save()
         {
             _logger.Info("Saving video dialog layout...");
 
@@ -77,9 +77,13 @@ namespace RaceControl.Common.Settings
             catch (Exception ex)
             {
                 _logger.Error(ex, "An exception occurred while saving video dialog layout.");
+                
+                return false;
             }
 
             _logger.Info("Done saving video dialog layout.");
+            
+            return true;
         }
     }
 }

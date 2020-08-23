@@ -348,7 +348,7 @@
                                 Height="24"
                                 Margin="3"
                                 Command="{Binding OpenVideoDialogLayoutCommand}"
-                                Content="Watch session in saved layout"
+                                Content="Open saved layout"
                                 ToolTip="Watch the selected session in the previously saved layout" />
                         </StackPanel>
                     </GroupBox>
