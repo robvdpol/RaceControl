@@ -37,7 +37,6 @@ namespace RaceControl.ViewModels
         private readonly IGithubService _githubService;
         private readonly ICredentialService _credentialService;
         private readonly IStreamlinkLauncher _streamlinkLauncher;
-        private readonly IList<IVideoDialogViewModel> _videoDialogViewModels = new List<IVideoDialogViewModel>();
 
         private ICommand _loadedCommand;
         private ICommand _closingCommand;
@@ -58,12 +57,16 @@ namespace RaceControl.ViewModels
         private ICommand _downloadChannelCommand;
         private ICommand _downloadEpisodeCommand;
         private ICommand _setRecordingLocationCommand;
+        private ICommand _saveVideoDialogLayoutCommand;
+        private ICommand _openVideoDialogLayoutCommand;
         private ICommand _deleteCredentialCommand;
 
         private ISettings _settings;
+        private IVideoDialogLayout _videoDialogLayout;
         private string _token;
         private string _vlcExeLocation;
         private string _mpvExeLocation;
+        private ObservableCollection<IVideoDialogViewModel> _videoDialogViewModels;
         private ObservableCollection<Season> _seasons;
         private ObservableCollection<Series> _series;
         private ObservableCollection<Series> _selectedSeries;
@@ -87,7 +90,8 @@ namespace RaceControl.ViewModels
             IGithubService githubService,
             ICredentialService credentialService,
             IStreamlinkLauncher streamlinkLauncher,
-            ISettings settings)
+            ISettings settings,
+            IVideoDialogLayout videoDialogLayout)
         {
             _logger = logger;
             _dialogService = dialogService;
@@ -96,6 +100,7 @@ namespace RaceControl.ViewModels
             _credentialService = credentialService;
             _streamlinkLauncher = streamlinkLauncher;
             _settings = settings;
+            _videoDialogLayout = videoDialogLayout;
         }
 
         public ICommand LoadedCommand => _loadedCommand ??= new DelegateCommand<RoutedEventArgs>(LoadedExecute);
@@ -117,12 +122,20 @@ namespace RaceControl.ViewModels
         public ICommand DownloadChannelCommand => _downloadChannelCommand ??= new DelegateCommand<Channel>(DownloadChannelExecute, CanDownloadChannelExecute).ObservesProperty(() => SelectedSession).ObservesProperty(() => SelectedLiveSession);
         public ICommand DownloadEpisodeCommand => _downloadEpisodeCommand ??= new DelegateCommand<Episode>(DownloadEpisodeExecute);
         public ICommand SetRecordingLocationCommand => _setRecordingLocationCommand ??= new DelegateCommand(SetRecordingLocationExecute);
+        public ICommand SaveVideoDialogLayoutCommand => _saveVideoDialogLayoutCommand ??= new DelegateCommand(SaveVideoDialogLayoutExecute, CanSaveVideoDialogLayoutExecute).ObservesProperty(() => VideoDialogViewModels.Count);
+        public ICommand OpenVideoDialogLayoutCommand => _openVideoDialogLayoutCommand ??= new DelegateCommand(OpenVideoDialogLayoutExecute, CanOpenVideoDialogLayoutExecute).ObservesProperty(() => VideoDialogLayout.Instances.Count).ObservesProperty(() => Channels.Count);
         public ICommand DeleteCredentialCommand => _deleteCredentialCommand ??= new DelegateCommand(DeleteCredentialExecute);
 
         public ISettings Settings
         {
             get => _settings;
             set => SetProperty(ref _settings, value);
+        }
+
+        public IVideoDialogLayout VideoDialogLayout
+        {
+            get => _videoDialogLayout;
+            set => SetProperty(ref _videoDialogLayout, value);
         }
 
         public string VlcExeLocation
@@ -135,6 +148,12 @@ namespace RaceControl.ViewModels
         {
             get => _mpvExeLocation;
             set => SetProperty(ref _mpvExeLocation, value);
+        }
+
+        public ObservableCollection<IVideoDialogViewModel> VideoDialogViewModels
+        {
+            get => _videoDialogViewModels ??= new ObservableCollection<IVideoDialogViewModel>();
+            set => SetProperty(ref _videoDialogViewModels, value);
         }
 
         public ObservableCollection<Season> Seasons
@@ -232,6 +251,7 @@ namespace RaceControl.ViewModels
         {
             IsBusy = true;
             Settings.Load();
+            VideoDialogLayout.Load();
 
             try
             {
@@ -371,16 +391,23 @@ namespace RaceControl.ViewModels
 
         private void WatchChannelExecute(Channel channel)
         {
+            WatchChannel(channel);
+        }
+
+        private void WatchChannel(Channel channel, VideoDialogInstance instance = null)
+        {
             var session = GetCurrentSession();
             var title = GetTitle(session, channel);
             var parameters = new DialogParameters
             {
+                { ParameterNames.TITLE, title },
+                { ParameterNames.NAME, channel.Name },
                 { ParameterNames.TOKEN, _token },
                 { ParameterNames.CONTENT_TYPE, ContentType.Channel },
                 { ParameterNames.CONTENT_URL, channel.Self },
                 { ParameterNames.SYNC_UID, session.UID },
-                { ParameterNames.TITLE, title },
-                { ParameterNames.IS_LIVE, session.IsLive }
+                { ParameterNames.IS_LIVE, session.IsLive },
+                { ParameterNames.INSTANCE, instance }
             };
 
             _logger.Info($"Starting internal player for channel with parameters: '{parameters}'.");
@@ -389,15 +416,17 @@ namespace RaceControl.ViewModels
 
         private void WatchEpisodeExecute(Episode episode)
         {
-            var title = GetTitle(episode);
+            var title = episode.ToString();
             var parameters = new DialogParameters
             {
+                { ParameterNames.TITLE, title },
+                { ParameterNames.NAME, title },
                 { ParameterNames.TOKEN, _token },
                 { ParameterNames.CONTENT_TYPE, ContentType.Asset },
                 { ParameterNames.CONTENT_URL, episode.Items.First() },
                 { ParameterNames.SYNC_UID, episode.UID },
-                { ParameterNames.TITLE, title },
-                { ParameterNames.IS_LIVE, false }
+                { ParameterNames.IS_LIVE, false },
+                { ParameterNames.INSTANCE, null }
             };
 
             _logger.Info($"Starting internal player for episode with parameters: '{parameters}'.");
@@ -407,17 +436,17 @@ namespace RaceControl.ViewModels
         private void OpenVideoDialog(IDialogParameters parameters)
         {
             var viewModel = (IVideoDialogViewModel)_dialogService.Show(nameof(VideoDialog), parameters, OnVideoDialogClosed, false);
-            _videoDialogViewModels.Add(viewModel);
+            VideoDialogViewModels.Add(viewModel);
         }
 
         private void OnVideoDialogClosed(IDialogResult result)
         {
             var uniqueIdentifier = result.Parameters.GetValue<Guid>(ParameterNames.UNIQUE_IDENTIFIER);
-            var viewModel = _videoDialogViewModels.FirstOrDefault(viewModel => viewModel.UniqueIdentifier == uniqueIdentifier);
+            var viewModel = VideoDialogViewModels.FirstOrDefault(viewModel => viewModel.UniqueIdentifier == uniqueIdentifier);
 
             if (viewModel != null)
             {
-                _videoDialogViewModels.Remove(viewModel);
+                VideoDialogViewModels.Remove(viewModel);
             }
         }
 
@@ -454,7 +483,7 @@ namespace RaceControl.ViewModels
         private async void WatchVlcEpisodeExecute(Episode episode)
         {
             IsBusy = true;
-            var title = GetTitle(episode);
+            var title = episode.ToString();
 
             try
             {
@@ -503,7 +532,7 @@ namespace RaceControl.ViewModels
         private async void WatchMpvEpisodeExecute(Episode episode)
         {
             IsBusy = true;
-            var title = GetTitle(episode);
+            var title = episode.ToString();
 
             try
             {
@@ -557,7 +586,9 @@ namespace RaceControl.ViewModels
 
         private bool CanDownloadChannelExecute(Channel channel)
         {
-            return !GetCurrentSession().IsLive;
+            var session = GetCurrentSession();
+
+            return session != null && !session.IsLive;
         }
 
         private void DownloadChannelExecute(Channel channel)
@@ -569,7 +600,7 @@ namespace RaceControl.ViewModels
 
         private void DownloadEpisodeExecute(Episode episode)
         {
-            var title = GetTitle(episode);
+            var title = episode.ToString();
             PerformDownload(title, ContentType.Asset, episode.Items.First());
         }
 
@@ -598,6 +629,36 @@ namespace RaceControl.ViewModels
             if (_dialogService.SelectFolder("Select a recording location", Settings.RecordingLocation, out var recordingLocation))
             {
                 Settings.RecordingLocation = recordingLocation;
+            }
+        }
+
+        private bool CanSaveVideoDialogLayoutExecute()
+        {
+            return VideoDialogViewModels.Any(viewModel => viewModel.ContentType == ContentType.Channel);
+        }
+
+        private void SaveVideoDialogLayoutExecute()
+        {
+            VideoDialogLayout.Clear();
+            VideoDialogLayout.Add(VideoDialogViewModels.Where(vm => vm.ContentType == ContentType.Channel).Select(vm => vm.GetVideoDialogInstance()));
+            VideoDialogLayout.Save();
+        }
+
+        private bool CanOpenVideoDialogLayoutExecute()
+        {
+            return VideoDialogLayout.Instances.Any() && Channels.Any();
+        }
+
+        private void OpenVideoDialogLayoutExecute()
+        {
+            foreach (var instance in VideoDialogLayout.Instances)
+            {
+                var channel = Channels.FirstOrDefault(c => c.Name == instance.ChannelName);
+
+                if (channel != null)
+                {
+                    WatchChannel(channel, instance);
+                }
             }
         }
 
@@ -821,16 +882,16 @@ namespace RaceControl.ViewModels
 
         private void ClearEvents()
         {
-            Events.Clear();
             ClearSessions();
+            Events.Clear();
         }
 
         private void ClearSessions()
         {
-            SelectedLiveSession = null;
-            Sessions.Clear();
-            ClearChannels();
             ClearEpisodes();
+            ClearChannels();
+            Sessions.Clear();
+            SelectedLiveSession = null;
         }
 
         private void ClearChannels()
@@ -846,7 +907,5 @@ namespace RaceControl.ViewModels
         private Session GetCurrentSession() => SelectedLiveSession ?? SelectedSession;
 
         private static string GetTitle(Session session, Channel channel) => $"{session.SessionName} - {channel}";
-
-        private static string GetTitle(Episode episode) => $"{episode}";
     }
 }

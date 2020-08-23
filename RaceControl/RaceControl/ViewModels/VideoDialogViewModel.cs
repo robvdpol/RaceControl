@@ -53,6 +53,7 @@ namespace RaceControl.ViewModels
         private ICommand _startCastVideoCommand;
         private ICommand _stopCastVideoCommand;
 
+        private string _name;
         private string _token;
         private ContentType _contentType;
         private string _contentUrl;
@@ -112,6 +113,12 @@ namespace RaceControl.ViewModels
         public ICommand StopCastVideoCommand => _stopCastVideoCommand ??= new DelegateCommand(StopCastVideoExecute, CanStopCastVideoExecute).ObservesProperty(() => IsCasting);
 
         public Guid UniqueIdentifier { get; } = Guid.NewGuid();
+
+        public string Name
+        {
+            get => _name;
+            set => SetProperty(ref _name, value);
+        }
 
         public string Token
         {
@@ -251,14 +258,45 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _windowState, value);
         }
 
+        public VideoDialogInstance GetVideoDialogInstance()
+        {
+            return new VideoDialogInstance
+            {
+                Top = Top,
+                Left = Left,
+                Width = Width,
+                Height = Height,
+                ResizeMode = (int)ResizeMode,
+                WindowState = (int)WindowState,
+                ChannelName = Name
+            };
+        }
+
         public override async void OnDialogOpened(IDialogParameters parameters)
         {
+            Title = parameters.GetValue<string>(ParameterNames.TITLE);
+            Name = parameters.GetValue<string>(ParameterNames.NAME);
             Token = parameters.GetValue<string>(ParameterNames.TOKEN);
             ContentType = parameters.GetValue<ContentType>(ParameterNames.CONTENT_TYPE);
             ContentUrl = parameters.GetValue<string>(ParameterNames.CONTENT_URL);
             SyncUID = parameters.GetValue<string>(ParameterNames.SYNC_UID);
-            Title = parameters.GetValue<string>(ParameterNames.TITLE);
             IsLive = parameters.GetValue<bool>(ParameterNames.IS_LIVE);
+
+            var instance = parameters.GetValue<VideoDialogInstance>(ParameterNames.INSTANCE);
+
+            if (instance != null)
+            {
+                ResizeMode = (ResizeMode)instance.ResizeMode;
+                WindowState = (WindowState)instance.WindowState;
+                Top = instance.Top;
+                Left = instance.Left;
+
+                if (WindowState != WindowState.Maximized)
+                {
+                    Width = instance.Width;
+                    Height = instance.Height;
+                }
+            }
 
             var streamUrl = await GenerateStreamUrlAsync();
 

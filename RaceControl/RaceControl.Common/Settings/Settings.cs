@@ -47,7 +47,7 @@ namespace RaceControl.Common.Settings
 
         public void Load()
         {
-            _logger.Info("Loading video settings...");
+            _logger.Info("Loading settings...");
 
             if (!File.Exists(Filename))
             {
@@ -63,15 +63,15 @@ namespace RaceControl.Common.Settings
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "An exception occurred while loading video settings.");
+                _logger.Error(ex, "An exception occurred while loading settings.");
             }
 
-            _logger.Info("Done loading video settings.");
+            _logger.Info("Done loading settings.");
         }
 
         public void Save()
         {
-            _logger.Info("Saving video settings...");
+            _logger.Info("Saving settings...");
 
             try
             {
@@ -82,10 +82,10 @@ namespace RaceControl.Common.Settings
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "An exception occurred while saving video settings.");
+                _logger.Error(ex, "An exception occurred while saving settings.");
             }
 
-            _logger.Info("Done saving video settings.");
+            _logger.Info("Done saving settings.");
         }
     }
 }

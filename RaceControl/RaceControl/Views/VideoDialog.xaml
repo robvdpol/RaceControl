@@ -25,7 +25,7 @@
     </UserControl.Resources>
     <prism:Dialog.WindowStyle>
         <Style TargetType="Window">
-            <Setter Property="prism:Dialog.WindowStartupLocation" Value="CenterScreen" />
+            <Setter Property="prism:Dialog.WindowStartupLocation" Value="Manual" />
             <Setter Property="WindowStyle" Value="None" />
             <Setter Property="WindowState" Value="{Binding WindowState}" />
             <Setter Property="ResizeMode" Value="{Binding ResizeMode}" />

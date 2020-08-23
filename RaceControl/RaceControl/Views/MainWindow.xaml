@@ -297,6 +297,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <GroupBox
                         Grid.Row="0"
@@ -335,15 +336,32 @@
                     <GroupBox
                         Grid.Row="1"
                         Margin="5,3"
-                        Header="Account">
+                        Header="Layout">
                         <StackPanel Orientation="Vertical">
                             <Button
                                 Height="24"
                                 Margin="3"
-                                Command="{Binding DeleteCredentialCommand}"
-                                Content="Delete stored credentials"
-                                ToolTip="Deletes your credentials from this system. Use this if you want to login with different credentials." />
+                                Command="{Binding SaveVideoDialogLayoutCommand}"
+                                Content="Save current layout"
+                                ToolTip="Saves the position and size of all currently open video players" />
+                            <Button
+                                Height="24"
+                                Margin="3"
+                                Command="{Binding OpenVideoDialogLayoutCommand}"
+                                Content="Watch session in saved layout"
+                                ToolTip="Watch the selected session in the previously saved layout" />
                         </StackPanel>
+                    </GroupBox>
+                    <GroupBox
+                        Grid.Row="2"
+                        Margin="5,3"
+                        Header="Account">
+                        <Button
+                            Height="24"
+                            Margin="3"
+                            Command="{Binding DeleteCredentialCommand}"
+                            Content="Delete stored credentials"
+                            ToolTip="Deletes your credentials from this system. Use this if you want to login with different credentials." />
                     </GroupBox>
                 </Grid>
             </Border>

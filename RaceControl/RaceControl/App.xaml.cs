@@ -59,6 +59,7 @@ namespace RaceControl
             containerRegistry.RegisterSingleton<IChildProcessTracker, ChildProcessTracker>();
             containerRegistry.RegisterSingleton<IRestClient, RestClient>();
             containerRegistry.RegisterSingleton<ISettings, Settings>();
+            containerRegistry.RegisterSingleton<IVideoDialogLayout, VideoDialogLayout>();
             containerRegistry.Register<IAuthorizationService, AuthorizationService>();
             containerRegistry.Register<IF1TVClient, F1TVClient>();
             containerRegistry.Register<IApiService, ApiService>();

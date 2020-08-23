@@ -1,4 +1,5 @@
-﻿using RaceControl.Services.Interfaces.F1TV;
+﻿using RaceControl.Common.Settings;
+using RaceControl.Services.Interfaces.F1TV;
 using System;
 
 namespace RaceControl.Interfaces
@@ -8,5 +9,7 @@ namespace RaceControl.Interfaces
         Guid UniqueIdentifier { get; }
 
         ContentType ContentType { get; }
+
+        VideoDialogInstance GetVideoDialogInstance();
     }
 }
