@@ -233,13 +233,6 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _selectedVodType, value);
         }
 
-        private async void RefreshLiveSessionsTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            _refreshLiveSessionsTimer?.Stop();
-            await RefreshLiveSessionsAsync();
-            _refreshLiveSessionsTimer?.Start();
-        }
-
         private async void LoadedExecute(RoutedEventArgs args)
         {
             IsBusy = true;
@@ -384,27 +377,9 @@ namespace RaceControl.ViewModels
 
         private void WatchChannelExecute(Channel channel)
         {
-            WatchChannel(channel);
-        }
-
-        private void WatchChannel(Channel channel, VideoDialogInstance instance = null)
-        {
             var session = GetCurrentSession();
-            var title = GetTitle(session, channel);
-            var parameters = new DialogParameters
-            {
-                { ParameterNames.TITLE, title },
-                { ParameterNames.NAME, channel.Name },
-                { ParameterNames.TOKEN, _token },
-                { ParameterNames.CONTENT_TYPE, ContentType.Channel },
-                { ParameterNames.CONTENT_URL, channel.Self },
-                { ParameterNames.SYNC_UID, session.UID },
-                { ParameterNames.IS_LIVE, session.IsLive },
-                { ParameterNames.INSTANCE, instance }
-            };
 
-            _logger.Info($"Starting internal player for channel with parameters: '{parameters}'.");
-            OpenVideoDialog(parameters);
+            WatchChannel(session, channel);
         }
 
         private void WatchEpisodeExecute(Episode episode)
@@ -424,23 +399,6 @@ namespace RaceControl.ViewModels
 
             _logger.Info($"Starting internal player for episode with parameters: '{parameters}'.");
             OpenVideoDialog(parameters);
-        }
-
-        private void OpenVideoDialog(IDialogParameters parameters)
-        {
-            var viewModel = (IVideoDialogViewModel)_dialogService.Show(nameof(VideoDialog), parameters, OnVideoDialogClosed, false);
-            VideoDialogViewModels.Add(viewModel);
-        }
-
-        private void OnVideoDialogClosed(IDialogResult result)
-        {
-            var uniqueIdentifier = result.Parameters.GetValue<Guid>(ParameterNames.UNIQUE_IDENTIFIER);
-            var viewModel = VideoDialogViewModels.FirstOrDefault(vm => vm.UniqueIdentifier == uniqueIdentifier);
-
-            if (viewModel != null)
-            {
-                VideoDialogViewModels.Remove(viewModel);
-            }
         }
 
         private bool CanWatchVlcChannelExecute(Channel channel)
@@ -597,26 +555,6 @@ namespace RaceControl.ViewModels
             PerformDownload(title, ContentType.Asset, episode.Items.First());
         }
 
-        private void PerformDownload(string title, ContentType contentType, string contentUrl)
-        {
-            var defaultFilename = $"{title}.mkv".RemoveInvalidFileNameChars();
-
-            if (_dialogService.SelectFile("Select a filename", Settings.RecordingLocation, defaultFilename, ".mkv", out var filename))
-            {
-                var parameters = new DialogParameters
-                {
-                    { ParameterNames.NAME, title },
-                    { ParameterNames.FILENAME, filename },
-                    { ParameterNames.TOKEN, _token },
-                    { ParameterNames.CONTENT_TYPE, contentType },
-                    { ParameterNames.CONTENT_URL, contentUrl}
-                };
-
-                _logger.Info($"Starting download with parameters: '{parameters}'.");
-                _dialogService.Show(nameof(DownloadDialog), parameters, null);
-            }
-        }
-
         private void SetRecordingLocationExecute()
         {
             if (_dialogService.SelectFolder("Select a recording location", Settings.RecordingLocation, out var recordingLocation))
@@ -648,13 +586,15 @@ namespace RaceControl.ViewModels
 
         private void OpenVideoDialogLayoutExecute()
         {
+            var session = GetCurrentSession();
+
             foreach (var instance in VideoDialogLayout.Instances)
             {
                 var channel = Channels.FirstOrDefault(c => c.Name == instance.ChannelName);
 
                 if (channel != null && !VideoDialogViewModels.Any(vm => vm.ContentType == ContentType.Channel && vm.ContentUrl == channel.Self))
                 {
-                    WatchChannel(channel, instance);
+                    WatchChannel(session, channel, instance);
                 }
             }
         }
@@ -678,6 +618,13 @@ namespace RaceControl.ViewModels
             }
 
             IsBusy = false;
+        }
+
+        private async void RefreshLiveSessionsTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            _refreshLiveSessionsTimer?.Stop();
+            await RefreshLiveSessionsAsync();
+            _refreshLiveSessionsTimer?.Start();
         }
 
         private async Task InitializeAsync(string token)
@@ -854,6 +801,62 @@ namespace RaceControl.ViewModels
         {
             var episodes = await _apiService.GetEpisodesForSessionAsync(sessionUID);
             Episodes.AddRange(episodes.OrderBy(e => e.Title));
+        }
+
+        private void WatchChannel(Session session, Channel channel, VideoDialogInstance instance = null)
+        {
+            var title = GetTitle(session, channel);
+            var parameters = new DialogParameters
+            {
+                { ParameterNames.TITLE, title },
+                { ParameterNames.NAME, channel.Name },
+                { ParameterNames.TOKEN, _token },
+                { ParameterNames.CONTENT_TYPE, ContentType.Channel },
+                { ParameterNames.CONTENT_URL, channel.Self },
+                { ParameterNames.SYNC_UID, session.UID },
+                { ParameterNames.IS_LIVE, session.IsLive },
+                { ParameterNames.INSTANCE, instance }
+            };
+
+            _logger.Info($"Starting internal player for channel with parameters: '{parameters}'.");
+            OpenVideoDialog(parameters);
+        }
+
+        private void OpenVideoDialog(IDialogParameters parameters)
+        {
+            var viewModel = (IVideoDialogViewModel)_dialogService.Show(nameof(VideoDialog), parameters, OnVideoDialogClosed, false);
+            VideoDialogViewModels.Add(viewModel);
+        }
+
+        private void OnVideoDialogClosed(IDialogResult result)
+        {
+            var uniqueIdentifier = result.Parameters.GetValue<Guid>(ParameterNames.UNIQUE_IDENTIFIER);
+            var viewModel = VideoDialogViewModels.FirstOrDefault(vm => vm.UniqueIdentifier == uniqueIdentifier);
+
+            if (viewModel != null)
+            {
+                VideoDialogViewModels.Remove(viewModel);
+            }
+        }
+
+        private void PerformDownload(string title, ContentType contentType, string contentUrl)
+        {
+            var defaultFilename = $"{title}.mkv".RemoveInvalidFileNameChars();
+
+            if (_dialogService.SelectFile("Select a filename", Settings.RecordingLocation, defaultFilename, ".mkv", out var filename))
+            {
+                var parameters = new DialogParameters
+                {
+                    { ParameterNames.NAME, title },
+                    { ParameterNames.FILENAME, filename },
+                    { ParameterNames.TOKEN, _token },
+                    { ParameterNames.CONTENT_TYPE, contentType },
+                    { ParameterNames.CONTENT_URL, contentUrl}
+                };
+
+                _logger.Info($"Starting download with parameters: '{parameters}'.");
+                _dialogService.Show(nameof(DownloadDialog), parameters, null);
+            }
         }
 
         private void WatchStreamInVlc(string url, string title, bool isLive)
