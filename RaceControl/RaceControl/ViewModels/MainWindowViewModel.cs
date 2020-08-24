@@ -20,7 +20,6 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
 using System.Timers;
 using System.Windows;
 using System.Windows.Input;
@@ -341,26 +340,8 @@ namespace RaceControl.ViewModels
                 if (SelectedVodType.ContentUrls.Any())
                 {
                     IsBusy = true;
-
-                    // Limit number of concurrent requests to 50
-                    var options = new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 50 };
-                    var downloader = new TransformBlock<string, Episode>(episodeUID => _apiService.GetEpisodeAsync(episodeUID), options);
-                    var buffer = new BufferBlock<Episode>();
-                    downloader.LinkTo(buffer);
-
-                    foreach (var contentUrl in SelectedVodType.ContentUrls)
-                    {
-                        await downloader.SendAsync(contentUrl.GetUID());
-                    }
-
-                    downloader.Complete();
-                    await downloader.Completion;
-
-                    if (buffer.TryReceiveAll(out var episodes))
-                    {
-                        Episodes.AddRange(episodes.OrderBy(e => e.Title));
-                    }
-
+                    var episodes = await DownloadHelper.BufferedDownload(_apiService.GetEpisodeAsync, SelectedVodType.ContentUrls.Select(c => c.GetUID()));
+                    Episodes.AddRange(episodes.OrderBy(e => e.Title));
                     IsBusy = false;
                 }
             }
