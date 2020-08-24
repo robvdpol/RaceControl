@@ -4,19 +4,19 @@ namespace RaceControl.Core.Helpers
 {
     public static class MessageBoxHelper
     {
-        public static void ShowInfo(string message)
+        public static void ShowInfo(string message, string caption = "Info")
         {
-            MessageBox.Show(Application.Current.MainWindow, message, "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(Application.Current.MainWindow, message, caption, MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        public static void ShowError(string message)
+        public static void ShowError(string message, string caption = "Error")
         {
-            MessageBox.Show(Application.Current.MainWindow, message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(Application.Current.MainWindow, message, caption, MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
-        public static bool AskQuestion(string message)
+        public static bool AskQuestion(string message, string caption = "Question")
         {
-            return MessageBox.Show(Application.Current.MainWindow, message, "Question", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
+            return MessageBox.Show(Application.Current.MainWindow, message, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
         }
     }
 }

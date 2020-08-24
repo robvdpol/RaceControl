@@ -567,7 +567,7 @@ namespace RaceControl.ViewModels
 
             if (VideoDialogLayout.Save())
             {
-                MessageBoxHelper.ShowInfo("The current window layout has been successfully saved.");
+                MessageBoxHelper.ShowInfo("The current window layout has been successfully saved.", "Layout");
             }
         }
 
@@ -595,7 +595,7 @@ namespace RaceControl.ViewModels
         {
             IsBusy = true;
 
-            if (MessageBoxHelper.AskQuestion("Are you sure you want to delete your credentials from this system?"))
+            if (_credentialService.LoadCredential(out var email, out _) && MessageBoxHelper.AskQuestion($"Are you sure you want to delete the credentials of {email} from this system?", "Credentials"))
             {
                 await Task.Run(() => _credentialService.DeleteCredential());
                 Login();
