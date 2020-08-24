@@ -1,10 +1,8 @@
 ﻿using NLog;
 using Prism.Services.Dialogs;
-using RaceControl.Core.Helpers;
 using RaceControl.Core.Mvvm;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Streamlink;
-using System;
 using System.Diagnostics;
 
 namespace RaceControl.ViewModels
@@ -54,30 +52,18 @@ namespace RaceControl.ViewModels
 
         public override async void OnDialogOpened(IDialogParameters parameters)
         {
-            base.OnDialogOpened(parameters);
-
             Title = "Download";
             Name = parameters.GetValue<string>(ParameterNames.NAME);
             Filename = parameters.GetValue<string>(ParameterNames.FILENAME);
             var token = parameters.GetValue<string>(ParameterNames.TOKEN);
             var contentType = parameters.GetValue<ContentType>(ParameterNames.CONTENT_TYPE);
             var contentUrl = parameters.GetValue<string>(ParameterNames.CONTENT_URL);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(token, contentType, contentUrl);
 
-            string streamUrl;
-
-            try
-            {
-                streamUrl = await _apiService.GetTokenisedUrlAsync(token, contentType, contentUrl);
-            }
-            catch (Exception ex)
-            {
-                var message = $"An error occurred while trying to get tokenised URL for content-type '{contentType}' and content-URL '{contentUrl}'.";
-                _logger.Error(ex, message);
-                MessageBoxHelper.ShowError(message);
-                return;
-            }
-
+            _logger.Info($"Starting download process for content-type '{contentType}' and content-URL '{contentUrl}'...");
             _downloadProcess = _streamlinkLauncher.StartStreamlinkDownload(streamUrl, Filename, DownloadProcess_Exited);
+
+            base.OnDialogOpened(parameters);
         }
 
         public override void OnDialogClosed()
@@ -91,6 +77,7 @@ namespace RaceControl.ViewModels
         {
             HasExited = true;
             ExitCodeSuccess = exitCode == 0;
+            _logger.Info($"Download process finished with exitcode '{exitCode}'.");
         }
     }
 }
