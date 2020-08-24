@@ -387,6 +387,22 @@ namespace RaceControl.ViewModels
         {
             // Prevent closing the dialog too soon, this causes problems with LibVLC
             Opened = true;
+            Paused = false;
+        }
+
+        private void MediaPlayer_Paused(object sender, EventArgs e)
+        {
+            Paused = true;
+        }
+
+        private void MediaPlayer_Unmuted(object sender, EventArgs e)
+        {
+            Mute = false;
+        }
+
+        private void MediaPlayer_Muted(object sender, EventArgs e)
+        {
+            Mute = true;
         }
 
         private void MediaPlayer_TimeChanged(object sender, MediaPlayerTimeChangedEventArgs e)
@@ -514,16 +530,14 @@ namespace RaceControl.ViewModels
             if (MediaPlayer.CanPause)
             {
                 _logger.Info("Toggling pause...");
-                Paused = !Paused;
-                MediaPlayer.SetPause(Paused);
+                MediaPlayer.Pause();
             }
         }
 
         private void ToggleMuteExecute()
         {
             _logger.Info("Toggling mute...");
-            Mute = !Mute;
-            MediaPlayer.Mute = Mute;
+            MediaPlayer.ToggleMute();
         }
 
         private bool CanFastForwardExecute(string arg)
@@ -733,6 +747,9 @@ namespace RaceControl.ViewModels
             };
 
             MediaPlayer.Playing += MediaPlayer_Playing;
+            MediaPlayer.Paused += MediaPlayer_Paused;
+            MediaPlayer.Muted += MediaPlayer_Muted;
+            MediaPlayer.Unmuted += MediaPlayer_Unmuted;
             MediaPlayer.TimeChanged += MediaPlayer_TimeChanged;
             MediaPlayer.ESAdded += MediaPlayer_ESAdded;
             MediaPlayer.ESDeleted += MediaPlayer_ESDeleted;
@@ -760,6 +777,9 @@ namespace RaceControl.ViewModels
         {
             _logger.Info("Removing mediaplayer...");
             MediaPlayer.Playing -= MediaPlayer_Playing;
+            MediaPlayer.Paused -= MediaPlayer_Paused;
+            MediaPlayer.Muted -= MediaPlayer_Muted;
+            MediaPlayer.Unmuted -= MediaPlayer_Unmuted;
             MediaPlayer.TimeChanged -= MediaPlayer_TimeChanged;
             MediaPlayer.ESAdded -= MediaPlayer_ESAdded;
             MediaPlayer.ESDeleted -= MediaPlayer_ESDeleted;
