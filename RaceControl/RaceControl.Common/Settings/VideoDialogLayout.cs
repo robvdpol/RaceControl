@@ -57,7 +57,7 @@ namespace RaceControl.Common.Settings
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "An exception occurred while loading video dialog layout.");
+                _logger.Error(ex, "An error occurred while loading video dialog layout.");
             }
 
             _logger.Info("Done loading video dialog layout.");
@@ -76,7 +76,7 @@ namespace RaceControl.Common.Settings
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "An exception occurred while saving video dialog layout.");
+                _logger.Error(ex, "An error occurred while saving video dialog layout.");
 
                 return false;
             }

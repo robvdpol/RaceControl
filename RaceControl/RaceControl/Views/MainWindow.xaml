@@ -349,7 +349,7 @@
                                     ToolTip="Saves the position and size of all currently open video players" />
                                 <Button
                                     Command="{Binding OpenVideoDialogLayoutCommand}"
-                                    Content="Open saved layout"
+                                    Content="Watch in saved layout"
                                     Style="{StaticResource OptionButtonStyle}"
                                     ToolTip="Watch the selected session in the previously saved layout" />
                             </StackPanel>

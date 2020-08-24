@@ -71,7 +71,7 @@ namespace RaceControl.Common.Settings
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "An exception occurred while loading settings.");
+                _logger.Error(ex, "An error occurred while loading settings.");
             }
 
             _logger.Info("Done loading settings.");
@@ -90,7 +90,7 @@ namespace RaceControl.Common.Settings
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "An exception occurred while saving settings.");
+                _logger.Error(ex, "An error occurred while saving settings.");
             }
 
             _logger.Info("Done saving settings.");
