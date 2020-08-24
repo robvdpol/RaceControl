@@ -1,5 +1,6 @@
 ﻿using LibVLCSharp.Shared;
 using LibVLCSharp.Shared.Structures;
+using NLog;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Services.Dialogs;
@@ -29,6 +30,7 @@ namespace RaceControl.ViewModels
 {
     public class VideoDialogViewModel : DialogViewModelBase, IVideoDialogViewModel
     {
+        private readonly ILogger _logger;
         private readonly IEventAggregator _eventAggregator;
         private readonly IApiService _apiService;
         private readonly IStreamlinkLauncher _streamlinkLauncher;
@@ -82,12 +84,14 @@ namespace RaceControl.ViewModels
         private WindowStartupLocation _startupLocation = WindowStartupLocation.CenterOwner;
 
         public VideoDialogViewModel(
+            ILogger logger,
             IEventAggregator eventAggregator,
             IApiService apiService,
             IStreamlinkLauncher streamlinkLauncher,
             ISettings settings,
             LibVLC libVLC)
         {
+            _logger = logger;
             _eventAggregator = eventAggregator;
             _apiService = apiService;
             _streamlinkLauncher = streamlinkLauncher;
@@ -649,6 +653,8 @@ namespace RaceControl.ViewModels
 
         private async Task ChangeRendererAsync(RendererItem renderer)
         {
+            _logger.Info($"Changing renderer to '{renderer?.Name}'...");
+
             var streamTime = MediaPlayer.Time;
             var streamUrl = IsLive ? Media.Mrl : await GenerateStreamUrlAsync();
 
@@ -661,32 +667,46 @@ namespace RaceControl.ViewModels
             {
                 SetMediaPlayerTime(streamTime);
             }
+
+            _logger.Info("Done changing renderer.");
         }
 
         private void SetFullScreen()
         {
+            _logger.Info("Changing to fullscreen mode...");
+
             ResizeMode = ResizeMode.NoResize;
             WindowState = WindowState.Maximized;
         }
 
         private void SetWindowed()
         {
+            _logger.Info("Changing to windowed mode...");
+
             WindowState = WindowState.Normal;
         }
 
         private void SetMediaPlayerTime(long time)
         {
+            _logger.Info($"Setting mediaplayer time to '{time}'...");
+
             MediaPlayer.Time = time;
         }
 
         private void CreateMedia(string url)
         {
+            _logger.Info("Creating media...");
+
             Media = new Media(_libVLC, url, FromType.FromLocation);
             Media.DurationChanged += Media_DurationChanged;
+
+            _logger.Info("Done creating media.");
         }
 
         private void CreateMediaPlayer()
         {
+            _logger.Info("Creating mediaplayer...");
+
             MediaPlayer = new MediaPlayer(_libVLC)
             {
                 EnableHardwareDecoding = true,
@@ -699,33 +719,51 @@ namespace RaceControl.ViewModels
             MediaPlayer.TimeChanged += MediaPlayer_TimeChanged;
             MediaPlayer.ESAdded += MediaPlayer_ESAdded;
             MediaPlayer.ESDeleted += MediaPlayer_ESDeleted;
+
+            _logger.Info("Done creating mediaplayer.");
         }
 
         private void StartPlayback(RendererItem renderer = null)
         {
+            _logger.Info("Starting playback...");
+
             AudioTrackDescriptions.Clear();
             MediaPlayer.SetRenderer(renderer);
             MediaPlayer.Play(Media);
+
+            _logger.Info("Done starting playback.");
         }
 
         private void RemoveMedia()
         {
+            _logger.Info("Removing media...");
+
             Media.DurationChanged -= Media_DurationChanged;
             Media.Dispose();
+
+            _logger.Info("Done removing media.");
         }
 
         private void RemoveMediaPlayer()
         {
+            _logger.Info("Removing mediaplayer...");
+
             MediaPlayer.TimeChanged -= MediaPlayer_TimeChanged;
             MediaPlayer.ESAdded -= MediaPlayer_ESAdded;
             MediaPlayer.ESDeleted -= MediaPlayer_ESDeleted;
             MediaPlayer.Dispose();
+
+            _logger.Info("Done removing mediaplayer.");
         }
 
         private void StopPlayback()
         {
+            _logger.Info("Stopping playback...");
+
             MediaPlayer.Stop();
             AudioTrackDescriptions.Clear();
+
+            _logger.Info("Done stopping playback.");
         }
     }
 }
