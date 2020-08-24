@@ -297,73 +297,75 @@
                 BorderBrush="#ABADB3"
                 BorderThickness="1"
                 UseLayoutRounding="True">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <GroupBox
-                        Grid.Row="0"
-                        Margin="5,3"
-                        Header="Live broadcasts">
-                        <StackPanel Orientation="Vertical">
-                            <CheckBox
-                                Margin="3"
-                                Content="Force lower quality live streams"
-                                IsChecked="{Binding Settings.LowQualityMode}"
-                                ToolTip="Use in case of stuttering caused by low bandwidth connection" />
-                            <CheckBox
-                                Margin="3"
-                                Content="Use alternative CDN for live streams"
-                                IsChecked="{Binding Settings.UseAlternativeStream}"
-                                ToolTip="Use when regular live streams do not work" />
-                            <CheckBox
-                                Margin="3"
-                                Content="Record live streams"
-                                IsChecked="{Binding Settings.EnableRecording}"
-                                ToolTip="Save a copy of watched live streams to the file system" />
-                            <TextBlock Margin="3" Text="Recording location:" />
-                            <TextBlock
-                                Margin="3,0,3,3"
-                                Text="{Binding Settings.RecordingLocation}"
-                                TextWrapping="Wrap"
-                                ToolTip="{Binding Settings.RecordingLocation}" />
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <GroupBox
+                            Grid.Row="0"
+                            Margin="5,3"
+                            Header="Live broadcasts">
+                            <StackPanel Orientation="Vertical">
+                                <CheckBox
+                                    Margin="3"
+                                    Content="Force lower quality live streams"
+                                    IsChecked="{Binding Settings.LowQualityMode}"
+                                    ToolTip="Use in case of stuttering caused by low bandwidth connection" />
+                                <CheckBox
+                                    Margin="3"
+                                    Content="Use alternative CDN for live streams"
+                                    IsChecked="{Binding Settings.UseAlternativeStream}"
+                                    ToolTip="Use when regular live streams do not work" />
+                                <CheckBox
+                                    Margin="3"
+                                    Content="Record live streams"
+                                    IsChecked="{Binding Settings.EnableRecording}"
+                                    ToolTip="Save a copy of watched live streams to the file system" />
+                                <TextBlock Margin="3" Text="Recording location:" />
+                                <TextBlock
+                                    Margin="3,0,3,3"
+                                    Text="{Binding Settings.RecordingLocation}"
+                                    TextWrapping="Wrap"
+                                    ToolTip="{Binding Settings.RecordingLocation}" />
+                                <Button
+                                    Command="{Binding SetRecordingLocationCommand}"
+                                    Content="Change recording location"
+                                    Style="{StaticResource OptionButtonStyle}"
+                                    ToolTip="Change the location where recordings of live streams are saved" />
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox
+                            Grid.Row="1"
+                            Margin="5,3"
+                            Header="Video player">
+                            <StackPanel Orientation="Vertical">
+                                <Button
+                                    Command="{Binding SaveVideoDialogLayoutCommand}"
+                                    Content="Save current layout"
+                                    Style="{StaticResource OptionButtonStyle}"
+                                    ToolTip="Saves the position and size of all currently open video players" />
+                                <Button
+                                    Command="{Binding OpenVideoDialogLayoutCommand}"
+                                    Content="Open saved layout"
+                                    Style="{StaticResource OptionButtonStyle}"
+                                    ToolTip="Watch the selected session in the previously saved layout" />
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox
+                            Grid.Row="2"
+                            Margin="5,3"
+                            Header="Account">
                             <Button
-                                Command="{Binding SetRecordingLocationCommand}"
-                                Content="Change recording location"
+                                Command="{Binding DeleteCredentialCommand}"
+                                Content="Delete stored credentials"
                                 Style="{StaticResource OptionButtonStyle}"
-                                ToolTip="Change the location where recordings of live streams are saved" />
-                        </StackPanel>
-                    </GroupBox>
-                    <GroupBox
-                        Grid.Row="1"
-                        Margin="5,3"
-                        Header="Video player">
-                        <StackPanel Orientation="Vertical">
-                            <Button
-                                Command="{Binding SaveVideoDialogLayoutCommand}"
-                                Content="Save current layout"
-                                Style="{StaticResource OptionButtonStyle}"
-                                ToolTip="Saves the position and size of all currently open video players" />
-                            <Button
-                                Command="{Binding OpenVideoDialogLayoutCommand}"
-                                Content="Open saved layout"
-                                Style="{StaticResource OptionButtonStyle}"
-                                ToolTip="Watch the selected session in the previously saved layout" />
-                        </StackPanel>
-                    </GroupBox>
-                    <GroupBox
-                        Grid.Row="2"
-                        Margin="5,3"
-                        Header="Account">
-                        <Button
-                            Command="{Binding DeleteCredentialCommand}"
-                            Content="Delete stored credentials"
-                            Style="{StaticResource OptionButtonStyle}"
-                            ToolTip="Removes your credentials from the system, useful if you want to login with different credentials." />
-                    </GroupBox>
-                </Grid>
+                                ToolTip="Removes your credentials from the system, useful if you want to login with different credentials." />
+                        </GroupBox>
+                    </Grid>
+                </ScrollViewer>
             </Border>
             <Label
                 Grid.Row="2"
