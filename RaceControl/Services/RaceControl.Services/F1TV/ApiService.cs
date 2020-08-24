@@ -38,8 +38,8 @@ namespace RaceControl.Services.F1TV
                 .WithField(Session.EndTimeField)
                 .WithField(Session.EventOccurrenceUrlField)
                 .WithField(Session.SeriesUrlField)
-                .WithFilter(Session.StartTimeField, LarkFilterType.LessThan, utcNow.AddDays(2).ToString("yyyy-MM-ddTHH:mm:ss"))
-                .WithFilter(Session.EndTimeField, LarkFilterType.GreaterThan, utcNow.AddDays(-2).ToString("yyyy-MM-ddTHH:mm:ss"))
+                .WithFilter(Session.StartTimeField, LarkFilterType.LessThan, utcNow.AddDays(1).ToString("yyyy-MM-ddTHH:mm:ss"))
+                .WithFilter(Session.EndTimeField, LarkFilterType.GreaterThan, utcNow.AddDays(-1).ToString("yyyy-MM-ddTHH:mm:ss"))
                 .OrderBy(Session.StartTimeField, LarkSortDirection.Descending)
                 ;
 
