@@ -22,7 +22,7 @@ namespace RaceControl.Core.Mvvm
         public bool Opened
         {
             get => _opened;
-            private set => SetProperty(ref _opened, value);
+            protected set => SetProperty(ref _opened, value);
         }
 
         public event Action<IDialogResult> RequestClose;

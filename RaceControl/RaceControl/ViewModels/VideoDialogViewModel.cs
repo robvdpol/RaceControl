@@ -337,11 +337,6 @@ namespace RaceControl.ViewModels
             _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
 
             _eventAggregator.GetEvent<SyncStreamsEvent>().Subscribe(OnSyncSession);
-
-            // Prevent closing the dialog too soon, this causes problems with LibVLC
-            await Task.Delay(2000);
-
-            base.OnDialogOpened(parameters);
         }
 
         public override void OnDialogClosed()
@@ -386,6 +381,12 @@ namespace RaceControl.ViewModels
         private void Media_DurationChanged(object sender, MediaDurationChangedEventArgs e)
         {
             Duration = e.Duration;
+        }
+
+        private void MediaPlayer_Playing(object sender, EventArgs e)
+        {
+            // Prevent closing the dialog too soon, this causes problems with LibVLC
+            Opened = true;
         }
 
         private void MediaPlayer_TimeChanged(object sender, MediaPlayerTimeChangedEventArgs e)
@@ -731,6 +732,7 @@ namespace RaceControl.ViewModels
                 NetworkCaching = 4000
             };
 
+            MediaPlayer.Playing += MediaPlayer_Playing;
             MediaPlayer.TimeChanged += MediaPlayer_TimeChanged;
             MediaPlayer.ESAdded += MediaPlayer_ESAdded;
             MediaPlayer.ESDeleted += MediaPlayer_ESDeleted;
@@ -757,6 +759,7 @@ namespace RaceControl.ViewModels
         private void RemoveMediaPlayer()
         {
             _logger.Info("Removing mediaplayer...");
+            MediaPlayer.Playing -= MediaPlayer_Playing;
             MediaPlayer.TimeChanged -= MediaPlayer_TimeChanged;
             MediaPlayer.ESAdded -= MediaPlayer_ESAdded;
             MediaPlayer.ESDeleted -= MediaPlayer_ESDeleted;
