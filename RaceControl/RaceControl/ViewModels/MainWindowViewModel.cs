@@ -675,7 +675,7 @@ namespace RaceControl.ViewModels
                 return;
             }
 
-            if (release == null || release.PreRelease || release.Draft)
+            if (release == null || release.PreRelease || release.Draft || release.TagName == Settings.LatestRelease)
             {
                 _logger.Info("No new release found.");
             }
@@ -695,6 +695,8 @@ namespace RaceControl.ViewModels
                         ProcessUtils.BrowseToUrl(release.HtmlUrl);
                     }
                 });
+
+                Settings.LatestRelease = release.TagName;
             }
 
             _logger.Info("Done checking for updates.");

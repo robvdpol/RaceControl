@@ -16,6 +16,7 @@ namespace RaceControl.Common.Settings
         private bool _useAlternativeStream;
         private bool _enableRecording;
         private string _recordingLocation = Environment.CurrentDirectory;
+        private string _latestRelease;
         private ObservableCollection<string> _selectedSeries;
 
         public Settings(ILogger logger)
@@ -45,6 +46,12 @@ namespace RaceControl.Common.Settings
         {
             get => _recordingLocation;
             set => SetProperty(ref _recordingLocation, value);
+        }
+
+        public string LatestRelease
+        {
+            get => _latestRelease;
+            set => SetProperty(ref _latestRelease, value);
         }
 
         public ObservableCollection<string> SelectedSeries

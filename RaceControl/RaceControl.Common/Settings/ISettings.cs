@@ -12,6 +12,8 @@ namespace RaceControl.Common.Settings
 
         string RecordingLocation { get; set; }
 
+        string LatestRelease { get; set; }
+
         ObservableCollection<string> SelectedSeries { get; set; }
 
         void Load();
