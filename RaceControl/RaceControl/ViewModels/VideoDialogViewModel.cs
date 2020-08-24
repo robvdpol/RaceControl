@@ -541,7 +541,7 @@ namespace RaceControl.ViewModels
         {
             if (UniqueIdentifier != payload.RequesterIdentifier && SyncUID == payload.SyncUID)
             {
-                SetMediaPlayerTime(payload.Time, true);
+                SetMediaPlayerTime(payload.Time);
             }
         }
 
@@ -674,12 +674,9 @@ namespace RaceControl.ViewModels
             WindowState = WindowState.Normal;
         }
 
-        private void SetMediaPlayerTime(long time, bool mustBePlaying = false)
+        private void SetMediaPlayerTime(long time)
         {
-            if (!mustBePlaying || MediaPlayer.IsPlaying)
-            {
-                MediaPlayer.Time = time;
-            }
+            MediaPlayer.Time = time;
         }
 
         private void CreateMedia(string url)
