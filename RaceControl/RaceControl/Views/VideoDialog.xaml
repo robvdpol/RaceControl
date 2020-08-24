@@ -233,11 +233,20 @@
                                 Grid.Row="0"
                                 Grid.RowSpan="2"
                                 Grid.Column="0"
-                                MinWidth="55"
+                                MinWidth="60"
                                 Command="{Binding ToggleFullScreenCommand}"
-                                Content="Fullscreen"
-                                Style="{StaticResource ControlBarButtonStyle}"
-                                ToolTip="Toggle fullscreen mode" />
+                                ToolTip="Toggle fullscreen mode">
+                                <Button.Style>
+                                    <Style BasedOn="{StaticResource ControlBarButtonStyle}" TargetType="Button">
+                                        <Setter Property="Content" Value="Fullscreen" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding WindowState, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static WindowState.Maximized}}" Value="True">
+                                                <Setter Property="Content" Value="Windowed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
                             <Button
                                 Grid.Row="0"
                                 Grid.Column="1"
@@ -278,7 +287,7 @@
                                 Grid.Row="0"
                                 Grid.RowSpan="2"
                                 Grid.Column="3"
-                                MinWidth="55"
+                                MinWidth="60"
                                 Command="{Binding CloseWindowCommand}"
                                 Content="Close"
                                 Style="{StaticResource ControlBarButtonStyle}"

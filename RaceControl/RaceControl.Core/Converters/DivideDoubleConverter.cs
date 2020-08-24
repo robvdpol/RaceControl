@@ -10,11 +10,6 @@ namespace RaceControl.Core.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (targetType != typeof(double) && targetType != typeof(double?))
-            {
-                throw new InvalidOperationException("The target must be a double");
-            }
-
             if (value != null)
             {
                 var dblValue = System.Convert.ToDouble(value);

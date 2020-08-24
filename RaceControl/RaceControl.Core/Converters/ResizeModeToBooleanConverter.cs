@@ -10,11 +10,6 @@ namespace RaceControl.Core.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (targetType != typeof(bool) && targetType != typeof(bool?))
-            {
-                throw new InvalidOperationException("The target must be a boolean");
-            }
-
             if (value is ResizeMode resizeMode)
             {
                 return resizeMode == ResizeMode.CanResize;
