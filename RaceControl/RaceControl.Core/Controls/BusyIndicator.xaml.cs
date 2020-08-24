@@ -1,8 +1,6 @@
-﻿using System.Windows.Controls;
-
-namespace RaceControl.Core.Controls
+﻿namespace RaceControl.Core.Controls
 {
-    public partial class BusyIndicator : UserControl
+    public partial class BusyIndicator
     {
         public BusyIndicator()
         {

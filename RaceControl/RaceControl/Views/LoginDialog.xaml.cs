@@ -1,8 +1,6 @@
-﻿using System.Windows.Controls;
-
-namespace RaceControl.Views
+﻿namespace RaceControl.Views
 {
-    public partial class LoginDialog : UserControl
+    public partial class LoginDialog
     {
         public LoginDialog()
         {

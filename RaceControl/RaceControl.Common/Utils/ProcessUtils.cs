@@ -22,7 +22,7 @@ namespace RaceControl.Common.Utils
 
         public static void BrowseToUrl(string url)
         {
-            Process.Start("explorer.exe", url).Dispose();
+            Process.Start("explorer.exe", url)?.Dispose();
         }
     }
 }

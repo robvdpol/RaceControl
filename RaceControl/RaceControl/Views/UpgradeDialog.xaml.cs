@@ -1,8 +1,6 @@
-﻿using System.Windows.Controls;
-
-namespace RaceControl.Views
+﻿namespace RaceControl.Views
 {
-    public partial class UpgradeDialog : UserControl
+    public partial class UpgradeDialog
     {
         public UpgradeDialog()
         {

@@ -1,8 +1,6 @@
-﻿using System.Windows.Controls;
-
-namespace RaceControl.Views
+﻿namespace RaceControl.Views
 {
-    public partial class DownloadDialog : UserControl
+    public partial class DownloadDialog
     {
         public DownloadDialog()
         {

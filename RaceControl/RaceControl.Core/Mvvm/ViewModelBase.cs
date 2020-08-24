@@ -21,7 +21,7 @@ namespace RaceControl.Core.Mvvm
         public ICommand PreviewKeyDownCommand => _previewKeyDownCommand ??= new DelegateCommand<KeyEventArgs>(PreviewKeyDownExecute);
         public ICommand KeyDownCommand => _keyDownCommand ??= new DelegateCommand<KeyEventArgs>(KeyDownExecute);
 
-        protected void CleanupProcess(Process process)
+        protected static void CleanupProcess(Process process)
         {
             if (process != null)
             {

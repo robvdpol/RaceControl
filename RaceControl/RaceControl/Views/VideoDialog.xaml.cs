@@ -1,8 +1,6 @@
-﻿using System.Windows.Controls;
-
-namespace RaceControl.Views
+﻿namespace RaceControl.Views
 {
-    public partial class VideoDialog : UserControl
+    public partial class VideoDialog
     {
         public VideoDialog()
         {

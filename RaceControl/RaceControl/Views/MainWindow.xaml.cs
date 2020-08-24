@@ -1,10 +1,9 @@
 ﻿using RaceControl.Common.Utils;
 using System;
-using System.Windows;
 
 namespace RaceControl.Views
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
         public MainWindow()
         {
