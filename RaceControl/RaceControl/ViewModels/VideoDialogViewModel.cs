@@ -327,12 +327,6 @@ namespace RaceControl.ViewModels
             if (IsLive)
             {
                 _streamlinkProcess = _streamlinkLauncher.StartStreamlinkExternal(streamUrl, out streamUrl);
-
-                if (_settings.EnableRecording)
-                {
-                    var recordingStreamUrl = await GenerateStreamUrlAsync();
-                    _streamlinkRecordingProcess = _streamlinkLauncher.StartStreamlinkRecording(recordingStreamUrl, Title);
-                }
             }
 
             CreateMedia(streamUrl);

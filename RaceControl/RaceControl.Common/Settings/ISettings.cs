@@ -8,8 +8,6 @@ namespace RaceControl.Common.Settings
 
         bool UseAlternativeStream { get; set; }
 
-        bool EnableRecording { get; set; }
-
         string RecordingLocation { get; set; }
 
         string LatestRelease { get; set; }

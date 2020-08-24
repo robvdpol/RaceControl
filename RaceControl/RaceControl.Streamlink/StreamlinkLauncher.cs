@@ -76,8 +76,7 @@ namespace RaceControl.Streamlink
         public void StartStreamlinkVlc(string vlcExeLocation, string streamUrl, string title)
         {
             var streamIdentifier = GetStreamIdentifier();
-            var recordingArguments = GetRecordingArguments(title);
-            var streamlinkArguments = $"--player \"{vlcExeLocation} --file-caching=2000 --network-caching=4000\" --title \"{title}\" --hls-audio-select * {recordingArguments} \"{streamUrl}\" {streamIdentifier}";
+            var streamlinkArguments = $"--player \"{vlcExeLocation} --file-caching=2000 --network-caching=4000\" --title \"{title}\" --hls-audio-select * \"{streamUrl}\" {streamIdentifier}";
 
             _logger.Info($"Starting VLC Streamlink-instance for stream-URL '{streamUrl}' with identifier '{streamIdentifier}'...");
 
@@ -89,8 +88,7 @@ namespace RaceControl.Streamlink
         public void StartStreamlinkMpv(string mpvExeLocation, string streamUrl, string title)
         {
             var streamIdentifier = GetStreamIdentifier();
-            var recordingArguments = GetRecordingArguments(title);
-            var streamlinkArguments = $"--player \"{mpvExeLocation}\" --title \"{title}\" --hls-audio-select * {recordingArguments} \"{streamUrl}\" {streamIdentifier}";
+            var streamlinkArguments = $"--player \"{mpvExeLocation}\" --title \"{title}\" --hls-audio-select * \"{streamUrl}\" {streamIdentifier}";
 
             _logger.Info($"Starting MPV Streamlink-instance for stream-URL '{streamUrl}' with identifier '{streamIdentifier}'...");
 
@@ -109,21 +107,9 @@ namespace RaceControl.Streamlink
             return !_settings.UseAlternativeStream ? "best" : "1080p_alt";
         }
 
-        private string GetRecordingArguments(string title)
-        {
-            if (!_settings.EnableRecording)
-            {
-                return string.Empty;
-            }
-
-            var recordingFilename = GetRecordingFilename(title);
-
-            return $"--record \"{recordingFilename}\" --force";
-        }
-
         private string GetRecordingFilename(string title)
         {
-            var filename = $"{DateTime.Now:yyyyMMddHHmmss} {title}.mkv".RemoveInvalidFileNameChars(string.Empty);
+            var filename = $"{DateTime.Now:yyyyMMddHHmmss} {title}.mkv".RemoveInvalidFileNameChars();
 
             return Path.Combine(_settings.RecordingLocation, filename);
         }

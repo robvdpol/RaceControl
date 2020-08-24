@@ -14,7 +14,6 @@ namespace RaceControl.Common.Settings
 
         private bool _lowQualityMode;
         private bool _useAlternativeStream;
-        private bool _enableRecording;
         private string _recordingLocation = Environment.CurrentDirectory;
         private string _latestRelease;
         private ObservableCollection<string> _selectedSeries;
@@ -34,12 +33,6 @@ namespace RaceControl.Common.Settings
         {
             get => _useAlternativeStream;
             set => SetProperty(ref _useAlternativeStream, value);
-        }
-
-        public bool EnableRecording
-        {
-            get => _enableRecording;
-            set => SetProperty(ref _enableRecording, value);
         }
 
         public string RecordingLocation
