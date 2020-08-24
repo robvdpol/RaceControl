@@ -121,12 +121,6 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _name, value);
         }
 
-        public string Token
-        {
-            get => _token;
-            set => SetProperty(ref _token, value);
-        }
-
         public ContentType ContentType
         {
             get => _contentType;
@@ -281,9 +275,9 @@ namespace RaceControl.ViewModels
 
         public override async void OnDialogOpened(IDialogParameters parameters)
         {
+            _token = parameters.GetValue<string>(ParameterNames.TOKEN);
             Title = parameters.GetValue<string>(ParameterNames.TITLE);
             Name = parameters.GetValue<string>(ParameterNames.NAME);
-            Token = parameters.GetValue<string>(ParameterNames.TOKEN);
             ContentType = parameters.GetValue<ContentType>(ParameterNames.CONTENT_TYPE);
             ContentUrl = parameters.GetValue<string>(ParameterNames.CONTENT_URL);
             SyncUID = parameters.GetValue<string>(ParameterNames.SYNC_UID);
@@ -650,7 +644,7 @@ namespace RaceControl.ViewModels
 
         private async Task<string> GenerateStreamUrlAsync()
         {
-            return await _apiService.GetTokenisedUrlAsync(Token, ContentType, ContentUrl);
+            return await _apiService.GetTokenisedUrlAsync(_token, ContentType, ContentUrl);
         }
 
         private async Task ChangeRendererAsync(RendererItem renderer)

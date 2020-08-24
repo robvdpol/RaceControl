@@ -249,21 +249,12 @@ namespace RaceControl.ViewModels
                 _logger.Error(ex, "An exception occurred while checking for updates.");
             }
 
-            IsBusy = false;
-
-            _dialogService.ShowDialog(nameof(LoginDialog), null, async dialogResult =>
+            if (Login())
             {
-                if (dialogResult.Result == ButtonResult.OK)
-                {
-                    var token = dialogResult.Parameters.GetValue<string>(ParameterNames.TOKEN);
-                    await InitializeAsync(token);
-                }
-                else
-                {
-                    _logger.Info("Login cancelled by user, shutting down...");
-                    Application.Current.Shutdown();
-                }
-            });
+                await InitializeAsync();
+            }
+
+            IsBusy = false;
         }
 
         private void ClosingExecute()
@@ -388,9 +379,9 @@ namespace RaceControl.ViewModels
             var title = episode.ToString();
             var parameters = new DialogParameters
             {
+                { ParameterNames.TOKEN, _token },
                 { ParameterNames.TITLE, title },
                 { ParameterNames.NAME, title },
-                { ParameterNames.TOKEN, _token },
                 { ParameterNames.CONTENT_TYPE, ContentType.Asset },
                 { ParameterNames.CONTENT_URL, episode.Items.First() },
                 { ParameterNames.SYNC_UID, episode.UID },
@@ -606,16 +597,8 @@ namespace RaceControl.ViewModels
 
             if (MessageBoxHelper.AskQuestion("Are you sure you want to delete your credentials from this system?"))
             {
-                var deleted = await Task.Run(() => _credentialService.DeleteCredential());
-
-                if (deleted)
-                {
-                    MessageBoxHelper.ShowInfo("Your credentials have been successfully deleted from this system.");
-                }
-                else
-                {
-                    MessageBoxHelper.ShowError("Your credentials have already been deleted from this system.");
-                }
+                await Task.Run(() => _credentialService.DeleteCredential());
+                Login();
             }
 
             IsBusy = false;
@@ -628,14 +611,33 @@ namespace RaceControl.ViewModels
             _refreshLiveSessionsTimer?.Start();
         }
 
-        private async Task InitializeAsync(string token)
+        private bool Login()
         {
-            IsBusy = true;
-            SetToken(token);
+            var success = false;
+
+            _dialogService.ShowDialog(nameof(LoginDialog), null, dialogResult =>
+            {
+                success = dialogResult.Result == ButtonResult.OK;
+
+                if (success)
+                {
+                    _token = dialogResult.Parameters.GetValue<string>(ParameterNames.TOKEN);
+                }
+                else
+                {
+                    _logger.Info("Login cancelled by user, shutting down...");
+                    Application.Current.Shutdown();
+                }
+            });
+
+            return success;
+        }
+
+        private async Task InitializeAsync()
+        {
             SetVlcExeLocation();
             SetMpvExeLocation();
             await LoadInitialDataAsync();
-            IsBusy = false;
 
             _refreshLiveSessionsTimer = new Timer(60000) { AutoReset = false };
             _refreshLiveSessionsTimer.Elapsed += RefreshLiveSessionsTimer_Elapsed;
@@ -672,11 +674,6 @@ namespace RaceControl.ViewModels
             }
 
             _logger.Info("Done checking for updates.");
-        }
-
-        private void SetToken(string token)
-        {
-            _token = token;
         }
 
         private void SetVlcExeLocation()
@@ -809,9 +806,9 @@ namespace RaceControl.ViewModels
             var title = GetTitle(session, channel);
             var parameters = new DialogParameters
             {
+                { ParameterNames.TOKEN, _token },
                 { ParameterNames.TITLE, title },
                 { ParameterNames.NAME, channel.Name },
-                { ParameterNames.TOKEN, _token },
                 { ParameterNames.CONTENT_TYPE, ContentType.Channel },
                 { ParameterNames.CONTENT_URL, channel.Self },
                 { ParameterNames.SYNC_UID, session.UID },
