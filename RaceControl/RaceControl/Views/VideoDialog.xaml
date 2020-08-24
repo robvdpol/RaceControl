@@ -138,16 +138,30 @@
                             Grid.Row="0"
                             Grid.Column="0"
                             Orientation="Horizontal">
-                            <Button
-                                Command="{Binding TogglePauseCommand}"
-                                Content="Pause"
-                                Style="{StaticResource ControlBarButtonStyle}"
-                                ToolTip="Toggle pause" />
-                            <Button
-                                Command="{Binding ToggleMuteCommand}"
-                                Content="Mute"
-                                Style="{StaticResource ControlBarButtonStyle}"
-                                ToolTip="Toggle mute" />
+                            <Button Command="{Binding TogglePauseCommand}" ToolTip="Toggle pause">
+                                <Button.Style>
+                                    <Style BasedOn="{StaticResource ControlBarButtonStyle}" TargetType="Button">
+                                        <Setter Property="Content" Value="Pause" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Paused}" Value="True">
+                                                <Setter Property="Content" Value="Resume" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                            <Button Command="{Binding ToggleMuteCommand}" ToolTip="Toggle mute">
+                                <Button.Style>
+                                    <Style BasedOn="{StaticResource ControlBarButtonStyle}" TargetType="Button">
+                                        <Setter Property="Content" Value="Mute" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Mute}" Value="True">
+                                                <Setter Property="Content" Value="Unmute" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
                             <Button
                                 Command="{Binding FastForwardCommand}"
                                 CommandParameter="-60"

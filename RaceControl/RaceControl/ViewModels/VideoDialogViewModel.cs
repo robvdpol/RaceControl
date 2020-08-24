@@ -67,6 +67,8 @@ namespace RaceControl.ViewModels
         private MediaPlayer _mediaPlayer;
         private Media _media;
         private ObservableCollection<TrackDescription> _audioTrackDescriptions;
+        private bool _paused;
+        private bool _mute;
         private long _duration;
         private long _sliderTime;
         private TimeSpan _displayTime;
@@ -171,6 +173,18 @@ namespace RaceControl.ViewModels
         {
             get => _audioTrackDescriptions ??= new ObservableCollection<TrackDescription>();
             set => SetProperty(ref _audioTrackDescriptions, value);
+        }
+
+        public bool Paused
+        {
+            get => _paused;
+            set => SetProperty(ref _paused, value);
+        }
+
+        public bool Mute
+        {
+            get => _mute;
+            set => SetProperty(ref _mute, value);
         }
 
         public long Duration
@@ -505,14 +519,16 @@ namespace RaceControl.ViewModels
             if (MediaPlayer.CanPause)
             {
                 _logger.Info("Toggling pause...");
-                MediaPlayer.Pause();
+                Paused = !Paused;
+                MediaPlayer.SetPause(Paused);
             }
         }
 
         private void ToggleMuteExecute()
         {
             _logger.Info("Toggling mute...");
-            MediaPlayer.ToggleMute();
+            Mute = !Mute;
+            MediaPlayer.Mute = Mute;
         }
 
         private bool CanFastForwardExecute(string arg)
