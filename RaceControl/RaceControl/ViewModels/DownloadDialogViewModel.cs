@@ -1,13 +1,17 @@
-﻿using Prism.Services.Dialogs;
+﻿using NLog;
+using Prism.Services.Dialogs;
+using RaceControl.Core.Helpers;
 using RaceControl.Core.Mvvm;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Streamlink;
+using System;
 using System.Diagnostics;
 
 namespace RaceControl.ViewModels
 {
     public class DownloadDialogViewModel : DialogViewModelBase
     {
+        private readonly ILogger _logger;
         private readonly IApiService _apiService;
         private readonly IStreamlinkLauncher _streamlinkLauncher;
 
@@ -17,8 +21,9 @@ namespace RaceControl.ViewModels
         private bool _hasExited;
         private bool _exitCodeSuccess;
 
-        public DownloadDialogViewModel(IApiService apiService, IStreamlinkLauncher streamlinkLauncher)
+        public DownloadDialogViewModel(ILogger logger, IApiService apiService, IStreamlinkLauncher streamlinkLauncher)
         {
+            _logger = logger;
             _apiService = apiService;
             _streamlinkLauncher = streamlinkLauncher;
         }
@@ -49,6 +54,8 @@ namespace RaceControl.ViewModels
 
         public override async void OnDialogOpened(IDialogParameters parameters)
         {
+            base.OnDialogOpened(parameters);
+
             Title = "Download";
             Name = parameters.GetValue<string>(ParameterNames.NAME);
             Filename = parameters.GetValue<string>(ParameterNames.FILENAME);
@@ -56,10 +63,21 @@ namespace RaceControl.ViewModels
             var contentType = parameters.GetValue<ContentType>(ParameterNames.CONTENT_TYPE);
             var contentUrl = parameters.GetValue<string>(ParameterNames.CONTENT_URL);
 
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(token, contentType, contentUrl);
-            _downloadProcess = _streamlinkLauncher.StartStreamlinkDownload(streamUrl, Filename, DownloadProcess_Exited);
+            string streamUrl;
 
-            base.OnDialogOpened(parameters);
+            try
+            {
+                streamUrl = await _apiService.GetTokenisedUrlAsync(token, contentType, contentUrl);
+            }
+            catch (Exception ex)
+            {
+                var message = $"An error occurred while trying to get tokenised URL for content-type '{contentType}' and content-URL '{contentUrl}'.";
+                _logger.Error(ex, message);
+                MessageBoxHelper.ShowError(message);
+                return;
+            }
+
+            _downloadProcess = _streamlinkLauncher.StartStreamlinkDownload(streamUrl, Filename, DownloadProcess_Exited);
         }
 
         public override void OnDialogClosed()

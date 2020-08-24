@@ -235,6 +235,7 @@ namespace RaceControl.ViewModels
 
         private async void LoadedExecute(RoutedEventArgs args)
         {
+            _logger.Info("Initializing application...");
             IsBusy = true;
             Settings.Load();
             VideoDialogLayout.Load();
@@ -259,6 +260,7 @@ namespace RaceControl.ViewModels
             }
 
             Settings.Save();
+            _logger.Info("Closing application...");
         }
 
         private static void MouseMoveExecute()
