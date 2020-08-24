@@ -283,30 +283,28 @@ namespace RaceControl.ViewModels
 
         private async void SeasonSelectionChangedExecute()
         {
-            IsBusy = true;
             ClearEvents();
 
             if (SelectedSeason != null)
             {
+                IsBusy = true;
                 var events = await _apiService.GetEventsForSeasonAsync(SelectedSeason.UID);
                 Events.AddRange(events);
+                IsBusy = false;
             }
-
-            IsBusy = false;
         }
 
         private async void EventSelectionChangedExecute()
         {
-            IsBusy = true;
             ClearSessions();
 
             if (SelectedEvent != null)
             {
+                IsBusy = true;
                 var sessions = await _apiService.GetSessionsForEventAsync(SelectedEvent.UID);
                 Sessions.AddRange(sessions.Where(s => s.IsLive || s.IsReplay));
+                IsBusy = false;
             }
-
-            IsBusy = false;
         }
 
         private async void LiveSessionSelectionChangedExecute()
@@ -335,7 +333,6 @@ namespace RaceControl.ViewModels
         {
             if (SelectedVodType != null)
             {
-                IsBusy = true;
                 SelectedLiveSession = null;
                 SelectedSession = null;
                 ClearChannels();
@@ -343,6 +340,8 @@ namespace RaceControl.ViewModels
 
                 if (SelectedVodType.ContentUrls.Any())
                 {
+                    IsBusy = true;
+
                     // Limit number of concurrent requests to 50
                     var options = new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 50 };
                     var downloader = new TransformBlock<string, Episode>(episodeUID => _apiService.GetEpisodeAsync(episodeUID), options);
@@ -361,9 +360,9 @@ namespace RaceControl.ViewModels
                     {
                         Episodes.AddRange(episodes.OrderBy(e => e.Title));
                     }
-                }
 
-                IsBusy = false;
+                    IsBusy = false;
+                }
             }
         }
 
@@ -784,9 +783,7 @@ namespace RaceControl.ViewModels
             ClearChannels();
             ClearEpisodes();
 
-            await Task.WhenAll(
-                LoadChannelsForSessionAsync(session.UID),
-                LoadEpisodesForSessionAsync(session.UID));
+            await Task.WhenAll(LoadChannelsForSessionAsync(session.UID), LoadEpisodesForSessionAsync(session.UID));
         }
 
         private async Task LoadChannelsForSessionAsync(string sessionUID)
