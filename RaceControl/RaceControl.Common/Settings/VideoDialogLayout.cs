@@ -12,12 +12,14 @@ namespace RaceControl.Common.Settings
         private const string Filename = "RaceControl.layout.json";
 
         private readonly ILogger _logger;
+        private readonly JsonSerializer _serializer;
 
         private ObservableCollection<VideoDialogInstance> _instances;
 
-        public VideoDialogLayout(ILogger logger)
+        public VideoDialogLayout(ILogger logger, JsonSerializer serializer)
         {
             _logger = logger;
+            _serializer = serializer;
         }
 
         public ObservableCollection<VideoDialogInstance> Instances
@@ -52,7 +54,7 @@ namespace RaceControl.Common.Settings
             {
                 using (var file = File.OpenText(Filename))
                 {
-                    new JsonSerializer().Populate(file, this);
+                    _serializer.Populate(file, this);
                 }
             }
             catch (Exception ex)
@@ -71,7 +73,7 @@ namespace RaceControl.Common.Settings
             {
                 using (var file = File.CreateText(Filename))
                 {
-                    new JsonSerializer().Serialize(file, this);
+                    _serializer.Serialize(file, this);
                 }
             }
             catch (Exception ex)

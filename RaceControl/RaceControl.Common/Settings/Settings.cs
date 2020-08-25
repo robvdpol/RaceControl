@@ -11,6 +11,7 @@ namespace RaceControl.Common.Settings
         private const string Filename = "RaceControl.settings.json";
 
         private readonly ILogger _logger;
+        private readonly JsonSerializer _serializer;
 
         private bool _lowQualityMode;
         private bool _useAlternativeStream;
@@ -18,9 +19,10 @@ namespace RaceControl.Common.Settings
         private string _latestRelease;
         private ObservableCollection<string> _selectedSeries;
 
-        public Settings(ILogger logger)
+        public Settings(ILogger logger, JsonSerializer serializer)
         {
             _logger = logger;
+            _serializer = serializer;
         }
 
         public bool LowQualityMode
@@ -66,7 +68,7 @@ namespace RaceControl.Common.Settings
             {
                 using (var file = File.OpenText(Filename))
                 {
-                    new JsonSerializer().Populate(file, this);
+                    _serializer.Populate(file, this);
                 }
             }
             catch (Exception ex)
@@ -85,7 +87,7 @@ namespace RaceControl.Common.Settings
             {
                 using (var file = File.CreateText(Filename))
                 {
-                    new JsonSerializer().Serialize(file, this);
+                    _serializer.Serialize(file, this);
                 }
             }
             catch (Exception ex)

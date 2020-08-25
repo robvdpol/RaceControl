@@ -1,5 +1,6 @@
 ﻿using DryIoc;
 using LibVLCSharp.Shared;
+using Newtonsoft.Json;
 using NLog;
 using NLog.Config;
 using NLog.Layouts;
@@ -54,18 +55,19 @@ namespace RaceControl
             containerRegistry.RegisterDialog<DownloadDialog, DownloadDialogViewModel>();
             containerRegistry.RegisterDialog<VideoDialog, VideoDialogViewModel>();
 
+            containerRegistry.RegisterInstance(new LibVLC());
             containerRegistry.RegisterSingleton<IExtendedDialogService, ExtendedDialogService>();
             containerRegistry.RegisterSingleton<IChildProcessTracker, ChildProcessTracker>();
             containerRegistry.RegisterSingleton<IRestClient, RestClient>();
             containerRegistry.RegisterSingleton<ISettings, Settings>();
             containerRegistry.RegisterSingleton<IVideoDialogLayout, VideoDialogLayout>();
+            containerRegistry.Register<JsonSerializer>(() => new JsonSerializer() { Formatting = Formatting.Indented });
             containerRegistry.Register<IAuthorizationService, AuthorizationService>();
             containerRegistry.Register<IF1TVClient, F1TVClient>();
             containerRegistry.Register<IApiService, ApiService>();
             containerRegistry.Register<IGithubService, GithubService>();
             containerRegistry.Register<ICredentialService, CredentialService>();
             containerRegistry.Register<IStreamlinkLauncher, StreamlinkLauncher>();
-            containerRegistry.RegisterInstance(new LibVLC());
             containerRegistry.Register<MediaPlayer>(container => new MediaPlayer(container.Resolve<LibVLC>())
             {
                 EnableHardwareDecoding = true,
