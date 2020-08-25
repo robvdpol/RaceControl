@@ -356,7 +356,7 @@
                                 Command="{Binding DeleteCredentialCommand}"
                                 Content="Delete stored credentials"
                                 Style="{StaticResource OptionButtonStyle}"
-                                ToolTip="Removes your credentials from the system, useful if you want to login with different credentials." />
+                                ToolTip="Removes your credentials from the system, useful if you want to login with different credentials" />
                         </GroupBox>
                     </Grid>
                 </ScrollViewer>

@@ -13,8 +13,7 @@
         <Grid
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
-            Background="Transparent"
-            ToolTip="Searching....">
+            Background="Transparent">
             <Canvas
                 Name="Canvas1"
                 Width="120"
