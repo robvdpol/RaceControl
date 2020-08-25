@@ -47,6 +47,7 @@ namespace RaceControl.ViewModels
         private ICommand _toggleMuteCommand;
         private ICommand _fastForwardCommand;
         private ICommand _syncSessionCommand;
+        private ICommand _toggleRecordingCommand;
         private ICommand _toggleFullScreenCommand;
         private ICommand _moveToCornerCommand;
         private ICommand _audioTrackSelectionChangedCommand;
@@ -60,6 +61,7 @@ namespace RaceControl.ViewModels
         private string _contentUrl;
         private string _syncUID;
         private bool _isLive;
+        private bool _isRecording;
         private bool _isCasting;
         private Process _streamlinkProcess;
         private Process _streamlinkRecordingProcess;
@@ -109,6 +111,7 @@ namespace RaceControl.ViewModels
         public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand(ToggleMuteExecute);
         public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<string>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => IsLive);
         public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => IsLive);
+        public ICommand ToggleRecordingCommand => _toggleRecordingCommand ??= new DelegateCommand(ToggleRecordingExecute, CanToggleRecordingExecute).ObservesProperty(() => IsLive).ObservesProperty(() => IsRecording).ObservesProperty(() => Paused);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand(ToggleFullScreenExecute);
         public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => WindowState);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
@@ -146,6 +149,12 @@ namespace RaceControl.ViewModels
         {
             get => _isLive;
             set => SetProperty(ref _isLive, value);
+        }
+
+        public bool IsRecording
+        {
+            get => _isRecording;
+            set => SetProperty(ref _isRecording, value);
         }
 
         public bool IsCasting
@@ -564,6 +573,25 @@ namespace RaceControl.ViewModels
             _eventAggregator.GetEvent<SyncStreamsEvent>().Publish(payload);
         }
 
+        private bool CanToggleRecordingExecute()
+        {
+            return IsLive && (IsRecording || !Paused);
+        }
+
+        private async void ToggleRecordingExecute()
+        {
+            if (!IsRecording)
+            {
+                await StartRecording();
+            }
+            else
+            {
+                StopRecording();
+            }
+
+            IsRecording = !IsRecording;
+        }
+
         private void OnSyncSession(SyncStreamsEventPayload payload)
         {
             if (UniqueIdentifier != payload.RequesterIdentifier && SyncUID == payload.SyncUID)
@@ -702,6 +730,22 @@ namespace RaceControl.ViewModels
             }
 
             _logger.Info("Done changing renderer.");
+        }
+
+        private async Task StartRecording()
+        {
+            _logger.Info("Starting recording process...");
+            var streamUrl = await GenerateStreamUrlAsync();
+            _streamlinkRecordingProcess = _streamlinkLauncher.StartStreamlinkRecording(streamUrl, Title);
+            _logger.Info("Recording process started.");
+        }
+
+        private void StopRecording()
+        {
+            _logger.Info("Stopping recording process...");
+            CleanupProcess(_streamlinkRecordingProcess);
+            _streamlinkRecordingProcess = null;
+            _logger.Info("Recording process stopped.");
         }
 
         private void SetFullScreen()

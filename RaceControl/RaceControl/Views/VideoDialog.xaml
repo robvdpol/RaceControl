@@ -243,10 +243,21 @@
                                     <Image Source="{StaticResource SynchronizeBitmapImage}" />
                                 </Button.Content>
                             </Button>
-                            <Button Style="{StaticResource ControlBarButtonStyle}" ToolTip="Start recording">
-                                <Button.Content>
-                                    <Image Source="{StaticResource RecordBitmapImage}" />
-                                </Button.Content>
+                            <Button Command="{Binding ToggleRecordingCommand}" ToolTip="Start/stop recording">
+                                <Button.Resources>
+                                    <Image x:Key="RecordImage" Source="{StaticResource RecordBitmapImage}" />
+                                    <Image x:Key="StopImage" Source="{StaticResource StopBitmapImage}" />
+                                </Button.Resources>
+                                <Button.Style>
+                                    <Style BasedOn="{StaticResource ControlBarButtonStyle}" TargetType="Button">
+                                        <Setter Property="Content" Value="{StaticResource RecordImage}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsRecording}" Value="True">
+                                                <Setter Property="Content" Value="{StaticResource StopImage}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
                             </Button>
                         </StackPanel>
                         <Grid Grid.Row="1" Grid.Column="0">
