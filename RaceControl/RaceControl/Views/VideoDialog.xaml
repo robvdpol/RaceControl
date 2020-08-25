@@ -37,8 +37,10 @@
         <BitmapImage x:Key="PauseBitmapImage" UriSource="/Icons/pause_48px.png" />
         <BitmapImage x:Key="AudioBitmapImage" UriSource="/Icons/audio_48px.png" />
         <BitmapImage x:Key="NoAudioBitmapImage" UriSource="/Icons/no_audio_48px.png" />
-        <BitmapImage x:Key="FastForwardBitmapImage" UriSource="/Icons/fast_forward_48px.png" />
-        <BitmapImage x:Key="RewindBitmapImage" UriSource="/Icons/rewind_48px.png" />
+        <BitmapImage x:Key="FastForward10BitmapImage" UriSource="/Icons/fast_forward_10_48px.png" />
+        <BitmapImage x:Key="FastForward60BitmapImage" UriSource="/Icons/fast_forward_60_48px.png" />
+        <BitmapImage x:Key="Rewind10BitmapImage" UriSource="/Icons/rewind_10_48px.png" />
+        <BitmapImage x:Key="Rewind60BitmapImage" UriSource="/Icons/rewind_60_48px.png" />
         <BitmapImage x:Key="SynchronizeBitmapImage" UriSource="/Icons/synchronize_48px.png" />
         <BitmapImage x:Key="RecordBitmapImage" UriSource="/Icons/record_48px.png" />
         <BitmapImage x:Key="StopBitmapImage" UriSource="/Icons/stop_48px.png" />
@@ -203,7 +205,7 @@
                                 Style="{StaticResource ControlBarButtonStyle}"
                                 ToolTip="Rewind one minute">
                                 <Button.Content>
-                                    <Image Source="{StaticResource RewindBitmapImage}" />
+                                    <Image Source="{StaticResource Rewind60BitmapImage}" />
                                 </Button.Content>
                             </Button>
                             <Button
@@ -212,7 +214,7 @@
                                 Style="{StaticResource ControlBarButtonStyle}"
                                 ToolTip="Rewind ten seconds">
                                 <Button.Content>
-                                    <Image Source="{StaticResource RewindBitmapImage}" />
+                                    <Image Source="{StaticResource Rewind10BitmapImage}" />
                                 </Button.Content>
                             </Button>
                             <Button
@@ -221,7 +223,7 @@
                                 Style="{StaticResource ControlBarButtonStyle}"
                                 ToolTip="Fast forward ten seconds">
                                 <Button.Content>
-                                    <Image Source="{StaticResource FastForwardBitmapImage}" />
+                                    <Image Source="{StaticResource FastForward10BitmapImage}" />
                                 </Button.Content>
                             </Button>
                             <Button
@@ -230,7 +232,7 @@
                                 Style="{StaticResource ControlBarButtonStyle}"
                                 ToolTip="Fast forward one minute">
                                 <Button.Content>
-                                    <Image Source="{StaticResource FastForwardBitmapImage}" />
+                                    <Image Source="{StaticResource FastForward60BitmapImage}" />
                                 </Button.Content>
                             </Button>
                             <Button

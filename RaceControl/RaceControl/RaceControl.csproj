@@ -12,7 +12,8 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Icons\audio_48px.png" />
-    <None Remove="Icons\fast_forward_48px.png" />
+    <None Remove="Icons\fast_forward_10_48px.png" />
+    <None Remove="Icons\fast_forward_60_48px.png" />
     <None Remove="Icons\fullscreen_96px.png" />
     <None Remove="Icons\left_down_48px.png" />
     <None Remove="Icons\left_up_48px.png" />
@@ -20,7 +21,8 @@
     <None Remove="Icons\pause_48px.png" />
     <None Remove="Icons\play_48px.png" />
     <None Remove="Icons\record_48px.png" />
-    <None Remove="Icons\rewind_48px.png" />
+    <None Remove="Icons\rewind_10_48px.png" />
+    <None Remove="Icons\rewind_60_48px.png" />
     <None Remove="Icons\right_down_48px.png" />
     <None Remove="Icons\right_up_48px.png" />
     <None Remove="Icons\shutdown_96px.png" />
@@ -30,7 +32,8 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\audio_48px.png" />
-    <Resource Include="Icons\fast_forward_48px.png" />
+    <Resource Include="Icons\fast_forward_10_48px.png" />
+    <Resource Include="Icons\fast_forward_60_48px.png" />
     <Resource Include="Icons\fullscreen_96px.png" />
     <Resource Include="Icons\left_down_48px.png" />
     <Resource Include="Icons\left_up_48px.png" />
@@ -38,7 +41,8 @@
     <Resource Include="Icons\pause_48px.png" />
     <Resource Include="Icons\play_48px.png" />
     <Resource Include="Icons\record_48px.png" />
-    <Resource Include="Icons\rewind_48px.png" />
+    <Resource Include="Icons\rewind_10_48px.png" />
+    <Resource Include="Icons\rewind_60_48px.png" />
     <Resource Include="Icons\right_down_48px.png" />
     <Resource Include="Icons\right_up_48px.png" />
     <Resource Include="Icons\shutdown_96px.png" />
