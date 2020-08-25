@@ -34,7 +34,6 @@ namespace RaceControl.ViewModels
         private readonly IEventAggregator _eventAggregator;
         private readonly IApiService _apiService;
         private readonly IStreamlinkLauncher _streamlinkLauncher;
-        private readonly ISettings _settings;
         private readonly LibVLC _libVLC;
 
         private ICommand _mouseDownVideoCommand;
@@ -90,14 +89,12 @@ namespace RaceControl.ViewModels
             IEventAggregator eventAggregator,
             IApiService apiService,
             IStreamlinkLauncher streamlinkLauncher,
-            ISettings settings,
             LibVLC libVLC)
         {
             _logger = logger;
             _eventAggregator = eventAggregator;
             _apiService = apiService;
             _streamlinkLauncher = streamlinkLauncher;
-            _settings = settings;
             _libVLC = libVLC;
         }
 
@@ -676,7 +673,7 @@ namespace RaceControl.ViewModels
 
         private async void StopCastVideoExecute()
         {
-            _logger.Info($"Stopping casting of video...");
+            _logger.Info("Stopping casting of video...");
             await ChangeRendererAsync(null);
             IsCasting = false;
         }

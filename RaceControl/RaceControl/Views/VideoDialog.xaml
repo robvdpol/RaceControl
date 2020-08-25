@@ -17,11 +17,38 @@
         <core:DivideDoubleConverter x:Key="DivideDoubleConverter" />
         <Style x:Key="ControlBarButtonStyle" TargetType="Button">
             <Setter Property="Margin" Value="2" />
-            <Setter Property="Width" Value="Auto" />
-            <Setter Property="Height" Value="Auto" />
-            <Setter Property="MinWidth" Value="50" />
-            <Setter Property="MinHeight" Value="21" />
+            <Setter Property="Width" Value="24" />
+            <Setter Property="Height" Value="24" />
         </Style>
+        <Style
+            x:Key="ControlBarButtonStyleLarge"
+            BasedOn="{StaticResource ControlBarButtonStyle}"
+            TargetType="Button">
+            <Setter Property="Width" Value="52" />
+            <Setter Property="Height" Value="52" />
+        </Style>
+        <Style
+            x:Key="ControlBarButtonStyleWide"
+            BasedOn="{StaticResource ControlBarButtonStyle}"
+            TargetType="Button">
+            <Setter Property="Width" Value="52" />
+        </Style>
+        <BitmapImage x:Key="PlayBitmapImage" UriSource="/Icons/play_48px.png" />
+        <BitmapImage x:Key="PauseBitmapImage" UriSource="/Icons/pause_48px.png" />
+        <BitmapImage x:Key="AudioBitmapImage" UriSource="/Icons/audio_48px.png" />
+        <BitmapImage x:Key="NoAudioBitmapImage" UriSource="/Icons/no_audio_48px.png" />
+        <BitmapImage x:Key="FastForwardBitmapImage" UriSource="/Icons/fast_forward_48px.png" />
+        <BitmapImage x:Key="RewindBitmapImage" UriSource="/Icons/rewind_48px.png" />
+        <BitmapImage x:Key="SynchronizeBitmapImage" UriSource="/Icons/synchronize_48px.png" />
+        <BitmapImage x:Key="RecordBitmapImage" UriSource="/Icons/record_48px.png" />
+        <BitmapImage x:Key="StopBitmapImage" UriSource="/Icons/stop_48px.png" />
+        <BitmapImage x:Key="FullscreenBitmapImage" UriSource="/Icons/fullscreen_96px.png" />
+        <BitmapImage x:Key="WindowedBitmapImage" UriSource="/Icons/windowed_96px.png" />
+        <BitmapImage x:Key="LeftDownBitmapImage" UriSource="/Icons/left_down_48px.png" />
+        <BitmapImage x:Key="LeftUpBitmapImage" UriSource="/Icons/left_up_48px.png" />
+        <BitmapImage x:Key="RightDownBitmapImage" UriSource="/Icons/right_down_48px.png" />
+        <BitmapImage x:Key="RightUpBitmapImage" UriSource="/Icons/right_up_48px.png" />
+        <BitmapImage x:Key="ShutdownBitmapImage" UriSource="/Icons/shutdown_96px.png" />
     </UserControl.Resources>
     <prism:Dialog.WindowStyle>
         <Style TargetType="Window">
@@ -139,24 +166,32 @@
                             Grid.Column="0"
                             Orientation="Horizontal">
                             <Button Command="{Binding TogglePauseCommand}" ToolTip="Toggle pause">
+                                <Button.Resources>
+                                    <Image x:Key="PlayImage" Source="{StaticResource PlayBitmapImage}" />
+                                    <Image x:Key="PauseImage" Source="{StaticResource PauseBitmapImage}" />
+                                </Button.Resources>
                                 <Button.Style>
                                     <Style BasedOn="{StaticResource ControlBarButtonStyle}" TargetType="Button">
-                                        <Setter Property="Content" Value="Pause" />
+                                        <Setter Property="Content" Value="{StaticResource PauseImage}" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Paused}" Value="True">
-                                                <Setter Property="Content" Value="Resume" />
+                                                <Setter Property="Content" Value="{StaticResource PlayImage}" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </Button.Style>
                             </Button>
                             <Button Command="{Binding ToggleMuteCommand}" ToolTip="Toggle mute">
+                                <Button.Resources>
+                                    <Image x:Key="AudioImage" Source="{StaticResource AudioBitmapImage}" />
+                                    <Image x:Key="NoAudioImage" Source="{StaticResource NoAudioBitmapImage}" />
+                                </Button.Resources>
                                 <Button.Style>
                                     <Style BasedOn="{StaticResource ControlBarButtonStyle}" TargetType="Button">
-                                        <Setter Property="Content" Value="Mute" />
+                                        <Setter Property="Content" Value="{StaticResource NoAudioImage}" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Mute}" Value="True">
-                                                <Setter Property="Content" Value="Unmute" />
+                                                <Setter Property="Content" Value="{StaticResource AudioImage}" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -165,32 +200,52 @@
                             <Button
                                 Command="{Binding FastForwardCommand}"
                                 CommandParameter="-60"
-                                Content="-1 min"
                                 Style="{StaticResource ControlBarButtonStyle}"
-                                ToolTip="Rewind one minute" />
+                                ToolTip="Rewind one minute">
+                                <Button.Content>
+                                    <Image Source="{StaticResource RewindBitmapImage}" />
+                                </Button.Content>
+                            </Button>
                             <Button
                                 Command="{Binding FastForwardCommand}"
                                 CommandParameter="-10"
-                                Content="-10 sec"
                                 Style="{StaticResource ControlBarButtonStyle}"
-                                ToolTip="Rewind ten seconds" />
+                                ToolTip="Rewind ten seconds">
+                                <Button.Content>
+                                    <Image Source="{StaticResource RewindBitmapImage}" />
+                                </Button.Content>
+                            </Button>
                             <Button
                                 Command="{Binding FastForwardCommand}"
                                 CommandParameter="10"
-                                Content="+10 sec"
                                 Style="{StaticResource ControlBarButtonStyle}"
-                                ToolTip="Fast forward ten seconds" />
+                                ToolTip="Fast forward ten seconds">
+                                <Button.Content>
+                                    <Image Source="{StaticResource FastForwardBitmapImage}" />
+                                </Button.Content>
+                            </Button>
                             <Button
                                 Command="{Binding FastForwardCommand}"
                                 CommandParameter="60"
-                                Content="+1 min"
                                 Style="{StaticResource ControlBarButtonStyle}"
-                                ToolTip="Fast forward one minute" />
+                                ToolTip="Fast forward one minute">
+                                <Button.Content>
+                                    <Image Source="{StaticResource FastForwardBitmapImage}" />
+                                </Button.Content>
+                            </Button>
                             <Button
                                 Command="{Binding SyncSessionCommand}"
-                                Content="Sync"
                                 Style="{StaticResource ControlBarButtonStyle}"
-                                ToolTip="Synchronize playback across players *experimental*" />
+                                ToolTip="Synchronize playback across players *experimental*">
+                                <Button.Content>
+                                    <Image Source="{StaticResource SynchronizeBitmapImage}" />
+                                </Button.Content>
+                            </Button>
+                            <Button Style="{StaticResource ControlBarButtonStyle}" ToolTip="Start recording">
+                                <Button.Content>
+                                    <Image Source="{StaticResource RecordBitmapImage}" />
+                                </Button.Content>
+                            </Button>
                         </StackPanel>
                         <Grid Grid.Row="1" Grid.Column="0">
                             <Grid.ColumnDefinitions>
@@ -236,12 +291,16 @@
                                 MinWidth="60"
                                 Command="{Binding ToggleFullScreenCommand}"
                                 ToolTip="Toggle fullscreen mode">
+                                <Button.Resources>
+                                    <Image x:Key="FullscreenImage" Source="{StaticResource FullscreenBitmapImage}" />
+                                    <Image x:Key="WindowedImage" Source="{StaticResource WindowedBitmapImage}" />
+                                </Button.Resources>
                                 <Button.Style>
-                                    <Style BasedOn="{StaticResource ControlBarButtonStyle}" TargetType="Button">
-                                        <Setter Property="Content" Value="Fullscreen" />
+                                    <Style BasedOn="{StaticResource ControlBarButtonStyleLarge}" TargetType="Button">
+                                        <Setter Property="Content" Value="{StaticResource FullscreenImage}" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding WindowState, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static WindowState.Maximized}}" Value="True">
-                                                <Setter Property="Content" Value="Windowed" />
+                                                <Setter Property="Content" Value="{StaticResource WindowedImage}" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -253,46 +312,61 @@
                                 MinWidth="25"
                                 Command="{Binding MoveToCornerCommand}"
                                 CommandParameter="{x:Static enums:WindowLocation.TopLeft}"
-                                Content="TL"
                                 Style="{StaticResource ControlBarButtonStyle}"
-                                ToolTip="Move window to top left corner of current screen" />
+                                ToolTip="Move window to top left corner of current screen">
+                                <Button.Content>
+                                    <Image Source="{StaticResource LeftUpBitmapImage}" />
+                                </Button.Content>
+                            </Button>
                             <Button
                                 Grid.Row="0"
                                 Grid.Column="2"
                                 MinWidth="25"
                                 Command="{Binding MoveToCornerCommand}"
                                 CommandParameter="{x:Static enums:WindowLocation.TopRight}"
-                                Content="TR"
                                 Style="{StaticResource ControlBarButtonStyle}"
-                                ToolTip="Move window to top right corner of current screen" />
+                                ToolTip="Move window to top right corner of current screen">
+                                <Button.Content>
+                                    <Image Source="{StaticResource RightUpBitmapImage}" />
+                                </Button.Content>
+                            </Button>
                             <Button
                                 Grid.Row="1"
                                 Grid.Column="1"
                                 MinWidth="25"
                                 Command="{Binding MoveToCornerCommand}"
                                 CommandParameter="{x:Static enums:WindowLocation.BottomLeft}"
-                                Content="BL"
                                 Style="{StaticResource ControlBarButtonStyle}"
-                                ToolTip="Move window to bottom left corner of current screen" />
+                                ToolTip="Move window to bottom left corner of current screen">
+                                <Button.Content>
+                                    <Image Source="{StaticResource LeftDownBitmapImage}" />
+                                </Button.Content>
+                            </Button>
                             <Button
                                 Grid.Row="1"
                                 Grid.Column="2"
                                 MinWidth="25"
                                 Command="{Binding MoveToCornerCommand}"
                                 CommandParameter="{x:Static enums:WindowLocation.BottomRight}"
-                                Content="BR"
                                 Style="{StaticResource ControlBarButtonStyle}"
-                                ToolTip="Move window to bottom right corner of current screen" />
+                                ToolTip="Move window to bottom right corner of current screen">
+                                <Button.Content>
+                                    <Image Source="{StaticResource RightDownBitmapImage}" />
+                                </Button.Content>
+                            </Button>
                             <Button
                                 Grid.Row="0"
                                 Grid.RowSpan="2"
                                 Grid.Column="3"
                                 MinWidth="60"
                                 Command="{Binding CloseWindowCommand}"
-                                Content="Close"
-                                Style="{StaticResource ControlBarButtonStyle}"
+                                Style="{StaticResource ControlBarButtonStyleLarge}"
                                 ToolTip="Close window (Esc)"
-                                Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <Button.Content>
+                                    <Image Source="{StaticResource ShutdownBitmapImage}" />
+                                </Button.Content>
+                            </Button>
                         </Grid>
                         <CheckBox
                             Grid.Row="0"
@@ -309,7 +383,7 @@
                             <Button
                                 Command="{Binding ScanChromecastCommand}"
                                 Content="Scan"
-                                Style="{StaticResource ControlBarButtonStyle}"
+                                Style="{StaticResource ControlBarButtonStyleWide}"
                                 ToolTip="Scan for Chromecast devices in local network" />
                             <Grid>
                                 <ComboBox
@@ -341,12 +415,12 @@
                             <Button
                                 Command="{Binding StartCastVideoCommand}"
                                 Content="Cast"
-                                Style="{StaticResource ControlBarButtonStyle}"
+                                Style="{StaticResource ControlBarButtonStyleWide}"
                                 ToolTip="Cast stream to selected Chromecast device" />
                             <Button
                                 Command="{Binding StopCastVideoCommand}"
                                 Content="Stop"
-                                Style="{StaticResource ControlBarButtonStyle}"
+                                Style="{StaticResource ControlBarButtonStyleWide}"
                                 ToolTip="Stop casting and resume stream in window" />
                         </StackPanel>
                     </Grid>
