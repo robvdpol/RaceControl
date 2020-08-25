@@ -323,8 +323,7 @@
                                 <TextBlock
                                     Margin="3,0,3,3"
                                     Text="{Binding Settings.RecordingLocation}"
-                                    TextWrapping="Wrap"
-                                    ToolTip="{Binding Settings.RecordingLocation}" />
+                                    TextWrapping="Wrap" />
                                 <Button
                                     Command="{Binding SetRecordingLocationCommand}"
                                     Content="Change recording location"
