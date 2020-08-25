@@ -61,6 +61,8 @@ namespace RaceControl.ViewModels
         private string _contentUrl;
         private string _syncUID;
         private bool _isLive;
+        private bool _isPaused;
+        private bool _isMuted;
         private bool _isRecording;
         private bool _isCasting;
         private Process _streamlinkProcess;
@@ -68,8 +70,6 @@ namespace RaceControl.ViewModels
         private MediaPlayer _mediaPlayer;
         private Media _media;
         private ObservableCollection<TrackDescription> _audioTrackDescriptions;
-        private bool _paused;
-        private bool _mute;
         private long _duration;
         private long _sliderTime;
         private TimeSpan _displayTime;
@@ -111,7 +111,7 @@ namespace RaceControl.ViewModels
         public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand(ToggleMuteExecute);
         public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<string>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => IsLive);
         public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => IsLive);
-        public ICommand ToggleRecordingCommand => _toggleRecordingCommand ??= new DelegateCommand(ToggleRecordingExecute, CanToggleRecordingExecute).ObservesProperty(() => IsLive).ObservesProperty(() => IsRecording).ObservesProperty(() => Paused);
+        public ICommand ToggleRecordingCommand => _toggleRecordingCommand ??= new DelegateCommand(ToggleRecordingExecute, CanToggleRecordingExecute).ObservesProperty(() => IsLive).ObservesProperty(() => IsRecording).ObservesProperty(() => IsPaused);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand(ToggleFullScreenExecute);
         public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => WindowState);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
@@ -151,6 +151,18 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _isLive, value);
         }
 
+        public bool IsPaused
+        {
+            get => _isPaused;
+            set => SetProperty(ref _isPaused, value);
+        }
+
+        public bool IsMuted
+        {
+            get => _isMuted;
+            set => SetProperty(ref _isMuted, value);
+        }
+
         public bool IsRecording
         {
             get => _isRecording;
@@ -179,18 +191,6 @@ namespace RaceControl.ViewModels
         {
             get => _audioTrackDescriptions ??= new ObservableCollection<TrackDescription>();
             set => SetProperty(ref _audioTrackDescriptions, value);
-        }
-
-        public bool Paused
-        {
-            get => _paused;
-            set => SetProperty(ref _paused, value);
-        }
-
-        public bool Mute
-        {
-            get => _mute;
-            set => SetProperty(ref _mute, value);
         }
 
         public long Duration
@@ -393,22 +393,22 @@ namespace RaceControl.ViewModels
         {
             // Prevent closing the dialog too soon, this causes problems with LibVLC
             Opened = true;
-            Paused = false;
+            IsPaused = false;
         }
 
         private void MediaPlayer_Paused(object sender, EventArgs e)
         {
-            Paused = true;
+            IsPaused = true;
         }
 
         private void MediaPlayer_Unmuted(object sender, EventArgs e)
         {
-            Mute = false;
+            IsMuted = false;
         }
 
         private void MediaPlayer_Muted(object sender, EventArgs e)
         {
-            Mute = true;
+            IsMuted = true;
         }
 
         private void MediaPlayer_TimeChanged(object sender, MediaPlayerTimeChangedEventArgs e)
@@ -575,7 +575,7 @@ namespace RaceControl.ViewModels
 
         private bool CanToggleRecordingExecute()
         {
-            return IsLive && (IsRecording || !Paused);
+            return IsLive && (IsRecording || !IsPaused);
         }
 
         private async void ToggleRecordingExecute()
