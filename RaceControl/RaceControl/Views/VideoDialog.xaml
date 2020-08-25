@@ -17,20 +17,20 @@
         <core:DivideDoubleConverter x:Key="DivideDoubleConverter" />
         <Style x:Key="ControlBarButtonStyle" TargetType="Button">
             <Setter Property="Margin" Value="2" />
-            <Setter Property="Width" Value="24" />
+            <Setter Property="Width" Value="36" />
             <Setter Property="Height" Value="24" />
-        </Style>
-        <Style
-            x:Key="ControlBarButtonStyleLarge"
-            BasedOn="{StaticResource ControlBarButtonStyle}"
-            TargetType="Button">
-            <Setter Property="Width" Value="52" />
-            <Setter Property="Height" Value="52" />
         </Style>
         <Style
             x:Key="ControlBarButtonStyleWide"
             BasedOn="{StaticResource ControlBarButtonStyle}"
             TargetType="Button">
+            <Setter Property="Width" Value="42" />
+        </Style>
+        <Style
+            x:Key="ControlBarButtonStyleLarge"
+            BasedOn="{StaticResource ControlBarButtonStyle}"
+            TargetType="Button">
+            <Setter Property="Height" Value="52" />
             <Setter Property="Width" Value="52" />
         </Style>
         <BitmapImage x:Key="PlayBitmapImage" UriSource="/Icons/play_48px.png" />
@@ -123,7 +123,7 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock
                             Grid.Column="0"
-                            Margin="4,2"
+                            Margin="5,2"
                             VerticalAlignment="Center">
                             <TextBlock.Text>
                                 <MultiBinding StringFormat="{}{0:00}:{1:00}:{2:00}">
@@ -188,10 +188,10 @@
                                 </Button.Resources>
                                 <Button.Style>
                                     <Style BasedOn="{StaticResource ControlBarButtonStyle}" TargetType="Button">
-                                        <Setter Property="Content" Value="{StaticResource NoAudioImage}" />
+                                        <Setter Property="Content" Value="{StaticResource AudioImage}" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Mute}" Value="True">
-                                                <Setter Property="Content" Value="{StaticResource AudioImage}" />
+                                                <Setter Property="Content" Value="{StaticResource NoAudioImage}" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -254,7 +254,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock
                                 Grid.Column="0"
-                                Margin="4,2"
+                                Margin="5,2"
                                 VerticalAlignment="Center"
                                 Text="Audio track:" />
                             <ComboBox
@@ -288,7 +288,6 @@
                                 Grid.Row="0"
                                 Grid.RowSpan="2"
                                 Grid.Column="0"
-                                MinWidth="60"
                                 Command="{Binding ToggleFullScreenCommand}"
                                 ToolTip="Toggle fullscreen mode">
                                 <Button.Resources>
@@ -358,7 +357,6 @@
                                 Grid.Row="0"
                                 Grid.RowSpan="2"
                                 Grid.Column="3"
-                                MinWidth="60"
                                 Command="{Binding CloseWindowCommand}"
                                 Style="{StaticResource ControlBarButtonStyleLarge}"
                                 ToolTip="Close window (Esc)"
@@ -387,14 +385,14 @@
                                 ToolTip="Scan for Chromecast devices in local network" />
                             <Grid>
                                 <ComboBox
-                                    Width="170"
+                                    Width="180"
                                     Margin="2"
                                     DisplayMemberPath="Name"
                                     IsEnabled="{Binding HasItems, RelativeSource={RelativeSource Self}}"
                                     ItemsSource="{Binding RendererItems}"
                                     SelectedItem="{Binding SelectedRendererItem}" />
                                 <TextBlock
-                                    Width="170"
+                                    Width="180"
                                     Margin="2"
                                     Padding="6,0,0,2"
                                     VerticalAlignment="Center"
