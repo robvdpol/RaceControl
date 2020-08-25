@@ -54,7 +54,6 @@ namespace RaceControl
             containerRegistry.RegisterDialog<DownloadDialog, DownloadDialogViewModel>();
             containerRegistry.RegisterDialog<VideoDialog, VideoDialogViewModel>();
 
-            containerRegistry.RegisterInstance(new LibVLC());
             containerRegistry.RegisterSingleton<IExtendedDialogService, ExtendedDialogService>();
             containerRegistry.RegisterSingleton<IChildProcessTracker, ChildProcessTracker>();
             containerRegistry.RegisterSingleton<IRestClient, RestClient>();
@@ -66,6 +65,15 @@ namespace RaceControl
             containerRegistry.Register<IGithubService, GithubService>();
             containerRegistry.Register<ICredentialService, CredentialService>();
             containerRegistry.Register<IStreamlinkLauncher, StreamlinkLauncher>();
+            containerRegistry.RegisterInstance(new LibVLC());
+            containerRegistry.Register<MediaPlayer>(container => new MediaPlayer(container.Resolve<LibVLC>())
+            {
+                EnableHardwareDecoding = true,
+                EnableMouseInput = false,
+                EnableKeyInput = false,
+                FileCaching = 2000,
+                NetworkCaching = 4000
+            });
         }
 
         private static void InitializeLogging()

@@ -55,8 +55,8 @@ namespace RaceControl.ViewModels
         private ICommand _startCastVideoCommand;
         private ICommand _stopCastVideoCommand;
 
-        private string _name;
         private string _token;
+        private string _name;
         private ContentType _contentType;
         private string _contentUrl;
         private string _syncUID;
@@ -67,7 +67,6 @@ namespace RaceControl.ViewModels
         private bool _isCasting;
         private Process _streamlinkProcess;
         private Process _streamlinkRecordingProcess;
-        private MediaPlayer _mediaPlayer;
         private Media _media;
         private ObservableCollection<TrackDescription> _audioTrackDescriptions;
         private long _duration;
@@ -91,13 +90,15 @@ namespace RaceControl.ViewModels
             IEventAggregator eventAggregator,
             IApiService apiService,
             IStreamlinkLauncher streamlinkLauncher,
-            LibVLC libVLC)
+            LibVLC libVLC,
+            MediaPlayer mediaPlayer)
         {
             _logger = logger;
             _eventAggregator = eventAggregator;
             _apiService = apiService;
             _streamlinkLauncher = streamlinkLauncher;
             _libVLC = libVLC;
+            MediaPlayer = mediaPlayer;
         }
 
         public ICommand MouseDownVideoCommand => _mouseDownVideoCommand ??= new DelegateCommand<MouseButtonEventArgs>(MouseDownVideoExecute);
@@ -120,6 +121,8 @@ namespace RaceControl.ViewModels
         public ICommand StopCastVideoCommand => _stopCastVideoCommand ??= new DelegateCommand(StopCastVideoExecute, CanStopCastVideoExecute).ObservesProperty(() => IsCasting);
 
         public Guid UniqueIdentifier { get; } = Guid.NewGuid();
+
+        public MediaPlayer MediaPlayer { get; }
 
         public string Name
         {
@@ -173,12 +176,6 @@ namespace RaceControl.ViewModels
         {
             get => _isCasting;
             set => SetProperty(ref _isCasting, value);
-        }
-
-        public MediaPlayer MediaPlayer
-        {
-            get => _mediaPlayer;
-            set => SetProperty(ref _mediaPlayer, value);
         }
 
         public Media Media
@@ -335,8 +332,8 @@ namespace RaceControl.ViewModels
                 _streamlinkProcess = _streamlinkLauncher.StartStreamlinkExternal(streamUrl, out streamUrl);
             }
 
-            CreateMedia(streamUrl);
             CreateMediaPlayer();
+            CreateMedia(streamUrl);
             StartPlayback();
 
             _showControlsTimer = new Timer(2000) { AutoReset = false };
@@ -358,8 +355,8 @@ namespace RaceControl.ViewModels
             }
 
             StopPlayback();
-            RemoveMediaPlayer();
             RemoveMedia();
+            RemoveMediaPlayer();
 
             if (RendererDiscoverer != null)
             {
@@ -767,26 +764,9 @@ namespace RaceControl.ViewModels
             MediaPlayer.Time = time;
         }
 
-        private void CreateMedia(string url)
-        {
-            _logger.Info("Creating media...");
-            Media = new Media(_libVLC, url, FromType.FromLocation);
-            Media.DurationChanged += Media_DurationChanged;
-            _logger.Info("Done creating media.");
-        }
-
         private void CreateMediaPlayer()
         {
             _logger.Info("Creating mediaplayer...");
-            MediaPlayer = new MediaPlayer(_libVLC)
-            {
-                EnableHardwareDecoding = true,
-                EnableMouseInput = false,
-                EnableKeyInput = false,
-                FileCaching = 2000,
-                NetworkCaching = 4000
-            };
-
             MediaPlayer.Playing += MediaPlayer_Playing;
             MediaPlayer.Paused += MediaPlayer_Paused;
             MediaPlayer.Muted += MediaPlayer_Muted;
@@ -797,6 +777,14 @@ namespace RaceControl.ViewModels
             _logger.Info("Done creating mediaplayer.");
         }
 
+        private void CreateMedia(string url)
+        {
+            _logger.Info("Creating media...");
+            Media = new Media(_libVLC, url, FromType.FromLocation);
+            Media.DurationChanged += Media_DurationChanged;
+            _logger.Info("Done creating media.");
+        }
+
         private void StartPlayback(RendererItem renderer = null)
         {
             _logger.Info("Starting playback...");
@@ -804,14 +792,6 @@ namespace RaceControl.ViewModels
             MediaPlayer.SetRenderer(renderer);
             MediaPlayer.Play(Media);
             _logger.Info("Done starting playback.");
-        }
-
-        private void RemoveMedia()
-        {
-            _logger.Info("Removing media...");
-            Media.DurationChanged -= Media_DurationChanged;
-            Media.Dispose();
-            _logger.Info("Done removing media.");
         }
 
         private void RemoveMediaPlayer()
@@ -826,6 +806,14 @@ namespace RaceControl.ViewModels
             MediaPlayer.ESDeleted -= MediaPlayer_ESDeleted;
             MediaPlayer.Dispose();
             _logger.Info("Done removing mediaplayer.");
+        }
+
+        private void RemoveMedia()
+        {
+            _logger.Info("Removing media...");
+            Media.DurationChanged -= Media_DurationChanged;
+            Media.Dispose();
+            _logger.Info("Done removing media.");
         }
 
         private void StopPlayback()
