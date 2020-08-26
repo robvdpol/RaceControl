@@ -55,7 +55,11 @@ namespace RaceControl.Core.Mvvm
         protected void ForceCloseWindow()
         {
             Opened = true;
-            CloseWindowExecute();
+
+            if (CloseWindowCommand.CanExecute(null))
+            {
+                CloseWindowCommand.Execute(null);
+            }
         }
     }
 }

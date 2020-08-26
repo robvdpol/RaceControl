@@ -326,17 +326,11 @@ namespace RaceControl.ViewModels
                 StartupLocation = WindowStartupLocation.CenterScreen;
             }
 
-            CreateMediaPlayer();
+            var streamUrl = await GenerateStreamUrlAsync();
 
-            string streamUrl;
-
-            try
+            if (streamUrl == null)
             {
-                streamUrl = await GenerateStreamUrlAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, "An error occurred while trying to generate stream URL.");
+                _logger.Error("Closing video player, stream URL is empty.");
                 ForceCloseWindow();
                 return;
             }
@@ -346,6 +340,7 @@ namespace RaceControl.ViewModels
                 _streamlinkProcess = _streamlinkLauncher.StartStreamlinkExternal(streamUrl, out streamUrl);
             }
 
+            CreateMediaPlayer();
             CreateMedia(streamUrl);
             StartPlayback();
 
@@ -594,14 +589,13 @@ namespace RaceControl.ViewModels
         {
             if (!IsRecording)
             {
-                await StartRecording();
+                IsRecording = await StartRecordingAsync();
             }
             else
             {
                 StopRecording();
+                IsRecording = false;
             }
-
-            IsRecording = !IsRecording;
         }
 
         private void OnSyncSession(SyncStreamsEventPayload payload)
@@ -702,8 +696,11 @@ namespace RaceControl.ViewModels
         private async void StartCastVideoExecute()
         {
             _logger.Info($"Starting casting of video with renderer '{SelectedRendererItem.Name}'...");
-            await ChangeRendererAsync(SelectedRendererItem);
-            IsCasting = true;
+
+            if (await ChangeRendererAsync(SelectedRendererItem))
+            {
+                IsCasting = true;
+            }
         }
 
         private bool CanStopCastVideoExecute()
@@ -714,22 +711,41 @@ namespace RaceControl.ViewModels
         private async void StopCastVideoExecute()
         {
             _logger.Info("Stopping casting of video...");
-            await ChangeRendererAsync(null);
-            IsCasting = false;
+
+            if (await ChangeRendererAsync(null))
+            {
+                IsCasting = false;
+            }
         }
 
         private async Task<string> GenerateStreamUrlAsync()
         {
             _logger.Info($"Getting tokenised URL for content-type '{ContentType}' and content-url '{ContentUrl}'...");
 
-            return await _apiService.GetTokenisedUrlAsync(_token, ContentType, ContentUrl);
+            try
+            {
+                return await _apiService.GetTokenisedUrlAsync(_token, ContentType, ContentUrl);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "An error occurred while trying to get tokenised URL.");
+            }
+
+            return null;
         }
 
-        private async Task ChangeRendererAsync(RendererItem renderer)
+        private async Task<bool> ChangeRendererAsync(RendererItem renderer)
         {
             _logger.Info($"Changing renderer to '{renderer?.Name}'...");
+
             var streamTime = MediaPlayer.Time;
             var streamUrl = IsLive ? Media.Mrl : await GenerateStreamUrlAsync();
+
+            if (streamUrl == null)
+            {
+                _logger.Error("Renderer not changed, stream URL is empty.");
+                return false;
+            }
 
             StopPlayback();
             RemoveMedia();
@@ -742,14 +758,25 @@ namespace RaceControl.ViewModels
             }
 
             _logger.Info("Done changing renderer.");
+
+            return true;
         }
 
-        private async Task StartRecording()
+        private async Task<bool> StartRecordingAsync()
         {
             _logger.Info("Starting recording process...");
             var streamUrl = await GenerateStreamUrlAsync();
+
+            if (streamUrl == null)
+            {
+                _logger.Error("Recording process not started, stream URL is empty.");
+                return false;
+            }
+
             _streamlinkRecordingProcess = _streamlinkLauncher.StartStreamlinkRecording(streamUrl, Title);
             _logger.Info("Recording process started.");
+
+            return true;
         }
 
         private void StopRecording()
