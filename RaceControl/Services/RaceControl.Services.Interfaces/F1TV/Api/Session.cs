@@ -20,10 +20,10 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         public string Status { get; set; }
 
         [JsonProperty("start_time")]
-        public DateTime? StartTime { get; set; }
+        public DateTime StartTime { get; set; }
 
         [JsonProperty("end_time")]
-        public DateTime? EndTime { get; set; }
+        public DateTime EndTime { get; set; }
 
         [JsonProperty("eventoccurrence_url")]
         public string EventOccurrenceUrl { get; set; }

@@ -13,10 +13,10 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         public string Name { get; set; }
 
         [JsonProperty("start_date")]
-        public DateTime? StartDate { get; set; }
+        public DateTime StartDate { get; set; }
 
         [JsonProperty("end_date")]
-        public DateTime? EndDate { get; set; }
+        public DateTime EndDate { get; set; }
 
         [JsonProperty("race_season_url")]
         public string RaceSeasonUrl { get; set; }

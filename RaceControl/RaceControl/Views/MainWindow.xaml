@@ -7,6 +7,7 @@
     xmlns:ctrls="clr-namespace:RaceControl.Core.Controls;assembly=RaceControl.Core"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:prism="http://prismlibrary.com/"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
     Width="1250"
     Height="800"
     prism:ViewModelLocator.AutoWireViewModel="True"
@@ -15,6 +16,7 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <core:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <core:CollectionContainsConverter x:Key="CollectionContainsConverter" />
+        <core:DatePassedConverter x:Key="DatePassedConverter" />
         <Style x:Key="HeaderLabelStyle" TargetType="Label">
             <Setter Property="Margin" Value="2" />
             <Setter Property="FontWeight" Value="Bold" />
@@ -138,6 +140,23 @@
                         <i:InvokeCommandAction Command="{Binding EventSelectionChangedCommand}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Value="True">
+                                <DataTrigger.Binding>
+                                    <Binding Converter="{StaticResource DatePassedConverter}" Path="StartDate">
+                                        <Binding.ConverterParameter>
+                                            <sys:Int32>-3</sys:Int32>
+                                        </Binding.ConverterParameter>
+                                    </Binding>
+                                </DataTrigger.Binding>
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListBox.ItemContainerStyle>
             </ListBox>
             <Grid
                 Grid.Row="0"
