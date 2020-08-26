@@ -61,7 +61,12 @@ namespace RaceControl.ViewModels
             var streamUrl = await _apiService.GetTokenisedUrlAsync(token, contentType, contentUrl);
 
             _logger.Info($"Starting download process for content-type '{contentType}' and content-URL '{contentUrl}'...");
-            _downloadProcess = _streamlinkLauncher.StartStreamlinkDownload(streamUrl, Filename, DownloadProcess_Exited);
+            _downloadProcess = _streamlinkLauncher.StartStreamlinkDownload(streamUrl, Filename, (exitCode) =>
+            {
+                HasExited = true;
+                ExitCodeSuccess = exitCode == 0;
+                _logger.Info($"Download process finished with exitcode '{exitCode}'.");
+            });
 
             base.OnDialogOpened(parameters);
         }
@@ -71,13 +76,6 @@ namespace RaceControl.ViewModels
             CleanupProcess(_downloadProcess);
 
             base.OnDialogClosed();
-        }
-
-        private void DownloadProcess_Exited(int exitCode)
-        {
-            HasExited = true;
-            ExitCodeSuccess = exitCode == 0;
-            _logger.Info($"Download process finished with exitcode '{exitCode}'.");
         }
     }
 }
