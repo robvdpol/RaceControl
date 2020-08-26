@@ -306,25 +306,7 @@ namespace RaceControl.ViewModels
             IsLive = parameters.GetValue<bool>(ParameterNames.IS_LIVE);
 
             var instance = parameters.GetValue<VideoDialogInstance>(ParameterNames.INSTANCE);
-
-            if (instance != null)
-            {
-                StartupLocation = WindowStartupLocation.Manual;
-                ResizeMode = (ResizeMode)instance.ResizeMode;
-                WindowState = (WindowState)instance.WindowState;
-                Top = instance.Top;
-                Left = instance.Left;
-
-                if (WindowState != WindowState.Maximized)
-                {
-                    Width = instance.Width;
-                    Height = instance.Height;
-                }
-            }
-            else
-            {
-                StartupLocation = WindowStartupLocation.CenterScreen;
-            }
+            SetWindowLocation(instance);
 
             var streamUrl = await GenerateStreamUrlAsync();
 
@@ -715,6 +697,28 @@ namespace RaceControl.ViewModels
             if (await ChangeRendererAsync(null))
             {
                 IsCasting = false;
+            }
+        }
+
+        private void SetWindowLocation(VideoDialogInstance instance)
+        {
+            if (instance != null)
+            {
+                StartupLocation = WindowStartupLocation.Manual;
+                ResizeMode = (ResizeMode)instance.ResizeMode;
+                WindowState = (WindowState)instance.WindowState;
+                Top = instance.Top;
+                Left = instance.Left;
+
+                if (WindowState != WindowState.Maximized)
+                {
+                    Width = instance.Width;
+                    Height = instance.Height;
+                }
+            }
+            else
+            {
+                StartupLocation = WindowStartupLocation.CenterScreen;
             }
         }
 
