@@ -77,6 +77,7 @@ namespace RaceControl.ViewModels
         private RendererItem _selectedRendererItem;
         private Timer _showControlsTimer;
         private bool _showControls;
+        private SubscriptionToken _syncStreamsEventToken;
         private double _top;
         private double _left;
         private double _width = 1200;
@@ -325,28 +326,42 @@ namespace RaceControl.ViewModels
                 StartupLocation = WindowStartupLocation.CenterScreen;
             }
 
-            var streamUrl = await GenerateStreamUrlAsync();
+            CreateMediaPlayer();
+
+            string streamUrl;
+
+            try
+            {
+                streamUrl = await GenerateStreamUrlAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "An error occurred while trying to generate stream URL.");
+                ForceCloseWindow();
+                return;
+            }
 
             if (IsLive)
             {
                 _streamlinkProcess = _streamlinkLauncher.StartStreamlinkExternal(streamUrl, out streamUrl);
             }
 
-            CreateMediaPlayer();
             CreateMedia(streamUrl);
             StartPlayback();
 
             _showControlsTimer = new Timer(2000) { AutoReset = false };
             _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
-
-            _eventAggregator.GetEvent<SyncStreamsEvent>().Subscribe(OnSyncSession);
+            _syncStreamsEventToken = _eventAggregator.GetEvent<SyncStreamsEvent>().Subscribe(OnSyncSession);
 
             base.OnDialogOpened(parameters);
         }
 
         public override void OnDialogClosed()
         {
-            _eventAggregator.GetEvent<SyncStreamsEvent>().Unsubscribe(OnSyncSession);
+            if (_syncStreamsEventToken != null)
+            {
+                _eventAggregator.GetEvent<SyncStreamsEvent>().Unsubscribe(_syncStreamsEventToken);
+            }
 
             if (_showControlsTimer != null)
             {
@@ -811,8 +826,13 @@ namespace RaceControl.ViewModels
         private void RemoveMedia()
         {
             _logger.Info("Removing media...");
-            Media.DurationChanged -= Media_DurationChanged;
-            Media.Dispose();
+
+            if (Media != null)
+            {
+                Media.DurationChanged -= Media_DurationChanged;
+                Media.Dispose();
+            }
+
             _logger.Info("Done removing media.");
         }
 

@@ -51,5 +51,11 @@ namespace RaceControl.Core.Mvvm
         {
             RequestClose?.Invoke(dialogResult);
         }
+
+        protected void ForceCloseWindow()
+        {
+            Opened = true;
+            CloseWindowExecute();
+        }
     }
 }
