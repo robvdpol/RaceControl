@@ -306,7 +306,7 @@ namespace RaceControl.ViewModels
                 try
                 {
                     var sessions = await _apiService.GetSessionsForEventAsync(SelectedEvent.UID);
-                    Sessions.AddRange(sessions.Where(s => s.IsLive || s.IsReplay));
+                    Sessions.AddRange(sessions.Where(s => s.IsLive || s.IsReplay || s.IsExpired));
                 }
                 catch (Exception ex)
                 {

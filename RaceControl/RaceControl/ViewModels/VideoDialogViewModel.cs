@@ -340,6 +340,8 @@ namespace RaceControl.ViewModels
             _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
 
             _eventAggregator.GetEvent<SyncStreamsEvent>().Subscribe(OnSyncSession);
+
+            base.OnDialogOpened(parameters);
         }
 
         public override void OnDialogClosed()
@@ -388,8 +390,6 @@ namespace RaceControl.ViewModels
 
         private void MediaPlayer_Playing(object sender, EventArgs e)
         {
-            // Prevent closing the dialog too soon, this causes problems with LibVLC
-            Opened = true;
             IsPaused = false;
         }
 
