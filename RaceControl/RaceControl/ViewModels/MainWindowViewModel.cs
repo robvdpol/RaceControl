@@ -28,9 +28,6 @@ namespace RaceControl.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        private const string NotApplicableSeriesUID = @"seri_77d8d2aa25fb4da08bada2d93ec0dd1f";
-        private const string Formula1SeriesUID = @"seri_436bb431c3a24d7d8e200a74e1d11de4";
-
         private readonly ILogger _logger;
         private readonly IExtendedDialogService _dialogService;
         private readonly IApiService _apiService;
@@ -760,7 +757,7 @@ namespace RaceControl.ViewModels
         {
             try
             {
-                var series = (await _apiService.GetSeriesAsync()).Where(s => s.UID != NotApplicableSeriesUID);
+                var series = await _apiService.GetSeriesAsync();
                 Series.AddRange(series);
             }
             catch (Exception ex)
@@ -772,7 +769,7 @@ namespace RaceControl.ViewModels
 
             if (!Settings.SelectedSeries.Any())
             {
-                var f1Series = Series.FirstOrDefault(s => s.UID == Formula1SeriesUID);
+                var f1Series = Series.FirstOrDefault(s => s.Name == "Formula 1" && s.HasContent);
 
                 if (f1Series != null)
                 {

@@ -79,6 +79,8 @@ namespace RaceControl.Services.F1TV
                 .WithField(Series.UIDField)
                 .WithField(Series.SelfField)
                 .WithField(Series.NameField)
+                .WithField(Series.ContentUrlsField)
+                .WithField(Series.SessionOccurrenceUrlsField)
                 .OrderBy(Series.NameField, LarkSortDirection.Ascending)
                 ;
 

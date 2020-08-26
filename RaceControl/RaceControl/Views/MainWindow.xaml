@@ -68,9 +68,9 @@
                 Grid.Column="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="2*" />
+                    <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="5*" />
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Label
                     Grid.Row="0"
@@ -103,6 +103,12 @@
                         <Style TargetType="{x:Type ListBoxItem}">
                             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                             <Setter Property="Focusable" Value="False" />
+                            <Setter Property="Visibility" Value="Visible" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding HasContent}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
                         </Style>
                     </ListBox.ItemContainerStyle>
                     <ListBox.ItemTemplate>
@@ -335,7 +341,7 @@
                         <GroupBox
                             Grid.Row="1"
                             Margin="5,3"
-                            Header="Video player">
+                            Header="Video players">
                             <StackPanel Orientation="Vertical">
                                 <Button
                                     Command="{Binding SaveVideoDialogLayoutCommand}"
