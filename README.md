@@ -7,7 +7,7 @@ Race Control is an open source [F1TV](https://f1tv.formula1.com) desktop client 
 * Watch F1TV live streams in the highest quality available (1080p at the moment)
 * Supports three different video players (internal player, VLC and MPV)
 * Open as many streams as you like, using the layout that you like
-* Save your custom video player layout so you don't have to re-arrange your windows manually every time you watch a session
+* Save your custom video player layout, so you don't have to position your windows manually every time you watch a session
 * Cast to your Chromecast with a single click of a button (internal player and VLC only)
 * Experimental synchronization of streams (replays only at the moment)
 
