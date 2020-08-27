@@ -1,5 +1,7 @@
-﻿using Prism.Commands;
+﻿using NLog;
+using Prism.Commands;
 using Prism.Mvvm;
+using System;
 using System.Diagnostics;
 using System.Windows.Input;
 
@@ -7,10 +9,19 @@ namespace RaceControl.Core.Mvvm
 {
     public class ViewModelBase : BindableBase
     {
-        private bool _isBusy;
+        protected readonly ILogger Logger;
 
         private ICommand _previewKeyDownCommand;
         private ICommand _keyDownCommand;
+        private bool _isBusy;
+
+        protected ViewModelBase(ILogger logger)
+        {
+            Logger = logger;
+        }
+
+        public ICommand PreviewKeyDownCommand => _previewKeyDownCommand ??= new DelegateCommand<KeyEventArgs>(PreviewKeyDownExecute);
+        public ICommand KeyDownCommand => _keyDownCommand ??= new DelegateCommand<KeyEventArgs>(KeyDownExecute);
 
         public bool IsBusy
         {
@@ -18,16 +29,20 @@ namespace RaceControl.Core.Mvvm
             set => SetProperty(ref _isBusy, value);
         }
 
-        public ICommand PreviewKeyDownCommand => _previewKeyDownCommand ??= new DelegateCommand<KeyEventArgs>(PreviewKeyDownExecute);
-        public ICommand KeyDownCommand => _keyDownCommand ??= new DelegateCommand<KeyEventArgs>(KeyDownExecute);
-
-        protected static void CleanupProcess(Process process)
+        protected void CleanupProcess(Process process)
         {
             if (process != null)
             {
                 if (!process.HasExited)
                 {
-                    process.Kill(true);
+                    try
+                    {
+                        process.Kill(true);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error(ex, $"An error occurred while trying to kill process with id '{process.Id}' and name '{process.ProcessName}'.");
+                    }
                 }
 
                 process.Dispose();

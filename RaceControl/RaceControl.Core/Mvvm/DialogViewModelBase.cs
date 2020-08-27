@@ -1,4 +1,5 @@
-﻿using Prism.Commands;
+﻿using NLog;
+using Prism.Commands;
 using Prism.Services.Dialogs;
 using System;
 using System.Windows.Input;
@@ -10,6 +11,10 @@ namespace RaceControl.Core.Mvvm
         private ICommand _closeWindowCommand;
         private string _title;
         private bool _opened;
+
+        protected DialogViewModelBase(ILogger logger) : base(logger)
+        {
+        }
 
         public ICommand CloseWindowCommand => _closeWindowCommand ??= new DelegateCommand(CloseWindowExecute, CanCloseDialog).ObservesProperty(() => Opened);
 

@@ -1,4 +1,5 @@
-﻿using Prism.Commands;
+﻿using NLog;
+using Prism.Commands;
 using Prism.Services.Dialogs;
 using RaceControl.Core.Mvvm;
 using RaceControl.Services.Interfaces.Github;
@@ -9,8 +10,11 @@ namespace RaceControl.ViewModels
     public class UpgradeDialogViewModel : DialogViewModelBase
     {
         private ICommand _closeCommand;
-
         private Release _release;
+
+        public UpgradeDialogViewModel(ILogger logger) : base(logger)
+        {
+        }
 
         public ICommand CloseCommand => _closeCommand ??= new DelegateCommand<bool?>(CloseExecute);
 

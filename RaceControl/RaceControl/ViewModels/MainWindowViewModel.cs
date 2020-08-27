@@ -28,7 +28,6 @@ namespace RaceControl.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        private readonly ILogger _logger;
         private readonly IExtendedDialogService _dialogService;
         private readonly IApiService _apiService;
         private readonly IGithubService _githubService;
@@ -58,8 +57,6 @@ namespace RaceControl.ViewModels
         private ICommand _openVideoDialogLayoutCommand;
         private ICommand _deleteCredentialCommand;
 
-        private ISettings _settings;
-        private IVideoDialogLayout _videoDialogLayout;
         private string _token;
         private string _vlcExeLocation;
         private string _mpvExeLocation;
@@ -88,15 +85,15 @@ namespace RaceControl.ViewModels
             IStreamlinkLauncher streamlinkLauncher,
             ISettings settings,
             IVideoDialogLayout videoDialogLayout)
+            : base(logger)
         {
-            _logger = logger;
             _dialogService = dialogService;
             _apiService = apiService;
             _githubService = githubService;
             _credentialService = credentialService;
             _streamlinkLauncher = streamlinkLauncher;
-            _settings = settings;
-            _videoDialogLayout = videoDialogLayout;
+            Settings = settings;
+            VideoDialogLayout = videoDialogLayout;
         }
 
         public ICommand LoadedCommand => _loadedCommand ??= new DelegateCommand<RoutedEventArgs>(LoadedExecute);
@@ -122,17 +119,9 @@ namespace RaceControl.ViewModels
         public ICommand OpenVideoDialogLayoutCommand => _openVideoDialogLayoutCommand ??= new DelegateCommand(OpenVideoDialogLayoutExecute, CanOpenVideoDialogLayoutExecute).ObservesProperty(() => VideoDialogLayout.Instances.Count).ObservesProperty(() => Channels.Count);
         public ICommand DeleteCredentialCommand => _deleteCredentialCommand ??= new DelegateCommand(DeleteCredentialExecute);
 
-        public ISettings Settings
-        {
-            get => _settings;
-            set => SetProperty(ref _settings, value);
-        }
+        public ISettings Settings { get; }
 
-        public IVideoDialogLayout VideoDialogLayout
-        {
-            get => _videoDialogLayout;
-            set => SetProperty(ref _videoDialogLayout, value);
-        }
+        public IVideoDialogLayout VideoDialogLayout { get; }
 
         public string VlcExeLocation
         {
@@ -232,7 +221,7 @@ namespace RaceControl.ViewModels
 
         private async void LoadedExecute(RoutedEventArgs args)
         {
-            _logger.Info("Initializing application...");
+            Logger.Info("Initializing application...");
             IsBusy = true;
             Settings.Load();
             VideoDialogLayout.Load();
@@ -257,7 +246,7 @@ namespace RaceControl.ViewModels
             }
 
             Settings.Save();
-            _logger.Info("Closing application...");
+            Logger.Info("Closing application...");
         }
 
         private static void MouseMoveExecute()
@@ -287,7 +276,7 @@ namespace RaceControl.ViewModels
                 catch (Exception ex)
                 {
                     var message = $"An error occurred while trying to load events for race season '{SelectedSeason.Name}'.";
-                    _logger.Error(ex, message);
+                    Logger.Error(ex, message);
                     MessageBoxHelper.ShowError(message);
                 }
 
@@ -311,7 +300,7 @@ namespace RaceControl.ViewModels
                 catch (Exception ex)
                 {
                     var message = $"An error occurred while trying to load sessions for event '{SelectedEvent.Name}'.";
-                    _logger.Error(ex, message);
+                    Logger.Error(ex, message);
                     MessageBoxHelper.ShowError(message);
                 }
 
@@ -362,7 +351,7 @@ namespace RaceControl.ViewModels
                     catch (Exception ex)
                     {
                         var message = $"An error occurred while trying to load episodes for VOD-type '{SelectedVodType.Name}'.";
-                        _logger.Error(ex, message);
+                        Logger.Error(ex, message);
                         MessageBoxHelper.ShowError(message);
                     }
 
@@ -393,7 +382,7 @@ namespace RaceControl.ViewModels
                 { ParameterNames.INSTANCE, null }
             };
 
-            _logger.Info($"Starting internal player for episode with parameters: '{parameters}'.");
+            Logger.Info($"Starting internal player for episode with parameters: '{parameters}'.");
             OpenVideoDialog(parameters);
         }
 
@@ -416,7 +405,7 @@ namespace RaceControl.ViewModels
             catch (Exception ex)
             {
                 var message = $"An error occurred while trying to watch channel '{channel.Name}' in VLC.";
-                _logger.Error(ex, message);
+                Logger.Error(ex, message);
                 MessageBoxHelper.ShowError(message);
             }
 
@@ -441,7 +430,7 @@ namespace RaceControl.ViewModels
             catch (Exception ex)
             {
                 var message = $"An error occurred while trying to watch episode '{episode.Title}' in VLC.";
-                _logger.Error(ex, message);
+                Logger.Error(ex, message);
                 MessageBoxHelper.ShowError(message);
             }
 
@@ -467,7 +456,7 @@ namespace RaceControl.ViewModels
             catch (Exception ex)
             {
                 var message = $"An error occurred while trying to watch channel '{channel.Name}' in MPV.";
-                _logger.Error(ex, message);
+                Logger.Error(ex, message);
                 MessageBoxHelper.ShowError(message);
             }
 
@@ -492,7 +481,7 @@ namespace RaceControl.ViewModels
             catch (Exception ex)
             {
                 var message = $"An error occurred while trying to watch episode '{episode.Title}' in MPV.";
-                _logger.Error(ex, message);
+                Logger.Error(ex, message);
                 MessageBoxHelper.ShowError(message);
             }
 
@@ -511,7 +500,7 @@ namespace RaceControl.ViewModels
             catch (Exception ex)
             {
                 var message = $"An error occurred while trying to copy URL for channel '{channel.Name}' to clipboard.";
-                _logger.Error(ex, message);
+                Logger.Error(ex, message);
                 MessageBoxHelper.ShowError(message);
             }
 
@@ -530,7 +519,7 @@ namespace RaceControl.ViewModels
             catch (Exception ex)
             {
                 var message = $"An error occurred while trying to copy URL for episode '{episode.Title}' to clipboard.";
-                _logger.Error(ex, message);
+                Logger.Error(ex, message);
                 MessageBoxHelper.ShowError(message);
             }
 
@@ -635,7 +624,7 @@ namespace RaceControl.ViewModels
                 }
                 else
                 {
-                    _logger.Info("Login cancelled by user, shutting down...");
+                    Logger.Info("Login cancelled by user, shutting down...");
                     Application.Current.Shutdown();
                 }
             });
@@ -656,7 +645,7 @@ namespace RaceControl.ViewModels
 
         private async Task CheckForUpdatesAsync()
         {
-            _logger.Info("Checking for updates...");
+            Logger.Info("Checking for updates...");
 
             Release release;
 
@@ -667,18 +656,18 @@ namespace RaceControl.ViewModels
             catch (Exception ex)
             {
                 const string message = "An error occurred while checking for updates.";
-                _logger.Error(ex, message);
+                Logger.Error(ex, message);
                 MessageBoxHelper.ShowError(message);
                 return;
             }
 
             if (release == null || release.PreRelease || release.Draft || release.TagName == Settings.LatestRelease)
             {
-                _logger.Info("No new release found.");
+                Logger.Info("No new release found.");
             }
             else if (Version.TryParse(release.TagName, out var version) && version > AssemblyUtils.GetApplicationVersion())
             {
-                _logger.Info($"Found new release '{release.Name}'.");
+                Logger.Info($"Found new release '{release.Name}'.");
 
                 var parameters = new DialogParameters
                 {
@@ -696,7 +685,7 @@ namespace RaceControl.ViewModels
                 Settings.LatestRelease = release.TagName;
             }
 
-            _logger.Info("Done checking for updates.");
+            Logger.Info("Done checking for updates.");
         }
 
         private void SetVlcExeLocation()
@@ -706,11 +695,11 @@ namespace RaceControl.ViewModels
             if (vlcRegistryKey != null && vlcRegistryKey.GetValue(null) is string vlcExeLocation && File.Exists(vlcExeLocation))
             {
                 VlcExeLocation = vlcExeLocation;
-                _logger.Info($"Found VLC installation at '{vlcExeLocation}'.");
+                Logger.Info($"Found VLC installation at '{vlcExeLocation}'.");
             }
             else
             {
-                _logger.Warn("Could not find VLC installation.");
+                Logger.Warn("Could not find VLC installation.");
             }
         }
 
@@ -721,11 +710,11 @@ namespace RaceControl.ViewModels
             if (File.Exists(mpvExeLocation))
             {
                 MpvExeLocation = mpvExeLocation;
-                _logger.Info($"Found MPV installation at '{mpvExeLocation}'.");
+                Logger.Info($"Found MPV installation at '{mpvExeLocation}'.");
             }
             else
             {
-                _logger.Warn("Could not find MPV installation.");
+                Logger.Warn("Could not find MPV installation.");
             }
         }
 
@@ -748,7 +737,7 @@ namespace RaceControl.ViewModels
             catch (Exception ex)
             {
                 const string message = "An error occurred while trying to load race seasons.";
-                _logger.Error(ex, message);
+                Logger.Error(ex, message);
                 MessageBoxHelper.ShowError(message);
             }
         }
@@ -763,7 +752,7 @@ namespace RaceControl.ViewModels
             catch (Exception ex)
             {
                 const string message = "An error occurred while trying to load series.";
-                _logger.Error(ex, message);
+                Logger.Error(ex, message);
                 MessageBoxHelper.ShowError(message);
             }
 
@@ -788,14 +777,14 @@ namespace RaceControl.ViewModels
             catch (Exception ex)
             {
                 const string message = "An error occurred while trying to load VOD-types.";
-                _logger.Error(ex, message);
+                Logger.Error(ex, message);
                 MessageBoxHelper.ShowError(message);
             }
         }
 
         private async Task RefreshLiveSessionsAsync()
         {
-            _logger.Info("Refreshing live sessions...");
+            Logger.Info("Refreshing live sessions...");
 
             IList<Session> liveSessions;
 
@@ -805,7 +794,7 @@ namespace RaceControl.ViewModels
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "An error occurred while refreshing live sessions.");
+                Logger.Error(ex, "An error occurred while refreshing live sessions.");
                 return;
             }
 
@@ -825,7 +814,7 @@ namespace RaceControl.ViewModels
                 }
             });
 
-            _logger.Info("Done refreshing live sessions.");
+            Logger.Info("Done refreshing live sessions.");
         }
 
         private async Task SelectSessionAsync(Session session)
@@ -847,7 +836,7 @@ namespace RaceControl.ViewModels
             catch (Exception ex)
             {
                 var message = $"An error occurred while trying to load channels for session '{session.SessionName}'.";
-                _logger.Error(ex, message);
+                Logger.Error(ex, message);
                 MessageBoxHelper.ShowError(message);
             }
         }
@@ -862,7 +851,7 @@ namespace RaceControl.ViewModels
             catch (Exception ex)
             {
                 var message = $"An error occurred while trying to load episodes for session '{session.SessionName}'.";
-                _logger.Error(ex, message);
+                Logger.Error(ex, message);
                 MessageBoxHelper.ShowError(message);
             }
         }
@@ -882,7 +871,7 @@ namespace RaceControl.ViewModels
                 { ParameterNames.INSTANCE, instance }
             };
 
-            _logger.Info($"Starting internal player for channel with parameters: '{parameters}'.");
+            Logger.Info($"Starting internal player for channel with parameters: '{parameters}'.");
             OpenVideoDialog(parameters);
         }
 
@@ -918,7 +907,7 @@ namespace RaceControl.ViewModels
                     { ParameterNames.CONTENT_URL, contentUrl}
                 };
 
-                _logger.Info($"Starting download with parameters: '{parameters}'.");
+                Logger.Info($"Starting download with parameters: '{parameters}'.");
                 _dialogService.Show(nameof(DownloadDialog), parameters, null);
             }
         }

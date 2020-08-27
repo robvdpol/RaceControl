@@ -9,7 +9,6 @@ namespace RaceControl.ViewModels
 {
     public class DownloadDialogViewModel : DialogViewModelBase
     {
-        private readonly ILogger _logger;
         private readonly IApiService _apiService;
         private readonly IStreamlinkLauncher _streamlinkLauncher;
 
@@ -19,9 +18,8 @@ namespace RaceControl.ViewModels
         private bool _hasExited;
         private bool _exitCodeSuccess;
 
-        public DownloadDialogViewModel(ILogger logger, IApiService apiService, IStreamlinkLauncher streamlinkLauncher)
+        public DownloadDialogViewModel(ILogger logger, IApiService apiService, IStreamlinkLauncher streamlinkLauncher) : base(logger)
         {
-            _logger = logger;
             _apiService = apiService;
             _streamlinkLauncher = streamlinkLauncher;
         }
@@ -60,12 +58,12 @@ namespace RaceControl.ViewModels
             var contentUrl = parameters.GetValue<string>(ParameterNames.CONTENT_URL);
             var streamUrl = await _apiService.GetTokenisedUrlAsync(token, contentType, contentUrl);
 
-            _logger.Info($"Starting download process for content-type '{contentType}' and content-URL '{contentUrl}'...");
+            Logger.Info($"Starting download process for content-type '{contentType}' and content-URL '{contentUrl}'...");
             _downloadProcess = _streamlinkLauncher.StartStreamlinkDownload(streamUrl, Filename, exitCode =>
             {
                 HasExited = true;
                 ExitCodeSuccess = exitCode == 0;
-                _logger.Info($"Download process finished with exitcode '{exitCode}'.");
+                Logger.Info($"Download process finished with exitcode '{exitCode}'.");
             });
 
             base.OnDialogOpened(parameters);

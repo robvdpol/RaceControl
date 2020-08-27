@@ -13,7 +13,6 @@ namespace RaceControl.ViewModels
 {
     public class LoginDialogViewModel : DialogViewModelBase
     {
-        private readonly ILogger _logger;
         private readonly IAuthorizationService _authorizationService;
         private readonly ICredentialService _credentialService;
 
@@ -23,9 +22,8 @@ namespace RaceControl.ViewModels
         private string _password;
         private string _error;
 
-        public LoginDialogViewModel(ILogger logger, IAuthorizationService authorizationService, ICredentialService credentialService)
+        public LoginDialogViewModel(ILogger logger, IAuthorizationService authorizationService, ICredentialService credentialService) : base(logger)
         {
-            _logger = logger;
             _authorizationService = authorizationService;
             _credentialService = credentialService;
         }
@@ -84,13 +82,13 @@ namespace RaceControl.ViewModels
 
             try
             {
-                _logger.Info("Attempting to login...");
+                Logger.Info("Attempting to login...");
                 token = await _authorizationService.LoginAsync(Email, Password);
-                _logger.Info("Login successful.");
+                Logger.Info("Login successful.");
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "Login failed.");
+                Logger.Error(ex, "Login failed.");
                 Error = ex.Message;
                 IsBusy = false;
                 return;
