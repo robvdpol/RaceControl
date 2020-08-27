@@ -104,11 +104,11 @@ namespace RaceControl.ViewModels
         public ICommand LiveSessionSelectionChangedCommand => _liveSessionSelectionChangedCommand ??= new DelegateCommand(LiveSessionSelectionChangedExecute);
         public ICommand SessionSelectionChangedCommand => _sessionSelectionChangedCommand ??= new DelegateCommand(SessionSelectionChangedExecute);
         public ICommand VodTypeSelectionChangedCommand => _vodTypeSelectionChangedCommand ??= new DelegateCommand(VodTypeSelectionChangedExecute);
-        public ICommand WatchChannelCommand => _watchChannelCommand ??= new DelegateCommand<Channel>(WatchChannelExecute);
+        public ICommand WatchChannelCommand => _watchChannelCommand ??= new DelegateCommand<Channel>(WatchChannelExecute, CanWatchChannelExecute).ObservesProperty(() => SelectedSession).ObservesProperty(() => SelectedLiveSession);
         public ICommand WatchEpisodeCommand => _watchEpisodeCommand ??= new DelegateCommand<Episode>(WatchEpisodeExecute);
-        public ICommand WatchVlcChannelCommand => _watchVlcChannelCommand ??= new DelegateCommand<Channel>(WatchVlcChannelExecute, CanWatchVlcChannelExecute).ObservesProperty(() => VlcExeLocation);
+        public ICommand WatchVlcChannelCommand => _watchVlcChannelCommand ??= new DelegateCommand<Channel>(WatchVlcChannelExecute, CanWatchVlcChannelExecute).ObservesProperty(() => VlcExeLocation).ObservesProperty(() => SelectedSession).ObservesProperty(() => SelectedLiveSession);
         public ICommand WatchVlcEpisodeCommand => _watchVlcEpisodeCommand ??= new DelegateCommand<Episode>(WatchVlcEpisodeExecute, CanWatchVlcEpisodeExecute).ObservesProperty(() => VlcExeLocation);
-        public ICommand WatchMpvChannelCommand => _watchMpvChannelCommand ??= new DelegateCommand<Channel>(WatchMpvChannelExecute, CanWatchMpvChannelExecute).ObservesProperty(() => MpvExeLocation);
+        public ICommand WatchMpvChannelCommand => _watchMpvChannelCommand ??= new DelegateCommand<Channel>(WatchMpvChannelExecute, CanWatchMpvChannelExecute).ObservesProperty(() => MpvExeLocation).ObservesProperty(() => SelectedSession).ObservesProperty(() => SelectedLiveSession);
         public ICommand WatchMpvEpisodeCommand => _watchMpvEpisodeCommand ??= new DelegateCommand<Episode>(WatchMpvEpisodeExecute, CanWatchMpvEpisodeExecute).ObservesProperty(() => MpvExeLocation);
         public ICommand CopyUrlChannelCommand => _copyUrlChannelCommand ??= new DelegateCommand<Channel>(CopyUrlChannelExecute);
         public ICommand CopyUrlEpisodeCommand => _copyUrlEpisodeCommand ??= new DelegateCommand<Episode>(CopyUrlEpisodeExecute);
@@ -360,9 +360,14 @@ namespace RaceControl.ViewModels
             }
         }
 
+        private bool CanWatchChannelExecute(Channel channel)
+        {
+            return GetSelectedSession() != null;
+        }
+
         private void WatchChannelExecute(Channel channel)
         {
-            var session = GetCurrentSession();
+            var session = GetSelectedSession();
 
             WatchChannel(session, channel);
         }
@@ -388,13 +393,13 @@ namespace RaceControl.ViewModels
 
         private bool CanWatchVlcChannelExecute(Channel channel)
         {
-            return !string.IsNullOrWhiteSpace(VlcExeLocation) && File.Exists(VlcExeLocation);
+            return !string.IsNullOrWhiteSpace(VlcExeLocation) && File.Exists(VlcExeLocation) && GetSelectedSession() != null;
         }
 
         private async void WatchVlcChannelExecute(Channel channel)
         {
             IsBusy = true;
-            var session = GetCurrentSession();
+            var session = GetSelectedSession();
             var title = GetTitle(session, channel);
 
             try
@@ -439,13 +444,13 @@ namespace RaceControl.ViewModels
 
         private bool CanWatchMpvChannelExecute(Channel channel)
         {
-            return !string.IsNullOrWhiteSpace(MpvExeLocation) && File.Exists(MpvExeLocation);
+            return !string.IsNullOrWhiteSpace(MpvExeLocation) && File.Exists(MpvExeLocation) && GetSelectedSession() != null;
         }
 
         private async void WatchMpvChannelExecute(Channel channel)
         {
             IsBusy = true;
-            var session = GetCurrentSession();
+            var session = GetSelectedSession();
             var title = GetTitle(session, channel);
 
             try
@@ -528,14 +533,14 @@ namespace RaceControl.ViewModels
 
         private bool CanDownloadChannelExecute(Channel channel)
         {
-            var session = GetCurrentSession();
+            var session = GetSelectedSession();
 
             return session != null && !session.IsLive;
         }
 
         private void DownloadChannelExecute(Channel channel)
         {
-            var session = GetCurrentSession();
+            var session = GetSelectedSession();
             var title = GetTitle(session, channel);
             StartDownload(title, ContentType.Channel, channel.Self);
         }
@@ -577,7 +582,7 @@ namespace RaceControl.ViewModels
 
         private void OpenVideoDialogLayoutExecute()
         {
-            var session = GetCurrentSession();
+            var session = GetSelectedSession();
 
             foreach (var instance in VideoDialogLayout.Instances)
             {
@@ -805,6 +810,12 @@ namespace RaceControl.ViewModels
             {
                 foreach (var sessionToRemove in sessionsToRemove)
                 {
+                    if (SelectedLiveSession != null && SelectedLiveSession.UID == sessionToRemove.UID)
+                    {
+                        Episodes.Clear();
+                        Channels.Clear();
+                    }
+
                     LiveSessions.Remove(sessionToRemove);
                 }
 
@@ -961,7 +972,7 @@ namespace RaceControl.ViewModels
             return await _apiService.GetTokenisedUrlForAssetAsync(_token, episode.Items.First());
         }
 
-        private Session GetCurrentSession() => SelectedLiveSession ?? SelectedSession;
+        private Session GetSelectedSession() => SelectedLiveSession ?? SelectedSession;
 
         private static string GetTitle(Session session, Channel channel) => $"{session.SessionName} - {channel}";
     }
