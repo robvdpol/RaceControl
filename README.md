@@ -39,6 +39,7 @@ Maybe, please create an issue (feature request) and I will consider it. As a wor
 * [Flaticon](https://www.flaticon.com) for providing the application icon
 * [Prism Library](https://prismlibrary.com)
 * [Newtonsoft Json.NET](https://www.newtonsoft.com/json)
+* [NLog](https://nlog-project.org)
 * [CredentialManagement.Standard NuGet package](https://www.nuget.org/packages/CredentialManagement.Standard)
 
 ## Screenshots
