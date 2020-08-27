@@ -61,7 +61,7 @@ namespace RaceControl.ViewModels
             var streamUrl = await _apiService.GetTokenisedUrlAsync(token, contentType, contentUrl);
 
             _logger.Info($"Starting download process for content-type '{contentType}' and content-URL '{contentUrl}'...");
-            _downloadProcess = _streamlinkLauncher.StartStreamlinkDownload(streamUrl, Filename, (exitCode) =>
+            _downloadProcess = _streamlinkLauncher.StartStreamlinkDownload(streamUrl, Filename, exitCode =>
             {
                 HasExited = true;
                 ExitCodeSuccess = exitCode == 0;

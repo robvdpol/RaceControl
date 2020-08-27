@@ -61,7 +61,7 @@ namespace RaceControl
             containerRegistry.RegisterSingleton<IRestClient, RestClient>();
             containerRegistry.RegisterSingleton<ISettings, Settings>();
             containerRegistry.RegisterSingleton<IVideoDialogLayout, VideoDialogLayout>();
-            containerRegistry.Register<JsonSerializer>(() => new JsonSerializer() { Formatting = Formatting.Indented });
+            containerRegistry.Register<JsonSerializer>(() => new JsonSerializer { Formatting = Formatting.Indented });
             containerRegistry.Register<IAuthorizationService, AuthorizationService>();
             containerRegistry.Register<IF1TVClient, F1TVClient>();
             containerRegistry.Register<IApiService, ApiService>();
