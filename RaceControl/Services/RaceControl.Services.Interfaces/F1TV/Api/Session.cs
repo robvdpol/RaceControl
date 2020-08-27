@@ -62,7 +62,22 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
 
         public override string ToString()
         {
-            return IsExpired ? $"{Name} (expired)" : Name;
+            if (IsUpcoming)
+            {
+                return $"{Name} (upcoming)";
+            }
+
+            if (IsLive)
+            {
+                return $"{Name} (live)";
+            }
+
+            if (IsExpired)
+            {
+                return $"{Name} (expired)";
+            }
+
+            return Name;
         }
     }
 }
