@@ -7,6 +7,7 @@ Race Control is an open source [F1TV](https://f1tv.formula1.com) desktop client 
 * Watch F1TV live streams in the highest quality available (1080p at the moment)
 * Supports three different video players (internal player, VLC and MPV)
 * Open as many streams as you like, using the layout that you like
+* Save your custom layout, so you don't have to re-arrange your video players manually every time you watch a session
 * Cast to your Chromecast with a single click of a button (internal player and VLC only)
 * Experimental synchronization of streams (replays only at the moment)
 
@@ -20,7 +21,7 @@ Race Control is an open source [F1TV](https://f1tv.formula1.com) desktop client 
 You need an F1TV account to watch F1TV streams. If you want to watch race replays, an F1TV Access subscription is required. If you want to watch live sessions, an F1TV Pro subscription is required. You can create an account and subscribe at http://f1tv.formula1.com.
 
 #### What happens with my credentials when I login?
-You F1TV login credentials are stored locally in the Windows Credential Manager, so you don't have to login every time you start the application. If you wish to switch to a different F1TV account, open the Credential Manager, go to 'Windows Credentials' and under 'Generic Credentials' find the entry called 'RaceControlF1TV'. If you delete the entry, you will be asked to login again when you start the application.
+Your F1TV login credentials are stored locally in the Windows Credential Manager, so you don't have to login every time you start the application. If you wish to switch to a different F1TV account, press the button 'Delete stored credentials' located in 'Options'. Your credentials will be removed and you will be asked to login again.
 
 #### Why is the VLC button disabled?
 You need to have VLC media player installed on your machine. The location of your VLC installation will be automatically detected.
