@@ -533,9 +533,7 @@ namespace RaceControl.ViewModels
 
         private bool CanDownloadChannelExecute(Channel channel)
         {
-            var session = GetSelectedSession();
-
-            return session != null && !session.IsLive;
+            return GetSelectedSession()?.IsReplay ?? false;
         }
 
         private void DownloadChannelExecute(Channel channel)
