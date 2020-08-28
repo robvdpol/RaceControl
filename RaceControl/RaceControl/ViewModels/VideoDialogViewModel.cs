@@ -651,12 +651,20 @@ namespace RaceControl.ViewModels
             Logger.Info($"Done moving window (top: {Top}, left: {Left}, width: {Width}, height: {Height}).");
         }
 
-        private void AudioTrackSelectionChangedExecute(SelectionChangedEventArgs args)
+        private async void AudioTrackSelectionChangedExecute(SelectionChangedEventArgs args)
         {
             if (args.AddedItems.Count > 0 && args.AddedItems[0] is TrackDescription trackDescription)
             {
                 Logger.Info($"Changing audio track to '{trackDescription.Id}'...");
                 MediaPlayer.SetAudioTrack(trackDescription.Id);
+
+                if (_streamlinkProcess == null)
+                {
+                    // Workaround to fix audio out of sync after switching audio track
+                    await Task.Delay(250);
+                    SetMediaPlayerTime(MediaPlayer.Time - 500);
+                }
+
                 Logger.Info("Done changing audio track.");
             }
         }
@@ -811,7 +819,7 @@ namespace RaceControl.ViewModels
         private void SetMediaPlayerTime(long time)
         {
             Logger.Info($"Setting mediaplayer time to '{time}'...");
-            MediaPlayer.Time = time;
+            MediaPlayer.Time = Math.Max(time, 0);
         }
 
         private void CreateMediaPlayer()
