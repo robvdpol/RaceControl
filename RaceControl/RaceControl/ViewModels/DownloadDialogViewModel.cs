@@ -3,7 +3,9 @@ using Prism.Services.Dialogs;
 using RaceControl.Core.Mvvm;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Streamlink;
+using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace RaceControl.ViewModels
 {
@@ -15,8 +17,9 @@ namespace RaceControl.ViewModels
         private Process _downloadProcess;
         private string _name;
         private string _filename;
+        private bool _hasStarted;
         private bool _hasExited;
-        private bool _exitCodeSuccess;
+        private bool _hasFailed;
 
         public DownloadDialogViewModel(ILogger logger, IApiService apiService, IStreamlinkLauncher streamlinkLauncher) : base(logger)
         {
@@ -36,16 +39,22 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _filename, value);
         }
 
+        public bool HasStarted
+        {
+            get => _hasStarted;
+            set => SetProperty(ref _hasStarted, value);
+        }
+
         public bool HasExited
         {
             get => _hasExited;
             set => SetProperty(ref _hasExited, value);
         }
 
-        public bool ExitCodeSuccess
+        public bool HasFailed
         {
-            get => _exitCodeSuccess;
-            set => SetProperty(ref _exitCodeSuccess, value);
+            get => _hasFailed;
+            set => SetProperty(ref _hasFailed, value);
         }
 
         public override async void OnDialogOpened(IDialogParameters parameters)
@@ -56,15 +65,23 @@ namespace RaceControl.ViewModels
             var token = parameters.GetValue<string>(ParameterNames.TOKEN);
             var contentType = parameters.GetValue<ContentType>(ParameterNames.CONTENT_TYPE);
             var contentUrl = parameters.GetValue<string>(ParameterNames.CONTENT_URL);
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(token, contentType, contentUrl);
+            var streamUrl = await GenerateStreamUrlAsync(token, contentType, contentUrl);
 
-            Logger.Info($"Starting download process for content-type '{contentType}' and content-URL '{contentUrl}'...");
-            _downloadProcess = _streamlinkLauncher.StartStreamlinkDownload(streamUrl, Filename, exitCode =>
+            if (streamUrl == null)
             {
-                HasExited = true;
-                ExitCodeSuccess = exitCode == 0;
-                Logger.Info($"Download process finished with exitcode '{exitCode}'.");
-            });
+                HasFailed = true;
+            }
+            else
+            {
+                Logger.Info($"Starting download process for content-type '{contentType}' and content-URL '{contentUrl}'...");
+                _downloadProcess = _streamlinkLauncher.StartStreamlinkDownload(streamUrl, Filename, exitCode =>
+                {
+                    HasExited = true;
+                    HasFailed = exitCode != 0;
+                    Logger.Info($"Download process finished with exitcode '{exitCode}'.");
+                });
+                HasStarted = true;
+            }
 
             base.OnDialogOpened(parameters);
         }
@@ -74,6 +91,22 @@ namespace RaceControl.ViewModels
             CleanupProcess(_downloadProcess);
 
             base.OnDialogClosed();
+        }
+
+        private async Task<string> GenerateStreamUrlAsync(string token, ContentType contentType, string contentUrl)
+        {
+            Logger.Info($"Getting tokenised URL for content-type '{contentType}' and content-url '{contentUrl}'...");
+
+            try
+            {
+                return await _apiService.GetTokenisedUrlAsync(token, contentType, contentUrl);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "An error occurred while trying to get tokenised URL.");
+            }
+
+            return null;
         }
     }
 }

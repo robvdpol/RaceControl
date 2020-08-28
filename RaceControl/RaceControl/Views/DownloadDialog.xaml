@@ -42,26 +42,31 @@
             <Run FontWeight="Bold">
                 <Run.Style>
                     <Style TargetType="{x:Type Run}">
-                        <Setter Property="Text" Value="Downloading..." />
+                        <Setter Property="Text" Value="Waiting..." />
                         <Style.Triggers>
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
-                                    <Condition Binding="{Binding HasExited}" Value="True" />
-                                    <Condition Binding="{Binding ExitCodeSuccess}" Value="True" />
+                                    <Condition Binding="{Binding HasStarted}" Value="True" />
+                                    <Condition Binding="{Binding HasExited}" Value="False" />
+                                    <Condition Binding="{Binding HasFailed}" Value="False" />
                                 </MultiDataTrigger.Conditions>
                                 <MultiDataTrigger.Setters>
-                                    <Setter Property="Text" Value="Done" />
+                                    <Setter Property="Text" Value="Downloading..." />
                                 </MultiDataTrigger.Setters>
                             </MultiDataTrigger>
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding HasStarted}" Value="True" />
                                     <Condition Binding="{Binding HasExited}" Value="True" />
-                                    <Condition Binding="{Binding ExitCodeSuccess}" Value="False" />
+                                    <Condition Binding="{Binding HasFailed}" Value="False" />
                                 </MultiDataTrigger.Conditions>
                                 <MultiDataTrigger.Setters>
-                                    <Setter Property="Text" Value="Failed (see log file for details)" />
+                                    <Setter Property="Text" Value="Finished" />
                                 </MultiDataTrigger.Setters>
                             </MultiDataTrigger>
+                            <DataTrigger Binding="{Binding HasFailed}" Value="True">
+                                <Setter Property="Text" Value="Failed (see log file for details)" />
+                            </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </Run.Style>
@@ -77,11 +82,17 @@
             IsDefault="True">
             <Button.Style>
                 <Style TargetType="{x:Type Button}">
-                    <Setter Property="Content" Value="Cancel" />
+                    <Setter Property="Content" Value="Close" />
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding HasExited}" Value="True">
-                            <Setter Property="Content" Value="Close" />
-                        </DataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding HasStarted}" Value="True" />
+                                <Condition Binding="{Binding HasExited}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <MultiDataTrigger.Setters>
+                                <Setter Property="Content" Value="Cancel" />
+                            </MultiDataTrigger.Setters>
+                        </MultiDataTrigger>
                     </Style.Triggers>
                 </Style>
             </Button.Style>
