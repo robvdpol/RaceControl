@@ -33,6 +33,7 @@ namespace RaceControl.ViewModels
         private readonly IEventAggregator _eventAggregator;
         private readonly IApiService _apiService;
         private readonly IStreamlinkLauncher _streamlinkLauncher;
+        private readonly ISettings _settings;
         private readonly LibVLC _libVLC;
 
         private ICommand _mouseDownVideoCommand;
@@ -90,6 +91,7 @@ namespace RaceControl.ViewModels
             IEventAggregator eventAggregator,
             IApiService apiService,
             IStreamlinkLauncher streamlinkLauncher,
+            ISettings settings,
             LibVLC libVLC,
             MediaPlayer mediaPlayer)
             : base(logger)
@@ -97,6 +99,7 @@ namespace RaceControl.ViewModels
             _eventAggregator = eventAggregator;
             _apiService = apiService;
             _streamlinkLauncher = streamlinkLauncher;
+            _settings = settings;
             _libVLC = libVLC;
             MediaPlayer = mediaPlayer;
         }
@@ -316,7 +319,7 @@ namespace RaceControl.ViewModels
                 return;
             }
 
-            if (IsLive)
+            if (IsLive && !_settings.DisableStreamlink)
             {
                 var (streamlinkProcess, streamlinkUrl) = await _streamlinkLauncher.StartStreamlinkExternal(streamUrl);
                 _streamlinkProcess = streamlinkProcess;

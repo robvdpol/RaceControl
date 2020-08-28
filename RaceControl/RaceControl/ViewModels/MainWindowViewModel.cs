@@ -923,7 +923,7 @@ namespace RaceControl.ViewModels
 
         private void WatchStreamInVlc(string url, string title, bool isLive)
         {
-            if (isLive)
+            if (isLive && !Settings.DisableStreamlink)
             {
                 _streamlinkLauncher.StartStreamlinkVlc(VlcExeLocation, url, title);
             }
@@ -935,7 +935,7 @@ namespace RaceControl.ViewModels
 
         private void WatchStreamInMpv(string url, string title, bool isLive)
         {
-            if (isLive)
+            if (isLive && !Settings.DisableStreamlink)
             {
                 _streamlinkLauncher.StartStreamlinkMpv(MpvExeLocation, url, title);
             }
