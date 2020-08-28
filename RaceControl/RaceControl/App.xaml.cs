@@ -24,6 +24,7 @@ using RaceControl.Services.Lark;
 using RaceControl.Streamlink;
 using RaceControl.ViewModels;
 using RaceControl.Views;
+using System;
 using System.Windows;
 using System.Windows.Threading;
 using LibVLCSharpCore = LibVLCSharp.Shared.Core;
@@ -40,9 +41,14 @@ namespace RaceControl
 
         protected override void Initialize()
         {
+            var splashScreen = new SplashScreen("splashscreen.png");
+            splashScreen.Show(false);
+
             LibVLCSharpCore.Initialize();
             InitializeLogging();
             base.Initialize();
+
+            splashScreen.Close(TimeSpan.Zero);
         }
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)

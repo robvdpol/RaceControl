@@ -33,6 +33,7 @@
     <None Remove="Icons\stop_48px.png" />
     <None Remove="Icons\synchronize_48px.png" />
     <None Remove="Icons\windowed_96px.png" />
+    <None Remove="splashscreen.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\audio_48px.png" />
@@ -53,6 +54,7 @@
     <Resource Include="Icons\stop_48px.png" />
     <Resource Include="Icons\synchronize_48px.png" />
     <Resource Include="Icons\windowed_96px.png" />
+    <Resource Include="splashscreen.png" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="LibVLCSharp" Version="3.4.7" />
