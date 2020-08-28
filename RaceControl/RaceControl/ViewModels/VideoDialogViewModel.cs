@@ -332,6 +332,7 @@ namespace RaceControl.ViewModels
 
             _showControlsTimer = new Timer(2000) { AutoReset = false };
             _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
+            _showControlsTimer.Start();
             _syncStreamsEventToken = _eventAggregator.GetEvent<SyncStreamsEvent>().Subscribe(OnSyncSession);
 
             base.OnDialogOpened(parameters);
