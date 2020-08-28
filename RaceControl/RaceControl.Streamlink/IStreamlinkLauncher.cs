@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace RaceControl.Streamlink
 {
     public interface IStreamlinkLauncher
     {
-        Process StartStreamlinkExternal(string streamUrl, out string streamlinkUrl);
+        Task<(Process process, string streamlinkUrl)> StartStreamlinkExternal(string streamUrl);
 
         Process StartStreamlinkRecording(string streamUrl, string title);
 

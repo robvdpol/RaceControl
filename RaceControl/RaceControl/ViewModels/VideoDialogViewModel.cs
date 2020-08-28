@@ -318,8 +318,9 @@ namespace RaceControl.ViewModels
 
             if (IsLive)
             {
-                _streamlinkProcess = _streamlinkLauncher.StartStreamlinkExternal(streamUrl, out streamUrl);
-                await Task.Delay(2000);
+                var (streamlinkProcess, streamlinkUrl) = await _streamlinkLauncher.StartStreamlinkExternal(streamUrl);
+                _streamlinkProcess = streamlinkProcess;
+                streamUrl = streamlinkUrl;
             }
 
             CreateMediaPlayer();

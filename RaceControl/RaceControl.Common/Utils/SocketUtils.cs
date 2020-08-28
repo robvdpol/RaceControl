@@ -1,5 +1,9 @@
-﻿using System.Net;
+﻿using System;
+using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace RaceControl.Common.Utils
 {
@@ -7,11 +11,34 @@ namespace RaceControl.Common.Utils
     {
         public static int GetFreePort()
         {
-            using (var sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+            using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
             {
-                sock.Bind(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 0));
+                socket.Bind(new IPEndPoint(IPAddress.Loopback, 0));
 
-                return ((IPEndPoint)sock.LocalEndPoint).Port;
+                return ((IPEndPoint)socket.LocalEndPoint).Port;
+            }
+        }
+
+        public static bool IsPortInUse(int port)
+        {
+            return IPGlobalProperties
+                .GetIPGlobalProperties()
+                .GetActiveTcpListeners()
+                .Any(ep => ep.Port == port);
+        }
+
+        public static async Task WaitUntilPortInUseAsync(int port, int timeout = 30, int interval = 100)
+        {
+            var start = DateTime.UtcNow;
+
+            while (DateTime.UtcNow.Subtract(start).TotalSeconds <= timeout)
+            {
+                if (IsPortInUse(port))
+                {
+                    return;
+                }
+
+                await Task.Delay(interval);
             }
         }
     }

@@ -5,6 +5,7 @@ using RaceControl.Common.Utils;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace RaceControl.Streamlink
 {
@@ -23,20 +24,20 @@ namespace RaceControl.Streamlink
             _childProcessTracker = childProcessTracker;
         }
 
-        public Process StartStreamlinkExternal(string streamUrl, out string streamlinkUrl)
+        public async Task<(Process process, string streamlinkUrl)> StartStreamlinkExternal(string streamUrl)
         {
             var port = SocketUtils.GetFreePort();
             var streamIdentifier = GetStreamIdentifier();
             var streamlinkArguments = $"--player-external-http --player-external-http-port {port} --hls-audio-select * \"{streamUrl}\" {streamIdentifier}";
-            streamlinkUrl = $"http://127.0.0.1:{port}";
 
             _logger.Info($"Starting external Streamlink-instance for stream-URL '{streamUrl}' with identifier '{streamIdentifier}' on port '{port}'...");
 
             var process = ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, false, true);
             process.Start();
             _childProcessTracker.AddProcess(process);
+            await SocketUtils.WaitUntilPortInUseAsync(port);
 
-            return process;
+            return (process, $"http://127.0.0.1:{port}");
         }
 
         public Process StartStreamlinkRecording(string streamUrl, string title)
