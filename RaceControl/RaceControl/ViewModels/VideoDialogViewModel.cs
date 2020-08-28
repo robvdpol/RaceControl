@@ -61,6 +61,7 @@ namespace RaceControl.ViewModels
         private string _contentUrl;
         private string _syncUID;
         private bool _isLive;
+        private bool _isStreamlink;
         private bool _isPaused;
         private bool _isMuted;
         private bool _isRecording;
@@ -155,6 +156,12 @@ namespace RaceControl.ViewModels
         {
             get => _isLive;
             set => SetProperty(ref _isLive, value);
+        }
+
+        public bool IsStreamlink
+        {
+            get => _isStreamlink;
+            set => SetProperty(ref _isStreamlink, value);
         }
 
         public bool IsPaused
@@ -306,6 +313,7 @@ namespace RaceControl.ViewModels
             ContentUrl = parameters.GetValue<string>(ParameterNames.CONTENT_URL);
             SyncUID = parameters.GetValue<string>(ParameterNames.SYNC_UID);
             IsLive = parameters.GetValue<bool>(ParameterNames.IS_LIVE);
+            IsStreamlink = IsLive && !_settings.DisableStreamlink;
 
             var instance = parameters.GetValue<VideoDialogInstance>(ParameterNames.INSTANCE);
             SetWindowLocation(instance);
@@ -319,7 +327,7 @@ namespace RaceControl.ViewModels
                 return;
             }
 
-            if (IsLive && !_settings.DisableStreamlink)
+            if (IsStreamlink)
             {
                 var (streamlinkProcess, streamlinkUrl) = await _streamlinkLauncher.StartStreamlinkExternal(streamUrl);
                 _streamlinkProcess = streamlinkProcess;
@@ -756,7 +764,7 @@ namespace RaceControl.ViewModels
             Logger.Info($"Changing renderer to '{renderer?.Name}'...");
 
             var streamTime = MediaPlayer.Time;
-            var streamUrl = IsLive ? Media.Mrl : await GenerateStreamUrlAsync();
+            var streamUrl = IsStreamlink ? Media.Mrl : await GenerateStreamUrlAsync();
 
             if (streamUrl == null)
             {
