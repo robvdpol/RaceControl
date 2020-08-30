@@ -2,6 +2,7 @@
 using RaceControl.Common.Utils;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace RaceControl.Services.Interfaces.F1TV.Api
 {
@@ -37,6 +38,9 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         [JsonProperty("channel_urls")]
         public List<Channel> ChannelUrls { get; set; }
 
+        [JsonProperty("image_urls")]
+        public List<Image> ImageUrls { get; set; }
+
         [JsonIgnore]
         public bool IsUpcoming => Status == "upcoming";
 
@@ -49,6 +53,9 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         [JsonIgnore]
         public bool IsReplay => Status == "replay";
 
+        [JsonIgnore]
+        public string ThumbnailUrl => ImageUrls.FirstOrDefault(image => image.ImageType == "Thumbnail")?.Url;
+
         public static string UIDField => JsonUtils.GetJsonPropertyName<Session>(s => s.UID);
         public static string NameField => JsonUtils.GetJsonPropertyName<Session>(s => s.Name);
         public static string SessionNameField => JsonUtils.GetJsonPropertyName<Session>(s => s.SessionName);
@@ -59,6 +66,7 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         public static string SeriesUrlField => JsonUtils.GetJsonPropertyName<Session>(s => s.SeriesUrl);
         public static string ContentUrlsField => JsonUtils.GetJsonPropertyName<Session>(s => s.ContentUrls);
         public static string ChannelUrlsField => JsonUtils.GetJsonPropertyName<Session>(s => s.ChannelUrls);
+        public static string ImageUrlsField => JsonUtils.GetJsonPropertyName<Session>(s => s.ImageUrls);
 
         public override string ToString()
         {

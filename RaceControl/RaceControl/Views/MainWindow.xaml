@@ -19,10 +19,10 @@
         <core:DatePassedConverter x:Key="DatePassedConverter" />
         <Style x:Key="HeaderLabelStyle" TargetType="Label">
             <Setter Property="Margin" Value="2" />
-            <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="Background" Value="#DDDDDD" />
             <Setter Property="BorderBrush" Value="#ABADB3" />
             <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="FontWeight" Value="Bold" />
         </Style>
         <Style x:Key="OptionButtonStyle" TargetType="Button">
             <Setter Property="Margin" Value="3" />
@@ -31,6 +31,14 @@
         </Style>
         <Style x:Key="ContentListBoxStyle" TargetType="ListBox">
             <Setter Property="Margin" Value="2" />
+            <Setter Property="Background" Value="#FFFFFF" />
+        </Style>
+        <Style x:Key="OptionBorderStyle" TargetType="Border">
+            <Setter Property="Margin" Value="2" />
+            <Setter Property="Background" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="#ABADB3" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="UseLayoutRounding" Value="True" />
         </Style>
     </Window.Resources>
     <i:Interaction.Triggers>
@@ -216,6 +224,36 @@
                     Style="{StaticResource ContentListBoxStyle}">
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
+                            <Setter Property="ToolTip">
+                                <Setter.Value>
+                                    <ToolTip Placement="Right">
+                                        <ToolTip.Style>
+                                            <Style TargetType="ToolTip">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="ToolTip">
+                                                            <ContentPresenter />
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </ToolTip.Style>
+                                        <ToolTip.Triggers>
+                                            <EventTrigger RoutedEvent="ToolTip.Opened">
+                                                <BeginStoryboard>
+                                                    <Storyboard TargetProperty="Opacity">
+                                                        <DoubleAnimation
+                                                            From="0.0"
+                                                            To="1.0"
+                                                            Duration="0:0:0.5" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger>
+                                        </ToolTip.Triggers>
+                                        <Image Width="400" Source="{Binding ThumbnailUrl}" />
+                                    </ToolTip>
+                                </Setter.Value>
+                            </Setter>
                             <Setter Property="Visibility" Value="Collapsed" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsUpcoming}" Value="True">
@@ -325,10 +363,7 @@
             <Border
                 Grid.Row="3"
                 Grid.Column="0"
-                Margin="2"
-                BorderBrush="#ABADB3"
-                BorderThickness="1"
-                UseLayoutRounding="True">
+                Style="{StaticResource OptionBorderStyle}">
                 <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                     <Grid>
                         <Grid.RowDefinitions>

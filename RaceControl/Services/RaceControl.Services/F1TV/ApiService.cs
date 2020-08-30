@@ -142,6 +142,11 @@ namespace RaceControl.Services.F1TV
                 .WithField(Session.EndTimeField)
                 .WithField(Session.EventOccurrenceUrlField)
                 .WithField(Session.SeriesUrlField)
+                .WithField(Session.ImageUrlsField, true)
+                .WithSubField(Session.ImageUrlsField, Image.UIDField)
+                .WithSubField(Session.ImageUrlsField, Image.TitleField)
+                .WithSubField(Session.ImageUrlsField, Image.ImageTypeField)
+                .WithSubField(Session.ImageUrlsField, Image.UrlField)
                 .WithFilter(Session.EventOccurrenceUrlField, LarkFilterType.Equals, eventUID)
                 .OrderBy(Session.StartTimeField, LarkSortDirection.Ascending)
                 ;
