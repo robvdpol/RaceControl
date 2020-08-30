@@ -17,6 +17,12 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         [JsonProperty("channel_type")]
         public string ChannelType { get; set; }
 
+        [JsonIgnore]
+        public bool IsBackup => ChannelType == ChannelTypes.Backup;
+
+        [JsonIgnore]
+        public ContentType ContentType => IsBackup ? ContentType.Backup : ContentType.Channel;
+
         public static string UIDField => JsonUtils.GetJsonPropertyName<Channel>(s => s.UID);
         public static string SelfField => JsonUtils.GetJsonPropertyName<Channel>(s => s.Self);
         public static string NameField => JsonUtils.GetJsonPropertyName<Channel>(s => s.Name);

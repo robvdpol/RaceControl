@@ -8,5 +8,7 @@ namespace RaceControl.Services.Interfaces.Lark
         Task<TokenisedUrl> GetTokenisedUrlForChannelAsync(string token, string channelUrl);
 
         Task<TokenisedUrlContainer> GetTokenisedUrlForAssetAsync(string token, string assetUrl);
+
+        Task<BackupStream> GetBackupStream();
     }
 }

@@ -540,7 +540,7 @@ namespace RaceControl.ViewModels
         {
             var session = GetSelectedSession();
             var title = GetTitle(session, channel);
-            StartDownload(title, ContentType.Channel, channel.Self);
+            StartDownload(title, channel.ContentType, channel.Self);
         }
 
         private void DownloadEpisodeExecute(Episode episode)
@@ -840,6 +840,16 @@ namespace RaceControl.ViewModels
             try
             {
                 var channels = await _apiService.GetChannelsForSessionAsync(session.UID);
+
+                if (session.IsLive)
+                {
+                    channels.Add(new Channel
+                    {
+                        ChannelType = ChannelTypes.Backup,
+                        Name = "Backup stream"
+                    });
+                }
+
                 Channels.AddRange(channels.OrderBy(c => c.ChannelType, new ChannelTypeComparer()));
             }
             catch (Exception ex)
@@ -873,7 +883,7 @@ namespace RaceControl.ViewModels
                 { ParameterNames.TOKEN, _token },
                 { ParameterNames.TITLE, title },
                 { ParameterNames.NAME, channel.Name },
-                { ParameterNames.CONTENT_TYPE, ContentType.Channel },
+                { ParameterNames.CONTENT_TYPE, channel.ContentType },
                 { ParameterNames.CONTENT_URL, channel.Self },
                 { ParameterNames.SYNC_UID, session.UID },
                 { ParameterNames.IS_LIVE, session.IsLive },
@@ -962,12 +972,12 @@ namespace RaceControl.ViewModels
 
         private async Task<string> GetTokenisedUrlForChannelAsync(Channel channel)
         {
-            return await _apiService.GetTokenisedUrlForChannelAsync(_token, channel.Self);
+            return await _apiService.GetTokenisedUrlAsync(_token, channel.ContentType, channel.Self);
         }
 
         private async Task<string> GetTokenisedUrlForEpisodeAsync(Episode episode)
         {
-            return await _apiService.GetTokenisedUrlForAssetAsync(_token, episode.Items.First());
+            return await _apiService.GetTokenisedUrlAsync(_token, ContentType.Asset, episode.Items.First());
         }
 
         private Session GetSelectedSession() => SelectedLiveSession ?? SelectedSession;

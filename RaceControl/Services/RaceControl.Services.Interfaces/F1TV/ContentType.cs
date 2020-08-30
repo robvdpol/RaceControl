@@ -3,6 +3,7 @@
     public enum ContentType
     {
         Channel,
-        Asset
+        Asset,
+        Backup
     }
 }

@@ -24,10 +24,6 @@ namespace RaceControl.Services.Interfaces.F1TV
 
         Task<Episode> GetEpisodeAsync(string episodeUID);
 
-        Task<string> GetTokenisedUrlForChannelAsync(string token, string channelUrl);
-
-        Task<string> GetTokenisedUrlForAssetAsync(string token, string assetUrl);
-
         Task<string> GetTokenisedUrlAsync(string token, ContentType contentType, string contentUrl);
     }
 }

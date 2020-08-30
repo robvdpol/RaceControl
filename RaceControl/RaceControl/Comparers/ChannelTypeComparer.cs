@@ -1,14 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using RaceControl.Services.Interfaces.F1TV.Api;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace RaceControl.Comparers
 {
     public class ChannelTypeComparer : IComparer<string>
     {
-        private const string Wif = "wif";
-        private const string Driver = "driver";
-        private const string Other = "other";
-
         public int Compare([AllowNull] string x, [AllowNull] string y)
         {
             if (x == y)
@@ -16,34 +13,44 @@ namespace RaceControl.Comparers
                 return 0;
             }
 
-            if (x == Wif)
+            if (x == ChannelTypes.Wif)
             {
                 return -1;
             }
 
-            if (y == Wif)
+            if (y == ChannelTypes.Wif)
             {
                 return 1;
             }
 
-            if (x == Other)
+            if (x == ChannelTypes.Other)
             {
                 return -1;
             }
 
-            if (y == Other)
+            if (y == ChannelTypes.Other)
             {
                 return 1;
             }
 
-            if (x == Driver)
+            if (x == ChannelTypes.Driver)
             {
                 return -1;
             }
 
-            if (y == Driver)
+            if (y == ChannelTypes.Driver)
             {
                 return 1;
+            }
+
+            if (x == ChannelTypes.Backup)
+            {
+                return 1;
+            }
+
+            if (y == ChannelTypes.Backup)
+            {
+                return -1;
             }
 
             return 0;

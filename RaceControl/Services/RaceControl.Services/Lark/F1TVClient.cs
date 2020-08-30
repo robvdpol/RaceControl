@@ -7,6 +7,8 @@ namespace RaceControl.Services.Lark
 {
     public class F1TVClient : LarkClient, IF1TVClient
     {
+        private const string BackupStreamUrl = @"https://f1tv.formula1.com/dr/stream.json";
+
         public F1TVClient(IRestClient restClient) : base(restClient, "https://f1tv.formula1.com/api")
         {
         }
@@ -27,6 +29,11 @@ namespace RaceControl.Services.Lark
             var tokenisedUrlContainer = await RestClient.PostAsJsonAsync<AssetUrl, TokenisedUrlContainer>(url, request, null, token);
 
             return tokenisedUrlContainer;
+        }
+
+        public async Task<BackupStream> GetBackupStream()
+        {
+            return await RestClient.GetAsJsonAsync<BackupStream>(BackupStreamUrl);
         }
     }
 }
