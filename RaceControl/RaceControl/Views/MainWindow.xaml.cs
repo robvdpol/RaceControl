@@ -15,7 +15,7 @@ namespace RaceControl.Views
             base.OnInitialized(e);
 
             var version = AssemblyUtils.GetApplicationVersion();
-            Title = $"Race Control {version.Major}.{version.Minor} - An open source F1TV client";
+            Title = $"Race Control {version.Major}.{version.Minor}.{version.Build} - An open source F1TV client";
         }
     }
 }
