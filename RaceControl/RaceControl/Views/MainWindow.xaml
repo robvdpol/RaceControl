@@ -40,6 +40,11 @@
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="UseLayoutRounding" Value="True" />
         </Style>
+        <Style x:Key="ThumbnailBorderStyle" TargetType="Border">
+            <Setter Property="BorderBrush" Value="#EE0000" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="UseLayoutRounding" Value="True" />
+        </Style>
     </Window.Resources>
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
@@ -250,7 +255,12 @@
                                                 </BeginStoryboard>
                                             </EventTrigger>
                                         </ToolTip.Triggers>
-                                        <Image Width="400" Source="{Binding ThumbnailUrl}" />
+                                        <Border Style="{StaticResource ThumbnailBorderStyle}">
+                                            <Image
+                                                Width="400"
+                                                RenderOptions.BitmapScalingMode="HighQuality"
+                                                Source="{Binding ThumbnailUrl}" />
+                                        </Border>
                                     </ToolTip>
                                 </Setter.Value>
                             </Setter>
