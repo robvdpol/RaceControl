@@ -841,7 +841,7 @@ namespace RaceControl.ViewModels
             {
                 var channels = await _apiService.GetChannelsForSessionAsync(session.UID);
 
-                if (session.IsLive)
+                if (session.IsLive && channels.Count > 1)
                 {
                     channels.Add(new Channel
                     {
