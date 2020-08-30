@@ -231,7 +231,7 @@
                         <Style TargetType="ListBoxItem">
                             <Setter Property="ToolTip">
                                 <Setter.Value>
-                                    <ToolTip Placement="Right">
+                                    <ToolTip Placement="Left">
                                         <ToolTip.Style>
                                             <Style TargetType="ToolTip">
                                                 <Setter Property="Template">
@@ -258,6 +258,7 @@
                                         <Border Style="{StaticResource ThumbnailBorderStyle}">
                                             <Image
                                                 Width="400"
+                                                Height="225"
                                                 RenderOptions.BitmapScalingMode="HighQuality"
                                                 Source="{Binding ThumbnailUrl}" />
                                         </Border>
@@ -472,6 +473,46 @@
                 ItemsSource="{Binding Episodes}"
                 ScrollViewer.VerticalScrollBarVisibility="Visible"
                 Style="{StaticResource ContentListBoxStyle}">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="ToolTip">
+                            <Setter.Value>
+                                <ToolTip Placement="Left">
+                                    <ToolTip.Style>
+                                        <Style TargetType="ToolTip">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="ToolTip">
+                                                        <ContentPresenter />
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ToolTip.Style>
+                                    <ToolTip.Triggers>
+                                        <EventTrigger RoutedEvent="ToolTip.Opened">
+                                            <BeginStoryboard>
+                                                <Storyboard TargetProperty="Opacity">
+                                                    <DoubleAnimation
+                                                        From="0.0"
+                                                        To="1.0"
+                                                        Duration="0:0:0.5" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </ToolTip.Triggers>
+                                    <Border Style="{StaticResource ThumbnailBorderStyle}">
+                                        <Image
+                                            Width="400"
+                                            Height="225"
+                                            RenderOptions.BitmapScalingMode="HighQuality"
+                                            Source="{Binding ThumbnailUrl}" />
+                                    </Border>
+                                </ToolTip>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>

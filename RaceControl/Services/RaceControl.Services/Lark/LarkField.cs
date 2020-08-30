@@ -2,7 +2,7 @@
 {
     public class LarkField
     {
-        public LarkField(string fieldName, bool expand = false)
+        public LarkField(string fieldName, bool expand)
         {
             FieldName = fieldName;
             Expand = expand;

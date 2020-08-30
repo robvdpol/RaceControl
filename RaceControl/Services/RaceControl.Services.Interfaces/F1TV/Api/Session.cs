@@ -54,7 +54,7 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         public bool IsReplay => Status == "replay";
 
         [JsonIgnore]
-        public string ThumbnailUrl => ImageUrls.FirstOrDefault(image => image.ImageType == "Thumbnail")?.Url;
+        public string ThumbnailUrl => ImageUrls?.FirstOrDefault(img => img.ImageType == "Thumbnail")?.Url;
 
         public static string UIDField => JsonUtils.GetJsonPropertyName<Session>(s => s.UID);
         public static string NameField => JsonUtils.GetJsonPropertyName<Session>(s => s.Name);

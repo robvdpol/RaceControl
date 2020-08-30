@@ -4,7 +4,9 @@
     {
         ILarkRequest WithField(string field, bool expand = false);
 
-        ILarkRequest WithSubField(string field, string subField);
+        ILarkRequest WithSubField(string field, string subField, bool expand = false);
+
+        ILarkRequest WithSubSubField(string field, string subField, string subSubField);
 
         ILarkRequest WithFilter(string field, LarkFilterType filterType, string filterValue);
 

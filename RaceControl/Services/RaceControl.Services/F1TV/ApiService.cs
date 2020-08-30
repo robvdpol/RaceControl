@@ -186,6 +186,11 @@ namespace RaceControl.Services.F1TV
                 .WithSubField(Session.ContentUrlsField, Episode.UIDField)
                 .WithSubField(Session.ContentUrlsField, Episode.TitleField)
                 .WithSubField(Session.ContentUrlsField, Episode.ItemsField)
+                .WithSubField(Session.ContentUrlsField, Episode.ImageUrlsField, true)
+                .WithSubSubField(Session.ContentUrlsField, Episode.ImageUrlsField, Image.UIDField)
+                .WithSubSubField(Session.ContentUrlsField, Episode.ImageUrlsField, Image.TitleField)
+                .WithSubSubField(Session.ContentUrlsField, Episode.ImageUrlsField, Image.ImageTypeField)
+                .WithSubSubField(Session.ContentUrlsField, Episode.ImageUrlsField, Image.UrlField)
                 ;
 
             var episodes = (await _client.GetItemAsync<Session>(request)).ContentUrls;
@@ -203,6 +208,11 @@ namespace RaceControl.Services.F1TV
                 .WithField(Episode.UIDField)
                 .WithField(Episode.TitleField)
                 .WithField(Episode.ItemsField)
+                .WithField(Episode.ImageUrlsField, true)
+                .WithSubField(Episode.ImageUrlsField, Image.UIDField)
+                .WithSubField(Episode.ImageUrlsField, Image.TitleField)
+                .WithSubField(Episode.ImageUrlsField, Image.ImageTypeField)
+                .WithSubField(Episode.ImageUrlsField, Image.UrlField)
                 ;
 
             return await _client.GetItemAsync<Episode>(request);
