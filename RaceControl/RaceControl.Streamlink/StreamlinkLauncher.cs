@@ -24,7 +24,7 @@ namespace RaceControl.Streamlink
             _childProcessTracker = childProcessTracker;
         }
 
-        public async Task<(Process process, string streamlinkUrl)> StartStreamlinkExternal(string streamUrl)
+        public async Task<(Process process, string streamlinkUrl)> StartStreamlinkExternal(string streamUrl, int timeout = 15)
         {
             var port = SocketUtils.GetFreePort();
             var streamIdentifier = GetStreamIdentifier();
@@ -32,10 +32,12 @@ namespace RaceControl.Streamlink
 
             _logger.Info($"Starting external Streamlink-instance for stream-URL '{streamUrl}' with identifier '{streamIdentifier}' on port '{port}'...");
 
-            var process = ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, true);
+            var process = ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, true, true);
+            process.OutputDataReceived += (sender, args) => _logger.Info(args.Data);
             process.Start();
+            process.BeginOutputReadLine();
             _childProcessTracker.AddProcess(process);
-            await SocketUtils.WaitUntilPortInUseAsync(port);
+            await SocketUtils.WaitUntilPortInUseAsync(port, timeout);
 
             return (process, $"http://127.0.0.1:{port}");
         }
@@ -48,8 +50,10 @@ namespace RaceControl.Streamlink
 
             _logger.Info($"Starting recording Streamlink-instance for stream-URL '{streamUrl}' with identifier '{streamIdentifier}' to file '{filename}'...");
 
-            var process = ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, true);
+            var process = ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, true, true);
+            process.OutputDataReceived += (sender, args) => _logger.Info(args.Data);
             process.Start();
+            process.BeginOutputReadLine();
             _childProcessTracker.AddProcess(process);
 
             return process;
@@ -63,12 +67,10 @@ namespace RaceControl.Streamlink
 
             var process = ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, true, true);
             process.EnableRaisingEvents = true;
-            process.OutputDataReceived += (sender, args) => _logger.Info(args.Data);
-            process.ErrorDataReceived += (sender, args) => _logger.Error(args.Data);
             process.Exited += (sender, args) => exitAction(process.ExitCode);
+            process.OutputDataReceived += (sender, args) => _logger.Info(args.Data);
             process.Start();
             process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
             _childProcessTracker.AddProcess(process);
 
             return process;

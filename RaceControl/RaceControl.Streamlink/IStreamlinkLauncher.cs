@@ -6,7 +6,7 @@ namespace RaceControl.Streamlink
 {
     public interface IStreamlinkLauncher
     {
-        Task<(Process process, string streamlinkUrl)> StartStreamlinkExternal(string streamUrl);
+        Task<(Process process, string streamlinkUrl)> StartStreamlinkExternal(string streamUrl, int timeout = 15);
 
         Process StartStreamlinkRecording(string streamUrl, string title);
 
