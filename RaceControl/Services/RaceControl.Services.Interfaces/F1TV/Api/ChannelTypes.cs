@@ -2,9 +2,9 @@
 {
     public static class ChannelTypes
     {
-        public const string Wif = "wif";
-        public const string Driver = "driver";
-        public const string Other = "other";
-        public const string Backup = "backup";
+        public const string WIF = "wif";
+        public const string DRIVER = "driver";
+        public const string OTHER = "other";
+        public const string BACKUP = "backup";
     }
 }

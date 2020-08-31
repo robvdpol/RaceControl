@@ -20,7 +20,7 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         public string ChannelType { get; set; }
 
         [JsonIgnore]
-        public ContentType ContentType => ChannelType == ChannelTypes.Backup ? ContentType.Backup : ContentType.Channel;
+        public ContentType ContentType => ChannelType == ChannelTypes.BACKUP ? ContentType.Backup : ContentType.Channel;
 
         [JsonIgnore]
         public string ContentUrl => Self;

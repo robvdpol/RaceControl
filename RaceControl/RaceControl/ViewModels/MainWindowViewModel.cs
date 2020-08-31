@@ -846,7 +846,7 @@ namespace RaceControl.ViewModels
                 {
                     channels.Add(new Channel
                     {
-                        ChannelType = ChannelTypes.Backup,
+                        ChannelType = ChannelTypes.BACKUP,
                         Name = "Backup stream"
                     });
                 }
