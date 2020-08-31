@@ -701,9 +701,9 @@ namespace RaceControl.ViewModels
 
         private void SetVlcExeLocation()
         {
-            var vlcRegistryKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\VideoLAN\VLC") ?? Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\VideoLAN\VLC");
+            var registryKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\VideoLAN\VLC") ?? Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\VideoLAN\VLC");
 
-            if (vlcRegistryKey != null && vlcRegistryKey.GetValue(null) is string vlcExeLocation && File.Exists(vlcExeLocation))
+            if (registryKey != null && registryKey.GetValue(null) is string vlcExeLocation && File.Exists(vlcExeLocation))
             {
                 VlcExeLocation = vlcExeLocation;
                 Logger.Info($"Found VLC installation at '{vlcExeLocation}'.");
@@ -918,25 +918,6 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void StartDownload(string title, IPlayable playable)
-        {
-            var defaultFilename = $"{title}.mkv".RemoveInvalidFileNameChars();
-
-            if (_dialogService.SelectFile("Select a filename", Settings.RecordingLocation, defaultFilename, ".mkv", out var filename))
-            {
-                var parameters = new DialogParameters
-                {
-                    { ParameterNames.NAME, title },
-                    { ParameterNames.FILENAME, filename },
-                    { ParameterNames.TOKEN, _token },
-                    { ParameterNames.PLAYABLE, playable}
-                };
-
-                Logger.Info($"Starting download with parameters: '{parameters}'.");
-                _dialogService.Show(nameof(DownloadDialog), parameters, null);
-            }
-        }
-
         private void WatchStreamInVlc(string url, string title, bool isLive)
         {
             if (isLive && !Settings.DisableStreamlink)
@@ -958,6 +939,25 @@ namespace RaceControl.ViewModels
             else
             {
                 ProcessUtils.CreateProcess(MpvExeLocation, $"{url} --title=\"{title}\"").Start();
+            }
+        }
+
+        private void StartDownload(string title, IPlayable playable)
+        {
+            var defaultFilename = $"{title}.mkv".RemoveInvalidFileNameChars();
+
+            if (_dialogService.SelectFile("Select a filename", Settings.RecordingLocation, defaultFilename, ".mkv", out var filename))
+            {
+                var parameters = new DialogParameters
+                {
+                    { ParameterNames.NAME, title },
+                    { ParameterNames.FILENAME, filename },
+                    { ParameterNames.TOKEN, _token },
+                    { ParameterNames.PLAYABLE, playable}
+                };
+
+                Logger.Info($"Starting download with parameters: '{parameters}'.");
+                _dialogService.Show(nameof(DownloadDialog), parameters, null);
             }
         }
 
