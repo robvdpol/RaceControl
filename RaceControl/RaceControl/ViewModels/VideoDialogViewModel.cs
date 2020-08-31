@@ -112,16 +112,16 @@ namespace RaceControl.ViewModels
         public ICommand MouseMoveControlBarCommand => _mouseMoveControlBarCommand ??= new DelegateCommand(MouseMoveControlBarExecute);
         public ICommand MouseEnterControlBarCommand => _mouseEnterControlBarCommand ??= new DelegateCommand(MouseEnterControlBarExecute);
         public ICommand MouseLeaveControlBarCommand => _mouseLeaveControlBarCommand ??= new DelegateCommand(MouseLeaveControlBarExecute);
-        public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute);
-        public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand(ToggleMuteExecute);
-        public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<string>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => IsLive);
-        public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => IsLive);
-        public ICommand ToggleRecordingCommand => _toggleRecordingCommand ??= new DelegateCommand(ToggleRecordingExecute, CanToggleRecordingExecute).ObservesProperty(() => IsLive).ObservesProperty(() => IsRecording).ObservesProperty(() => IsPaused);
+        public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute).ObservesCanExecute(() => CanClose);
+        public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand(ToggleMuteExecute).ObservesCanExecute(() => CanClose);
+        public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<string>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => CanClose).ObservesProperty(() => IsLive);
+        public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => CanClose).ObservesProperty(() => IsLive);
+        public ICommand ToggleRecordingCommand => _toggleRecordingCommand ??= new DelegateCommand(ToggleRecordingExecute, CanToggleRecordingExecute).ObservesProperty(() => CanClose).ObservesProperty(() => IsLive).ObservesProperty(() => IsRecording).ObservesProperty(() => IsPaused);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand(ToggleFullScreenExecute);
         public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => WindowState);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
-        public ICommand ScanChromecastCommand => _scanChromecastCommand ??= new DelegateCommand(ScanChromecastExecute, CanScanChromecastExecute).ObservesProperty(() => RendererDiscoverer);
-        public ICommand StartCastVideoCommand => _startCastVideoCommand ??= new DelegateCommand(StartCastVideoExecute, CanStartCastVideoExecute).ObservesProperty(() => SelectedRendererItem);
+        public ICommand ScanChromecastCommand => _scanChromecastCommand ??= new DelegateCommand(ScanChromecastExecute, CanScanChromecastExecute).ObservesProperty(() => CanClose).ObservesProperty(() => RendererDiscoverer);
+        public ICommand StartCastVideoCommand => _startCastVideoCommand ??= new DelegateCommand(StartCastVideoExecute, CanStartCastVideoExecute).ObservesProperty(() => CanClose).ObservesProperty(() => SelectedRendererItem);
         public ICommand StopCastVideoCommand => _stopCastVideoCommand ??= new DelegateCommand(StopCastVideoExecute, CanStopCastVideoExecute).ObservesProperty(() => IsCasting);
 
         public Guid UniqueIdentifier { get; } = Guid.NewGuid();
@@ -543,7 +543,7 @@ namespace RaceControl.ViewModels
 
         private bool CanFastForwardExecute(string arg)
         {
-            return !IsLive;
+            return CanClose && !IsLive;
         }
 
         private void FastForwardExecute(string value)
@@ -558,7 +558,7 @@ namespace RaceControl.ViewModels
 
         private bool CanSyncSessionExecute()
         {
-            return !IsLive;
+            return CanClose && !IsLive;
         }
 
         private void SyncSessionExecute()
@@ -570,7 +570,7 @@ namespace RaceControl.ViewModels
 
         private bool CanToggleRecordingExecute()
         {
-            return IsLive && (IsRecording || !IsPaused);
+            return CanClose && IsLive && (IsRecording || !IsPaused);
         }
 
         private async void ToggleRecordingExecute()
@@ -673,7 +673,7 @@ namespace RaceControl.ViewModels
 
         private bool CanScanChromecastExecute()
         {
-            return RendererDiscoverer == null;
+            return CanClose && RendererDiscoverer == null;
         }
 
         private void ScanChromecastExecute()
@@ -686,7 +686,7 @@ namespace RaceControl.ViewModels
 
         private bool CanStartCastVideoExecute()
         {
-            return SelectedRendererItem != null;
+            return CanClose && SelectedRendererItem != null;
         }
 
         private async void StartCastVideoExecute()

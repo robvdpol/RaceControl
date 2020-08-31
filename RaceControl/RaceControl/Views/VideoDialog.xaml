@@ -372,8 +372,7 @@
                                 Grid.Column="3"
                                 Command="{Binding CloseWindowCommand}"
                                 Style="{StaticResource ControlBarButtonStyleLarge}"
-                                ToolTip="Close window (Esc)"
-                                Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                ToolTip="Close window">
                                 <Button.Content>
                                     <Image Source="{StaticResource ShutdownBitmapImage}" />
                                 </Button.Content>
