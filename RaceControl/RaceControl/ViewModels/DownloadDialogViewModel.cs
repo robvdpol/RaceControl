@@ -1,6 +1,5 @@
 ﻿using NLog;
 using Prism.Services.Dialogs;
-using RaceControl.Common.Enum;
 using RaceControl.Common.Interfaces;
 using RaceControl.Core.Mvvm;
 using RaceControl.Services.Interfaces.F1TV;
@@ -66,7 +65,7 @@ namespace RaceControl.ViewModels
             Filename = parameters.GetValue<string>(ParameterNames.FILENAME);
             var token = parameters.GetValue<string>(ParameterNames.TOKEN);
             var playable = parameters.GetValue<IPlayable>(ParameterNames.PLAYABLE);
-            var streamUrl = await GenerateStreamUrlAsync(token, playable.ContentType, playable.ContentUrl);
+            var streamUrl = await GenerateStreamUrlAsync(token, playable);
 
             if (streamUrl == null)
             {
@@ -94,11 +93,11 @@ namespace RaceControl.ViewModels
             base.OnDialogClosed();
         }
 
-        private async Task<string> GenerateStreamUrlAsync(string token, ContentType contentType, string contentUrl)
+        private async Task<string> GenerateStreamUrlAsync(string token, IPlayable playable)
         {
             try
             {
-                return await _apiService.GetTokenisedUrlAsync(token, contentType, contentUrl);
+                return await _apiService.GetTokenisedUrlAsync(token, playable.ContentType, playable.ContentUrl);
             }
             catch (Exception ex)
             {
