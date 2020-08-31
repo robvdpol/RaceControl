@@ -1,5 +1,5 @@
-﻿using RaceControl.Common.Settings;
-using RaceControl.Services.Interfaces.F1TV;
+﻿using RaceControl.Common.Enum;
+using RaceControl.Common.Settings;
 using System;
 
 namespace RaceControl.Interfaces

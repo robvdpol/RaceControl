@@ -40,11 +40,6 @@
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="UseLayoutRounding" Value="True" />
         </Style>
-        <Style x:Key="ThumbnailBorderStyle" TargetType="Border">
-            <Setter Property="BorderBrush" Value="#EE0000" />
-            <Setter Property="BorderThickness" Value="2" />
-            <Setter Property="UseLayoutRounding" Value="True" />
-        </Style>
     </Window.Resources>
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
@@ -255,13 +250,11 @@
                                                 </BeginStoryboard>
                                             </EventTrigger>
                                         </ToolTip.Triggers>
-                                        <Border Style="{StaticResource ThumbnailBorderStyle}">
-                                            <Image
-                                                Width="400"
-                                                Height="225"
-                                                RenderOptions.BitmapScalingMode="HighQuality"
-                                                Source="{Binding ThumbnailUrl}" />
-                                        </Border>
+                                        <Image
+                                            Width="400"
+                                            Height="225"
+                                            RenderOptions.BitmapScalingMode="HighQuality"
+                                            Source="{Binding ThumbnailUrl}" />
                                     </ToolTip>
                                 </Setter.Value>
                             </Setter>
@@ -501,13 +494,11 @@
                                             </BeginStoryboard>
                                         </EventTrigger>
                                     </ToolTip.Triggers>
-                                    <Border Style="{StaticResource ThumbnailBorderStyle}">
-                                        <Image
-                                            Width="400"
-                                            Height="225"
-                                            RenderOptions.BitmapScalingMode="HighQuality"
-                                            Source="{Binding ThumbnailUrl}" />
-                                    </Border>
+                                    <Image
+                                        Width="400"
+                                        Height="225"
+                                        RenderOptions.BitmapScalingMode="HighQuality"
+                                        Source="{Binding ThumbnailUrl}" />
                                 </ToolTip>
                             </Setter.Value>
                         </Setter>

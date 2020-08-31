@@ -1,5 +1,6 @@
 ﻿using NLog;
 using Prism.Services.Dialogs;
+using RaceControl.Common.Enum;
 using RaceControl.Core.Mvvm;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Streamlink;
@@ -95,8 +96,6 @@ namespace RaceControl.ViewModels
 
         private async Task<string> GenerateStreamUrlAsync(string token, ContentType contentType, string contentUrl)
         {
-            Logger.Info($"Getting tokenised URL for content-type '{contentType}' and content-url '{contentUrl}'...");
-
             try
             {
                 return await _apiService.GetTokenisedUrlAsync(token, contentType, contentUrl);

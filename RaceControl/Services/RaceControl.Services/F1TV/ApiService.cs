@@ -1,4 +1,5 @@
 ﻿using NLog;
+using RaceControl.Common.Enum;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Api;
 using RaceControl.Services.Interfaces.Lark;
@@ -220,42 +221,19 @@ namespace RaceControl.Services.F1TV
 
         public async Task<string> GetTokenisedUrlAsync(string token, ContentType contentType, string contentUrl)
         {
-            switch (contentType)
+            _logger.Info($"Getting tokenised URL for content-type '{contentType}' and content-URL '{contentUrl}' using token '{token}'...");
+
+            var url = contentType switch
             {
-                case ContentType.Channel:
-                    return await GetTokenisedUrlForChannelAsync(token, contentUrl);
+                ContentType.Channel => (await _client.GetTokenisedUrlForChannelAsync(token, contentUrl)).Url,
+                ContentType.Asset => (await _client.GetTokenisedUrlForAssetAsync(token, contentUrl)).Objects.First().TokenisedUrl.Url,
+                ContentType.Backup => (await _client.GetBackupStream()).StreamManifest,
+                _ => throw new ArgumentException($"Could not generate tokenised URL for unsupported content-type '{contentType}'.", nameof(contentType))
+            };
 
-                case ContentType.Asset:
-                    return await GetTokenisedUrlForAssetAsync(token, contentUrl);
-
-                case ContentType.Backup:
-                    return (await GetBackupStream()).StreamManifest;
-            }
-
-            throw new ArgumentException($"Could not generate tokenised URL for content type '{contentType}'", nameof(contentType));
-        }
-
-        private async Task<string> GetTokenisedUrlForChannelAsync(string token, string channelUrl)
-        {
-            _logger.Info($"Getting tokenised URL for channel with URL '{channelUrl}' using token '{token}'...");
-            var url = (await _client.GetTokenisedUrlForChannelAsync(token, channelUrl)).Url;
             _logger.Info($"Got tokenised URL '{url}'.");
 
             return url;
-        }
-
-        private async Task<string> GetTokenisedUrlForAssetAsync(string token, string assetUrl)
-        {
-            _logger.Info($"Getting tokenised URL for asset with URL '{assetUrl}' using token '{token}'...");
-            var url = (await _client.GetTokenisedUrlForAssetAsync(token, assetUrl)).Objects.First().TokenisedUrl.Url;
-            _logger.Info($"Got tokenised URL '{url}'.");
-
-            return url;
-        }
-
-        private async Task<BackupStream> GetBackupStream()
-        {
-            return await _client.GetBackupStream();
         }
     }
 }

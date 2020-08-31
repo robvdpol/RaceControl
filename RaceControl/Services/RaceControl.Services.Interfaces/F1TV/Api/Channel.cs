@@ -1,9 +1,11 @@
 ﻿using Newtonsoft.Json;
+using RaceControl.Common.Enum;
+using RaceControl.Common.Interfaces;
 using RaceControl.Common.Utils;
 
 namespace RaceControl.Services.Interfaces.F1TV.Api
 {
-    public class Channel
+    public class Channel : IPlayable
     {
         [JsonProperty("uid")]
         public string UID { get; set; }
@@ -18,10 +20,10 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         public string ChannelType { get; set; }
 
         [JsonIgnore]
-        public bool IsBackup => ChannelType == ChannelTypes.Backup;
+        public ContentType ContentType => ChannelType == ChannelTypes.Backup ? ContentType.Backup : ContentType.Channel;
 
         [JsonIgnore]
-        public ContentType ContentType => IsBackup ? ContentType.Backup : ContentType.Channel;
+        public string ContentURL => Self;
 
         public static string UIDField => JsonUtils.GetJsonPropertyName<Channel>(s => s.UID);
         public static string SelfField => JsonUtils.GetJsonPropertyName<Channel>(s => s.Self);

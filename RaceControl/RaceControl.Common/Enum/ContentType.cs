@@ -1,4 +1,4 @@
-﻿namespace RaceControl.Services.Interfaces.F1TV
+﻿namespace RaceControl.Common.Enum
 {
     public enum ContentType
     {

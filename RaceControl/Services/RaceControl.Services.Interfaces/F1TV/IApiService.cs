@@ -1,4 +1,5 @@
-﻿using RaceControl.Services.Interfaces.F1TV.Api;
+﻿using RaceControl.Common.Enum;
+using RaceControl.Services.Interfaces.F1TV.Api;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

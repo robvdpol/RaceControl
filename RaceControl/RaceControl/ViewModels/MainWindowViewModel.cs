@@ -2,6 +2,8 @@
 using NLog;
 using Prism.Commands;
 using Prism.Services.Dialogs;
+using RaceControl.Common.Enum;
+using RaceControl.Common.Interfaces;
 using RaceControl.Common.Settings;
 using RaceControl.Common.Utils;
 using RaceControl.Comparers;
@@ -380,8 +382,8 @@ namespace RaceControl.ViewModels
                 { ParameterNames.TOKEN, _token },
                 { ParameterNames.TITLE, title },
                 { ParameterNames.NAME, title },
-                { ParameterNames.CONTENT_TYPE, ContentType.Asset },
-                { ParameterNames.CONTENT_URL, episode.Items.First() },
+                { ParameterNames.CONTENT_TYPE, episode.ContentType },
+                { ParameterNames.CONTENT_URL, episode.ContentURL },
                 { ParameterNames.SYNC_UID, episode.UID },
                 { ParameterNames.IS_LIVE, false },
                 { ParameterNames.INSTANCE, null }
@@ -404,7 +406,7 @@ namespace RaceControl.ViewModels
 
             try
             {
-                var url = await GetTokenisedUrlForChannelAsync(channel);
+                var url = await GetTokenisedUrlAsync(channel);
                 WatchStreamInVlc(url, title, session.IsLive);
             }
             catch (Exception ex)
@@ -429,7 +431,7 @@ namespace RaceControl.ViewModels
 
             try
             {
-                var url = await GetTokenisedUrlForEpisodeAsync(episode);
+                var url = await GetTokenisedUrlAsync(episode);
                 WatchStreamInVlc(url, title, false);
             }
             catch (Exception ex)
@@ -455,7 +457,7 @@ namespace RaceControl.ViewModels
 
             try
             {
-                var url = await GetTokenisedUrlForChannelAsync(channel);
+                var url = await GetTokenisedUrlAsync(channel);
                 WatchStreamInMpv(url, title, session.IsLive);
             }
             catch (Exception ex)
@@ -480,7 +482,7 @@ namespace RaceControl.ViewModels
 
             try
             {
-                var url = await GetTokenisedUrlForEpisodeAsync(episode);
+                var url = await GetTokenisedUrlAsync(episode);
                 WatchStreamInMpv(url, title, false);
             }
             catch (Exception ex)
@@ -499,7 +501,7 @@ namespace RaceControl.ViewModels
 
             try
             {
-                var url = await GetTokenisedUrlForChannelAsync(channel);
+                var url = await GetTokenisedUrlAsync(channel);
                 Clipboard.SetText(url);
             }
             catch (Exception ex)
@@ -518,7 +520,7 @@ namespace RaceControl.ViewModels
 
             try
             {
-                var url = await GetTokenisedUrlForEpisodeAsync(episode);
+                var url = await GetTokenisedUrlAsync(episode);
                 Clipboard.SetText(url);
             }
             catch (Exception ex)
@@ -540,13 +542,13 @@ namespace RaceControl.ViewModels
         {
             var session = GetSelectedSession();
             var title = GetTitle(session, channel);
-            StartDownload(title, channel.ContentType, channel.Self);
+            StartDownload(title, channel.ContentType, channel.ContentURL);
         }
 
         private void DownloadEpisodeExecute(Episode episode)
         {
             var title = episode.ToString();
-            StartDownload(title, ContentType.Asset, episode.Items.First());
+            StartDownload(title, episode.ContentType, episode.ContentURL);
         }
 
         private void SetRecordingLocationExecute()
@@ -586,7 +588,7 @@ namespace RaceControl.ViewModels
             {
                 var channel = Channels.FirstOrDefault(c => c.Name == instance.ChannelName);
 
-                if (channel != null && !VideoDialogViewModels.Any(vm => vm.ContentType == ContentType.Channel && vm.ContentUrl == channel.Self))
+                if (channel != null && !VideoDialogViewModels.Any(vm => vm.ContentType == channel.ContentType && vm.ContentUrl == channel.ContentURL))
                 {
                     WatchChannel(session, channel, instance);
                 }
@@ -884,7 +886,7 @@ namespace RaceControl.ViewModels
                 { ParameterNames.TITLE, title },
                 { ParameterNames.NAME, channel.Name },
                 { ParameterNames.CONTENT_TYPE, channel.ContentType },
-                { ParameterNames.CONTENT_URL, channel.Self },
+                { ParameterNames.CONTENT_URL, channel.ContentURL },
                 { ParameterNames.SYNC_UID, session.UID },
                 { ParameterNames.IS_LIVE, session.IsLive },
                 { ParameterNames.INSTANCE, instance }
@@ -970,14 +972,9 @@ namespace RaceControl.ViewModels
             SelectedVodType = null;
         }
 
-        private async Task<string> GetTokenisedUrlForChannelAsync(Channel channel)
+        private async Task<string> GetTokenisedUrlAsync(IPlayable playable)
         {
-            return await _apiService.GetTokenisedUrlAsync(_token, channel.ContentType, channel.Self);
-        }
-
-        private async Task<string> GetTokenisedUrlForEpisodeAsync(Episode episode)
-        {
-            return await _apiService.GetTokenisedUrlAsync(_token, ContentType.Asset, episode.Items.First());
+            return await _apiService.GetTokenisedUrlAsync(_token, playable.ContentType, playable.ContentURL);
         }
 
         private Session GetSelectedSession() => SelectedLiveSession ?? SelectedSession;

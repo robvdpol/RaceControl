@@ -4,6 +4,7 @@ using NLog;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Services.Dialogs;
+using RaceControl.Common.Enum;
 using RaceControl.Common.Settings;
 using RaceControl.Core.Mvvm;
 using RaceControl.Enums;
@@ -745,8 +746,6 @@ namespace RaceControl.ViewModels
 
         private async Task<string> GenerateStreamUrlAsync()
         {
-            Logger.Info($"Getting tokenised URL for content-type '{ContentType}' and content-url '{ContentUrl}'...");
-
             try
             {
                 return await _apiService.GetTokenisedUrlAsync(_token, ContentType, ContentUrl);
