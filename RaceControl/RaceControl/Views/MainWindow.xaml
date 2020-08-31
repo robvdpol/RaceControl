@@ -245,7 +245,7 @@
                                                         <DoubleAnimation
                                                             From="0.0"
                                                             To="1.0"
-                                                            Duration="0:0:0.5" />
+                                                            Duration="0:0:0.75" />
                                                     </Storyboard>
                                                 </BeginStoryboard>
                                             </EventTrigger>
@@ -489,7 +489,7 @@
                                                     <DoubleAnimation
                                                         From="0.0"
                                                         To="1.0"
-                                                        Duration="0:0:0.5" />
+                                                        Duration="0:0:0.75" />
                                                 </Storyboard>
                                             </BeginStoryboard>
                                         </EventTrigger>
