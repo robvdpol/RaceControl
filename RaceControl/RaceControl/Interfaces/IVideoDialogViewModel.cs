@@ -1,4 +1,4 @@
-﻿using RaceControl.Common.Enum;
+﻿using RaceControl.Common.Interfaces;
 using RaceControl.Common.Settings;
 using System;
 
@@ -8,9 +8,7 @@ namespace RaceControl.Interfaces
     {
         Guid UniqueIdentifier { get; }
 
-        ContentType ContentType { get; }
-
-        string ContentUrl { get; }
+        IPlayable Playable { get; }
 
         VideoDialogInstance GetVideoDialogInstance();
     }

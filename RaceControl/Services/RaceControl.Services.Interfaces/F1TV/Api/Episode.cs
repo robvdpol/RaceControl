@@ -25,7 +25,7 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         public ContentType ContentType => ContentType.Asset;
 
         [JsonIgnore]
-        public string ContentURL => Items?.FirstOrDefault();
+        public string ContentUrl => Items?.FirstOrDefault();
 
         [JsonIgnore]
         public string ThumbnailUrl => ImageUrls?.FirstOrDefault(img => img.ImageType == "Thumbnail")?.Url;

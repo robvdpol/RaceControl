@@ -66,7 +66,7 @@ namespace RaceControl.ViewModels
             Filename = parameters.GetValue<string>(ParameterNames.FILENAME);
             var token = parameters.GetValue<string>(ParameterNames.TOKEN);
             var playable = parameters.GetValue<IPlayable>(ParameterNames.PLAYABLE);
-            var streamUrl = await GenerateStreamUrlAsync(token, playable.ContentType, playable.ContentURL);
+            var streamUrl = await GenerateStreamUrlAsync(token, playable.ContentType, playable.ContentUrl);
 
             if (streamUrl == null)
             {
@@ -74,7 +74,7 @@ namespace RaceControl.ViewModels
             }
             else
             {
-                Logger.Info($"Starting download process for content-type '{playable.ContentType}' and content-URL '{playable.ContentURL}'...");
+                Logger.Info($"Starting download process for content-type '{playable.ContentType}' and content-URL '{playable.ContentUrl}'...");
                 _downloadProcess = _streamlinkLauncher.StartStreamlinkDownload(streamUrl, Filename, exitCode =>
                 {
                     HasExited = true;

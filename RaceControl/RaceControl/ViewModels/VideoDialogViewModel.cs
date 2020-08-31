@@ -4,7 +4,6 @@ using NLog;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Services.Dialogs;
-using RaceControl.Common.Enum;
 using RaceControl.Common.Interfaces;
 using RaceControl.Common.Settings;
 using RaceControl.Core.Mvvm;
@@ -59,8 +58,7 @@ namespace RaceControl.ViewModels
 
         private string _token;
         private string _name;
-        private ContentType _contentType;
-        private string _contentUrl;
+        private IPlayable _playable;
         private string _syncUID;
         private bool _isLive;
         private bool _isStreamlink;
@@ -136,16 +134,10 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _name, value);
         }
 
-        public ContentType ContentType
+        public IPlayable Playable
         {
-            get => _contentType;
-            set => SetProperty(ref _contentType, value);
-        }
-
-        public string ContentUrl
-        {
-            get => _contentUrl;
-            set => SetProperty(ref _contentUrl, value);
+            get => _playable;
+            set => SetProperty(ref _playable, value);
         }
 
         public string SyncUID
@@ -311,9 +303,7 @@ namespace RaceControl.ViewModels
             _token = parameters.GetValue<string>(ParameterNames.TOKEN);
             Title = parameters.GetValue<string>(ParameterNames.TITLE);
             Name = parameters.GetValue<string>(ParameterNames.NAME);
-            var playable = parameters.GetValue<IPlayable>(ParameterNames.PLAYABLE);
-            ContentType = playable.ContentType;
-            ContentUrl = playable.ContentURL;
+            Playable = parameters.GetValue<IPlayable>(ParameterNames.PLAYABLE);
             SyncUID = parameters.GetValue<string>(ParameterNames.SYNC_UID);
             IsLive = parameters.GetValue<bool>(ParameterNames.IS_LIVE);
             IsStreamlink = IsLive && !_settings.DisableStreamlink;
@@ -750,7 +740,7 @@ namespace RaceControl.ViewModels
         {
             try
             {
-                return await _apiService.GetTokenisedUrlAsync(_token, ContentType, ContentUrl);
+                return await _apiService.GetTokenisedUrlAsync(_token, Playable.ContentType, Playable.ContentUrl);
             }
             catch (Exception ex)
             {

@@ -560,13 +560,13 @@ namespace RaceControl.ViewModels
 
         private bool CanSaveVideoDialogLayoutExecute()
         {
-            return VideoDialogViewModels.Any(vm => vm.ContentType == ContentType.Channel);
+            return VideoDialogViewModels.Any(vm => vm.Playable.ContentType == ContentType.Channel);
         }
 
         private void SaveVideoDialogLayoutExecute()
         {
             VideoDialogLayout.Clear();
-            VideoDialogLayout.Add(VideoDialogViewModels.Where(vm => vm.ContentType == ContentType.Channel).Select(vm => vm.GetVideoDialogInstance()));
+            VideoDialogLayout.Add(VideoDialogViewModels.Where(vm => vm.Playable.ContentType == ContentType.Channel).Select(vm => vm.GetVideoDialogInstance()));
 
             if (VideoDialogLayout.Save())
             {
@@ -587,7 +587,7 @@ namespace RaceControl.ViewModels
             {
                 var channel = Channels.FirstOrDefault(c => c.Name == instance.ChannelName);
 
-                if (channel != null && !VideoDialogViewModels.Any(vm => vm.ContentType == channel.ContentType && vm.ContentUrl == channel.ContentURL))
+                if (channel != null && !VideoDialogViewModels.Any(vm => vm.Playable.ContentType == channel.ContentType && vm.Playable.ContentUrl == channel.ContentUrl))
                 {
                     WatchChannel(session, channel, instance);
                 }
@@ -971,7 +971,7 @@ namespace RaceControl.ViewModels
 
         private async Task<string> GetTokenisedUrlAsync(IPlayable playable)
         {
-            return await _apiService.GetTokenisedUrlAsync(_token, playable.ContentType, playable.ContentURL);
+            return await _apiService.GetTokenisedUrlAsync(_token, playable.ContentType, playable.ContentUrl);
         }
 
         private Session GetSelectedSession() => SelectedLiveSession ?? SelectedSession;

@@ -6,6 +6,6 @@ namespace RaceControl.Common.Interfaces
     {
         ContentType ContentType { get; }
 
-        string ContentURL { get; }
+        string ContentUrl { get; }
     }
 }
