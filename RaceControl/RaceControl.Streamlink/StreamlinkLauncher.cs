@@ -32,7 +32,7 @@ namespace RaceControl.Streamlink
 
             _logger.Info($"Starting external Streamlink-instance for stream-URL '{streamUrl}' with identifier '{streamIdentifier}' on port '{port}'...");
 
-            var process = ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, false, true);
+            var process = ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, true);
             process.Start();
             _childProcessTracker.AddProcess(process);
             await SocketUtils.WaitUntilPortInUseAsync(port);
@@ -43,12 +43,12 @@ namespace RaceControl.Streamlink
         public Process StartStreamlinkRecording(string streamUrl, string title)
         {
             var streamIdentifier = GetStreamIdentifier();
-            var recordingFilename = GetRecordingFilename(title);
-            var streamlinkArguments = $"--output \"{recordingFilename}\" --force --hls-audio-select * \"{streamUrl}\" {streamIdentifier}";
+            var filename = GetRecordingFilename(title);
+            var streamlinkArguments = $"--output \"{filename}\" --force --hls-audio-select * \"{streamUrl}\" {streamIdentifier}";
 
-            _logger.Info($"Starting recording Streamlink-instance for stream-URL '{streamUrl}' with identifier '{streamIdentifier}' to file '{recordingFilename}'...");
+            _logger.Info($"Starting recording Streamlink-instance for stream-URL '{streamUrl}' with identifier '{streamIdentifier}' to file '{filename}'...");
 
-            var process = ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, false, true);
+            var process = ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, true);
             process.Start();
             _childProcessTracker.AddProcess(process);
 
@@ -61,7 +61,7 @@ namespace RaceControl.Streamlink
 
             _logger.Info($"Starting download Streamlink-instance for stream-URL '{streamUrl}' to file '{filename}'...");
 
-            var process = ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, false, true, true);
+            var process = ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, true, true);
             process.EnableRaisingEvents = true;
             process.OutputDataReceived += (sender, args) => _logger.Info(args.Data);
             process.ErrorDataReceived += (sender, args) => _logger.Error(args.Data);
@@ -81,7 +81,7 @@ namespace RaceControl.Streamlink
 
             _logger.Info($"Starting VLC Streamlink-instance for stream-URL '{streamUrl}' with identifier '{streamIdentifier}'...");
 
-            var process = ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, false, true);
+            var process = ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, true);
             process.Start();
             process.Dispose();
         }
@@ -93,7 +93,7 @@ namespace RaceControl.Streamlink
 
             _logger.Info($"Starting MPV Streamlink-instance for stream-URL '{streamUrl}' with identifier '{streamIdentifier}'...");
 
-            var process = ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, false, true);
+            var process = ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, true);
             process.Start();
             process.Dispose();
         }

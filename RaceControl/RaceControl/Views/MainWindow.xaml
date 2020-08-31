@@ -301,6 +301,11 @@
                     ItemsSource="{Binding Channels}"
                     ScrollViewer.VerticalScrollBarVisibility="Visible"
                     Style="{StaticResource ContentListBoxStyle}">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Focusable" Value="False" />
+                        </Style>
+                    </ListBox.ItemContainerStyle>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Grid>
@@ -468,6 +473,7 @@
                 Style="{StaticResource ContentListBoxStyle}">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
+                        <Setter Property="Focusable" Value="False" />
                         <Setter Property="ToolTip">
                             <Setter.Value>
                                 <ToolTip Placement="Left">

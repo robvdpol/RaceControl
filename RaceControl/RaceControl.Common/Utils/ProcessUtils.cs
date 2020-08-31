@@ -4,7 +4,7 @@ namespace RaceControl.Common.Utils
 {
     public static class ProcessUtils
     {
-        public static Process CreateProcess(string filename, string arguments, bool useShellExecute = true, bool createNoWindow = false, bool redirectOutput = false)
+        public static Process CreateProcess(string filename, string arguments, bool createNoWindow = false, bool redirectOutput = false)
         {
             return new Process
             {
@@ -12,7 +12,7 @@ namespace RaceControl.Common.Utils
                 {
                     FileName = filename,
                     Arguments = arguments,
-                    UseShellExecute = useShellExecute,
+                    UseShellExecute = false,
                     CreateNoWindow = createNoWindow,
                     RedirectStandardOutput = redirectOutput,
                     RedirectStandardError = redirectOutput

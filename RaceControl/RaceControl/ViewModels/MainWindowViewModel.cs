@@ -926,7 +926,7 @@ namespace RaceControl.ViewModels
             }
             else
             {
-                ProcessUtils.CreateProcess(VlcExeLocation, $"{url} --meta-title=\"{title}\"").Start();
+                ProcessUtils.CreateProcess(VlcExeLocation, $"\"{url}\" --meta-title=\"{title}\"").Start();
             }
         }
 
@@ -938,7 +938,7 @@ namespace RaceControl.ViewModels
             }
             else
             {
-                ProcessUtils.CreateProcess(MpvExeLocation, $"{url} --title=\"{title}\"").Start();
+                ProcessUtils.CreateProcess(MpvExeLocation, $"\"{url}\" --title=\"{title}\"").Start();
             }
         }
 

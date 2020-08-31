@@ -27,7 +27,7 @@ namespace RaceControl.Common.Utils
                 .Any(ep => ep.Port == port);
         }
 
-        public static async Task WaitUntilPortInUseAsync(int port, int timeout = 30, int interval = 100)
+        public static async Task WaitUntilPortInUseAsync(int port, int timeout = 15, int interval = 100)
         {
             var start = DateTime.UtcNow;
 
