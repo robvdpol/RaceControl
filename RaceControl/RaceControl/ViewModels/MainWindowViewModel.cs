@@ -581,13 +581,20 @@ namespace RaceControl.ViewModels
 
         private void OpenVideoDialogLayoutExecute()
         {
+            var viewModelsToClose = VideoDialogViewModels.Where(vm => vm.Playable.ContentType == ContentType.Channel).ToList();
+
+            foreach (var viewModel in viewModelsToClose)
+            {
+                viewModel.CloseWindow();
+            }
+
             var session = GetSelectedSession();
 
             foreach (var instance in VideoDialogLayout.Instances)
             {
                 var channel = Channels.FirstOrDefault(c => c.Name == instance.ChannelName);
 
-                if (channel != null && !VideoDialogViewModels.Any(vm => vm.Playable.ContentType == channel.ContentType && vm.Playable.ContentUrl == channel.ContentUrl))
+                if (channel != null)
                 {
                     WatchChannel(session, channel, instance);
                 }

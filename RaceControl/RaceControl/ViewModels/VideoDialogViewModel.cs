@@ -316,7 +316,7 @@ namespace RaceControl.ViewModels
             if (streamUrl == null)
             {
                 Logger.Error("Closing video player, stream URL is empty.");
-                ForceCloseWindow();
+                CloseWindow(true);
                 return;
             }
 
