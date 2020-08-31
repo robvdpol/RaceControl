@@ -1,6 +1,7 @@
 ﻿using NLog;
 using Prism.Services.Dialogs;
 using RaceControl.Common.Enum;
+using RaceControl.Common.Interfaces;
 using RaceControl.Core.Mvvm;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Streamlink;
@@ -64,9 +65,8 @@ namespace RaceControl.ViewModels
             Name = parameters.GetValue<string>(ParameterNames.NAME);
             Filename = parameters.GetValue<string>(ParameterNames.FILENAME);
             var token = parameters.GetValue<string>(ParameterNames.TOKEN);
-            var contentType = parameters.GetValue<ContentType>(ParameterNames.CONTENT_TYPE);
-            var contentUrl = parameters.GetValue<string>(ParameterNames.CONTENT_URL);
-            var streamUrl = await GenerateStreamUrlAsync(token, contentType, contentUrl);
+            var playable = parameters.GetValue<IPlayable>(ParameterNames.PLAYABLE);
+            var streamUrl = await GenerateStreamUrlAsync(token, playable.ContentType, playable.ContentURL);
 
             if (streamUrl == null)
             {
@@ -74,7 +74,7 @@ namespace RaceControl.ViewModels
             }
             else
             {
-                Logger.Info($"Starting download process for content-type '{contentType}' and content-URL '{contentUrl}'...");
+                Logger.Info($"Starting download process for content-type '{playable.ContentType}' and content-URL '{playable.ContentURL}'...");
                 _downloadProcess = _streamlinkLauncher.StartStreamlinkDownload(streamUrl, Filename, exitCode =>
                 {
                     HasExited = true;

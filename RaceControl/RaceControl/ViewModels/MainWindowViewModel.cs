@@ -382,8 +382,7 @@ namespace RaceControl.ViewModels
                 { ParameterNames.TOKEN, _token },
                 { ParameterNames.TITLE, title },
                 { ParameterNames.NAME, title },
-                { ParameterNames.CONTENT_TYPE, episode.ContentType },
-                { ParameterNames.CONTENT_URL, episode.ContentURL },
+                { ParameterNames.PLAYABLE, episode },
                 { ParameterNames.SYNC_UID, episode.UID },
                 { ParameterNames.IS_LIVE, false },
                 { ParameterNames.INSTANCE, null }
@@ -542,13 +541,13 @@ namespace RaceControl.ViewModels
         {
             var session = GetSelectedSession();
             var title = GetTitle(session, channel);
-            StartDownload(title, channel.ContentType, channel.ContentURL);
+            StartDownload(title, channel);
         }
 
         private void DownloadEpisodeExecute(Episode episode)
         {
             var title = episode.ToString();
-            StartDownload(title, episode.ContentType, episode.ContentURL);
+            StartDownload(title, episode);
         }
 
         private void SetRecordingLocationExecute()
@@ -885,8 +884,7 @@ namespace RaceControl.ViewModels
                 { ParameterNames.TOKEN, _token },
                 { ParameterNames.TITLE, title },
                 { ParameterNames.NAME, channel.Name },
-                { ParameterNames.CONTENT_TYPE, channel.ContentType },
-                { ParameterNames.CONTENT_URL, channel.ContentURL },
+                { ParameterNames.PLAYABLE, channel },
                 { ParameterNames.SYNC_UID, session.UID },
                 { ParameterNames.IS_LIVE, session.IsLive },
                 { ParameterNames.INSTANCE, instance }
@@ -913,7 +911,7 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void StartDownload(string title, ContentType contentType, string contentUrl)
+        private void StartDownload(string title, IPlayable playable)
         {
             var defaultFilename = $"{title}.mkv".RemoveInvalidFileNameChars();
 
@@ -924,8 +922,7 @@ namespace RaceControl.ViewModels
                     { ParameterNames.NAME, title },
                     { ParameterNames.FILENAME, filename },
                     { ParameterNames.TOKEN, _token },
-                    { ParameterNames.CONTENT_TYPE, contentType },
-                    { ParameterNames.CONTENT_URL, contentUrl}
+                    { ParameterNames.PLAYABLE, playable}
                 };
 
                 Logger.Info($"Starting download with parameters: '{parameters}'.");
