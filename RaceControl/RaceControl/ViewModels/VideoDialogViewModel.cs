@@ -82,7 +82,7 @@ namespace RaceControl.ViewModels
         private double _top;
         private double _left;
         private double _width = 1200;
-        private double _height = 705;
+        private double _height = 685;
         private ResizeMode _resizeMode = ResizeMode.CanResize;
         private WindowState _windowState = WindowState.Normal;
         private WindowStartupLocation _startupLocation = WindowStartupLocation.CenterOwner;
