@@ -169,6 +169,7 @@ namespace RaceControl.Services.F1TV
                 .WithSubField(Session.ChannelUrlsField, Channel.SelfField)
                 .WithSubField(Session.ChannelUrlsField, Channel.NameField)
                 .WithSubField(Session.ChannelUrlsField, Channel.ChannelTypeField)
+                .WithSubField(Session.ChannelUrlsField, Channel.DriverOccurrenceUrlsField)
                 ;
 
             var channels = (await _client.GetItemAsync<Session>(request)).ChannelUrls;
@@ -217,6 +218,24 @@ namespace RaceControl.Services.F1TV
                 ;
 
             return await _client.GetItemAsync<Episode>(request);
+        }
+
+        public async Task<Driver> GetDriverAsync(string driverUID)
+        {
+            _logger.Info($"Querying driver with UID '{driverUID}'...");
+
+            var request = _client
+                .NewRequest("driver-occurrence", driverUID)
+                .WithField(Driver.UIDField)
+                .WithField(Driver.NameField)
+                .WithField(Driver.ImageUrlsField, true)
+                .WithSubField(Driver.ImageUrlsField, Image.UIDField)
+                .WithSubField(Driver.ImageUrlsField, Image.TitleField)
+                .WithSubField(Driver.ImageUrlsField, Image.ImageTypeField)
+                .WithSubField(Driver.ImageUrlsField, Image.UrlField)
+                ;
+
+            return await _client.GetItemAsync<Driver>(request);
         }
 
         public async Task<string> GetTokenisedUrlAsync(string token, ContentType contentType, string contentUrl)

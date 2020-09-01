@@ -2,6 +2,7 @@
 using RaceControl.Common.Enum;
 using RaceControl.Common.Interfaces;
 using RaceControl.Common.Utils;
+using System.Collections.Generic;
 
 namespace RaceControl.Services.Interfaces.F1TV.Api
 {
@@ -19,16 +20,20 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         [JsonProperty("channel_type")]
         public string ChannelType { get; set; }
 
+        [JsonProperty("driveroccurrence_urls")]
+        public List<string> DriverOccurrenceUrls { get; set; }
+
         [JsonIgnore]
         public ContentType ContentType => ChannelType == ChannelTypes.BACKUP ? ContentType.Backup : ContentType.Channel;
 
         [JsonIgnore]
         public string ContentUrl => Self;
 
-        public static string UIDField => JsonUtils.GetJsonPropertyName<Channel>(s => s.UID);
-        public static string SelfField => JsonUtils.GetJsonPropertyName<Channel>(s => s.Self);
-        public static string NameField => JsonUtils.GetJsonPropertyName<Channel>(s => s.Name);
-        public static string ChannelTypeField => JsonUtils.GetJsonPropertyName<Channel>(s => s.ChannelType);
+        public static string UIDField => JsonUtils.GetJsonPropertyName<Channel>(c => c.UID);
+        public static string SelfField => JsonUtils.GetJsonPropertyName<Channel>(c => c.Self);
+        public static string NameField => JsonUtils.GetJsonPropertyName<Channel>(c => c.Name);
+        public static string ChannelTypeField => JsonUtils.GetJsonPropertyName<Channel>(c => c.ChannelType);
+        public static string DriverOccurrenceUrlsField => JsonUtils.GetJsonPropertyName<Channel>(c => c.DriverOccurrenceUrls);
 
         public override string ToString()
         {

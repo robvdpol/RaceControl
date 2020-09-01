@@ -1,4 +1,5 @@
 ﻿using RaceControl.Common.Enum;
+using System.Collections.Generic;
 
 namespace RaceControl.Common.Interfaces
 {
@@ -7,5 +8,7 @@ namespace RaceControl.Common.Interfaces
         ContentType ContentType { get; }
 
         string ContentUrl { get; }
+
+        List<string> DriverOccurrenceUrls { get; }
     }
 }

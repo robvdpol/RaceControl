@@ -252,9 +252,8 @@
                                         </ToolTip.Triggers>
                                         <Image
                                             Width="400"
-                                            Height="225"
                                             RenderOptions.BitmapScalingMode="HighQuality"
-                                            Source="{Binding ThumbnailUrl}" />
+                                            Source="{Binding ThumbnailUrl, TargetNullValue={x:Null}}" />
                                     </ToolTip>
                                 </Setter.Value>
                             </Setter>
@@ -502,9 +501,8 @@
                                     </ToolTip.Triggers>
                                     <Image
                                         Width="400"
-                                        Height="225"
                                         RenderOptions.BitmapScalingMode="HighQuality"
-                                        Source="{Binding ThumbnailUrl}" />
+                                        Source="{Binding ThumbnailUrl, TargetNullValue={x:Null}}" />
                                 </ToolTip>
                             </Setter.Value>
                         </Setter>

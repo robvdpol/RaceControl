@@ -25,6 +25,8 @@ namespace RaceControl.Services.Interfaces.F1TV
 
         Task<Episode> GetEpisodeAsync(string episodeUID);
 
+        Task<Driver> GetDriverAsync(string driverUID);
+
         Task<string> GetTokenisedUrlAsync(string token, ContentType contentType, string contentUrl);
     }
 }

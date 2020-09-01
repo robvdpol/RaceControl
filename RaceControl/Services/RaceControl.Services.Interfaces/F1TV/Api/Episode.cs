@@ -30,6 +30,9 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         [JsonIgnore]
         public string ThumbnailUrl => ImageUrls?.FirstOrDefault(img => img.ImageType == "Thumbnail")?.Url;
 
+        [JsonIgnore]
+        public List<string> DriverOccurrenceUrls { get; } = new List<string>();
+
         public static string UIDField => JsonUtils.GetJsonPropertyName<Episode>(e => e.UID);
         public static string TitleField => JsonUtils.GetJsonPropertyName<Episode>(e => e.Title);
         public static string ItemsField => JsonUtils.GetJsonPropertyName<Episode>(e => e.Items);

@@ -6,6 +6,7 @@ using Prism.Events;
 using Prism.Services.Dialogs;
 using RaceControl.Common.Interfaces;
 using RaceControl.Common.Settings;
+using RaceControl.Common.Utils;
 using RaceControl.Core.Mvvm;
 using RaceControl.Enums;
 using RaceControl.Events;
@@ -87,6 +88,8 @@ namespace RaceControl.ViewModels
         private WindowState _windowState = WindowState.Normal;
         private WindowStartupLocation _startupLocation = WindowStartupLocation.CenterOwner;
         private bool _topmost;
+        private string _carImageUrl;
+        private string _headshotImageUrl;
 
         public VideoDialogViewModel(
             ILogger logger,
@@ -291,6 +294,18 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _topmost, value);
         }
 
+        public string CarImageUrl
+        {
+            get => _carImageUrl;
+            set => SetProperty(ref _carImageUrl, value);
+        }
+
+        public string HeadshotImageUrl
+        {
+            get => _headshotImageUrl;
+            set => SetProperty(ref _headshotImageUrl, value);
+        }
+
         public VideoDialogInstance GetVideoDialogInstance()
         {
             return new VideoDialogInstance
@@ -343,6 +358,8 @@ namespace RaceControl.ViewModels
             _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
             _showControlsTimer.Start();
             _syncStreamsEventToken = _eventAggregator.GetEvent<SyncStreamsEvent>().Subscribe(OnSyncSession);
+
+            await GetDriverImagesAsync();
 
             base.OnDialogOpened(parameters);
         }
@@ -757,6 +774,28 @@ namespace RaceControl.ViewModels
             }
 
             return null;
+        }
+
+        private async Task GetDriverImagesAsync()
+        {
+            if (Playable.DriverOccurrenceUrls.Any())
+            {
+                try
+                {
+                    var driverUID = Playable.DriverOccurrenceUrls.First().GetUID();
+                    var driver = await _apiService.GetDriverAsync(driverUID);
+
+                    if (driver != null)
+                    {
+                        CarImageUrl = driver.CarUrl;
+                        HeadshotImageUrl = driver.HeadshotUrl;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex, "An error occurred while trying to get driver images.");
+                }
+            }
         }
 
         private async Task<bool> ChangeRendererAsync(RendererItem renderer)
