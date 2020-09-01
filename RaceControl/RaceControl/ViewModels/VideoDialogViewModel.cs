@@ -86,6 +86,7 @@ namespace RaceControl.ViewModels
         private ResizeMode _resizeMode = ResizeMode.CanResize;
         private WindowState _windowState = WindowState.Normal;
         private WindowStartupLocation _startupLocation = WindowStartupLocation.CenterOwner;
+        private bool _topmost;
 
         public VideoDialogViewModel(
             ILogger logger,
@@ -284,6 +285,12 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _startupLocation, value);
         }
 
+        public bool Topmost
+        {
+            get => _topmost;
+            set => SetProperty(ref _topmost, value);
+        }
+
         public VideoDialogInstance GetVideoDialogInstance()
         {
             return new VideoDialogInstance
@@ -294,6 +301,7 @@ namespace RaceControl.ViewModels
                 Height = Height,
                 ResizeMode = (int)ResizeMode,
                 WindowState = (int)WindowState,
+                Topmost = Topmost,
                 ChannelName = Name
             };
         }
@@ -721,6 +729,7 @@ namespace RaceControl.ViewModels
                 StartupLocation = WindowStartupLocation.Manual;
                 ResizeMode = (ResizeMode)instance.ResizeMode;
                 WindowState = (WindowState)instance.WindowState;
+                Topmost = instance.Topmost;
                 Top = instance.Top;
                 Left = instance.Left;
 

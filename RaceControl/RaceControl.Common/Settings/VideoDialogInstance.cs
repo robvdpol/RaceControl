@@ -32,6 +32,11 @@
             get; set;
         }
 
+        public bool Topmost
+        {
+            get; set;
+        }
+
         public string ChannelName
         {
             get; set;

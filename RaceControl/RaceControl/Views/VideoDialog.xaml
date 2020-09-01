@@ -58,11 +58,12 @@
             <Setter Property="WindowStyle" Value="None" />
             <Setter Property="WindowState" Value="{Binding WindowState}" />
             <Setter Property="ResizeMode" Value="{Binding ResizeMode}" />
-            <Setter Property="ShowInTaskbar" Value="True" />
+            <Setter Property="Topmost" Value="{Binding Topmost}" />
             <Setter Property="Top" Value="{Binding Top, Mode=TwoWay}" />
             <Setter Property="Left" Value="{Binding Left, Mode=TwoWay}" />
             <Setter Property="Width" Value="{Binding Width, Mode=TwoWay}" />
             <Setter Property="Height" Value="{Binding Height, Mode=TwoWay}" />
+            <Setter Property="ShowInTaskbar" Value="True" />
         </Style>
     </prism:Dialog.WindowStyle>
     <vlc:VideoView Background="Black" MediaPlayer="{Binding MediaPlayer}">
@@ -379,14 +380,25 @@
                                 </Button.Content>
                             </Button>
                         </Grid>
-                        <CheckBox
-                            Grid.Row="0"
-                            Grid.Column="2"
-                            Margin="2"
-                            VerticalAlignment="Center"
-                            Content="Resizable window (uncheck to hide borders)"
-                            IsChecked="{Binding ResizeMode, Converter={StaticResource ResizeModeToBooleanConverter}}"
-                            IsEnabled="{Binding WindowState, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static WindowState.Normal}}" />
+                        <Grid Grid.Row="0" Grid.Column="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox
+                                Grid.Column="0"
+                                Margin="1,0"
+                                VerticalAlignment="Center"
+                                Content="Always on top"
+                                IsChecked="{Binding Topmost}" />
+                            <CheckBox
+                                Grid.Column="1"
+                                Margin="1,0"
+                                VerticalAlignment="Center"
+                                Content="Resizable window"
+                                IsChecked="{Binding ResizeMode, Converter={StaticResource ResizeModeToBooleanConverter}}"
+                                IsEnabled="{Binding WindowState, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static WindowState.Normal}}" />
+                        </Grid>
                         <StackPanel
                             Grid.Row="1"
                             Grid.Column="2"
