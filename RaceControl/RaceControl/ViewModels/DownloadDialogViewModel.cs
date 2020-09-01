@@ -78,7 +78,7 @@ namespace RaceControl.ViewModels
                 {
                     HasExited = true;
                     HasFailed = exitCode != 0;
-                    Logger.Info($"Download process finished with exitcode '{exitCode}'.");
+                    Logger.Info($"Download process finished with exitcode {exitCode}.");
                 });
                 HasStarted = true;
             }
