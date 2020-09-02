@@ -28,7 +28,8 @@ using System;
 using System.Windows;
 using System.Windows.Threading;
 using LibVLCSharpCore = LibVLCSharp.Shared.Core;
-using LogLevel = NLog.LogLevel;
+using LogLevelNLog = NLog.LogLevel;
+using LogLevelVLC = LibVLCSharp.Shared.LogLevel;
 
 namespace RaceControl
 {
@@ -43,52 +44,36 @@ namespace RaceControl
         {
             var splashScreen = new SplashScreen("splashscreen.png");
             splashScreen.Show(false);
-
             LibVLCSharpCore.Initialize();
             InitializeLogging();
             base.Initialize();
-
             splashScreen.Close(TimeSpan.Zero);
         }
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.GetContainer().Register(Made.Of<ILogger>(() => LogManager.GetLogger(Arg.Index<string>(0)), request => request.Parent.ImplementationType.Name));
-
             containerRegistry.RegisterDialogWindow<DialogWindow>();
             containerRegistry.RegisterDialog<LoginDialog, LoginDialogViewModel>();
             containerRegistry.RegisterDialog<UpgradeDialog, UpgradeDialogViewModel>();
             containerRegistry.RegisterDialog<DownloadDialog, DownloadDialogViewModel>();
             containerRegistry.RegisterDialog<VideoDialog, VideoDialogViewModel>();
 
-            containerRegistry.RegisterSingleton<IExtendedDialogService, ExtendedDialogService>();
-            containerRegistry.RegisterSingleton<IChildProcessTracker, ChildProcessTracker>();
-            containerRegistry.RegisterSingleton<IRestClient, RestClient>();
-            containerRegistry.RegisterSingleton<ISettings, Settings>();
-            containerRegistry.RegisterSingleton<IVideoDialogLayout, VideoDialogLayout>();
-            containerRegistry.Register<JsonSerializer>(() => new JsonSerializer { Formatting = Formatting.Indented });
-            containerRegistry.Register<IAuthorizationService, AuthorizationService>();
-            containerRegistry.Register<IF1TVClient, F1TVClient>();
-            containerRegistry.Register<IApiService, ApiService>();
-            containerRegistry.Register<IGithubService, GithubService>();
-            containerRegistry.Register<ICredentialService, CredentialService>();
-            containerRegistry.Register<IStreamlinkLauncher, StreamlinkLauncher>();
-            containerRegistry.RegisterSingleton<LibVLC>(container =>
-            {
-                var libVLC = new LibVLC();
-                var libVLCLogger = LogManager.GetLogger(libVLC.GetType().FullName);
-                libVLC.Log += (sender, args) => LogVLCEvent(libVLCLogger, args);
-
-                return libVLC;
-            });
-            containerRegistry.Register<MediaPlayer>(container => new MediaPlayer(container.Resolve<LibVLC>())
-            {
-                EnableHardwareDecoding = true,
-                EnableMouseInput = false,
-                EnableKeyInput = false,
-                FileCaching = 2000,
-                NetworkCaching = 4000
-            });
+            containerRegistry
+                .RegisterSingleton<IExtendedDialogService, ExtendedDialogService>()
+                .RegisterSingleton<IChildProcessTracker, ChildProcessTracker>()
+                .RegisterSingleton<IRestClient, RestClient>()
+                .RegisterSingleton<ISettings, Settings>()
+                .RegisterSingleton<IVideoDialogLayout, VideoDialogLayout>()
+                .Register<JsonSerializer>(() => new JsonSerializer { Formatting = Formatting.Indented })
+                .Register<IAuthorizationService, AuthorizationService>()
+                .Register<IF1TVClient, F1TVClient>()
+                .Register<IApiService, ApiService>()
+                .Register<IGithubService, GithubService>()
+                .Register<ICredentialService, CredentialService>()
+                .Register<IStreamlinkLauncher, StreamlinkLauncher>()
+                .Register<MediaPlayer>(CreateMediaPlayer)
+                .RegisterInstance(CreateLibVLC());
         }
 
         private static void InitializeLogging()
@@ -102,30 +87,52 @@ namespace RaceControl
                 ArchiveNumbering = ArchiveNumberingMode.Rolling,
                 MaxArchiveFiles = 2
             };
-            config.AddRule(LogLevel.Info, LogLevel.Fatal, logfile);
+            config.AddRule(LogLevelNLog.Info, LogLevelNLog.Fatal, logfile);
             LogManager.Configuration = config;
         }
 
-        private static void LogVLCEvent(ILogger logger, LogEventArgs args)
+        private static MediaPlayer CreateMediaPlayer(IContainerProvider container)
         {
-            switch (args.Level)
+            var libVLC = container.Resolve<LibVLC>();
+
+            return new MediaPlayer(libVLC)
             {
-                case LibVLCSharp.Shared.LogLevel.Debug:
-                    logger.Debug($"[VLC] {args.Message}");
-                    break;
+                EnableHardwareDecoding = true,
+                EnableMouseInput = false,
+                EnableKeyInput = false,
+                FileCaching = 2000,
+                NetworkCaching = 4000
+            };
+        }
 
-                case LibVLCSharp.Shared.LogLevel.Notice:
-                    logger.Info($"[VLC] {args.Message}");
-                    break;
+        private static LibVLC CreateLibVLC()
+        {
+            var libVLC = new LibVLC();
+            var logger = LogManager.GetLogger(libVLC.GetType().FullName);
 
-                case LibVLCSharp.Shared.LogLevel.Warning:
-                    logger.Warn($"[VLC] {args.Message}");
-                    break;
+            libVLC.Log += (sender, args) =>
+            {
+                switch (args.Level)
+                {
+                    case LogLevelVLC.Debug:
+                        logger.Debug($"[VLC] {args.Message}");
+                        break;
 
-                case LibVLCSharp.Shared.LogLevel.Error:
-                    logger.Error($"[VLC] {args.Message}");
-                    break;
-            }
+                    case LogLevelVLC.Notice:
+                        logger.Info($"[VLC] {args.Message}");
+                        break;
+
+                    case LogLevelVLC.Warning:
+                        logger.Warn($"[VLC] {args.Message}");
+                        break;
+
+                    case LogLevelVLC.Error:
+                        logger.Error($"[VLC] {args.Message}");
+                        break;
+                }
+            };
+
+            return libVLC;
         }
 
         private void PrismApplication_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
