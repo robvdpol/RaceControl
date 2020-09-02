@@ -33,7 +33,7 @@ namespace RaceControl.Streamlink
             _logger.Info($"Starting external Streamlink-instance for stream-URL '{streamUrl}' with identifier '{streamIdentifier}' on port '{port}'...");
 
             var process = ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, true, true);
-            process.OutputDataReceived += (sender, args) => _logger.Info(args.Data);
+            process.OutputDataReceived += (sender, args) => _logger.Info($"[Streamlink] {args.Data}");
             process.Start();
             process.BeginOutputReadLine();
             _childProcessTracker.AddProcess(process);
@@ -51,7 +51,7 @@ namespace RaceControl.Streamlink
             _logger.Info($"Starting recording Streamlink-instance for stream-URL '{streamUrl}' with identifier '{streamIdentifier}' to file '{filename}'...");
 
             var process = ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, true, true);
-            process.OutputDataReceived += (sender, args) => _logger.Info(args.Data);
+            process.OutputDataReceived += (sender, args) => _logger.Info($"[Streamlink] {args.Data}");
             process.Start();
             process.BeginOutputReadLine();
             _childProcessTracker.AddProcess(process);
@@ -68,7 +68,7 @@ namespace RaceControl.Streamlink
             var process = ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, true, true);
             process.EnableRaisingEvents = true;
             process.Exited += (sender, args) => exitAction(process.ExitCode);
-            process.OutputDataReceived += (sender, args) => _logger.Info(args.Data);
+            process.OutputDataReceived += (sender, args) => _logger.Info($"[Streamlink] {args.Data}");
             process.Start();
             process.BeginOutputReadLine();
             _childProcessTracker.AddProcess(process);

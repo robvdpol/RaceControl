@@ -61,7 +61,6 @@ namespace RaceControl
             containerRegistry.RegisterDialog<DownloadDialog, DownloadDialogViewModel>();
             containerRegistry.RegisterDialog<VideoDialog, VideoDialogViewModel>();
 
-            containerRegistry.RegisterInstance(new LibVLC());
             containerRegistry.RegisterSingleton<IExtendedDialogService, ExtendedDialogService>();
             containerRegistry.RegisterSingleton<IChildProcessTracker, ChildProcessTracker>();
             containerRegistry.RegisterSingleton<IRestClient, RestClient>();
@@ -74,6 +73,14 @@ namespace RaceControl
             containerRegistry.Register<IGithubService, GithubService>();
             containerRegistry.Register<ICredentialService, CredentialService>();
             containerRegistry.Register<IStreamlinkLauncher, StreamlinkLauncher>();
+            containerRegistry.RegisterSingleton<LibVLC>(container =>
+            {
+                var libVLC = new LibVLC();
+                var libVLCLogger = LogManager.GetLogger(libVLC.GetType().FullName);
+                libVLC.Log += (sender, args) => LogVLCEvent(libVLCLogger, args);
+
+                return libVLC;
+            });
             containerRegistry.Register<MediaPlayer>(container => new MediaPlayer(container.Resolve<LibVLC>())
             {
                 EnableHardwareDecoding = true,
@@ -97,6 +104,28 @@ namespace RaceControl
             };
             config.AddRule(LogLevel.Info, LogLevel.Fatal, logfile);
             LogManager.Configuration = config;
+        }
+
+        private static void LogVLCEvent(ILogger logger, LogEventArgs args)
+        {
+            switch (args.Level)
+            {
+                case LibVLCSharp.Shared.LogLevel.Debug:
+                    logger.Debug($"[VLC] {args.Message}");
+                    break;
+
+                case LibVLCSharp.Shared.LogLevel.Notice:
+                    logger.Info($"[VLC] {args.Message}");
+                    break;
+
+                case LibVLCSharp.Shared.LogLevel.Warning:
+                    logger.Warn($"[VLC] {args.Message}");
+                    break;
+
+                case LibVLCSharp.Shared.LogLevel.Error:
+                    logger.Error($"[VLC] {args.Message}");
+                    break;
+            }
         }
 
         private void PrismApplication_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
