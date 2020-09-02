@@ -11,35 +11,35 @@ namespace RaceControl.Common.Utils
     {
         public static int GetFreePort()
         {
-            using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
-            {
-                socket.Bind(new IPEndPoint(IPAddress.Loopback, 0));
+            using var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            socket.Bind(new IPEndPoint(IPAddress.Loopback, 0));
 
-                return ((IPEndPoint)socket.LocalEndPoint).Port;
-            }
+            return ((IPEndPoint)socket.LocalEndPoint).Port;
         }
 
-        public static bool IsPortInUse(int port)
-        {
-            return IPGlobalProperties
-                .GetIPGlobalProperties()
-                .GetActiveTcpListeners()
-                .Any(ep => ep.Port == port);
-        }
-
-        public static async Task WaitUntilPortInUseAsync(int port, int timeout, int interval = 250)
+        public static async Task WaitUntilPortInUseAsync(int port, int timeoutSeconds, int intervalMilliseconds = 250)
         {
             var start = DateTime.UtcNow;
+            var timeout = TimeSpan.FromSeconds(timeoutSeconds);
+            var interval = TimeSpan.FromMilliseconds(intervalMilliseconds);
 
-            while (DateTime.UtcNow.Subtract(start).TotalSeconds <= timeout)
+            while (DateTime.UtcNow.Subtract(start) < timeout)
             {
                 if (IsPortInUse(port))
                 {
                     return;
                 }
 
-                await Task.Delay(TimeSpan.FromMilliseconds(interval));
+                await Task.Delay(interval);
             }
+        }
+
+        private static bool IsPortInUse(int port)
+        {
+            return IPGlobalProperties
+                .GetIPGlobalProperties()
+                .GetActiveTcpListeners()
+                .Any(ep => ep.Port == port);
         }
     }
 }
