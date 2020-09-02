@@ -674,7 +674,7 @@ namespace RaceControl.ViewModels
                 Logger.Info($"Changing audio track to '{trackDescription.Id}'...");
                 MediaPlayer.SetAudioTrack(trackDescription.Id);
 
-                if (_streamlinkProcess == null)
+                if (!IsStreamlink)
                 {
                     // Workaround to fix audio out of sync after switching audio track
                     await Task.Delay(TimeSpan.FromMilliseconds(250));
