@@ -57,9 +57,11 @@ namespace RaceControl.ViewModels
         private ICommand _startCastVideoCommand;
         private ICommand _stopCastVideoCommand;
 
+        private Process _streamlinkProcess;
+        private Process _streamlinkRecordingProcess;
+        private IPlayable _playable;
         private string _token;
         private string _name;
-        private IPlayable _playable;
         private string _syncUID;
         private bool _isLive;
         private bool _isStreamlink;
@@ -68,16 +70,14 @@ namespace RaceControl.ViewModels
         private bool _isRecording;
         private bool _isScanning;
         private bool _isCasting;
-        private Process _streamlinkProcess;
-        private Process _streamlinkRecordingProcess;
-        private ObservableCollection<TrackDescription> _audioTrackDescriptions;
+        private bool _showControls;
         private long _duration;
         private long _sliderTime;
         private TimeSpan _displayTime;
+        private ObservableCollection<TrackDescription> _audioTrackDescriptions;
         private ObservableCollection<RendererItem> _rendererItems;
         private RendererItem _selectedRendererItem;
         private Timer _showControlsTimer;
-        private bool _showControls;
         private SubscriptionToken _syncStreamsEventToken;
         private double _top;
         private double _left;
@@ -131,16 +131,16 @@ namespace RaceControl.ViewModels
 
         public MediaPlayer MediaPlayer { get; }
 
-        public string Name
-        {
-            get => _name;
-            set => SetProperty(ref _name, value);
-        }
-
         public IPlayable Playable
         {
             get => _playable;
             set => SetProperty(ref _playable, value);
+        }
+
+        public string Name
+        {
+            get => _name;
+            set => SetProperty(ref _name, value);
         }
 
         public string SyncUID
@@ -191,10 +191,10 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _isCasting, value);
         }
 
-        public ObservableCollection<TrackDescription> AudioTrackDescriptions
+        public bool ShowControls
         {
-            get => _audioTrackDescriptions ??= new ObservableCollection<TrackDescription>();
-            set => SetProperty(ref _audioTrackDescriptions, value);
+            get => _showControls;
+            set => SetProperty(ref _showControls, value);
         }
 
         public long Duration
@@ -221,6 +221,12 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _displayTime, value);
         }
 
+        public ObservableCollection<TrackDescription> AudioTrackDescriptions
+        {
+            get => _audioTrackDescriptions ??= new ObservableCollection<TrackDescription>();
+            set => SetProperty(ref _audioTrackDescriptions, value);
+        }
+
         public ObservableCollection<RendererItem> RendererItems
         {
             get => _rendererItems ??= new ObservableCollection<RendererItem>();
@@ -231,12 +237,6 @@ namespace RaceControl.ViewModels
         {
             get => _selectedRendererItem;
             set => SetProperty(ref _selectedRendererItem, value);
-        }
-
-        public bool ShowControls
-        {
-            get => _showControls;
-            set => SetProperty(ref _showControls, value);
         }
 
         public double Top
@@ -317,9 +317,9 @@ namespace RaceControl.ViewModels
         public override async void OnDialogOpened(IDialogParameters parameters)
         {
             _token = parameters.GetValue<string>(ParameterNames.TOKEN);
+            Playable = parameters.GetValue<IPlayable>(ParameterNames.PLAYABLE);
             Title = parameters.GetValue<string>(ParameterNames.TITLE);
             Name = parameters.GetValue<string>(ParameterNames.NAME);
-            Playable = parameters.GetValue<IPlayable>(ParameterNames.PLAYABLE);
             SyncUID = parameters.GetValue<string>(ParameterNames.SYNC_UID);
             IsLive = parameters.GetValue<bool>(ParameterNames.IS_LIVE);
             IsStreamlink = IsLive && !_settings.DisableStreamlink;

@@ -383,9 +383,9 @@ namespace RaceControl.ViewModels
             var parameters = new DialogParameters
             {
                 { ParameterNames.TOKEN, _token },
+                { ParameterNames.PLAYABLE, episode },
                 { ParameterNames.TITLE, title },
                 { ParameterNames.NAME, title },
-                { ParameterNames.PLAYABLE, episode },
                 { ParameterNames.SYNC_UID, episode.UID },
                 { ParameterNames.IS_LIVE, false },
                 { ParameterNames.INSTANCE, null }
@@ -887,9 +887,9 @@ namespace RaceControl.ViewModels
             var parameters = new DialogParameters
             {
                 { ParameterNames.TOKEN, _token },
+                { ParameterNames.PLAYABLE, channel },
                 { ParameterNames.TITLE, title },
                 { ParameterNames.NAME, channel.Name },
-                { ParameterNames.PLAYABLE, channel },
                 { ParameterNames.SYNC_UID, session.UID },
                 { ParameterNames.IS_LIVE, session.IsLive },
                 { ParameterNames.INSTANCE, instance }
