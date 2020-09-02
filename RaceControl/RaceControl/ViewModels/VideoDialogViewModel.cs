@@ -66,6 +66,7 @@ namespace RaceControl.ViewModels
         private bool _isPaused;
         private bool _isMuted;
         private bool _isRecording;
+        private bool _isScanning;
         private bool _isCasting;
         private Process _streamlinkProcess;
         private Process _streamlinkRecordingProcess;
@@ -74,7 +75,6 @@ namespace RaceControl.ViewModels
         private long _duration;
         private long _sliderTime;
         private TimeSpan _displayTime;
-        private RendererDiscoverer _rendererDiscoverer;
         private ObservableCollection<RendererItem> _rendererItems;
         private RendererItem _selectedRendererItem;
         private Timer _showControlsTimer;
@@ -124,7 +124,7 @@ namespace RaceControl.ViewModels
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand(ToggleFullScreenExecute);
         public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => WindowState);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
-        public ICommand ScanChromecastCommand => _scanChromecastCommand ??= new DelegateCommand(ScanChromecastExecute, CanScanChromecastExecute).ObservesProperty(() => CanClose).ObservesProperty(() => RendererDiscoverer);
+        public ICommand ScanChromecastCommand => _scanChromecastCommand ??= new DelegateCommand(ScanChromecastExecute, CanScanChromecastExecute).ObservesProperty(() => CanClose).ObservesProperty(() => IsScanning);
         public ICommand StartCastVideoCommand => _startCastVideoCommand ??= new DelegateCommand(StartCastVideoExecute, CanStartCastVideoExecute).ObservesProperty(() => CanClose).ObservesProperty(() => SelectedRendererItem);
         public ICommand StopCastVideoCommand => _stopCastVideoCommand ??= new DelegateCommand(StopCastVideoExecute, CanStopCastVideoExecute).ObservesProperty(() => IsCasting);
 
@@ -180,6 +180,12 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _isRecording, value);
         }
 
+        public bool IsScanning
+        {
+            get => _isScanning;
+            set => SetProperty(ref _isScanning, value);
+        }
+
         public bool IsCasting
         {
             get => _isCasting;
@@ -220,12 +226,6 @@ namespace RaceControl.ViewModels
         {
             get => _displayTime;
             set => SetProperty(ref _displayTime, value);
-        }
-
-        public RendererDiscoverer RendererDiscoverer
-        {
-            get => _rendererDiscoverer;
-            set => SetProperty(ref _rendererDiscoverer, value);
         }
 
         public ObservableCollection<RendererItem> RendererItems
@@ -379,16 +379,8 @@ namespace RaceControl.ViewModels
                 _showControlsTimer = null;
             }
 
-            StopPlayback();
             RemoveMedia();
             RemoveMediaPlayer();
-
-            if (RendererDiscoverer != null)
-            {
-                RendererDiscoverer.Stop();
-                RendererDiscoverer.ItemAdded -= RendererDiscoverer_ItemAdded;
-                RendererDiscoverer.Dispose();
-            }
 
             CleanupProcess(_streamlinkProcess);
             CleanupProcess(_streamlinkRecordingProcess);
@@ -486,6 +478,8 @@ namespace RaceControl.ViewModels
         {
             if (e.RendererItem.CanRenderVideo)
             {
+                Logger.Info($"Found renderer '{e.RendererItem.Name}' of type '{e.RendererItem.Type}'.");
+
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     RendererItems.Add(e.RendererItem);
@@ -688,7 +682,7 @@ namespace RaceControl.ViewModels
                 if (_streamlinkProcess == null)
                 {
                     // Workaround to fix audio out of sync after switching audio track
-                    await Task.Delay(250);
+                    await Task.Delay(TimeSpan.FromMilliseconds(250));
                     SetMediaPlayerTime(MediaPlayer.Time - 500);
                 }
 
@@ -698,15 +692,33 @@ namespace RaceControl.ViewModels
 
         private bool CanScanChromecastExecute()
         {
-            return CanClose && RendererDiscoverer == null;
+            return CanClose && !IsScanning;
         }
 
-        private void ScanChromecastExecute()
+        private async void ScanChromecastExecute()
         {
+            IsScanning = true;
             Logger.Info("Scanning for Chromecast devices...");
-            RendererDiscoverer = new RendererDiscoverer(_libVLC);
-            RendererDiscoverer.ItemAdded += RendererDiscoverer_ItemAdded;
-            RendererDiscoverer.Start();
+
+            using (var rendererDiscoverer = new RendererDiscoverer(_libVLC))
+            {
+                rendererDiscoverer.ItemAdded += RendererDiscoverer_ItemAdded;
+
+                if (rendererDiscoverer.Start())
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(10));
+                    rendererDiscoverer.Stop();
+                }
+                else
+                {
+                    Logger.Warn("Could not start scanning for Chromecast devices.");
+                }
+
+                rendererDiscoverer.ItemAdded -= RendererDiscoverer_ItemAdded;
+            }
+
+            Logger.Info("Done scanning for Chromecast devices.");
+            IsScanning = false;
         }
 
         private bool CanStartCastVideoExecute()

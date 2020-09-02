@@ -27,7 +27,7 @@ namespace RaceControl.Common.Utils
                 .Any(ep => ep.Port == port);
         }
 
-        public static async Task WaitUntilPortInUseAsync(int port, int timeout, int interval = 200)
+        public static async Task WaitUntilPortInUseAsync(int port, int timeout, int interval = 250)
         {
             var start = DateTime.UtcNow;
 
@@ -38,7 +38,7 @@ namespace RaceControl.Common.Utils
                     return;
                 }
 
-                await Task.Delay(interval);
+                await Task.Delay(TimeSpan.FromMilliseconds(interval));
             }
         }
     }
