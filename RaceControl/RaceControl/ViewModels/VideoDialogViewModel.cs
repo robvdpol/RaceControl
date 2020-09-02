@@ -82,8 +82,8 @@ namespace RaceControl.ViewModels
         private SubscriptionToken _syncStreamsEventToken;
         private double _top;
         private double _left;
-        private double _width = 1200;
-        private double _height = 685;
+        private double _width = 960;
+        private double _height = 550;
         private ResizeMode _resizeMode = ResizeMode.CanResize;
         private WindowState _windowState = WindowState.Normal;
         private WindowStartupLocation _startupLocation = WindowStartupLocation.CenterOwner;
