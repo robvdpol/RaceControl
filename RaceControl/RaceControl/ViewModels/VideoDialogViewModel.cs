@@ -483,6 +483,7 @@ namespace RaceControl.ViewModels
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     RendererItems.Add(e.RendererItem);
+                    SelectedRendererItem ??= e.RendererItem;
                 });
             }
         }
