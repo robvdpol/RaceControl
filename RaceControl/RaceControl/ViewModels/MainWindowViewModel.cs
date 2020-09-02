@@ -227,6 +227,9 @@ namespace RaceControl.ViewModels
             IsBusy = true;
             Settings.Load();
             VideoDialogLayout.Load();
+            SetVlcExeLocation();
+            SetMpvExeLocation();
+
             await CheckForUpdatesAsync();
 
             if (Login())
@@ -621,37 +624,34 @@ namespace RaceControl.ViewModels
             _refreshLiveSessionsTimer?.Start();
         }
 
-        private bool Login()
+        private void SetVlcExeLocation()
         {
-            var success = false;
+            var registryKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\VideoLAN\VLC") ?? Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\VideoLAN\VLC");
 
-            _dialogService.ShowDialog(nameof(LoginDialog), null, dialogResult =>
+            if (registryKey != null && registryKey.GetValue(null) is string vlcExeLocation && File.Exists(vlcExeLocation))
             {
-                success = dialogResult.Result == ButtonResult.OK;
-
-                if (success)
-                {
-                    _token = dialogResult.Parameters.GetValue<string>(ParameterNames.TOKEN);
-                }
-                else
-                {
-                    Logger.Info("Login cancelled by user, shutting down...");
-                    Application.Current.Shutdown();
-                }
-            });
-
-            return success;
+                VlcExeLocation = vlcExeLocation;
+                Logger.Info($"Found VLC installation at '{vlcExeLocation}'.");
+            }
+            else
+            {
+                Logger.Warn("Could not find VLC installation.");
+            }
         }
 
-        private async Task InitializeAsync()
+        private void SetMpvExeLocation()
         {
-            SetVlcExeLocation();
-            SetMpvExeLocation();
-            await LoadInitialDataAsync();
+            var mpvExeLocation = Path.Combine(Environment.CurrentDirectory, @"mpv\mpv.exe");
 
-            _refreshLiveSessionsTimer = new Timer(60000) { AutoReset = false };
-            _refreshLiveSessionsTimer.Elapsed += RefreshLiveSessionsTimer_Elapsed;
-            _refreshLiveSessionsTimer.Start();
+            if (File.Exists(mpvExeLocation))
+            {
+                MpvExeLocation = mpvExeLocation;
+                Logger.Info($"Found MPV installation at '{mpvExeLocation}'.");
+            }
+            else
+            {
+                Logger.Warn("Could not find MPV installation.");
+            }
         }
 
         private async Task CheckForUpdatesAsync()
@@ -699,43 +699,41 @@ namespace RaceControl.ViewModels
             Logger.Info("Done checking for updates.");
         }
 
-        private void SetVlcExeLocation()
+        private bool Login()
         {
-            var registryKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\VideoLAN\VLC") ?? Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\VideoLAN\VLC");
+            var success = false;
 
-            if (registryKey != null && registryKey.GetValue(null) is string vlcExeLocation && File.Exists(vlcExeLocation))
+            _dialogService.ShowDialog(nameof(LoginDialog), null, dialogResult =>
             {
-                VlcExeLocation = vlcExeLocation;
-                Logger.Info($"Found VLC installation at '{vlcExeLocation}'.");
-            }
-            else
-            {
-                Logger.Warn("Could not find VLC installation.");
-            }
+                success = dialogResult.Result == ButtonResult.OK;
+
+                if (success)
+                {
+                    _token = dialogResult.Parameters.GetValue<string>(ParameterNames.TOKEN);
+                }
+                else
+                {
+                    Logger.Info("Login cancelled by user, shutting down...");
+                    Application.Current.Shutdown();
+                }
+            });
+
+            return success;
         }
 
-        private void SetMpvExeLocation()
-        {
-            var mpvExeLocation = Path.Combine(Environment.CurrentDirectory, @"mpv\mpv.exe");
-
-            if (File.Exists(mpvExeLocation))
-            {
-                MpvExeLocation = mpvExeLocation;
-                Logger.Info($"Found MPV installation at '{mpvExeLocation}'.");
-            }
-            else
-            {
-                Logger.Warn("Could not find MPV installation.");
-            }
-        }
-
-        private async Task LoadInitialDataAsync()
+        private async Task InitializeAsync()
         {
             await Task.WhenAll(
                 LoadSeasonsAsync(),
                 LoadSeriesAsync(),
                 LoadVodTypesAsync(),
                 RefreshLiveSessionsAsync());
+
+            SelectedSeason = Seasons.FirstOrDefault();
+
+            _refreshLiveSessionsTimer = new Timer(60000) { AutoReset = false };
+            _refreshLiveSessionsTimer.Elapsed += RefreshLiveSessionsTimer_Elapsed;
+            _refreshLiveSessionsTimer.Start();
         }
 
         private async Task LoadSeasonsAsync()
