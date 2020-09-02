@@ -10,11 +10,12 @@
             <Setter Property="ShowInTaskbar" Value="True" />
             <Setter Property="SizeToContent" Value="Height" />
             <Setter Property="Width" Value="550" />
-            <Setter Property="MinHeight" Value="175" />
+            <Setter Property="MinHeight" Value="190" />
         </Style>
     </prism:Dialog.WindowStyle>
     <Grid Margin="10">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -72,8 +73,15 @@
                 </Run.Style>
             </Run>
         </TextBlock>
-        <Button
+        <TextBlock
             Grid.Row="3"
+            Margin="2"
+            TextWrapping="Wrap">
+            <Run Text="Progress:" />
+            <Run Text="{Binding Percentage, StringFormat={}{0:F1}%}" />
+        </TextBlock>
+        <Button
+            Grid.Row="4"
             Width="100"
             Height="24"
             HorizontalAlignment="Right"

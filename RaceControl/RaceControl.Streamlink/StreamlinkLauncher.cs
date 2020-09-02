@@ -59,23 +59,6 @@ namespace RaceControl.Streamlink
             return process;
         }
 
-        public Process StartStreamlinkDownload(string streamUrl, string filename, Action<int> exitAction)
-        {
-            var streamlinkArguments = $"--output \"{filename}\" --force --hls-audio-select * \"{streamUrl}\" best";
-
-            _logger.Info($"Starting download Streamlink-instance for stream-URL '{streamUrl}' to file '{filename}'...");
-
-            var process = ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, true, true);
-            process.EnableRaisingEvents = true;
-            process.Exited += (sender, args) => exitAction(process.ExitCode);
-            process.OutputDataReceived += (sender, args) => _logger.Info($"[Streamlink] {args.Data}");
-            process.Start();
-            process.BeginOutputReadLine();
-            _childProcessTracker.AddProcess(process);
-
-            return process;
-        }
-
         public void StartStreamlinkVlc(string vlcExeLocation, string streamUrl, string title)
         {
             var streamIdentifier = GetStreamIdentifier();

@@ -942,9 +942,9 @@ namespace RaceControl.ViewModels
 
         private void StartDownload(string title, IPlayable playable)
         {
-            var defaultFilename = $"{title}.mkv".RemoveInvalidFileNameChars();
+            var defaultFilename = $"{title}.ts".RemoveInvalidFileNameChars();
 
-            if (_dialogService.SelectFile("Select a filename", Settings.RecordingLocation, defaultFilename, ".mkv", out var filename))
+            if (_dialogService.SelectFile("Select a filename", Settings.RecordingLocation, defaultFilename, ".ts", out var filename))
             {
                 var parameters = new DialogParameters
                 {
