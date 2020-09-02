@@ -372,6 +372,7 @@ namespace RaceControl.ViewModels
                 _showControlsTimer = null;
             }
 
+            StopPlayback();
             RemoveMedia(MediaPlayer.Media);
             RemoveMediaPlayer();
 
