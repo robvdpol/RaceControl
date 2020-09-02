@@ -70,7 +70,6 @@ namespace RaceControl.ViewModels
         private bool _isCasting;
         private Process _streamlinkProcess;
         private Process _streamlinkRecordingProcess;
-        private Media _media;
         private ObservableCollection<TrackDescription> _audioTrackDescriptions;
         private long _duration;
         private long _sliderTime;
@@ -190,12 +189,6 @@ namespace RaceControl.ViewModels
         {
             get => _isCasting;
             set => SetProperty(ref _isCasting, value);
-        }
-
-        public Media Media
-        {
-            get => _media;
-            set => SetProperty(ref _media, value);
         }
 
         public ObservableCollection<TrackDescription> AudioTrackDescriptions
@@ -351,8 +344,8 @@ namespace RaceControl.ViewModels
             }
 
             CreateMediaPlayer();
-            CreateMedia(streamUrl);
-            StartPlayback();
+            var media = CreateMedia(streamUrl);
+            StartPlayback(media);
 
             _showControlsTimer = new Timer(2000) { AutoReset = false };
             _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
@@ -379,7 +372,7 @@ namespace RaceControl.ViewModels
                 _showControlsTimer = null;
             }
 
-            RemoveMedia();
+            RemoveMedia(MediaPlayer.Media);
             RemoveMediaPlayer();
 
             CleanupProcess(_streamlinkProcess);
@@ -815,8 +808,9 @@ namespace RaceControl.ViewModels
         {
             Logger.Info($"Changing renderer to '{renderer?.Name}'...");
 
-            var streamTime = MediaPlayer.Time;
-            var streamUrl = IsStreamlink ? Media.Mrl : await GenerateStreamUrlAsync();
+            var time = MediaPlayer.Time;
+            var media = MediaPlayer.Media;
+            var streamUrl = IsStreamlink ? media.Mrl : await GenerateStreamUrlAsync();
 
             if (streamUrl == null)
             {
@@ -825,13 +819,13 @@ namespace RaceControl.ViewModels
             }
 
             StopPlayback();
-            RemoveMedia();
-            CreateMedia(streamUrl);
-            StartPlayback(renderer);
+            RemoveMedia(media);
+            media = CreateMedia(streamUrl);
+            StartPlayback(media, renderer);
 
             if (!IsLive)
             {
-                SetMediaPlayerTime(streamTime);
+                SetMediaPlayerTime(time);
             }
 
             Logger.Info("Done changing renderer.");
@@ -896,20 +890,22 @@ namespace RaceControl.ViewModels
             Logger.Info("Done creating mediaplayer.");
         }
 
-        private void CreateMedia(string url)
+        private Media CreateMedia(string url)
         {
             Logger.Info("Creating media...");
-            Media = new Media(_libVLC, url, FromType.FromLocation);
-            Media.DurationChanged += Media_DurationChanged;
+            var media = new Media(_libVLC, url, FromType.FromLocation);
+            media.DurationChanged += Media_DurationChanged;
             Logger.Info("Done creating media.");
+
+            return media;
         }
 
-        private void StartPlayback(RendererItem renderer = null)
+        private void StartPlayback(Media media, RendererItem renderer = null)
         {
             Logger.Info("Starting playback...");
             AudioTrackDescriptions.Clear();
             MediaPlayer.SetRenderer(renderer);
-            MediaPlayer.Play(Media);
+            MediaPlayer.Play(media);
             Logger.Info("Done starting playback.");
         }
 
@@ -927,14 +923,14 @@ namespace RaceControl.ViewModels
             Logger.Info("Done removing mediaplayer.");
         }
 
-        private void RemoveMedia()
+        private void RemoveMedia(Media media)
         {
             Logger.Info("Removing media...");
 
-            if (Media != null)
+            if (media != null)
             {
-                Media.DurationChanged -= Media_DurationChanged;
-                Media.Dispose();
+                media.DurationChanged -= Media_DurationChanged;
+                media.Dispose();
             }
 
             Logger.Info("Done removing media.");
