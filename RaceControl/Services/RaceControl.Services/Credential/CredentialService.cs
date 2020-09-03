@@ -44,7 +44,7 @@ namespace RaceControl.Services.Credential
             return loaded;
         }
 
-        public bool SaveCredential(string username, string password)
+        public void SaveCredential(string username, string password)
         {
             _logger.Info("Saving credentials to store...");
 
@@ -57,9 +57,7 @@ namespace RaceControl.Services.Credential
                 Password = password
             };
 
-            var saved = credential.Save();
-
-            if (saved)
+            if (credential.Save())
             {
                 _logger.Info("Credentials saved to store.");
             }
@@ -67,8 +65,6 @@ namespace RaceControl.Services.Credential
             {
                 _logger.Warn("Credentials not saved to store.");
             }
-
-            return saved;
         }
 
         public bool DeleteCredential()
