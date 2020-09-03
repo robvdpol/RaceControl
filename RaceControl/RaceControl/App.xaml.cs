@@ -7,7 +7,6 @@ using NLog.Layouts;
 using NLog.Targets;
 using Prism.DryIoc;
 using Prism.Ioc;
-using RaceControl.Common.ProcessTracker;
 using RaceControl.Common.Settings;
 using RaceControl.Core.Helpers;
 using RaceControl.Core.Mvvm;
@@ -61,7 +60,6 @@ namespace RaceControl
 
             containerRegistry
                 .RegisterSingleton<IExtendedDialogService, ExtendedDialogService>()
-                .RegisterSingleton<IChildProcessTracker, ChildProcessTracker>()
                 .RegisterSingleton<IRestClient, RestClient>()
                 .RegisterSingleton<ISettings, Settings>()
                 .RegisterSingleton<IVideoDialogLayout, VideoDialogLayout>()
@@ -76,26 +74,9 @@ namespace RaceControl
                 .RegisterInstance(CreateLibVLC());
         }
 
-        private static void InitializeLogging()
-        {
-            var config = new LoggingConfiguration();
-            var logfile = new FileTarget("logfile")
-            {
-                FileName = "RaceControl.log",
-                Layout = Layout.FromString("${longdate} ${uppercase:${level}} ${message}${onexception:inner=${newline}${exception:format=tostring}}"),
-                ArchiveAboveSize = 5 * 1024 * 1024,
-                ArchiveNumbering = ArchiveNumberingMode.Rolling,
-                MaxArchiveFiles = 2
-            };
-            config.AddRule(LogLevelNLog.Info, LogLevelNLog.Fatal, logfile);
-            LogManager.Configuration = config;
-        }
-
         private static MediaPlayer CreateMediaPlayer(IContainerProvider container)
         {
-            var libVLC = container.Resolve<LibVLC>();
-
-            return new MediaPlayer(libVLC)
+            return new MediaPlayer(container.Resolve<LibVLC>())
             {
                 EnableHardwareDecoding = true,
                 EnableMouseInput = false,
@@ -135,9 +116,24 @@ namespace RaceControl
             return libVLC;
         }
 
+        private static void InitializeLogging()
+        {
+            var config = new LoggingConfiguration();
+            var logfile = new FileTarget("logfile")
+            {
+                FileName = "RaceControl.log",
+                Layout = Layout.FromString("${longdate} ${uppercase:${level}} ${message}${onexception:inner=${newline}${exception:format=tostring}}"),
+                ArchiveAboveSize = 5 * 1024 * 1024,
+                ArchiveNumbering = ArchiveNumberingMode.Rolling,
+                MaxArchiveFiles = 2
+            };
+            config.AddRule(LogLevelNLog.Info, LogLevelNLog.Fatal, logfile);
+            LogManager.Configuration = config;
+        }
+
         private void PrismApplication_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
-            LogManager.GetCurrentClassLogger().Error(e.Exception, "An unhandled exception occurred.");
+            LogManager.GetLogger(sender.GetType().FullName).Error(e.Exception, "An unhandled exception occurred.");
             MessageBoxHelper.ShowError(e.Exception.Message);
             e.Handled = true;
         }

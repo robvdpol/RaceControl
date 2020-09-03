@@ -1,5 +1,4 @@
 ﻿using NLog;
-using RaceControl.Common.ProcessTracker;
 using RaceControl.Common.Settings;
 using RaceControl.Common.Utils;
 using System;
@@ -15,13 +14,11 @@ namespace RaceControl.Streamlink
 
         private readonly ILogger _logger;
         private readonly ISettings _settings;
-        private readonly IChildProcessTracker _childProcessTracker;
 
-        public StreamlinkLauncher(ILogger logger, ISettings videoSettings, IChildProcessTracker childProcessTracker)
+        public StreamlinkLauncher(ILogger logger, ISettings videoSettings)
         {
             _logger = logger;
             _settings = videoSettings;
-            _childProcessTracker = childProcessTracker;
         }
 
         public async Task<(Process process, string streamlinkUrl)> StartStreamlinkExternal(string streamUrl, int timeout = 15)
@@ -36,7 +33,7 @@ namespace RaceControl.Streamlink
             process.OutputDataReceived += (sender, args) => _logger.Info($"[Streamlink] {args.Data}");
             process.Start();
             process.BeginOutputReadLine();
-            _childProcessTracker.AddProcess(process);
+
             await SocketUtils.WaitUntilPortInUseAsync(port, timeout);
 
             return (process, $"http://127.0.0.1:{port}");
@@ -54,7 +51,6 @@ namespace RaceControl.Streamlink
             process.OutputDataReceived += (sender, args) => _logger.Info($"[Streamlink] {args.Data}");
             process.Start();
             process.BeginOutputReadLine();
-            _childProcessTracker.AddProcess(process);
 
             return process;
         }
@@ -95,7 +91,7 @@ namespace RaceControl.Streamlink
 
         private string GetRecordingFilename(string title)
         {
-            var filename = $"{DateTime.Now:yyyy-MM-dd HH.mm.ss.fff} {title}.ts".RemoveInvalidFileNameChars();
+            var filename = $"{DateTime.Now:yyyy-MM-dd HH.mm.ss} {title}.ts".RemoveInvalidFileNameChars();
 
             return Path.Combine(_settings.RecordingLocation, filename);
         }
