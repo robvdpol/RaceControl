@@ -1,13 +1,11 @@
 ﻿using Newtonsoft.Json;
-using RaceControl.Common.Enum;
-using RaceControl.Common.Interfaces;
 using RaceControl.Common.Utils;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace RaceControl.Services.Interfaces.F1TV.Api
 {
-    public class Episode : IPlayable
+    public class Episode
     {
         [JsonProperty("uid")]
         public string UID { get; set; }
@@ -22,16 +20,7 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         public List<Image> ImageUrls { get; set; }
 
         [JsonIgnore]
-        public ContentType ContentType => ContentType.Asset;
-
-        [JsonIgnore]
-        public string ContentUrl => Items?.FirstOrDefault();
-
-        [JsonIgnore]
         public string ThumbnailUrl => ImageUrls?.FirstOrDefault(img => img.ImageType == "Thumbnail")?.Url;
-
-        [JsonIgnore]
-        public List<string> DriverOccurrenceUrls { get; } = new List<string>();
 
         public static string UIDField => JsonUtils.GetJsonPropertyName<Episode>(e => e.UID);
         public static string TitleField => JsonUtils.GetJsonPropertyName<Episode>(e => e.Title);

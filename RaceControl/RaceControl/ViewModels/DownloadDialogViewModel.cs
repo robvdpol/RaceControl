@@ -1,7 +1,6 @@
 ﻿using LibVLCSharp.Shared;
 using NLog;
 using Prism.Services.Dialogs;
-using RaceControl.Common.Interfaces;
 using RaceControl.Core.Mvvm;
 using RaceControl.Services.Interfaces.F1TV;
 using System;
@@ -71,11 +70,12 @@ namespace RaceControl.ViewModels
         public override async void OnDialogOpened(IDialogParameters parameters)
         {
             Title = "Download";
-            Name = parameters.GetValue<string>(ParameterNames.NAME);
-            Filename = parameters.GetValue<string>(ParameterNames.FILENAME);
             var token = parameters.GetValue<string>(ParameterNames.TOKEN);
-            var playable = parameters.GetValue<IPlayable>(ParameterNames.PLAYABLE);
-            var streamUrl = await GenerateStreamUrlAsync(token, playable);
+            var playableContent = parameters.GetValue<PlayableContent>(ParameterNames.PLAYABLE_CONTENT);
+            Filename = parameters.GetValue<string>(ParameterNames.FILENAME);
+            Name = playableContent.Title;
+
+            var streamUrl = await GenerateStreamUrlAsync(token, playableContent);
 
             if (streamUrl == null)
             {
@@ -129,11 +129,11 @@ namespace RaceControl.ViewModels
             Progress = 100;
         }
 
-        private async Task<string> GenerateStreamUrlAsync(string token, IPlayable playable)
+        private async Task<string> GenerateStreamUrlAsync(string token, PlayableContent playableContent)
         {
             try
             {
-                return await _apiService.GetTokenisedUrlAsync(token, playable.ContentType, playable.ContentUrl);
+                return await _apiService.GetTokenisedUrlAsync(token, playableContent.ContentType, playableContent.ContentUrl);
             }
             catch (Exception ex)
             {

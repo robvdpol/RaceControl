@@ -4,9 +4,7 @@ using NLog;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Services.Dialogs;
-using RaceControl.Common.Interfaces;
 using RaceControl.Common.Settings;
-using RaceControl.Common.Utils;
 using RaceControl.Core.Mvvm;
 using RaceControl.Enums;
 using RaceControl.Events;
@@ -59,11 +57,8 @@ namespace RaceControl.ViewModels
 
         private Process _streamlinkProcess;
         private Process _streamlinkRecordingProcess;
-        private IPlayable _playable;
+        private PlayableContent _playableContent;
         private string _token;
-        private string _name;
-        private string _syncUID;
-        private bool _isLive;
         private bool _isStreamlink;
         private bool _isPaused;
         private bool _isMuted;
@@ -117,9 +112,9 @@ namespace RaceControl.ViewModels
         public ICommand MouseLeaveControlBarCommand => _mouseLeaveControlBarCommand ??= new DelegateCommand(MouseLeaveControlBarExecute);
         public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute).ObservesCanExecute(() => CanClose);
         public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand(ToggleMuteExecute).ObservesCanExecute(() => CanClose);
-        public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<string>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => CanClose).ObservesProperty(() => IsLive);
-        public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => CanClose).ObservesProperty(() => IsLive);
-        public ICommand ToggleRecordingCommand => _toggleRecordingCommand ??= new DelegateCommand(ToggleRecordingExecute, CanToggleRecordingExecute).ObservesProperty(() => CanClose).ObservesProperty(() => IsLive).ObservesProperty(() => IsRecording).ObservesProperty(() => IsPaused);
+        public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<string>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent);
+        public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent);
+        public ICommand ToggleRecordingCommand => _toggleRecordingCommand ??= new DelegateCommand(ToggleRecordingExecute, CanToggleRecordingExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent).ObservesProperty(() => IsRecording).ObservesProperty(() => IsPaused);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand(ToggleFullScreenExecute);
         public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => WindowState);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
@@ -131,28 +126,10 @@ namespace RaceControl.ViewModels
 
         public MediaPlayer MediaPlayer { get; }
 
-        public IPlayable Playable
+        public PlayableContent PlayableContent
         {
-            get => _playable;
-            set => SetProperty(ref _playable, value);
-        }
-
-        public string Name
-        {
-            get => _name;
-            set => SetProperty(ref _name, value);
-        }
-
-        public string SyncUID
-        {
-            get => _syncUID;
-            set => SetProperty(ref _syncUID, value);
-        }
-
-        public bool IsLive
-        {
-            get => _isLive;
-            set => SetProperty(ref _isLive, value);
+            get => _playableContent;
+            set => SetProperty(ref _playableContent, value);
         }
 
         public bool IsStreamlink
@@ -310,19 +287,16 @@ namespace RaceControl.ViewModels
                 ResizeMode = (int)ResizeMode,
                 WindowState = (int)WindowState,
                 Topmost = Topmost,
-                ChannelName = Name
+                ChannelName = PlayableContent.Name
             };
         }
 
         public override async void OnDialogOpened(IDialogParameters parameters)
         {
             _token = parameters.GetValue<string>(ParameterNames.TOKEN);
-            Playable = parameters.GetValue<IPlayable>(ParameterNames.PLAYABLE);
-            Title = parameters.GetValue<string>(ParameterNames.TITLE);
-            Name = parameters.GetValue<string>(ParameterNames.NAME);
-            SyncUID = parameters.GetValue<string>(ParameterNames.SYNC_UID);
-            IsLive = parameters.GetValue<bool>(ParameterNames.IS_LIVE);
-            IsStreamlink = IsLive && !_settings.DisableStreamlink;
+            PlayableContent = parameters.GetValue<PlayableContent>(ParameterNames.PLAYABLE_CONTENT);
+            IsStreamlink = PlayableContent.IsLive && !_settings.DisableStreamlink;
+            Title = PlayableContent.Title;
 
             var instance = parameters.GetValue<VideoDialogInstance>(ParameterNames.INSTANCE);
             SetWindowLocation(instance);
@@ -352,7 +326,7 @@ namespace RaceControl.ViewModels
             _showControlsTimer.Start();
             _syncStreamsEventToken = _eventAggregator.GetEvent<SyncStreamsEvent>().Subscribe(OnSyncSession);
 
-            await GetDriverImagesAsync();
+            await LoadDriverImageUrlsAsync();
 
             base.OnDialogOpened(parameters);
         }
@@ -557,7 +531,7 @@ namespace RaceControl.ViewModels
 
         private bool CanFastForwardExecute(string arg)
         {
-            return CanClose && !IsLive;
+            return CanClose && !PlayableContent.IsLive;
         }
 
         private void FastForwardExecute(string value)
@@ -572,19 +546,19 @@ namespace RaceControl.ViewModels
 
         private bool CanSyncSessionExecute()
         {
-            return CanClose && !IsLive;
+            return CanClose && !PlayableContent.IsLive;
         }
 
         private void SyncSessionExecute()
         {
-            var payload = new SyncStreamsEventPayload(UniqueIdentifier, SyncUID, MediaPlayer.Time);
+            var payload = new SyncStreamsEventPayload(UniqueIdentifier, PlayableContent.SyncUID, MediaPlayer.Time);
             Logger.Info($"Syncing streams with sync-UID '{payload.SyncUID}' to timestamp '{payload.Time}'...");
             _eventAggregator.GetEvent<SyncStreamsEvent>().Publish(payload);
         }
 
         private bool CanToggleRecordingExecute()
         {
-            return CanClose && IsLive && (IsRecording || !IsPaused);
+            return CanClose && PlayableContent.IsLive && (IsRecording || !IsPaused);
         }
 
         private async void ToggleRecordingExecute()
@@ -602,7 +576,7 @@ namespace RaceControl.ViewModels
 
         private void OnSyncSession(SyncStreamsEventPayload payload)
         {
-            if (UniqueIdentifier != payload.RequesterIdentifier && SyncUID == payload.SyncUID)
+            if (UniqueIdentifier != payload.RequesterIdentifier && PlayableContent.SyncUID == payload.SyncUID)
             {
                 SetMediaPlayerTime(payload.Time);
             }
@@ -773,7 +747,7 @@ namespace RaceControl.ViewModels
         {
             try
             {
-                return await _apiService.GetTokenisedUrlAsync(_token, Playable.ContentType, Playable.ContentUrl);
+                return await _apiService.GetTokenisedUrlAsync(_token, PlayableContent.ContentType, PlayableContent.ContentUrl);
             }
             catch (Exception ex)
             {
@@ -783,25 +757,26 @@ namespace RaceControl.ViewModels
             return null;
         }
 
-        private async Task GetDriverImagesAsync()
+        private async Task LoadDriverImageUrlsAsync()
         {
-            if (Playable.DriverOccurrenceUrls.Any())
+            if (string.IsNullOrWhiteSpace(PlayableContent.DriverUID))
             {
-                try
-                {
-                    var driverUID = Playable.DriverOccurrenceUrls.First().GetUID();
-                    var driver = await _apiService.GetDriverAsync(driverUID);
+                return;
+            }
 
-                    if (driver != null)
-                    {
-                        CarImageUrl = driver.CarUrl;
-                        HeadshotImageUrl = driver.HeadshotUrl;
-                    }
-                }
-                catch (Exception ex)
+            try
+            {
+                var driver = await _apiService.GetDriverAsync(PlayableContent.DriverUID);
+
+                if (driver != null)
                 {
-                    Logger.Error(ex, "An error occurred while trying to get driver images.");
+                    CarImageUrl = driver.CarUrl;
+                    HeadshotImageUrl = driver.HeadshotUrl;
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "An error occurred while trying to get driver images.");
             }
         }
 
@@ -824,7 +799,7 @@ namespace RaceControl.ViewModels
             media = CreateMedia(streamUrl);
             StartPlayback(media, renderer);
 
-            if (!IsLive)
+            if (!PlayableContent.IsLive)
             {
                 SetMediaPlayerTime(time);
             }
@@ -845,7 +820,7 @@ namespace RaceControl.ViewModels
                 return false;
             }
 
-            _streamlinkRecordingProcess = _streamlinkLauncher.StartStreamlinkRecording(streamUrl, Title);
+            _streamlinkRecordingProcess = _streamlinkLauncher.StartStreamlinkRecording(streamUrl, PlayableContent.Title);
             Logger.Info("Recording process started.");
 
             return true;

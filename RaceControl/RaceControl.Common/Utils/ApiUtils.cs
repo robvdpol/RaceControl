@@ -4,6 +4,11 @@
     {
         public static string GetUID(this string url)
         {
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                return null;
+            }
+
             if (url.EndsWith("/"))
             {
                 url = url.Substring(0, url.Length - 1);

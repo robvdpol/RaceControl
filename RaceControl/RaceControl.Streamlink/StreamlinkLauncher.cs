@@ -62,9 +62,8 @@ namespace RaceControl.Streamlink
 
             _logger.Info($"Starting VLC Streamlink-instance for stream-URL '{streamUrl}' with identifier '{streamIdentifier}'...");
 
-            var process = ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, true);
+            using var process = ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, true);
             process.Start();
-            process.Dispose();
         }
 
         public void StartStreamlinkMpv(string mpvExeLocation, string streamUrl, string title)
@@ -74,9 +73,8 @@ namespace RaceControl.Streamlink
 
             _logger.Info($"Starting MPV Streamlink-instance for stream-URL '{streamUrl}' with identifier '{streamIdentifier}'...");
 
-            var process = ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, true);
+            using var process = ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, true);
             process.Start();
-            process.Dispose();
         }
 
         private string GetStreamIdentifier()

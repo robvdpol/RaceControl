@@ -3,7 +3,6 @@ using NLog;
 using Prism.Commands;
 using Prism.Services.Dialogs;
 using RaceControl.Common.Enum;
-using RaceControl.Common.Interfaces;
 using RaceControl.Common.Settings;
 using RaceControl.Common.Utils;
 using RaceControl.Comparers;
@@ -112,7 +111,7 @@ namespace RaceControl.ViewModels
         public ICommand WatchVlcEpisodeCommand => _watchVlcEpisodeCommand ??= new DelegateCommand<Episode>(WatchVlcEpisodeExecute, CanWatchVlcEpisodeExecute).ObservesProperty(() => VlcExeLocation);
         public ICommand WatchMpvChannelCommand => _watchMpvChannelCommand ??= new DelegateCommand<Channel>(WatchMpvChannelExecute, CanWatchMpvChannelExecute).ObservesProperty(() => MpvExeLocation).ObservesProperty(() => SelectedSession).ObservesProperty(() => SelectedLiveSession);
         public ICommand WatchMpvEpisodeCommand => _watchMpvEpisodeCommand ??= new DelegateCommand<Episode>(WatchMpvEpisodeExecute, CanWatchMpvEpisodeExecute).ObservesProperty(() => MpvExeLocation);
-        public ICommand CopyUrlChannelCommand => _copyUrlChannelCommand ??= new DelegateCommand<Channel>(CopyUrlChannelExecute);
+        public ICommand CopyUrlChannelCommand => _copyUrlChannelCommand ??= new DelegateCommand<Channel>(CopyUrlChannelExecute, CanCopyUrlChannelExecute).ObservesProperty(() => SelectedSession).ObservesProperty(() => SelectedLiveSession);
         public ICommand CopyUrlEpisodeCommand => _copyUrlEpisodeCommand ??= new DelegateCommand<Episode>(CopyUrlEpisodeExecute);
         public ICommand DownloadChannelCommand => _downloadChannelCommand ??= new DelegateCommand<Channel>(DownloadChannelExecute, CanDownloadChannelExecute).ObservesProperty(() => SelectedSession).ObservesProperty(() => SelectedLiveSession);
         public ICommand DownloadEpisodeCommand => _downloadEpisodeCommand ??= new DelegateCommand<Episode>(DownloadEpisodeExecute);
@@ -373,25 +372,20 @@ namespace RaceControl.ViewModels
         private void WatchChannelExecute(Channel channel)
         {
             var session = GetSelectedSession();
-
-            WatchChannel(session, channel);
+            var playableContent = PlayableContent.Create(session, channel);
+            WatchChannel(playableContent);
         }
 
         private void WatchEpisodeExecute(Episode episode)
         {
-            var title = episode.ToString();
+            var playableContent = PlayableContent.Create(episode);
             var parameters = new DialogParameters
             {
                 { ParameterNames.TOKEN, _token },
-                { ParameterNames.PLAYABLE, episode },
-                { ParameterNames.TITLE, title },
-                { ParameterNames.NAME, title },
-                { ParameterNames.SYNC_UID, episode.UID },
-                { ParameterNames.IS_LIVE, false },
+                { ParameterNames.PLAYABLE_CONTENT, playableContent },
                 { ParameterNames.INSTANCE, null }
             };
 
-            Logger.Info($"Starting internal player for episode with parameters: '{parameters}'.");
             OpenVideoDialog(parameters);
         }
 
@@ -404,16 +398,16 @@ namespace RaceControl.ViewModels
         {
             IsBusy = true;
             var session = GetSelectedSession();
-            var title = GetTitle(session, channel);
+            var playableContent = PlayableContent.Create(session, channel);
 
             try
             {
-                var url = await GetTokenisedUrlAsync(channel);
-                WatchStreamInVlc(url, title, session.IsLive);
+                var streamUrl = await GetTokenisedUrlAsync(playableContent);
+                WatchStreamInVlc(playableContent, streamUrl);
             }
             catch (Exception ex)
             {
-                var message = $"An error occurred while trying to watch channel '{channel.Name}' in VLC.";
+                var message = $"An error occurred while trying to watch channel '{playableContent.Title}' in VLC.";
                 Logger.Error(ex, message);
                 MessageBoxHelper.ShowError(message);
             }
@@ -429,16 +423,16 @@ namespace RaceControl.ViewModels
         private async void WatchVlcEpisodeExecute(Episode episode)
         {
             IsBusy = true;
-            var title = episode.ToString();
+            var playableContent = PlayableContent.Create(episode);
 
             try
             {
-                var url = await GetTokenisedUrlAsync(episode);
-                WatchStreamInVlc(url, title, false);
+                var streamUrl = await GetTokenisedUrlAsync(playableContent);
+                WatchStreamInVlc(playableContent, streamUrl);
             }
             catch (Exception ex)
             {
-                var message = $"An error occurred while trying to watch episode '{episode.Title}' in VLC.";
+                var message = $"An error occurred while trying to watch episode '{playableContent.Title}' in VLC.";
                 Logger.Error(ex, message);
                 MessageBoxHelper.ShowError(message);
             }
@@ -455,16 +449,16 @@ namespace RaceControl.ViewModels
         {
             IsBusy = true;
             var session = GetSelectedSession();
-            var title = GetTitle(session, channel);
+            var playableContent = PlayableContent.Create(session, channel);
 
             try
             {
-                var url = await GetTokenisedUrlAsync(channel);
-                WatchStreamInMpv(url, title, session.IsLive);
+                var streamUrl = await GetTokenisedUrlAsync(playableContent);
+                WatchStreamInMpv(playableContent, streamUrl);
             }
             catch (Exception ex)
             {
-                var message = $"An error occurred while trying to watch channel '{channel.Name}' in MPV.";
+                var message = $"An error occurred while trying to watch channel '{playableContent.Title}' in MPV.";
                 Logger.Error(ex, message);
                 MessageBoxHelper.ShowError(message);
             }
@@ -480,16 +474,16 @@ namespace RaceControl.ViewModels
         private async void WatchMpvEpisodeExecute(Episode episode)
         {
             IsBusy = true;
-            var title = episode.ToString();
+            var playableContent = PlayableContent.Create(episode);
 
             try
             {
-                var url = await GetTokenisedUrlAsync(episode);
-                WatchStreamInMpv(url, title, false);
+                var streamUrl = await GetTokenisedUrlAsync(playableContent);
+                WatchStreamInMpv(playableContent, streamUrl);
             }
             catch (Exception ex)
             {
-                var message = $"An error occurred while trying to watch episode '{episode.Title}' in MPV.";
+                var message = $"An error occurred while trying to watch episode '{playableContent.Title}' in MPV.";
                 Logger.Error(ex, message);
                 MessageBoxHelper.ShowError(message);
             }
@@ -497,14 +491,21 @@ namespace RaceControl.ViewModels
             IsBusy = false;
         }
 
+        private bool CanCopyUrlChannelExecute(Channel channel)
+        {
+            return GetSelectedSession() != null;
+        }
+
         private async void CopyUrlChannelExecute(Channel channel)
         {
             IsBusy = true;
+            var session = GetSelectedSession();
+            var playableContent = PlayableContent.Create(session, channel);
 
             try
             {
-                var url = await GetTokenisedUrlAsync(channel);
-                Clipboard.SetText(url);
+                var streamUrl = await GetTokenisedUrlAsync(playableContent);
+                Clipboard.SetText(streamUrl);
             }
             catch (Exception ex)
             {
@@ -519,11 +520,12 @@ namespace RaceControl.ViewModels
         private async void CopyUrlEpisodeExecute(Episode episode)
         {
             IsBusy = true;
+            var playableContent = PlayableContent.Create(episode);
 
             try
             {
-                var url = await GetTokenisedUrlAsync(episode);
-                Clipboard.SetText(url);
+                var streamUrl = await GetTokenisedUrlAsync(playableContent);
+                Clipboard.SetText(streamUrl);
             }
             catch (Exception ex)
             {
@@ -543,14 +545,14 @@ namespace RaceControl.ViewModels
         private void DownloadChannelExecute(Channel channel)
         {
             var session = GetSelectedSession();
-            var title = GetTitle(session, channel);
-            StartDownload(title, channel);
+            var playableContent = PlayableContent.Create(session, channel);
+            StartDownload(playableContent);
         }
 
         private void DownloadEpisodeExecute(Episode episode)
         {
-            var title = episode.ToString();
-            StartDownload(title, episode);
+            var playableContent = PlayableContent.Create(episode);
+            StartDownload(playableContent);
         }
 
         private void SetRecordingLocationExecute()
@@ -563,13 +565,13 @@ namespace RaceControl.ViewModels
 
         private bool CanSaveVideoDialogLayoutExecute()
         {
-            return VideoDialogViewModels.Any(vm => vm.Playable.ContentType == ContentType.Channel);
+            return VideoDialogViewModels.Any(vm => vm.PlayableContent.ContentType == ContentType.Channel);
         }
 
         private void SaveVideoDialogLayoutExecute()
         {
             VideoDialogLayout.Clear();
-            VideoDialogLayout.Add(VideoDialogViewModels.Where(vm => vm.Playable.ContentType == ContentType.Channel).Select(vm => vm.GetVideoDialogInstance()));
+            VideoDialogLayout.Add(VideoDialogViewModels.Where(vm => vm.PlayableContent.ContentType == ContentType.Channel).Select(vm => vm.GetVideoDialogInstance()));
 
             if (VideoDialogLayout.Save())
             {
@@ -584,7 +586,7 @@ namespace RaceControl.ViewModels
 
         private void OpenVideoDialogLayoutExecute()
         {
-            var viewModelsToClose = VideoDialogViewModels.Where(vm => vm.Playable.ContentType == ContentType.Channel).ToList();
+            var viewModelsToClose = VideoDialogViewModels.Where(vm => vm.PlayableContent.ContentType == ContentType.Channel).ToList();
 
             foreach (var viewModel in viewModelsToClose)
             {
@@ -599,7 +601,8 @@ namespace RaceControl.ViewModels
 
                 if (channel != null)
                 {
-                    WatchChannel(session, channel, instance);
+                    var playableContent = PlayableContent.Create(session, channel);
+                    WatchChannel(playableContent, instance);
                 }
             }
         }
@@ -881,21 +884,15 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void WatchChannel(Session session, Channel channel, VideoDialogInstance instance = null)
+        private void WatchChannel(PlayableContent playableContent, VideoDialogInstance instance = null)
         {
-            var title = GetTitle(session, channel);
             var parameters = new DialogParameters
             {
                 { ParameterNames.TOKEN, _token },
-                { ParameterNames.PLAYABLE, channel },
-                { ParameterNames.TITLE, title },
-                { ParameterNames.NAME, channel.Name },
-                { ParameterNames.SYNC_UID, session.UID },
-                { ParameterNames.IS_LIVE, session.IsLive },
+                { ParameterNames.PLAYABLE_CONTENT, playableContent },
                 { ParameterNames.INSTANCE, instance }
             };
 
-            Logger.Info($"Starting internal player for channel with parameters: '{parameters}'.");
             OpenVideoDialog(parameters);
         }
 
@@ -916,45 +913,45 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void WatchStreamInVlc(string url, string title, bool isLive)
+        private void WatchStreamInVlc(PlayableContent playableContent, string streamUrl)
         {
-            if (isLive && !Settings.DisableStreamlink)
+            if (playableContent.IsLive && !Settings.DisableStreamlink)
             {
-                _streamlinkLauncher.StartStreamlinkVlc(VlcExeLocation, url, title);
+                _streamlinkLauncher.StartStreamlinkVlc(VlcExeLocation, streamUrl, playableContent.Title);
             }
             else
             {
-                ProcessUtils.CreateProcess(VlcExeLocation, $"\"{url}\" --meta-title=\"{title}\"").Start();
+                using var process = ProcessUtils.CreateProcess(VlcExeLocation, $"\"{streamUrl}\" --meta-title=\"{playableContent.Title}\"");
+                process.Start();
             }
         }
 
-        private void WatchStreamInMpv(string url, string title, bool isLive)
+        private void WatchStreamInMpv(PlayableContent playableContent, string streamUrl)
         {
-            if (isLive && !Settings.DisableStreamlink)
+            if (playableContent.IsLive && !Settings.DisableStreamlink)
             {
-                _streamlinkLauncher.StartStreamlinkMpv(MpvExeLocation, url, title);
+                _streamlinkLauncher.StartStreamlinkMpv(MpvExeLocation, streamUrl, playableContent.Title);
             }
             else
             {
-                ProcessUtils.CreateProcess(MpvExeLocation, $"\"{url}\" --title=\"{title}\"").Start();
+                using var process = ProcessUtils.CreateProcess(MpvExeLocation, $"\"{streamUrl}\" --title=\"{playableContent.Title}\"");
+                process.Start();
             }
         }
 
-        private void StartDownload(string title, IPlayable playable)
+        private void StartDownload(PlayableContent playableContent)
         {
-            var defaultFilename = $"{title}.ts".RemoveInvalidFileNameChars();
+            var defaultFilename = $"{playableContent.Title}.ts".RemoveInvalidFileNameChars();
 
             if (_dialogService.SelectFile("Select a filename", Settings.RecordingLocation, defaultFilename, ".ts", out var filename))
             {
                 var parameters = new DialogParameters
                 {
-                    { ParameterNames.NAME, title },
-                    { ParameterNames.FILENAME, filename },
                     { ParameterNames.TOKEN, _token },
-                    { ParameterNames.PLAYABLE, playable}
+                    { ParameterNames.PLAYABLE_CONTENT, playableContent},
+                    { ParameterNames.FILENAME, filename }
                 };
 
-                Logger.Info($"Starting download with parameters: '{parameters}'.");
                 _dialogService.Show(nameof(DownloadDialog), parameters, null);
             }
         }
@@ -974,9 +971,9 @@ namespace RaceControl.ViewModels
             SelectedVodType = null;
         }
 
-        private async Task<string> GetTokenisedUrlAsync(IPlayable playable)
+        private async Task<string> GetTokenisedUrlAsync(PlayableContent playableContent)
         {
-            return await _apiService.GetTokenisedUrlAsync(_token, playable.ContentType, playable.ContentUrl);
+            return await _apiService.GetTokenisedUrlAsync(_token, playableContent.ContentType, playableContent.ContentUrl);
         }
 
         private Session GetSelectedSession() => SelectedLiveSession ?? SelectedSession;

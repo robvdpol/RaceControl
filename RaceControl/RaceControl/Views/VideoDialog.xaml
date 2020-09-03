@@ -161,7 +161,7 @@
                         <Slider
                             Grid.Column="1"
                             Margin="2"
-                            IsEnabled="{Binding IsLive, Converter={StaticResource InverseBooleanConverter}}"
+                            IsEnabled="{Binding PlayableContent.IsLive, Converter={StaticResource InverseBooleanConverter}}"
                             IsMoveToPointEnabled="True"
                             IsSnapToTickEnabled="False"
                             Maximum="{Binding Duration}"
