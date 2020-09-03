@@ -81,14 +81,15 @@ namespace RaceControl.Core.Behaviors
                 var list = (IList)SelectedItems;
                 var item = checkBox.Tag;
 
-                if (checkBox.IsChecked == true && !list.Contains(item))
+                switch (checkBox.IsChecked)
                 {
-                    list.Add(item);
-                }
+                    case true when !list.Contains(item):
+                        list.Add(item);
+                        break;
 
-                if (checkBox.IsChecked == false && list.Contains(item))
-                {
-                    list.Remove(item);
+                    case false when list.Contains(item):
+                        list.Remove(item);
+                        break;
                 }
 
                 SubscribeToEvents(false, true);

@@ -52,10 +52,8 @@ namespace RaceControl.Common.Settings
 
             try
             {
-                using (var file = File.OpenText(Filename))
-                {
-                    _serializer.Populate(file, this);
-                }
+                using var file = File.OpenText(Filename);
+                _serializer.Populate(file, this);
             }
             catch (Exception ex)
             {
@@ -71,10 +69,8 @@ namespace RaceControl.Common.Settings
 
             try
             {
-                using (var file = File.CreateText(Filename))
-                {
-                    _serializer.Serialize(file, this);
-                }
+                using var file = File.CreateText(Filename);
+                _serializer.Serialize(file, this);
             }
             catch (Exception ex)
             {
