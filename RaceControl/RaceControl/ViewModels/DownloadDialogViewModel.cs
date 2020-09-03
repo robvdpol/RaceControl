@@ -84,9 +84,8 @@ namespace RaceControl.ViewModels
             else
             {
                 Logger.Info($"Downloading '{Name}' to file '{Filename}'...");
-                var media = new Media(_libVLC, streamUrl, FromType.FromLocation);
                 var option = $":sout=#std{{access=file,mux=ts,dst=\"{Filename}\"}}";
-                media.AddOption(option);
+                var media = new Media(_libVLC, streamUrl, FromType.FromLocation, option);
 
                 if (_mediaPlayer.Play(media))
                 {
