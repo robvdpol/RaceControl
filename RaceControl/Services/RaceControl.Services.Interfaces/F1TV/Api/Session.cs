@@ -72,7 +72,7 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         {
             if (IsUpcoming)
             {
-                return $"{Name} (upcoming)";
+                return $"{Name} (starts {StartTime:ddd HH:mm})";
             }
 
             if (IsLive)
