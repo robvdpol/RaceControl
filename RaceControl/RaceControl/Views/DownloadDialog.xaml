@@ -8,12 +8,16 @@
         <Style TargetType="Window">
             <Setter Property="ResizeMode" Value="CanMinimize" />
             <Setter Property="ShowInTaskbar" Value="True" />
-            <Setter Property="SizeToContent" Value="Height" />
+            <Setter Property="SizeToContent" Value="Manual" />
             <Setter Property="Width" Value="550" />
-            <Setter Property="MinHeight" Value="190" />
+            <Setter Property="Height" Value="180" />
         </Style>
     </prism:Dialog.WindowStyle>
     <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="80" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -23,65 +27,77 @@
         </Grid.RowDefinitions>
         <TextBlock
             Grid.Row="0"
+            Grid.Column="0"
             Margin="2"
-            TextWrapping="Wrap">
-            <Run Text="Name:" />
-            <Run Text="{Binding Name}" />
-        </TextBlock>
+            Text="Name:" />
+        <TextBlock
+            Grid.Row="0"
+            Grid.Column="1"
+            Margin="2"
+            Text="{Binding Name}" />
         <TextBlock
             Grid.Row="1"
+            Grid.Column="0"
             Margin="2"
-            TextWrapping="Wrap">
-            <Run Text="Destination:" />
-            <Run Text="{Binding Filename}" />
-        </TextBlock>
+            Text="Destination:" />
+        <TextBlock
+            Grid.Row="1"
+            Grid.Column="1"
+            Margin="2"
+            Text="{Binding Filename}" />
         <TextBlock
             Grid.Row="2"
+            Grid.Column="0"
             Margin="2"
-            TextWrapping="Wrap">
-            <Run Text="Status:" />
-            <Run FontWeight="Bold">
-                <Run.Style>
-                    <Style TargetType="{x:Type Run}">
-                        <Setter Property="Text" Value="Waiting..." />
-                        <Style.Triggers>
-                            <MultiDataTrigger>
-                                <MultiDataTrigger.Conditions>
-                                    <Condition Binding="{Binding HasStarted}" Value="True" />
-                                    <Condition Binding="{Binding HasExited}" Value="False" />
-                                    <Condition Binding="{Binding HasFailed}" Value="False" />
-                                </MultiDataTrigger.Conditions>
-                                <MultiDataTrigger.Setters>
-                                    <Setter Property="Text" Value="Downloading..." />
-                                </MultiDataTrigger.Setters>
-                            </MultiDataTrigger>
-                            <MultiDataTrigger>
-                                <MultiDataTrigger.Conditions>
-                                    <Condition Binding="{Binding HasStarted}" Value="True" />
-                                    <Condition Binding="{Binding HasExited}" Value="True" />
-                                    <Condition Binding="{Binding HasFailed}" Value="False" />
-                                </MultiDataTrigger.Conditions>
-                                <MultiDataTrigger.Setters>
-                                    <Setter Property="Text" Value="Finished" />
-                                </MultiDataTrigger.Setters>
-                            </MultiDataTrigger>
-                            <DataTrigger Binding="{Binding HasFailed}" Value="True">
-                                <Setter Property="Text" Value="Failed (see log file for details)" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Run.Style>
-            </Run>
+            Text="Status:" />
+        <TextBlock
+            Grid.Row="2"
+            Grid.Column="1"
+            Margin="2">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Text" Value="Waiting..." />
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding HasStarted}" Value="True" />
+                                <Condition Binding="{Binding HasFinished}" Value="False" />
+                                <Condition Binding="{Binding HasFailed}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <MultiDataTrigger.Setters>
+                                <Setter Property="Text" Value="Downloading..." />
+                            </MultiDataTrigger.Setters>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding HasStarted}" Value="True" />
+                                <Condition Binding="{Binding HasFinished}" Value="True" />
+                                <Condition Binding="{Binding HasFailed}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <MultiDataTrigger.Setters>
+                                <Setter Property="Text" Value="Finished" />
+                            </MultiDataTrigger.Setters>
+                        </MultiDataTrigger>
+                        <DataTrigger Binding="{Binding HasFailed}" Value="True">
+                            <Setter Property="Text" Value="Failed (see log file for details)" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
         </TextBlock>
         <TextBlock
             Grid.Row="3"
+            Grid.Column="0"
             Margin="2"
-            TextWrapping="Wrap">
-            <Run Text="Progress:" />
-            <Run Text="{Binding Percentage, StringFormat={}{0:F1}%}" />
-        </TextBlock>
+            Text="Progress:" />
+        <TextBlock
+            Grid.Row="3"
+            Grid.Column="1"
+            Margin="2"
+            Text="{Binding Progress, StringFormat={}{0:F1}%}" />
         <Button
             Grid.Row="4"
+            Grid.Column="1"
             Width="100"
             Height="24"
             HorizontalAlignment="Right"
@@ -95,7 +111,8 @@
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding HasStarted}" Value="True" />
-                                <Condition Binding="{Binding HasExited}" Value="False" />
+                                <Condition Binding="{Binding HasFinished}" Value="False" />
+                                <Condition Binding="{Binding HasFailed}" Value="False" />
                             </MultiDataTrigger.Conditions>
                             <MultiDataTrigger.Setters>
                                 <Setter Property="Content" Value="Cancel" />

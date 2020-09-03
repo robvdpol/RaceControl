@@ -18,15 +18,18 @@ namespace RaceControl.ViewModels
         private string _name;
         private string _filename;
         private bool _hasStarted;
-        private bool _hasExited;
+        private bool _hasFinished;
         private bool _hasFailed;
-        private float _percentage;
+        private float _progress;
 
         public DownloadDialogViewModel(ILogger logger, IApiService apiService, LibVLC libVLC, MediaPlayer mediaPlayer) : base(logger)
         {
             _apiService = apiService;
             _libVLC = libVLC;
             _mediaPlayer = mediaPlayer;
+            _mediaPlayer.PositionChanged += MediaPlayer_PositionChanged;
+            _mediaPlayer.EncounteredError += MediaPlayer_EncounteredError;
+            _mediaPlayer.EndReached += MediaPlayer_EndReached;
         }
 
         public string Name
@@ -47,10 +50,10 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _hasStarted, value);
         }
 
-        public bool HasExited
+        public bool HasFinished
         {
-            get => _hasExited;
-            set => SetProperty(ref _hasExited, value);
+            get => _hasFinished;
+            set => SetProperty(ref _hasFinished, value);
         }
 
         public bool HasFailed
@@ -59,10 +62,10 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _hasFailed, value);
         }
 
-        public float Percentage
+        public float Progress
         {
-            get => _percentage;
-            set => SetProperty(ref _percentage, value);
+            get => _progress;
+            set => SetProperty(ref _progress, value);
         }
 
         public override async void OnDialogOpened(IDialogParameters parameters)
@@ -74,18 +77,16 @@ namespace RaceControl.ViewModels
             var playable = parameters.GetValue<IPlayable>(ParameterNames.PLAYABLE);
             var streamUrl = await GenerateStreamUrlAsync(token, playable);
 
-            CreateMediaPlayer();
-
             if (streamUrl == null)
             {
                 HasFailed = true;
             }
             else
             {
-                Logger.Info($"Starting download process for content-type '{playable.ContentType}' and content-URL '{playable.ContentUrl}'...");
-
+                Logger.Info($"Downloading '{Name}' to file '{Filename}'...");
                 var media = new Media(_libVLC, streamUrl, FromType.FromLocation);
-                media.AddOption(":sout=#transcode{scodec=none}:std{access=file,mux=ts,dst='" + Filename + "'}");
+                var option = $":sout=#std{{access=file,mux=ts,dst=\"{Filename}\"}}";
+                media.AddOption(option);
 
                 if (_mediaPlayer.Play(media))
                 {
@@ -102,33 +103,31 @@ namespace RaceControl.ViewModels
 
         public override void OnDialogClosed()
         {
-            RemoveMediaPlayer();
+            _mediaPlayer.PositionChanged -= MediaPlayer_PositionChanged;
+            _mediaPlayer.EncounteredError -= MediaPlayer_EncounteredError;
+            _mediaPlayer.EndReached -= MediaPlayer_EndReached;
+            _mediaPlayer.Dispose();
 
             base.OnDialogClosed();
         }
 
-        private void CreateMediaPlayer()
-        {
-            _mediaPlayer.PositionChanged += MediaPlayer_PositionChanged;
-            _mediaPlayer.EndReached += MediaPlayer_EndReached;
-        }
-
-        private void RemoveMediaPlayer()
-        {
-            _mediaPlayer.PositionChanged -= MediaPlayer_PositionChanged;
-            _mediaPlayer.EndReached -= MediaPlayer_EndReached;
-            _mediaPlayer.Dispose();
-        }
-
         private void MediaPlayer_PositionChanged(object sender, MediaPlayerPositionChangedEventArgs e)
         {
-            Percentage = e.Position * 100;
+            Progress = e.Position * 100;
+        }
+
+        private void MediaPlayer_EncounteredError(object sender, EventArgs e)
+        {
+            Logger.Error($"Download of '{Name}' to file '{Filename}' failed.");
+            HasFailed = true;
+            Progress = 0;
         }
 
         private void MediaPlayer_EndReached(object sender, EventArgs e)
         {
-            Percentage = 100;
-            HasExited = true;
+            Logger.Info($"Download of '{Name}' to file '{Filename}' finished.");
+            HasFinished = true;
+            Progress = 100;
         }
 
         private async Task<string> GenerateStreamUrlAsync(string token, IPlayable playable)

@@ -811,7 +811,7 @@ namespace RaceControl.ViewModels
 
             var time = MediaPlayer.Time;
             var media = MediaPlayer.Media;
-            var streamUrl = IsStreamlink ? media.Mrl : await GenerateStreamUrlAsync();
+            var streamUrl = IsStreamlink ? media?.Mrl : await GenerateStreamUrlAsync();
 
             if (streamUrl == null)
             {
