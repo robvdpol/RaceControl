@@ -95,7 +95,7 @@ namespace RaceControl.Streamlink
 
         private string GetRecordingFilename(string title)
         {
-            var filename = $"{DateTime.Now:yyyy-MM-dd HH.mm.ss.fff} {title}.mkv".RemoveInvalidFileNameChars();
+            var filename = $"{DateTime.Now:yyyy-MM-dd HH.mm.ss.fff} {title}.ts".RemoveInvalidFileNameChars();
 
             return Path.Combine(_settings.RecordingLocation, filename);
         }
