@@ -123,7 +123,7 @@ namespace RaceControl
             {
                 FileName = "RaceControl.log",
                 Layout = Layout.FromString("${longdate} ${uppercase:${level}} ${message}${onexception:inner=${newline}${exception:format=tostring}}"),
-                ArchiveAboveSize = 5 * 1024 * 1024,
+                ArchiveAboveSize = 1024 * 1024,
                 ArchiveNumbering = ArchiveNumberingMode.Rolling,
                 MaxArchiveFiles = 2
             };
@@ -133,7 +133,7 @@ namespace RaceControl
 
         private void PrismApplication_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
-            LogManager.GetLogger(sender.GetType().FullName).Error(e.Exception, "An unhandled exception occurred.");
+            LogManager.GetCurrentClassLogger().Error(e.Exception, "An unhandled exception occurred.");
             MessageBoxHelper.ShowError(e.Exception.Message);
             e.Handled = true;
         }

@@ -632,7 +632,7 @@ namespace RaceControl.ViewModels
         {
             IsBusy = true;
 
-            if (_credentialService.LoadCredential(out var email, out _) && MessageBoxHelper.AskQuestion($"Are you sure you want to delete the credentials of {email} from this system?", "Credentials"))
+            if (MessageBoxHelper.AskQuestion("Are you sure you want to delete your credentials from this system?", "Credentials"))
             {
                 _credentialService.DeleteCredential();
                 Login();
