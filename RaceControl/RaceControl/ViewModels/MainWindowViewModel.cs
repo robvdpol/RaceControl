@@ -595,14 +595,14 @@ namespace RaceControl.ViewModels
             }
 
             var session = GetSelectedSession();
+            var playableContents = Channels.Select(channel => PlayableContent.Create(session, channel)).ToList();
 
             foreach (var instance in VideoDialogLayout.Instances)
             {
-                var channel = Channels.FirstOrDefault(c => c.Name == instance.ChannelName);
+                var playableContent = playableContents.FirstOrDefault(p => p.ContentType == ContentType.Channel && p.Name == instance.ChannelName);
 
-                if (channel != null)
+                if (playableContent != null)
                 {
-                    var playableContent = PlayableContent.Create(session, channel);
                     WatchChannel(playableContent, instance);
                 }
             }
