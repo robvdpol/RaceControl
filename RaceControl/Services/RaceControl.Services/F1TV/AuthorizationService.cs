@@ -2,7 +2,6 @@
 using RaceControl.Services.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Authorization;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -28,10 +27,12 @@ namespace RaceControl.Services.F1TV
         {
             var authResponse = await AuthenticateAsync(login, password);
 
+#if !DEBUG
             if (authResponse.Data.SubscriptionStatus != "active")
             {
-                throw new Exception("An active F1TV subscription is required.");
+                throw new System.Exception("An active F1TV subscription is required.");
             }
+#endif
 
             var tokenRequest = new TokenRequest
             {
