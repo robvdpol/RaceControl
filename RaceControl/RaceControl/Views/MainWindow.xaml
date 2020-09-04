@@ -398,7 +398,7 @@
                                     Margin="3"
                                     Content="Disable Streamlink for live streams"
                                     IsChecked="{Binding Settings.DisableStreamlink}"
-                                    ToolTip="Use when regular live streams do not work" />
+                                    ToolTip="Pass live stream URL directly to video player (usually only works in MPV)" />
                                 <TextBlock Margin="3" Text="Recording location:" />
                                 <TextBlock
                                     Margin="3,0,3,3"
