@@ -15,8 +15,8 @@ namespace RaceControl.ViewModels
         private readonly LibVLC _libVLC;
         private readonly MediaPlayer _mediaPlayer;
 
-        private string _name;
         private string _filename;
+        private string _name;
         private bool _hasStarted;
         private bool _hasFinished;
         private bool _hasFailed;
@@ -32,16 +32,18 @@ namespace RaceControl.ViewModels
             _mediaPlayer.EndReached += MediaPlayer_EndReached;
         }
 
-        public string Name
-        {
-            get => _name;
-            set => SetProperty(ref _name, value);
-        }
+        public override string Title { get; } = "Download";
 
         public string Filename
         {
             get => _filename;
             set => SetProperty(ref _filename, value);
+        }
+
+        public string Name
+        {
+            get => _name;
+            set => SetProperty(ref _name, value);
         }
 
         public bool HasStarted
@@ -70,7 +72,6 @@ namespace RaceControl.ViewModels
 
         public override async void OnDialogOpened(IDialogParameters parameters)
         {
-            Title = "Download";
             var token = parameters.GetValue<string>(ParameterNames.TOKEN);
             var playableContent = parameters.GetValue<IPlayableContent>(ParameterNames.PLAYABLE_CONTENT);
             Filename = parameters.GetValue<string>(ParameterNames.FILENAME);
@@ -134,7 +135,7 @@ namespace RaceControl.ViewModels
         {
             try
             {
-                return await _apiService.GetTokenisedUrlAsync(token, playableContent.ContentType, playableContent.ContentUrl);
+                return await _apiService.GetTokenisedUrlAsync(token, playableContent);
             }
             catch (Exception ex)
             {

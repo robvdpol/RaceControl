@@ -10,6 +10,7 @@ namespace RaceControl.ViewModels
     public class UpgradeDialogViewModel : DialogViewModelBase
     {
         private ICommand _closeCommand;
+
         private Release _release;
 
         public UpgradeDialogViewModel(ILogger logger) : base(logger)
@@ -17,6 +18,8 @@ namespace RaceControl.ViewModels
         }
 
         public ICommand CloseCommand => _closeCommand ??= new DelegateCommand<bool?>(CloseExecute);
+
+        public override string Title => Release?.Name;
 
         public Release Release
         {
@@ -27,7 +30,6 @@ namespace RaceControl.ViewModels
         public override void OnDialogOpened(IDialogParameters parameters)
         {
             Release = parameters.GetValue<Release>(ParameterNames.RELEASE);
-            Title = Release.Name;
 
             base.OnDialogOpened(parameters);
         }

@@ -9,7 +9,6 @@ namespace RaceControl.Core.Mvvm
     public abstract class DialogViewModelBase : ViewModelBase, IExtendedDialogAware
     {
         private ICommand _closeWindowCommand;
-        private string _title;
         private bool _canClose;
 
         protected DialogViewModelBase(ILogger logger) : base(logger)
@@ -18,11 +17,7 @@ namespace RaceControl.Core.Mvvm
 
         public ICommand CloseWindowCommand => _closeWindowCommand ??= new DelegateCommand(CloseWindowExecute, CanCloseDialog).ObservesProperty(() => CanClose);
 
-        public string Title
-        {
-            get => _title;
-            protected set => SetProperty(ref _title, value);
-        }
+        public abstract string Title { get; }
 
         public bool CanClose
         {

@@ -1,5 +1,6 @@
 ﻿using NLog;
 using RaceControl.Common.Enum;
+using RaceControl.Common.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Api;
 using RaceControl.Services.Interfaces.Lark;
@@ -238,16 +239,16 @@ namespace RaceControl.Services.F1TV
             return await _client.GetItemAsync<Driver>(request);
         }
 
-        public async Task<string> GetTokenisedUrlAsync(string token, ContentType contentType, string contentUrl)
+        public async Task<string> GetTokenisedUrlAsync(string token, IPlayableContent playableContent)
         {
-            _logger.Info($"Getting tokenised URL for content-type '{contentType}' and content-URL '{contentUrl}' using token '{token}'...");
+            _logger.Info($"Getting tokenised URL for content-type '{playableContent.ContentType}' and content-URL '{playableContent.ContentUrl}' using token '{token}'...");
 
-            var url = contentType switch
+            var url = playableContent.ContentType switch
             {
-                ContentType.Channel => (await _client.GetTokenisedUrlForChannelAsync(token, contentUrl)).Url,
-                ContentType.Asset => (await _client.GetTokenisedUrlForAssetAsync(token, contentUrl)).Objects.First().TokenisedUrl.Url,
+                ContentType.Channel => (await _client.GetTokenisedUrlForChannelAsync(token, playableContent.ContentUrl)).Url,
+                ContentType.Asset => (await _client.GetTokenisedUrlForAssetAsync(token, playableContent.ContentUrl)).Objects.First().TokenisedUrl.Url,
                 ContentType.Backup => (await _client.GetBackupStream()).StreamManifest,
-                _ => throw new ArgumentException($"Could not generate tokenised URL for unsupported content-type '{contentType}'.", nameof(contentType))
+                _ => throw new ArgumentException($"Could not generate tokenised URL for unsupported content-type '{playableContent.ContentType}'.", nameof(playableContent))
             };
 
             _logger.Info($"Got tokenised URL '{url}'.");

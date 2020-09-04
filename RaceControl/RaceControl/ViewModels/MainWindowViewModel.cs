@@ -403,7 +403,7 @@ namespace RaceControl.ViewModels
 
             try
             {
-                var streamUrl = await GetTokenisedUrlAsync(playableContent);
+                var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, playableContent);
                 WatchStreamInVlc(playableContent, streamUrl);
             }
             catch (Exception ex)
@@ -428,7 +428,7 @@ namespace RaceControl.ViewModels
 
             try
             {
-                var streamUrl = await GetTokenisedUrlAsync(playableContent);
+                var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, playableContent);
                 WatchStreamInVlc(playableContent, streamUrl);
             }
             catch (Exception ex)
@@ -454,7 +454,7 @@ namespace RaceControl.ViewModels
 
             try
             {
-                var streamUrl = await GetTokenisedUrlAsync(playableContent);
+                var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, playableContent);
                 WatchStreamInMpv(playableContent, streamUrl);
             }
             catch (Exception ex)
@@ -479,7 +479,7 @@ namespace RaceControl.ViewModels
 
             try
             {
-                var streamUrl = await GetTokenisedUrlAsync(playableContent);
+                var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, playableContent);
                 WatchStreamInMpv(playableContent, streamUrl);
             }
             catch (Exception ex)
@@ -505,7 +505,7 @@ namespace RaceControl.ViewModels
 
             try
             {
-                var streamUrl = await GetTokenisedUrlAsync(playableContent);
+                var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, playableContent);
                 Clipboard.SetText(streamUrl);
             }
             catch (Exception ex)
@@ -525,7 +525,7 @@ namespace RaceControl.ViewModels
 
             try
             {
-                var streamUrl = await GetTokenisedUrlAsync(playableContent);
+                var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, playableContent);
                 Clipboard.SetText(streamUrl);
             }
             catch (Exception ex)
@@ -970,11 +970,6 @@ namespace RaceControl.ViewModels
             Sessions.Clear();
             SelectedLiveSession = null;
             SelectedVodType = null;
-        }
-
-        private async Task<string> GetTokenisedUrlAsync(IPlayableContent playableContent)
-        {
-            return await _apiService.GetTokenisedUrlAsync(_token, playableContent.ContentType, playableContent.ContentUrl);
         }
 
         private Session GetSelectedSession() => SelectedLiveSession ?? SelectedSession;

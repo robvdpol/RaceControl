@@ -1,4 +1,4 @@
-﻿using RaceControl.Common.Enum;
+﻿using RaceControl.Common.Interfaces;
 using RaceControl.Services.Interfaces.F1TV.Api;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -27,6 +27,6 @@ namespace RaceControl.Services.Interfaces.F1TV
 
         Task<Driver> GetDriverAsync(string driverUID);
 
-        Task<string> GetTokenisedUrlAsync(string token, ContentType contentType, string contentUrl);
+        Task<string> GetTokenisedUrlAsync(string token, IPlayableContent playableContent);
     }
 }

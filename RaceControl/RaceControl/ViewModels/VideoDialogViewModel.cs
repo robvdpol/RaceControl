@@ -123,6 +123,8 @@ namespace RaceControl.ViewModels
         public ICommand StartCastVideoCommand => _startCastVideoCommand ??= new DelegateCommand(StartCastVideoExecute, CanStartCastVideoExecute).ObservesProperty(() => CanClose).ObservesProperty(() => SelectedRendererItem);
         public ICommand StopCastVideoCommand => _stopCastVideoCommand ??= new DelegateCommand(StopCastVideoExecute, CanStopCastVideoExecute).ObservesProperty(() => IsCasting);
 
+        public override string Title => PlayableContent?.Title;
+
         public Guid UniqueIdentifier { get; } = Guid.NewGuid();
 
         public MediaPlayer MediaPlayer { get; }
@@ -297,7 +299,6 @@ namespace RaceControl.ViewModels
             _token = parameters.GetValue<string>(ParameterNames.TOKEN);
             PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.PLAYABLE_CONTENT);
             IsStreamlink = PlayableContent.IsLive && !_settings.DisableStreamlink;
-            Title = PlayableContent.Title;
 
             var instance = parameters.GetValue<VideoDialogInstance>(ParameterNames.INSTANCE);
             SetWindowLocation(instance);
@@ -669,6 +670,7 @@ namespace RaceControl.ViewModels
         {
             IsScanning = true;
             Logger.Info("Scanning for Chromecast devices...");
+            RendererItems.Clear();
 
             using (var rendererDiscoverer = new RendererDiscoverer(_libVLC))
             {
@@ -748,7 +750,7 @@ namespace RaceControl.ViewModels
         {
             try
             {
-                return await _apiService.GetTokenisedUrlAsync(_token, PlayableContent.ContentType, PlayableContent.ContentUrl);
+                return await _apiService.GetTokenisedUrlAsync(_token, PlayableContent);
             }
             catch (Exception ex)
             {

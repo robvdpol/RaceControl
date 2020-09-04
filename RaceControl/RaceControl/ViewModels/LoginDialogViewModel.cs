@@ -33,6 +33,8 @@ namespace RaceControl.ViewModels
             .ObservesProperty(() => Password)
             .ObservesProperty(() => IsBusy);
 
+        public override string Title { get; } = "Login";
+
         public string Email
         {
             get => _email;
@@ -54,8 +56,6 @@ namespace RaceControl.ViewModels
         public override void OnDialogOpened(IDialogParameters parameters)
         {
             base.OnDialogOpened(parameters);
-
-            Title = "Login";
 
             if (_credentialService.LoadCredential(out var email, out var password))
             {
