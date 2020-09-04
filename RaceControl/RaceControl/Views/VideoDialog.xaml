@@ -410,15 +410,15 @@
                                 Grid.Column="0"
                                 Margin="1,0"
                                 VerticalAlignment="Center"
-                                Content="Always on top"
-                                IsChecked="{Binding Topmost}" />
+                                Content="Resizable window"
+                                IsChecked="{Binding ResizeMode, Converter={StaticResource ResizeModeToBooleanConverter}}"
+                                IsEnabled="{Binding WindowState, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static WindowState.Normal}}" />
                             <CheckBox
                                 Grid.Column="1"
                                 Margin="1,0"
                                 VerticalAlignment="Center"
-                                Content="Resizable window"
-                                IsChecked="{Binding ResizeMode, Converter={StaticResource ResizeModeToBooleanConverter}}"
-                                IsEnabled="{Binding WindowState, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static WindowState.Normal}}" />
+                                Content="Always on top"
+                                IsChecked="{Binding Topmost}" />
                         </Grid>
                         <StackPanel
                             Grid.Row="1"
