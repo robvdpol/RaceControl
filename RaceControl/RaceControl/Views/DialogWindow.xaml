@@ -11,5 +11,18 @@
     </Window.Style>
     <Window.InputBindings>
         <KeyBinding Key="Escape" Command="{Binding CloseWindowCommand}" />
+        <KeyBinding Key="Space" Command="{Binding TogglePauseCommand}" />
+        <KeyBinding Key="Right" Command="{Binding FastForwardCommand}" CommandParameter="10" />
+        <KeyBinding Key="Left" Command="{Binding FastForwardCommand}" CommandParameter="-10" />
+        <KeyBinding Key="Up" Command="{Binding FastForwardCommand}" CommandParameter="60" />
+        <KeyBinding Key="Down" Command="{Binding FastForwardCommand}" CommandParameter="-60" />
+        <KeyBinding Key="Right" Modifiers="Shift" Command="{Binding FastForwardCommand}" CommandParameter="5" />
+        <KeyBinding Key="Left" Modifiers="Shift" Command="{Binding FastForwardCommand}" CommandParameter="-5" />
+        <KeyBinding Key="Up" Modifiers="Shift" Command="{Binding FastForwardCommand}" CommandParameter="600" />
+        <KeyBinding Key="Down" Modifiers="Shift" Command="{Binding FastForwardCommand}" CommandParameter="-600" />
+        <KeyBinding Key="M" Command="{Binding ToggleMuteCommand}" />
+        <KeyBinding Key="F" Command="{Binding ToggleFullScreenCommand}" />
+        <KeyBinding Key="S" Command="{Binding SyncSessionCommand}" />
+        <KeyBinding Key="R" Command="{Binding ToggleRecordingCommand}" />
     </Window.InputBindings>
 </Window>
