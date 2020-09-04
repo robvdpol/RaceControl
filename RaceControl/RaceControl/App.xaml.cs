@@ -53,6 +53,7 @@ namespace RaceControl
         {
             containerRegistry.GetContainer().Register(Made.Of<ILogger>(() => LogManager.GetLogger(Arg.Index<string>(0)), request => request.Parent.ImplementationType.Name));
             containerRegistry.RegisterDialogWindow<DialogWindow>();
+            containerRegistry.RegisterDialogWindow<VideoDialogWindow>(nameof(VideoDialogWindow));
             containerRegistry.RegisterDialog<LoginDialog, LoginDialogViewModel>();
             containerRegistry.RegisterDialog<UpgradeDialog, UpgradeDialogViewModel>();
             containerRegistry.RegisterDialog<DownloadDialog, DownloadDialogViewModel>();

@@ -16,6 +16,25 @@ Race Control is an open source [F1TV](https://f1tv.formula1.com) desktop client 
 * Make sure you have the [.NET Core runtime (desktop)](https://dotnet.microsoft.com/download/dotnet-core/current/runtime) version 3.1 or above installed
 * Run RaceControl.exe to start the application
 
+## Keyboard shortcuts
+The internal player supports the following keyboard shortcuts:
+| Function            | Key                 |
+|---------------------|---------------------|
+| Close window        | Escape              |
+| Toggle pause        | Space               |
+| Toggle mute         | M                   |
+| Toggle fullscreen   | F                   |
+| Toggle recording    | R                   |
+| Synchronize session | S                   |
+| Jump forward 10 sec | Right arrow         |
+| Jump backward 10 sec| Left arrow          |
+| Jump forward 1 min  | Up arrow            |
+| Jump backward 1 min | Down arrow          |
+| Jump forward 5 sec  | Shift + Right arrow |
+| Jump backward 5 sec | Shift + Left arrow  |
+| Jump forward 10 min | Shift + Up arrow    |
+| Jump backward 10 min| Shift + Down arrow  |
+
 ## FAQ
 #### Why do I get a login popup? What credentials do I use to login?
 You need an F1TV account to watch F1TV streams. If you want to watch race replays, an F1TV Access subscription is required. If you want to watch live sessions, an F1TV Pro subscription is required. You can create an account and subscribe at http://f1tv.formula1.com.

@@ -919,7 +919,7 @@ namespace RaceControl.ViewModels
 
         private void OpenVideoDialog(IDialogParameters parameters)
         {
-            var viewModel = (IVideoDialogViewModel)_dialogService.Show(nameof(VideoDialog), parameters, OnVideoDialogClosed, false);
+            var viewModel = (IVideoDialogViewModel)_dialogService.Show(nameof(VideoDialog), parameters, OnVideoDialogClosed, false, nameof(VideoDialogWindow));
             VideoDialogViewModels.Add(viewModel);
         }
 

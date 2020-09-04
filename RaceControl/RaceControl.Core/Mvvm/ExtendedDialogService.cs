@@ -63,12 +63,12 @@ namespace RaceControl.Core.Mvvm
             return false;
         }
 
-        public object Show(string name, IDialogParameters parameters, Action<IDialogResult> callback, bool hasOwner)
+        public object Show(string name, IDialogParameters parameters, Action<IDialogResult> callback, bool hasOwner, string windowName = null)
         {
-            return ShowDialogInternal(name, parameters, callback, hasOwner);
+            return ShowDialogInternal(name, parameters, callback, hasOwner, windowName);
         }
 
-        private object ShowDialogInternal(string name, IDialogParameters parameters, Action<IDialogResult> callback, bool hasOwner, string windowName = null)
+        private object ShowDialogInternal(string name, IDialogParameters parameters, Action<IDialogResult> callback, bool hasOwner, string windowName)
         {
             var dialogWindow = CreateDialogWindow(windowName);
             ConfigureDialogWindowEvents(dialogWindow, callback);

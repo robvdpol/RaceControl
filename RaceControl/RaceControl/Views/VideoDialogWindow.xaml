@@ -1,0 +1,56 @@
+﻿<Window
+    x:Class="RaceControl.Views.VideoDialogWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="{Binding Title}"
+    WindowStartupLocation="CenterOwner">
+    <Window.Style>
+        <Style TargetType="{x:Type Window}">
+            <Setter Property="SizeToContent" Value="WidthAndHeight" />
+        </Style>
+    </Window.Style>
+    <Window.InputBindings>
+        <KeyBinding Key="Escape" Command="{Binding CloseWindowCommand}" />
+        <KeyBinding Key="Space" Command="{Binding TogglePauseCommand}" />
+        <KeyBinding Key="M" Command="{Binding ToggleMuteCommand}" />
+        <KeyBinding Key="F" Command="{Binding ToggleFullScreenCommand}" />
+        <KeyBinding Key="R" Command="{Binding ToggleRecordingCommand}" />
+        <KeyBinding Key="S" Command="{Binding SyncSessionCommand}" />
+        <KeyBinding
+            Key="Right"
+            Command="{Binding FastForwardCommand}"
+            CommandParameter="10" />
+        <KeyBinding
+            Key="Left"
+            Command="{Binding FastForwardCommand}"
+            CommandParameter="-10" />
+        <KeyBinding
+            Key="Up"
+            Command="{Binding FastForwardCommand}"
+            CommandParameter="60" />
+        <KeyBinding
+            Key="Down"
+            Command="{Binding FastForwardCommand}"
+            CommandParameter="-60" />
+        <KeyBinding
+            Key="Right"
+            Command="{Binding FastForwardCommand}"
+            CommandParameter="5"
+            Modifiers="Shift" />
+        <KeyBinding
+            Key="Left"
+            Command="{Binding FastForwardCommand}"
+            CommandParameter="-5"
+            Modifiers="Shift" />
+        <KeyBinding
+            Key="Up"
+            Command="{Binding FastForwardCommand}"
+            CommandParameter="600"
+            Modifiers="Shift" />
+        <KeyBinding
+            Key="Down"
+            Command="{Binding FastForwardCommand}"
+            CommandParameter="-600"
+            Modifiers="Shift" />
+    </Window.InputBindings>
+</Window>
