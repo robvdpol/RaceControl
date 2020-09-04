@@ -15,10 +15,10 @@ namespace RaceControl.Streamlink
         private readonly ILogger _logger;
         private readonly ISettings _settings;
 
-        public StreamlinkLauncher(ILogger logger, ISettings videoSettings)
+        public StreamlinkLauncher(ILogger logger, ISettings settings)
         {
             _logger = logger;
-            _settings = videoSettings;
+            _settings = settings;
         }
 
         public async Task<(Process process, string streamlinkUrl)> StartStreamlinkExternal(string streamUrl, int timeout = 15)
