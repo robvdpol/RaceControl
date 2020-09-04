@@ -43,7 +43,7 @@ namespace RaceControl
                 ContentUrl = channel.Self,
                 IsLive = session.IsLive,
                 SyncUID = session.UID,
-                DriverUID = channel.DriverOccurrenceUrls.FirstOrDefault().GetUID()
+                DriverUID = channel.DriverOccurrenceUrls?.FirstOrDefault().GetUID()
             };
         }
     }
