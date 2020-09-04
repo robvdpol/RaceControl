@@ -628,13 +628,13 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private async void DeleteCredentialExecute()
+        private void DeleteCredentialExecute()
         {
             IsBusy = true;
 
             if (_credentialService.LoadCredential(out var email, out _) && MessageBoxHelper.AskQuestion($"Are you sure you want to delete the credentials of {email} from this system?", "Credentials"))
             {
-                await Task.Run(() => _credentialService.DeleteCredential());
+                _credentialService.DeleteCredential();
                 Login();
             }
 

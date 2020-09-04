@@ -90,13 +90,15 @@ namespace RaceControl.ViewModels
             {
                 Logger.Error(ex, "Login failed.");
                 Error = ex.Message;
-                IsBusy = false;
                 return;
+            }
+            finally
+            {
+                IsBusy = false;
             }
 
             _credentialService.SaveCredential(Email, Password);
             RaiseRequestClose(new DialogResult(ButtonResult.OK, new DialogParameters { { ParameterNames.TOKEN, token.Token } }));
-            IsBusy = false;
         }
     }
 }
