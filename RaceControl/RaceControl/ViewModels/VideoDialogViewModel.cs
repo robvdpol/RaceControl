@@ -922,5 +922,25 @@ namespace RaceControl.ViewModels
             AudioTrackDescriptions.Clear();
             Logger.Info("Done stopping playback.");
         }
+
+        private void CleanupProcess(Process process)
+        {
+            if (process != null)
+            {
+                if (!process.HasExited)
+                {
+                    try
+                    {
+                        process.Kill(true);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error(ex, $"An error occurred while trying to kill process with id '{process.Id}' and name '{process.ProcessName}'.");
+                    }
+                }
+
+                process.Dispose();
+            }
+        }
     }
 }

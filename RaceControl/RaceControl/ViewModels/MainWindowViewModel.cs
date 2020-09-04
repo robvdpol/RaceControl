@@ -39,6 +39,8 @@ namespace RaceControl.ViewModels
         private ICommand _loadedCommand;
         private ICommand _closingCommand;
         private ICommand _mouseMoveCommand;
+        private ICommand _previewKeyDownCommand;
+        private ICommand _keyDownCommand;
         private ICommand _seasonSelectionChangedCommand;
         private ICommand _eventSelectionChangedCommand;
         private ICommand _liveSessionSelectionChangedCommand;
@@ -101,6 +103,8 @@ namespace RaceControl.ViewModels
         public ICommand LoadedCommand => _loadedCommand ??= new DelegateCommand<RoutedEventArgs>(LoadedExecute);
         public ICommand ClosingCommand => _closingCommand ??= new DelegateCommand(ClosingExecute);
         public ICommand MouseMoveCommand => _mouseMoveCommand ??= new DelegateCommand(MouseMoveExecute);
+        public ICommand PreviewKeyDownCommand => _previewKeyDownCommand ??= new DelegateCommand<KeyEventArgs>(PreviewKeyDownExecute);
+        public ICommand KeyDownCommand => _keyDownCommand ??= new DelegateCommand<KeyEventArgs>(KeyDownExecute);
         public ICommand SeasonSelectionChangedCommand => _seasonSelectionChangedCommand ??= new DelegateCommand(SeasonSelectionChangedExecute);
         public ICommand EventSelectionChangedCommand => _eventSelectionChangedCommand ??= new DelegateCommand(EventSelectionChangedExecute);
         public ICommand LiveSessionSelectionChangedCommand => _liveSessionSelectionChangedCommand ??= new DelegateCommand(LiveSessionSelectionChangedExecute);
@@ -262,6 +266,22 @@ namespace RaceControl.ViewModels
                 {
                     Mouse.OverrideCursor = null;
                 });
+            }
+        }
+
+        private void PreviewKeyDownExecute(KeyEventArgs args)
+        {
+            if (IsBusy)
+            {
+                args.Handled = true;
+            }
+        }
+
+        private void KeyDownExecute(KeyEventArgs args)
+        {
+            if (IsBusy)
+            {
+                args.Handled = true;
             }
         }
 
