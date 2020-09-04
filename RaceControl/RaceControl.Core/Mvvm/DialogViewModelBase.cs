@@ -19,10 +19,10 @@ namespace RaceControl.Core.Mvvm
 
         public abstract string Title { get; }
 
-        public bool CanClose
+        protected bool CanClose
         {
             get => _canClose;
-            protected set => SetProperty(ref _canClose, value);
+            private set => SetProperty(ref _canClose, value);
         }
 
         public event Action<IDialogResult> RequestClose;
