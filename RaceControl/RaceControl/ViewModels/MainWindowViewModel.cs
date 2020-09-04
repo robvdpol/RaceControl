@@ -3,6 +3,7 @@ using NLog;
 using Prism.Commands;
 using Prism.Services.Dialogs;
 using RaceControl.Common.Enum;
+using RaceControl.Common.Interfaces;
 using RaceControl.Common.Settings;
 using RaceControl.Common.Utils;
 using RaceControl.Comparers;
@@ -884,7 +885,7 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void WatchChannel(PlayableContent playableContent, VideoDialogInstance instance = null)
+        private void WatchChannel(IPlayableContent playableContent, VideoDialogInstance instance = null)
         {
             var parameters = new DialogParameters
             {
@@ -913,7 +914,7 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void WatchStreamInVlc(PlayableContent playableContent, string streamUrl)
+        private void WatchStreamInVlc(IPlayableContent playableContent, string streamUrl)
         {
             if (playableContent.IsLive && !Settings.DisableStreamlink)
             {
@@ -926,7 +927,7 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void WatchStreamInMpv(PlayableContent playableContent, string streamUrl)
+        private void WatchStreamInMpv(IPlayableContent playableContent, string streamUrl)
         {
             if (playableContent.IsLive && !Settings.DisableStreamlink)
             {
@@ -939,7 +940,7 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void StartDownload(PlayableContent playableContent)
+        private void StartDownload(IPlayableContent playableContent)
         {
             var defaultFilename = $"{playableContent.Title}.ts".RemoveInvalidFileNameChars();
 
@@ -971,13 +972,11 @@ namespace RaceControl.ViewModels
             SelectedVodType = null;
         }
 
-        private async Task<string> GetTokenisedUrlAsync(PlayableContent playableContent)
+        private async Task<string> GetTokenisedUrlAsync(IPlayableContent playableContent)
         {
             return await _apiService.GetTokenisedUrlAsync(_token, playableContent.ContentType, playableContent.ContentUrl);
         }
 
         private Session GetSelectedSession() => SelectedLiveSession ?? SelectedSession;
-
-        private static string GetTitle(Session session, Channel channel) => $"{session.SessionName} - {channel}";
     }
 }

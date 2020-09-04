@@ -1,11 +1,12 @@
 ﻿using RaceControl.Common.Enum;
+using RaceControl.Common.Interfaces;
 using RaceControl.Common.Utils;
 using RaceControl.Services.Interfaces.F1TV.Api;
 using System.Linq;
 
 namespace RaceControl
 {
-    public class PlayableContent
+    public class PlayableContent : IPlayableContent
     {
         private PlayableContent()
         {
@@ -19,7 +20,7 @@ namespace RaceControl
         public string SyncUID { get; private set; }
         public string DriverUID { get; private set; }
 
-        public static PlayableContent Create(Episode episode)
+        public static IPlayableContent Create(Episode episode)
         {
             return new PlayableContent
             {
@@ -32,7 +33,7 @@ namespace RaceControl
             };
         }
 
-        public static PlayableContent Create(Session session, Channel channel)
+        public static IPlayableContent Create(Session session, Channel channel)
         {
             return new PlayableContent
             {

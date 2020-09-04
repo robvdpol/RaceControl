@@ -1,4 +1,5 @@
-﻿using RaceControl.Common.Settings;
+﻿using RaceControl.Common.Interfaces;
+using RaceControl.Common.Settings;
 using RaceControl.Core.Mvvm;
 using System;
 
@@ -8,7 +9,7 @@ namespace RaceControl.Interfaces
     {
         Guid UniqueIdentifier { get; }
 
-        PlayableContent PlayableContent { get; }
+        IPlayableContent PlayableContent { get; }
 
         VideoDialogInstance GetVideoDialogInstance();
     }

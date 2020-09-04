@@ -1,6 +1,7 @@
 ﻿using LibVLCSharp.Shared;
 using NLog;
 using Prism.Services.Dialogs;
+using RaceControl.Common.Interfaces;
 using RaceControl.Core.Mvvm;
 using RaceControl.Services.Interfaces.F1TV;
 using System;
@@ -71,7 +72,7 @@ namespace RaceControl.ViewModels
         {
             Title = "Download";
             var token = parameters.GetValue<string>(ParameterNames.TOKEN);
-            var playableContent = parameters.GetValue<PlayableContent>(ParameterNames.PLAYABLE_CONTENT);
+            var playableContent = parameters.GetValue<IPlayableContent>(ParameterNames.PLAYABLE_CONTENT);
             Filename = parameters.GetValue<string>(ParameterNames.FILENAME);
             Name = playableContent.Title;
 
@@ -129,7 +130,7 @@ namespace RaceControl.ViewModels
             Progress = 100;
         }
 
-        private async Task<string> GenerateStreamUrlAsync(string token, PlayableContent playableContent)
+        private async Task<string> GenerateStreamUrlAsync(string token, IPlayableContent playableContent)
         {
             try
             {

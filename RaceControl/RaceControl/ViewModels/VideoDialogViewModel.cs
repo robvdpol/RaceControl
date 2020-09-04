@@ -4,6 +4,7 @@ using NLog;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Services.Dialogs;
+using RaceControl.Common.Interfaces;
 using RaceControl.Common.Settings;
 using RaceControl.Core.Mvvm;
 using RaceControl.Enums;
@@ -57,7 +58,7 @@ namespace RaceControl.ViewModels
 
         private Process _streamlinkProcess;
         private Process _streamlinkRecordingProcess;
-        private PlayableContent _playableContent;
+        private IPlayableContent _playableContent;
         private string _token;
         private bool _isStreamlink;
         private bool _isPaused;
@@ -126,7 +127,7 @@ namespace RaceControl.ViewModels
 
         public MediaPlayer MediaPlayer { get; }
 
-        public PlayableContent PlayableContent
+        public IPlayableContent PlayableContent
         {
             get => _playableContent;
             set => SetProperty(ref _playableContent, value);
@@ -294,7 +295,7 @@ namespace RaceControl.ViewModels
         public override async void OnDialogOpened(IDialogParameters parameters)
         {
             _token = parameters.GetValue<string>(ParameterNames.TOKEN);
-            PlayableContent = parameters.GetValue<PlayableContent>(ParameterNames.PLAYABLE_CONTENT);
+            PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.PLAYABLE_CONTENT);
             IsStreamlink = PlayableContent.IsLive && !_settings.DisableStreamlink;
             Title = PlayableContent.Title;
 
