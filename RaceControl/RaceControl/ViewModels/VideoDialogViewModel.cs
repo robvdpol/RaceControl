@@ -55,6 +55,7 @@ namespace RaceControl.ViewModels
 
         private Process _streamlinkProcess;
         private Process _streamlinkRecordingProcess;
+        private IMediaPlayer _mediaPlayer;
         private IPlayableContent _playableContent;
         private string _token;
         private bool _isStreamlink;
@@ -113,7 +114,11 @@ namespace RaceControl.ViewModels
 
         public Guid UniqueIdentifier { get; } = Guid.NewGuid();
 
-        public IMediaPlayer MediaPlayer { get; }
+        public IMediaPlayer MediaPlayer
+        {
+            get => _mediaPlayer;
+            set => SetProperty(ref _mediaPlayer, value);
+        }
 
         public IPlayableContent PlayableContent
         {
@@ -440,14 +445,12 @@ namespace RaceControl.ViewModels
         private void MoveToCornerExecute(WindowLocation? location)
         {
             Logger.Info($"Moving window to corner '{location}'...");
-
             var screen = Screen.FromRectangle(new Rectangle((int)Left, (int)Top, (int)Width, (int)Height));
             var scale = Math.Max(Screen.PrimaryScreen.WorkingArea.Width / SystemParameters.PrimaryScreenWidth, Screen.PrimaryScreen.WorkingArea.Height / SystemParameters.PrimaryScreenHeight);
             var top = screen.WorkingArea.Top / scale;
             var left = screen.WorkingArea.Left / scale;
             var width = screen.WorkingArea.Width / 2D / scale;
             var height = screen.WorkingArea.Height / 2D / scale;
-
             ResizeMode = ResizeMode.NoResize;
 
             switch (location)
@@ -475,7 +478,6 @@ namespace RaceControl.ViewModels
 
             Width = width;
             Height = height;
-
             Logger.Info($"Done moving window (top: {Top}, left: {Left}, width: {Width}, height: {Height}).");
         }
 
@@ -528,7 +530,7 @@ namespace RaceControl.ViewModels
         private async void StopCastVideoExecute()
         {
             Logger.Info("Stopping casting of video...");
-            await ChangeRendererAsync(null);
+            await ChangeRendererAsync();
         }
 
         private void SetWindowLocation(VideoDialogInstance instance)
@@ -591,10 +593,9 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private async Task ChangeRendererAsync(RendererItem renderer)
+        private async Task ChangeRendererAsync(RendererItem renderer = null)
         {
             Logger.Info($"Changing renderer to '{renderer?.Name}'...");
-
             var time = MediaPlayer.Time;
 
             if (IsStreamlink)

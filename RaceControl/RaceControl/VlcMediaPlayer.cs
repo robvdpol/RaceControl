@@ -146,19 +146,21 @@ namespace RaceControl
         {
             RendererItems.Clear();
 
-            using (var discoverer = new RendererDiscoverer(_libVLC))
+            using (var rendererDiscoverer = new RendererDiscoverer(_libVLC))
             {
-                discoverer.ItemAdded += RendererDiscoverer_ItemAdded;
+                rendererDiscoverer.ItemAdded += RendererDiscoverer_ItemAdded;
+                rendererDiscoverer.ItemDeleted += RendererDiscoverer_ItemDeleted;
 
-                if (discoverer.Start())
+                if (rendererDiscoverer.Start())
                 {
                     IsScanning = true;
                     await Task.Delay(TimeSpan.FromSeconds(10));
-                    discoverer.Stop();
+                    rendererDiscoverer.Stop();
                     IsScanning = false;
                 }
 
-                discoverer.ItemAdded -= RendererDiscoverer_ItemAdded;
+                rendererDiscoverer.ItemAdded -= RendererDiscoverer_ItemAdded;
+                rendererDiscoverer.ItemDeleted -= RendererDiscoverer_ItemDeleted;
             }
         }
 
@@ -263,6 +265,17 @@ namespace RaceControl
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     RendererItems.Add(e.RendererItem);
+                });
+            }
+        }
+
+        private void RendererDiscoverer_ItemDeleted(object sender, RendererDiscovererItemDeletedEventArgs e)
+        {
+            if (e.RendererItem.CanRenderVideo)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    RendererItems.Remove(e.RendererItem);
                 });
             }
         }
