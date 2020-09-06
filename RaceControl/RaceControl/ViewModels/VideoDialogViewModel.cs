@@ -390,7 +390,7 @@ namespace RaceControl.ViewModels
 
         private void SyncSessionExecute()
         {
-            var payload = new SyncStreamsEventPayload(UniqueIdentifier, PlayableContent.SyncUID, MediaPlayer.Time);
+            var payload = new SyncStreamsEventPayload(PlayableContent.SyncUID, MediaPlayer.Time);
             Logger.Info($"Syncing streams with sync-UID '{payload.SyncUID}' to timestamp '{payload.Time}'...");
             _eventAggregator.GetEvent<SyncStreamsEvent>().Publish(payload);
         }
