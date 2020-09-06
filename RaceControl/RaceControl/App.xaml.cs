@@ -73,6 +73,7 @@ namespace RaceControl
                 .Register<ICredentialService, CredentialService>()
                 .Register<IStreamlinkLauncher, StreamlinkLauncher>()
                 .Register<IMediaPlayer, VlcMediaPlayer>()
+                .Register<IMediaDownloader, VlcMediaDownloader>()
                 .Register<MediaPlayer>(CreateMediaPlayer)
                 .RegisterInstance(CreateLibVLC());
         }

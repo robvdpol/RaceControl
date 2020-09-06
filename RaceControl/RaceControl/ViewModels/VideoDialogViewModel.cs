@@ -55,9 +55,8 @@ namespace RaceControl.ViewModels
 
         private Process _streamlinkProcess;
         private Process _streamlinkRecordingProcess;
-        private IMediaPlayer _mediaPlayer;
-        private IPlayableContent _playableContent;
         private string _token;
+        private IPlayableContent _playableContent;
         private bool _isStreamlink;
         private bool _isRecording;
         private bool _showControls;
@@ -114,11 +113,7 @@ namespace RaceControl.ViewModels
 
         public Guid UniqueIdentifier { get; } = Guid.NewGuid();
 
-        public IMediaPlayer MediaPlayer
-        {
-            get => _mediaPlayer;
-            set => SetProperty(ref _mediaPlayer, value);
-        }
+        public IMediaPlayer MediaPlayer { get; }
 
         public IPlayableContent PlayableContent
         {
