@@ -1,6 +1,6 @@
 ﻿using RaceControl.Common.Interfaces;
-using RaceControl.Common.Settings;
 using RaceControl.Core.Mvvm;
+using RaceControl.Core.Settings;
 using System;
 
 namespace RaceControl.Interfaces
@@ -11,6 +11,6 @@ namespace RaceControl.Interfaces
 
         IPlayableContent PlayableContent { get; }
 
-        VideoDialogInstance GetVideoDialogInstance();
+        VideoDialogInstance Instance { get; }
     }
 }

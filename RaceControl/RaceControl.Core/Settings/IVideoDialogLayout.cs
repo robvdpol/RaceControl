@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace RaceControl.Common.Settings
+namespace RaceControl.Core.Settings
 {
     public interface IVideoDialogLayout
     {

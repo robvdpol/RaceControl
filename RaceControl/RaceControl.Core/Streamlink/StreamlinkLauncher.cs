@@ -1,12 +1,12 @@
 ﻿using NLog;
-using RaceControl.Common.Settings;
 using RaceControl.Common.Utils;
+using RaceControl.Core.Settings;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace RaceControl.Streamlink
+namespace RaceControl.Core.Streamlink
 {
     public class StreamlinkLauncher : IStreamlinkLauncher
     {

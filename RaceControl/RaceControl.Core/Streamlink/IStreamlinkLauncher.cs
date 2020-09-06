@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace RaceControl.Streamlink
+namespace RaceControl.Core.Streamlink
 {
     public interface IStreamlinkLauncher
     {

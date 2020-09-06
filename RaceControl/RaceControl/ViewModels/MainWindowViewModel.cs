@@ -4,17 +4,17 @@ using Prism.Commands;
 using Prism.Services.Dialogs;
 using RaceControl.Common.Enum;
 using RaceControl.Common.Interfaces;
-using RaceControl.Common.Settings;
 using RaceControl.Common.Utils;
 using RaceControl.Comparers;
 using RaceControl.Core.Helpers;
 using RaceControl.Core.Mvvm;
+using RaceControl.Core.Settings;
+using RaceControl.Core.Streamlink;
 using RaceControl.Interfaces;
 using RaceControl.Services.Interfaces.Credential;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Api;
 using RaceControl.Services.Interfaces.Github;
-using RaceControl.Streamlink;
 using RaceControl.Views;
 using System;
 using System.Collections.Generic;
@@ -591,7 +591,7 @@ namespace RaceControl.ViewModels
         private void SaveVideoDialogLayoutExecute()
         {
             VideoDialogLayout.Clear();
-            VideoDialogLayout.Add(VideoDialogViewModels.Where(vm => vm.PlayableContent.ContentType == ContentType.Channel).Select(vm => vm.GetVideoDialogInstance()));
+            VideoDialogLayout.Add(VideoDialogViewModels.Where(vm => vm.PlayableContent.ContentType == ContentType.Channel).Select(vm => vm.Instance));
 
             if (VideoDialogLayout.Save())
             {

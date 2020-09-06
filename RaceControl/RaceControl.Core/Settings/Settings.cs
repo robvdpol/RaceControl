@@ -1,10 +1,11 @@
 ﻿using Newtonsoft.Json;
 using NLog;
+using Prism.Mvvm;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
 
-namespace RaceControl.Common.Settings
+namespace RaceControl.Core.Settings
 {
     public class Settings : BindableBase, ISettings
     {
