@@ -104,11 +104,7 @@ namespace RaceControl.ViewModels
 
         public override void OnDialogClosed()
         {
-            _mediaPlayer.PositionChanged -= MediaPlayer_PositionChanged;
-            _mediaPlayer.EncounteredError -= MediaPlayer_EncounteredError;
-            _mediaPlayer.EndReached -= MediaPlayer_EndReached;
             _mediaPlayer.Dispose();
-
             base.OnDialogClosed();
         }
 

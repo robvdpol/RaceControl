@@ -267,7 +267,6 @@ namespace RaceControl.ViewModels
             if (_showControlsTimer != null)
             {
                 _showControlsTimer.Stop();
-                _showControlsTimer.Elapsed -= ShowControlsTimer_Elapsed;
                 _showControlsTimer.Dispose();
                 _showControlsTimer = null;
             }

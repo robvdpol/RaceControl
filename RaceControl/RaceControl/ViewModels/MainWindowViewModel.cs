@@ -249,7 +249,6 @@ namespace RaceControl.ViewModels
             if (_refreshLiveSessionsTimer != null)
             {
                 _refreshLiveSessionsTimer.Stop();
-                _refreshLiveSessionsTimer.Elapsed -= RefreshLiveSessionsTimer_Elapsed;
                 _refreshLiveSessionsTimer.Dispose();
                 _refreshLiveSessionsTimer = null;
             }
