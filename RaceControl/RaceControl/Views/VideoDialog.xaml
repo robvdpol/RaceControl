@@ -15,6 +15,7 @@
         <core:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
         <core:ResizeModeToBooleanConverter x:Key="ResizeModeToBooleanConverter" />
         <core:DivideDoubleConverter x:Key="DivideDoubleConverter" />
+        <core:MillisecondsToTimeSpanConverter x:Key="MillisecondsToTimeSpanConverter" />
         <Style x:Key="ControlBarButtonStyle" TargetType="Button">
             <Setter Property="Margin" Value="2" />
             <Setter Property="Width" Value="36" />
@@ -66,7 +67,7 @@
             <Setter Property="ShowInTaskbar" Value="True" />
         </Style>
     </prism:Dialog.WindowStyle>
-    <vlc:VideoView Background="Black" MediaPlayer="{Binding MediaPlayer}">
+    <vlc:VideoView Background="Black" MediaPlayer="{Binding MediaPlayer.MediaPlayer}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
@@ -80,7 +81,7 @@
                 Content="Casting..."
                 FontSize="22"
                 Foreground="White"
-                Visibility="{Binding IsCasting, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                Visibility="{Binding MediaPlayer.IsCasting, Converter={StaticResource BooleanToVisibilityConverter}}" />
             <!--  Non-transparent background is required to capture mouse events  -->
             <Grid Grid.Row="0" Background="#01000000">
                 <i:Interaction.Triggers>
@@ -149,26 +150,19 @@
                         <TextBlock
                             Grid.Column="0"
                             Margin="5,2"
-                            VerticalAlignment="Center">
-                            <TextBlock.Text>
-                                <MultiBinding StringFormat="{}{0:00}:{1:00}:{2:00}">
-                                    <Binding Path="DisplayTime.Hours" />
-                                    <Binding Path="DisplayTime.Minutes" />
-                                    <Binding Path="DisplayTime.Seconds" />
-                                </MultiBinding>
-                            </TextBlock.Text>
-                        </TextBlock>
+                            VerticalAlignment="Center"
+                            Text="{Binding MediaPlayer.Time, StringFormat=hh\\:mm\\:ss, Converter={StaticResource MillisecondsToTimeSpanConverter}}" />
                         <Slider
                             Grid.Column="1"
                             Margin="2"
                             IsEnabled="{Binding PlayableContent.IsLive, Converter={StaticResource InverseBooleanConverter}}"
                             IsMoveToPointEnabled="True"
                             IsSnapToTickEnabled="False"
-                            Maximum="{Binding Duration}"
+                            Maximum="{Binding MediaPlayer.Duration}"
                             TickPlacement="BottomRight"
-                            Value="{Binding SliderTime}">
+                            Value="{Binding MediaPlayer.Time}">
                             <Slider.TickFrequency>
-                                <Binding Converter="{StaticResource DivideDoubleConverter}" Path="Duration">
+                                <Binding Converter="{StaticResource DivideDoubleConverter}" Path="MediaPlayer.Duration">
                                     <Binding.ConverterParameter>
                                         <s:Double>100</s:Double>
                                     </Binding.ConverterParameter>
@@ -199,7 +193,7 @@
                                     <Style BasedOn="{StaticResource ControlBarButtonStyle}" TargetType="Button">
                                         <Setter Property="Content" Value="{StaticResource PauseImage}" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsPaused}" Value="True">
+                                            <DataTrigger Binding="{Binding MediaPlayer.IsPaused}" Value="True">
                                                 <Setter Property="Content" Value="{StaticResource PlayImage}" />
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -215,7 +209,7 @@
                                     <Style BasedOn="{StaticResource ControlBarButtonStyle}" TargetType="Button">
                                         <Setter Property="Content" Value="{StaticResource AudioImage}" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsMuted}" Value="True">
+                                            <DataTrigger Binding="{Binding MediaPlayer.IsMuted}" Value="True">
                                                 <Setter Property="Content" Value="{StaticResource NoAudioImage}" />
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -297,7 +291,7 @@
                                 Grid.Column="1"
                                 Margin="2"
                                 DisplayMemberPath="Name"
-                                ItemsSource="{Binding AudioTrackDescriptions}">
+                                ItemsSource="{Binding MediaPlayer.AudioTrackDescriptions}">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="SelectionChanged">
                                         <i:InvokeCommandAction Command="{Binding AudioTrackSelectionChangedCommand}" PassEventArgsToCommand="True" />
@@ -435,7 +429,7 @@
                                     Margin="2"
                                     DisplayMemberPath="Name"
                                     IsEnabled="{Binding HasItems, RelativeSource={RelativeSource Self}}"
-                                    ItemsSource="{Binding RendererItems}"
+                                    ItemsSource="{Binding MediaPlayer.RendererItems}"
                                     SelectedItem="{Binding SelectedRendererItem}" />
                                 <TextBlock
                                     Width="180"

@@ -13,10 +13,8 @@ using RaceControl.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Streamlink;
 using System;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -35,7 +33,6 @@ namespace RaceControl.ViewModels
         private readonly IApiService _apiService;
         private readonly IStreamlinkLauncher _streamlinkLauncher;
         private readonly ISettings _settings;
-        private readonly LibVLC _libVLC;
 
         private ICommand _mouseDownVideoCommand;
         private ICommand _mouseMoveVideoCommand;
@@ -61,17 +58,8 @@ namespace RaceControl.ViewModels
         private IPlayableContent _playableContent;
         private string _token;
         private bool _isStreamlink;
-        private bool _isPaused;
-        private bool _isMuted;
         private bool _isRecording;
-        private bool _isScanning;
-        private bool _isCasting;
         private bool _showControls;
-        private long _duration;
-        private long _sliderTime;
-        private TimeSpan _displayTime;
-        private ObservableCollection<TrackDescription> _audioTrackDescriptions;
-        private ObservableCollection<RendererItem> _rendererItems;
         private RendererItem _selectedRendererItem;
         private Timer _showControlsTimer;
         private SubscriptionToken _syncStreamsEventToken;
@@ -92,15 +80,13 @@ namespace RaceControl.ViewModels
             IApiService apiService,
             IStreamlinkLauncher streamlinkLauncher,
             ISettings settings,
-            LibVLC libVLC,
-            MediaPlayer mediaPlayer)
+            IMediaPlayer mediaPlayer)
             : base(logger)
         {
             _eventAggregator = eventAggregator;
             _apiService = apiService;
             _streamlinkLauncher = streamlinkLauncher;
             _settings = settings;
-            _libVLC = libVLC;
             MediaPlayer = mediaPlayer;
         }
 
@@ -115,19 +101,19 @@ namespace RaceControl.ViewModels
         public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand(ToggleMuteExecute).ObservesCanExecute(() => Initialized);
         public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<string>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => Initialized).ObservesProperty(() => PlayableContent);
         public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => Initialized).ObservesProperty(() => PlayableContent);
-        public ICommand ToggleRecordingCommand => _toggleRecordingCommand ??= new DelegateCommand(ToggleRecordingExecute, CanToggleRecordingExecute).ObservesProperty(() => Initialized).ObservesProperty(() => PlayableContent).ObservesProperty(() => IsRecording).ObservesProperty(() => IsPaused);
+        public ICommand ToggleRecordingCommand => _toggleRecordingCommand ??= new DelegateCommand(ToggleRecordingExecute, CanToggleRecordingExecute).ObservesProperty(() => Initialized).ObservesProperty(() => PlayableContent).ObservesProperty(() => IsRecording).ObservesProperty(() => MediaPlayer.IsPaused);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand(ToggleFullScreenExecute);
         public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => WindowState);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
-        public ICommand ScanChromecastCommand => _scanChromecastCommand ??= new DelegateCommand(ScanChromecastExecute, CanScanChromecastExecute).ObservesProperty(() => Initialized).ObservesProperty(() => IsScanning);
+        public ICommand ScanChromecastCommand => _scanChromecastCommand ??= new DelegateCommand(ScanChromecastExecute, CanScanChromecastExecute).ObservesProperty(() => Initialized).ObservesProperty(() => MediaPlayer.IsScanning);
         public ICommand StartCastVideoCommand => _startCastVideoCommand ??= new DelegateCommand(StartCastVideoExecute, CanStartCastVideoExecute).ObservesProperty(() => Initialized).ObservesProperty(() => SelectedRendererItem);
-        public ICommand StopCastVideoCommand => _stopCastVideoCommand ??= new DelegateCommand(StopCastVideoExecute, CanStopCastVideoExecute).ObservesProperty(() => IsCasting);
+        public ICommand StopCastVideoCommand => _stopCastVideoCommand ??= new DelegateCommand(StopCastVideoExecute, CanStopCastVideoExecute).ObservesProperty(() => MediaPlayer.IsCasting);
 
         public override string Title => PlayableContent?.Title;
 
         public Guid UniqueIdentifier { get; } = Guid.NewGuid();
 
-        public MediaPlayer MediaPlayer { get; }
+        public IMediaPlayer MediaPlayer { get; }
 
         public IPlayableContent PlayableContent
         {
@@ -141,76 +127,16 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _isStreamlink, value);
         }
 
-        public bool IsPaused
-        {
-            get => _isPaused;
-            set => SetProperty(ref _isPaused, value);
-        }
-
-        public bool IsMuted
-        {
-            get => _isMuted;
-            set => SetProperty(ref _isMuted, value);
-        }
-
         public bool IsRecording
         {
             get => _isRecording;
             set => SetProperty(ref _isRecording, value);
         }
 
-        public bool IsScanning
-        {
-            get => _isScanning;
-            set => SetProperty(ref _isScanning, value);
-        }
-
-        public bool IsCasting
-        {
-            get => _isCasting;
-            set => SetProperty(ref _isCasting, value);
-        }
-
         public bool ShowControls
         {
             get => _showControls;
             set => SetProperty(ref _showControls, value);
-        }
-
-        public long Duration
-        {
-            get => _duration;
-            set => SetProperty(ref _duration, value);
-        }
-
-        public long SliderTime
-        {
-            get => _sliderTime;
-            set
-            {
-                if (SetProperty(ref _sliderTime, value))
-                {
-                    SetMediaPlayerTime(_sliderTime);
-                }
-            }
-        }
-
-        public TimeSpan DisplayTime
-        {
-            get => _displayTime;
-            set => SetProperty(ref _displayTime, value);
-        }
-
-        public ObservableCollection<TrackDescription> AudioTrackDescriptions
-        {
-            get => _audioTrackDescriptions ??= new ObservableCollection<TrackDescription>();
-            set => SetProperty(ref _audioTrackDescriptions, value);
-        }
-
-        public ObservableCollection<RendererItem> RendererItems
-        {
-            get => _rendererItems ??= new ObservableCollection<RendererItem>();
-            set => SetProperty(ref _rendererItems, value);
         }
 
         public RendererItem SelectedRendererItem
@@ -319,9 +245,7 @@ namespace RaceControl.ViewModels
                 streamUrl = streamlinkUrl;
             }
 
-            CreateMediaPlayer();
-            var media = CreateMedia(streamUrl);
-            StartPlayback(media);
+            await MediaPlayer.StartPlaybackAsync(streamUrl);
 
             _showControlsTimer = new Timer(2000) { AutoReset = false };
             _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
@@ -348,9 +272,7 @@ namespace RaceControl.ViewModels
                 _showControlsTimer = null;
             }
 
-            StopPlayback();
-            RemoveMedia(MediaPlayer.Media);
-            RemoveMediaPlayer();
+            MediaPlayer.Dispose();
 
             CleanupProcess(_streamlinkProcess);
             CleanupProcess(_streamlinkRecordingProcess);
@@ -368,73 +290,6 @@ namespace RaceControl.ViewModels
             RaiseRequestClose(new DialogResult(ButtonResult.None, parameters));
         }
 
-        private void Media_DurationChanged(object sender, MediaDurationChangedEventArgs e)
-        {
-            Duration = e.Duration;
-        }
-
-        private void MediaPlayer_Playing(object sender, EventArgs e)
-        {
-            IsPaused = false;
-        }
-
-        private void MediaPlayer_Paused(object sender, EventArgs e)
-        {
-            IsPaused = true;
-        }
-
-        private void MediaPlayer_Unmuted(object sender, EventArgs e)
-        {
-            IsMuted = false;
-        }
-
-        private void MediaPlayer_Muted(object sender, EventArgs e)
-        {
-            IsMuted = true;
-        }
-
-        private void MediaPlayer_TimeChanged(object sender, MediaPlayerTimeChangedEventArgs e)
-        {
-            SetProperty(ref _sliderTime, e.Time, nameof(SliderTime));
-            DisplayTime = TimeSpan.FromMilliseconds(e.Time);
-        }
-
-        private void MediaPlayer_ESAdded(object sender, MediaPlayerESAddedEventArgs e)
-        {
-            if (e.Id >= 0)
-            {
-                switch (e.Type)
-                {
-                    case TrackType.Audio:
-                        var audioTrackDescription = MediaPlayer.AudioTrackDescription.First(p => p.Id == e.Id);
-
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            AudioTrackDescriptions.Add(audioTrackDescription);
-                        });
-                        break;
-                }
-            }
-        }
-
-        private void MediaPlayer_ESDeleted(object sender, MediaPlayerESDeletedEventArgs e)
-        {
-            if (e.Id >= 0)
-            {
-                switch (e.Type)
-                {
-                    case TrackType.Audio:
-                        var audioTrackDescription = AudioTrackDescriptions.First(p => p.Id == e.Id);
-
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            AudioTrackDescriptions.Remove(audioTrackDescription);
-                        });
-                        break;
-                }
-            }
-        }
-
         private void ShowControlsTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             Application.Current.Dispatcher.Invoke(() =>
@@ -442,20 +297,6 @@ namespace RaceControl.ViewModels
                 ShowControls = false;
                 Mouse.OverrideCursor = Cursors.None;
             });
-        }
-
-        private void RendererDiscoverer_ItemAdded(object sender, RendererDiscovererItemAddedEventArgs e)
-        {
-            if (e.RendererItem.CanRenderVideo)
-            {
-                Logger.Info($"Found renderer '{e.RendererItem.Name}' of type '{e.RendererItem.Type}'.");
-
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    RendererItems.Add(e.RendererItem);
-                    SelectedRendererItem ??= e.RendererItem;
-                });
-            }
         }
 
         private void MouseDownVideoExecute(MouseButtonEventArgs args)
@@ -518,11 +359,8 @@ namespace RaceControl.ViewModels
 
         private void TogglePauseExecute()
         {
-            if (MediaPlayer.CanPause)
-            {
-                Logger.Info("Toggling pause...");
-                MediaPlayer.Pause();
-            }
+            Logger.Info("Toggling pause...");
+            MediaPlayer.TogglePause();
         }
 
         private void ToggleMuteExecute()
@@ -541,8 +379,7 @@ namespace RaceControl.ViewModels
             if (int.TryParse(value, out var seconds))
             {
                 Logger.Info($"Fast forwarding stream {seconds} seconds...");
-                var time = MediaPlayer.Time + seconds * 1000;
-                SetMediaPlayerTime(time);
+                MediaPlayer.Time = MediaPlayer.Time + seconds * 1000;
             }
         }
 
@@ -560,7 +397,7 @@ namespace RaceControl.ViewModels
 
         private bool CanToggleRecordingExecute()
         {
-            return Initialized && PlayableContent.IsLive && (IsRecording || !IsPaused);
+            return Initialized && PlayableContent.IsLive && (IsRecording || !MediaPlayer.IsPaused);
         }
 
         private async void ToggleRecordingExecute()
@@ -578,9 +415,9 @@ namespace RaceControl.ViewModels
 
         private void OnSyncSession(SyncStreamsEventPayload payload)
         {
-            if (UniqueIdentifier != payload.RequesterIdentifier && PlayableContent.SyncUID == payload.SyncUID)
+            if (Initialized && PlayableContent.SyncUID == payload.SyncUID && !PlayableContent.IsLive)
             {
-                SetMediaPlayerTime(payload.Time);
+                MediaPlayer.Time = payload.Time;
             }
         }
 
@@ -654,7 +491,7 @@ namespace RaceControl.ViewModels
                 {
                     // Workaround to fix audio out of sync after switching audio track
                     await Task.Delay(TimeSpan.FromMilliseconds(250));
-                    SetMediaPlayerTime(MediaPlayer.Time - 500);
+                    MediaPlayer.Time = MediaPlayer.Time - 500;
                 }
 
                 Logger.Info("Done changing audio track.");
@@ -663,34 +500,14 @@ namespace RaceControl.ViewModels
 
         private bool CanScanChromecastExecute()
         {
-            return Initialized && !IsScanning;
+            return Initialized && !MediaPlayer.IsScanning;
         }
 
         private async void ScanChromecastExecute()
         {
-            IsScanning = true;
             Logger.Info("Scanning for Chromecast devices...");
-            RendererItems.Clear();
-
-            using (var rendererDiscoverer = new RendererDiscoverer(_libVLC))
-            {
-                rendererDiscoverer.ItemAdded += RendererDiscoverer_ItemAdded;
-
-                if (rendererDiscoverer.Start())
-                {
-                    await Task.Delay(TimeSpan.FromSeconds(10));
-                    rendererDiscoverer.Stop();
-                }
-                else
-                {
-                    Logger.Warn("Could not start scanning for Chromecast devices.");
-                }
-
-                rendererDiscoverer.ItemAdded -= RendererDiscoverer_ItemAdded;
-            }
-
+            await MediaPlayer.ScanChromecastAsync();
             Logger.Info("Done scanning for Chromecast devices.");
-            IsScanning = false;
         }
 
         private bool CanStartCastVideoExecute()
@@ -701,26 +518,18 @@ namespace RaceControl.ViewModels
         private async void StartCastVideoExecute()
         {
             Logger.Info($"Starting casting of video with renderer '{SelectedRendererItem.Name}'...");
-
-            if (await ChangeRendererAsync(SelectedRendererItem))
-            {
-                IsCasting = true;
-            }
+            await ChangeRendererAsync(SelectedRendererItem);
         }
 
         private bool CanStopCastVideoExecute()
         {
-            return IsCasting;
+            return MediaPlayer.IsCasting;
         }
 
         private async void StopCastVideoExecute()
         {
             Logger.Info("Stopping casting of video...");
-
-            if (await ChangeRendererAsync(null))
-            {
-                IsCasting = false;
-            }
+            await ChangeRendererAsync(null);
         }
 
         private void SetWindowLocation(VideoDialogInstance instance)
@@ -783,33 +592,35 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private async Task<bool> ChangeRendererAsync(RendererItem renderer)
+        private async Task ChangeRendererAsync(RendererItem renderer)
         {
             Logger.Info($"Changing renderer to '{renderer?.Name}'...");
 
             var time = MediaPlayer.Time;
-            var media = MediaPlayer.Media;
-            var streamUrl = IsStreamlink ? media?.Mrl : await GenerateStreamUrlAsync();
 
-            if (streamUrl == null)
+            if (IsStreamlink)
             {
-                Logger.Error("Renderer not changed, stream URL is empty.");
-                return false;
+                await MediaPlayer.ChangeRendererAsync(renderer);
             }
+            else
+            {
+                var streamUrl = await GenerateStreamUrlAsync();
 
-            StopPlayback();
-            RemoveMedia(media);
-            media = CreateMedia(streamUrl);
-            StartPlayback(media, renderer);
+                if (streamUrl == null)
+                {
+                    Logger.Error("Renderer not changed, stream URL is empty.");
+                    return;
+                }
+
+                await MediaPlayer.ChangeRendererAsync(renderer, streamUrl);
+            }
 
             if (!PlayableContent.IsLive)
             {
-                SetMediaPlayerTime(time);
+                MediaPlayer.Time = time;
             }
 
             Logger.Info("Done changing renderer.");
-
-            return true;
         }
 
         private async Task<bool> StartRecordingAsync()
@@ -848,79 +659,6 @@ namespace RaceControl.ViewModels
         {
             Logger.Info("Changing to windowed mode...");
             WindowState = WindowState.Normal;
-        }
-
-        private void SetMediaPlayerTime(long time)
-        {
-            Logger.Info($"Setting mediaplayer time to '{time}'...");
-            MediaPlayer.Time = Math.Max(time, 0);
-        }
-
-        private void CreateMediaPlayer()
-        {
-            Logger.Info("Creating mediaplayer...");
-            MediaPlayer.Playing += MediaPlayer_Playing;
-            MediaPlayer.Paused += MediaPlayer_Paused;
-            MediaPlayer.Muted += MediaPlayer_Muted;
-            MediaPlayer.Unmuted += MediaPlayer_Unmuted;
-            MediaPlayer.TimeChanged += MediaPlayer_TimeChanged;
-            MediaPlayer.ESAdded += MediaPlayer_ESAdded;
-            MediaPlayer.ESDeleted += MediaPlayer_ESDeleted;
-            Logger.Info("Done creating mediaplayer.");
-        }
-
-        private Media CreateMedia(string url)
-        {
-            Logger.Info("Creating media...");
-            var media = new Media(_libVLC, url, FromType.FromLocation);
-            media.DurationChanged += Media_DurationChanged;
-            Logger.Info("Done creating media.");
-
-            return media;
-        }
-
-        private void StartPlayback(Media media, RendererItem renderer = null)
-        {
-            Logger.Info("Starting playback...");
-            AudioTrackDescriptions.Clear();
-            MediaPlayer.SetRenderer(renderer);
-            MediaPlayer.Play(media);
-            Logger.Info("Done starting playback.");
-        }
-
-        private void RemoveMediaPlayer()
-        {
-            Logger.Info("Removing mediaplayer...");
-            MediaPlayer.Playing -= MediaPlayer_Playing;
-            MediaPlayer.Paused -= MediaPlayer_Paused;
-            MediaPlayer.Muted -= MediaPlayer_Muted;
-            MediaPlayer.Unmuted -= MediaPlayer_Unmuted;
-            MediaPlayer.TimeChanged -= MediaPlayer_TimeChanged;
-            MediaPlayer.ESAdded -= MediaPlayer_ESAdded;
-            MediaPlayer.ESDeleted -= MediaPlayer_ESDeleted;
-            MediaPlayer.Dispose();
-            Logger.Info("Done removing mediaplayer.");
-        }
-
-        private void RemoveMedia(Media media)
-        {
-            Logger.Info("Removing media...");
-
-            if (media != null)
-            {
-                media.DurationChanged -= Media_DurationChanged;
-                media.Dispose();
-            }
-
-            Logger.Info("Done removing media.");
-        }
-
-        private void StopPlayback()
-        {
-            Logger.Info("Stopping playback...");
-            MediaPlayer.Stop();
-            AudioTrackDescriptions.Clear();
-            Logger.Info("Done stopping playback.");
         }
 
         private void CleanupProcess(Process process)

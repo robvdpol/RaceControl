@@ -10,6 +10,7 @@ using Prism.Ioc;
 using RaceControl.Common.Settings;
 using RaceControl.Core.Helpers;
 using RaceControl.Core.Mvvm;
+using RaceControl.Interfaces;
 using RaceControl.Services;
 using RaceControl.Services.Credential;
 using RaceControl.Services.F1TV;
@@ -71,6 +72,7 @@ namespace RaceControl
                 .Register<IGithubService, GithubService>()
                 .Register<ICredentialService, CredentialService>()
                 .Register<IStreamlinkLauncher, StreamlinkLauncher>()
+                .Register<IMediaPlayer, VlcMediaPlayer>()
                 .Register<MediaPlayer>(CreateMediaPlayer)
                 .RegisterInstance(CreateLibVLC());
         }
