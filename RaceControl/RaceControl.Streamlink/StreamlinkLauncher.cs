@@ -66,17 +66,6 @@ namespace RaceControl.Streamlink
             process.Start();
         }
 
-        public void StartStreamlinkMpv(string mpvExeLocation, string streamUrl, string title)
-        {
-            var streamIdentifier = GetStreamIdentifier();
-            var streamlinkArguments = $"--player \"{mpvExeLocation}\" --title \"{title}\" --hls-audio-select * \"{streamUrl}\" {streamIdentifier}";
-
-            _logger.Info($"Starting MPV Streamlink-instance for stream-URL '{streamUrl}' with identifier '{streamIdentifier}'...");
-
-            using var process = ProcessUtils.CreateProcess(StreamlinkBatchLocation, streamlinkArguments, true);
-            process.Start();
-        }
-
         private string GetStreamIdentifier()
         {
             if (_settings.LowQualityMode)

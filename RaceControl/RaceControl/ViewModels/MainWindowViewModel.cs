@@ -948,15 +948,8 @@ namespace RaceControl.ViewModels
 
         private void WatchStreamInMpv(IPlayableContent playableContent, string streamUrl)
         {
-            if (playableContent.IsLive && !Settings.DisableStreamlink)
-            {
-                _streamlinkLauncher.StartStreamlinkMpv(MpvExeLocation, streamUrl, playableContent.Title);
-            }
-            else
-            {
-                using var process = ProcessUtils.CreateProcess(MpvExeLocation, $"\"{streamUrl}\" --title=\"{playableContent.Title}\"");
-                process.Start();
-            }
+            using var process = ProcessUtils.CreateProcess(MpvExeLocation, $"\"{streamUrl}\" --title=\"{playableContent.Title}\"");
+            process.Start();
         }
 
         private void StartDownload(IPlayableContent playableContent)
