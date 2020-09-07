@@ -96,7 +96,9 @@ namespace RaceControl
             set => SetProperty(ref _rendererItems, value);
         }
 
-        public async Task StartPlaybackAsync(string streamUrl, RendererItem renderer = null)
+        public Action<bool> IsMutedChanged { get; set; }
+
+        public async Task StartPlaybackAsync(string streamUrl, bool isMuted, RendererItem renderer = null)
         {
             _streamUrl = streamUrl;
             AudioTrackDescriptions.Clear();
@@ -107,6 +109,11 @@ namespace RaceControl
 
             if (MediaPlayer.Play(media))
             {
+                if (IsMuted != isMuted)
+                {
+                    ToggleMute();
+                }
+
                 IsCasting = renderer != null;
             }
         }
@@ -165,7 +172,7 @@ namespace RaceControl
         public async Task ChangeRendererAsync(RendererItem renderer, string streamUrl = null)
         {
             StopPlayback();
-            await StartPlaybackAsync(streamUrl ?? _streamUrl, renderer);
+            await StartPlaybackAsync(streamUrl ?? _streamUrl, IsMuted, renderer);
         }
 
         public void Dispose()
@@ -203,11 +210,13 @@ namespace RaceControl
         private void MediaPlayer_Unmuted(object sender, EventArgs e)
         {
             IsMuted = false;
+            IsMutedChanged?.Invoke(IsMuted);
         }
 
         private void MediaPlayer_Muted(object sender, EventArgs e)
         {
             IsMuted = true;
+            IsMutedChanged?.Invoke(IsMuted);
         }
 
         private void MediaPlayer_TimeChanged(object sender, MediaPlayerTimeChangedEventArgs e)

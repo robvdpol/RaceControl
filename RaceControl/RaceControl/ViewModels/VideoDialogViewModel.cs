@@ -175,7 +175,7 @@ namespace RaceControl.ViewModels
             if (dialogSettings != null)
             {
                 StartupLocation = WindowStartupLocation.Manual;
-                SetDialogSettings(dialogSettings);
+                LoadDialogSettings(dialogSettings);
             }
             else
             {
@@ -199,7 +199,8 @@ namespace RaceControl.ViewModels
                 streamUrl = streamlinkUrl;
             }
 
-            await MediaPlayer.StartPlaybackAsync(streamUrl);
+            MediaPlayer.IsMutedChanged += (isMuted) => { DialogSettings.IsMuted = isMuted; };
+            await MediaPlayer.StartPlaybackAsync(streamUrl, DialogSettings.IsMuted);
 
             _showControlsTimer = new Timer(2000) { AutoReset = false };
             _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
@@ -471,10 +472,9 @@ namespace RaceControl.ViewModels
             await ChangeRendererAsync();
         }
 
-        private void SetDialogSettings(VideoDialogSettings settings)
+        private void LoadDialogSettings(VideoDialogSettings settings)
         {
             // Properties need to be set in this order
-            DialogSettings.ChannelName = settings.ChannelName;
             DialogSettings.ResizeMode = settings.ResizeMode;
             DialogSettings.WindowState = settings.WindowState;
             DialogSettings.Topmost = settings.Topmost;
@@ -486,6 +486,9 @@ namespace RaceControl.ViewModels
                 DialogSettings.Width = settings.Width;
                 DialogSettings.Height = settings.Height;
             }
+
+            DialogSettings.IsMuted = settings.IsMuted;
+            DialogSettings.ChannelName = settings.ChannelName;
         }
 
         private async Task<string> GenerateStreamUrlAsync()

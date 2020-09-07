@@ -14,7 +14,7 @@ namespace RaceControl.Interfaces
 
         bool IsCasting { get; }
 
-        Task StartPlaybackAsync(string streamUrl, RendererItem renderer = null);
+        Task StartPlaybackAsync(string streamUrl, bool isMuted, RendererItem renderer = null);
 
         void TogglePause();
 
@@ -25,5 +25,7 @@ namespace RaceControl.Interfaces
         Task ScanChromecastAsync();
 
         Task ChangeRendererAsync(RendererItem renderer, string streamUrl = null);
+
+        Action<bool> IsMutedChanged { get; set; }
     }
 }

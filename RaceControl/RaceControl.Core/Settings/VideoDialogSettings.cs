@@ -12,6 +12,7 @@ namespace RaceControl.Core.Settings
         private ResizeMode _resizeMode;
         private WindowState _windowState;
         private bool _topmost;
+        private bool _isMuted;
         private string _channelName;
 
         public double Top
@@ -54,6 +55,12 @@ namespace RaceControl.Core.Settings
         {
             get => _topmost;
             set => SetProperty(ref _topmost, value);
+        }
+
+        public bool IsMuted
+        {
+            get => _isMuted;
+            set => SetProperty(ref _isMuted, value);
         }
 
         public string ChannelName
