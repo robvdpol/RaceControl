@@ -11,6 +11,6 @@ namespace RaceControl.Interfaces
 
         IPlayableContent PlayableContent { get; }
 
-        VideoDialogInstance Instance { get; }
+        VideoDialogSettings DialogSettings { get; }
     }
 }

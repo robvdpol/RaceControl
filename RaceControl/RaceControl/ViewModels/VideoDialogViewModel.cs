@@ -57,14 +57,14 @@ namespace RaceControl.ViewModels
         private Process _streamlinkRecordingProcess;
         private string _token;
         private IPlayableContent _playableContent;
+        private VideoDialogSettings _dialogSettings;
+        private WindowStartupLocation _startupLocation = WindowStartupLocation.CenterOwner;
         private bool _isStreamlink;
         private bool _isRecording;
         private bool _showControls;
         private RendererItem _selectedRendererItem;
         private Timer _showControlsTimer;
         private SubscriptionToken _syncStreamsEventToken;
-        private VideoDialogInstance _instance;
-        private WindowStartupLocation _startupLocation = WindowStartupLocation.CenterOwner;
         private string _carImageUrl;
 
         private string _headshotImageUrl;
@@ -98,7 +98,7 @@ namespace RaceControl.ViewModels
         public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => Initialized).ObservesProperty(() => PlayableContent);
         public ICommand ToggleRecordingCommand => _toggleRecordingCommand ??= new DelegateCommand(ToggleRecordingExecute, CanToggleRecordingExecute).ObservesProperty(() => Initialized).ObservesProperty(() => PlayableContent).ObservesProperty(() => IsRecording).ObservesProperty(() => MediaPlayer.IsPaused);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand(ToggleFullScreenExecute);
-        public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => Instance.WindowState);
+        public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => DialogSettings.WindowState);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
         public ICommand ScanChromecastCommand => _scanChromecastCommand ??= new DelegateCommand(ScanChromecastExecute, CanScanChromecastExecute).ObservesProperty(() => Initialized).ObservesProperty(() => MediaPlayer.IsScanning);
         public ICommand StartCastVideoCommand => _startCastVideoCommand ??= new DelegateCommand(StartCastVideoExecute, CanStartCastVideoExecute).ObservesProperty(() => Initialized).ObservesProperty(() => SelectedRendererItem);
@@ -114,6 +114,18 @@ namespace RaceControl.ViewModels
         {
             get => _playableContent;
             set => SetProperty(ref _playableContent, value);
+        }
+
+        public VideoDialogSettings DialogSettings
+        {
+            get => _dialogSettings ??= VideoDialogSettings.GetDefaultSettings();
+            set => SetProperty(ref _dialogSettings, value);
+        }
+
+        public WindowStartupLocation StartupLocation
+        {
+            get => _startupLocation;
+            set => SetProperty(ref _startupLocation, value);
         }
 
         public bool IsStreamlink
@@ -140,18 +152,6 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _selectedRendererItem, value);
         }
 
-        public VideoDialogInstance Instance
-        {
-            get => _instance;
-            set => SetProperty(ref _instance, value);
-        }
-
-        public WindowStartupLocation StartupLocation
-        {
-            get => _startupLocation;
-            set => SetProperty(ref _startupLocation, value);
-        }
-
         public string CarImageUrl
         {
             get => _carImageUrl;
@@ -169,27 +169,19 @@ namespace RaceControl.ViewModels
             _token = parameters.GetValue<string>(ParameterNames.TOKEN);
             PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.PLAYABLE_CONTENT);
             IsStreamlink = PlayableContent.IsLive && !_settings.DisableStreamlink;
-            var instance = parameters.GetValue<VideoDialogInstance>(ParameterNames.INSTANCE);
 
-            if (instance != null)
+            var dialogSettings = parameters.GetValue<VideoDialogSettings>(ParameterNames.DIALOG_SETTINGS);
+
+            if (dialogSettings != null)
             {
                 StartupLocation = WindowStartupLocation.Manual;
+                SetDialogSettings(dialogSettings);
             }
             else
             {
-                instance = new VideoDialogInstance
-                {
-                    Width = 960,
-                    Height = 550,
-                    ResizeMode = ResizeMode.CanResize,
-                    WindowState = WindowState.Normal,
-                    ChannelName = PlayableContent.Name
-                };
-
                 StartupLocation = WindowStartupLocation.CenterScreen;
+                DialogSettings.ChannelName = PlayableContent.Name;
             }
-
-            Instance = instance;
 
             var streamUrl = await GenerateStreamUrlAsync();
 
@@ -340,7 +332,7 @@ namespace RaceControl.ViewModels
             if (int.TryParse(value, out var seconds))
             {
                 Logger.Info($"Fast forwarding stream {seconds} seconds...");
-                MediaPlayer.Time = MediaPlayer.Time + seconds * 1000;
+                MediaPlayer.Time += seconds * 1000;
             }
         }
 
@@ -384,7 +376,7 @@ namespace RaceControl.ViewModels
 
         private void ToggleFullScreenExecute()
         {
-            if (Instance.WindowState != WindowState.Maximized)
+            if (DialogSettings.WindowState != WindowState.Maximized)
             {
                 SetFullScreen();
             }
@@ -396,46 +388,45 @@ namespace RaceControl.ViewModels
 
         private bool CanMoveToCornerExecute(WindowLocation? location)
         {
-            return Instance.WindowState != WindowState.Maximized && location != null;
+            return DialogSettings.WindowState != WindowState.Maximized && location != null;
         }
 
         private void MoveToCornerExecute(WindowLocation? location)
         {
             Logger.Info($"Moving window to corner '{location}'...");
-            var screen = Screen.FromRectangle(new Rectangle((int)Instance.Left, (int)Instance.Top, (int)Instance.Width, (int)Instance.Height));
+            var screen = Screen.FromRectangle(new Rectangle((int)DialogSettings.Left, (int)DialogSettings.Top, (int)DialogSettings.Width, (int)DialogSettings.Height));
             var scale = Math.Max(Screen.PrimaryScreen.WorkingArea.Width / SystemParameters.PrimaryScreenWidth, Screen.PrimaryScreen.WorkingArea.Height / SystemParameters.PrimaryScreenHeight);
             var top = screen.WorkingArea.Top / scale;
             var left = screen.WorkingArea.Left / scale;
             var width = screen.WorkingArea.Width / 2D / scale;
             var height = screen.WorkingArea.Height / 2D / scale;
-            Instance.ResizeMode = ResizeMode.NoResize;
+            DialogSettings.ResizeMode = ResizeMode.NoResize;
 
             switch (location)
             {
                 case WindowLocation.TopLeft:
-                    Instance.Top = top;
-                    Instance.Left = left;
+                    DialogSettings.Top = top;
+                    DialogSettings.Left = left;
                     break;
 
                 case WindowLocation.TopRight:
-                    Instance.Top = top;
-                    Instance.Left = left + width;
+                    DialogSettings.Top = top;
+                    DialogSettings.Left = left + width;
                     break;
 
                 case WindowLocation.BottomLeft:
-                    Instance.Top = top + height;
-                    Instance.Left = left;
+                    DialogSettings.Top = top + height;
+                    DialogSettings.Left = left;
                     break;
 
                 case WindowLocation.BottomRight:
-                    Instance.Top = top + height;
-                    Instance.Left = left + width;
+                    DialogSettings.Top = top + height;
+                    DialogSettings.Left = left + width;
                     break;
             }
 
-            Instance.Width = width;
-            Instance.Height = height;
-            Logger.Info($"Done moving window (top: {Instance.Top}, left: {Instance.Left}, width: {Instance.Width}, height: {Instance.Height}).");
+            DialogSettings.Width = width;
+            DialogSettings.Height = height;
         }
 
         private async void AudioTrackSelectionChangedExecute(SelectionChangedEventArgs args)
@@ -449,7 +440,7 @@ namespace RaceControl.ViewModels
                 {
                     // Workaround to fix audio out of sync after switching audio track
                     await Task.Delay(TimeSpan.FromMilliseconds(250));
-                    MediaPlayer.Time = MediaPlayer.Time - 500;
+                    MediaPlayer.Time -= 500;
                 }
 
                 Logger.Info("Done changing audio track.");
@@ -488,6 +479,23 @@ namespace RaceControl.ViewModels
         {
             Logger.Info("Stopping casting of video...");
             await ChangeRendererAsync();
+        }
+
+        private void SetDialogSettings(VideoDialogSettings settings)
+        {
+            // Properties need to be set in this order
+            DialogSettings.ChannelName = settings.ChannelName;
+            DialogSettings.ResizeMode = settings.ResizeMode;
+            DialogSettings.WindowState = settings.WindowState;
+            DialogSettings.Topmost = settings.Topmost;
+            DialogSettings.Top = settings.Top;
+            DialogSettings.Left = settings.Left;
+
+            if (settings.WindowState != WindowState.Maximized)
+            {
+                DialogSettings.Width = settings.Width;
+                DialogSettings.Height = settings.Height;
+            }
         }
 
         private async Task<string> GenerateStreamUrlAsync()
@@ -585,14 +593,14 @@ namespace RaceControl.ViewModels
         private void SetFullScreen()
         {
             Logger.Info("Changing to fullscreen mode...");
-            Instance.ResizeMode = ResizeMode.NoResize;
-            Instance.WindowState = WindowState.Maximized;
+            DialogSettings.ResizeMode = ResizeMode.NoResize;
+            DialogSettings.WindowState = WindowState.Maximized;
         }
 
         private void SetWindowed()
         {
             Logger.Info("Changing to windowed mode...");
-            Instance.WindowState = WindowState.Normal;
+            DialogSettings.WindowState = WindowState.Normal;
         }
 
         private void CleanupProcess(Process process)

@@ -5,9 +5,9 @@ namespace RaceControl.Core.Settings
 {
     public interface IVideoDialogLayout
     {
-        ObservableCollection<VideoDialogInstance> Instances { get; }
+        ObservableCollection<VideoDialogSettings> Instances { get; }
 
-        void Add(IEnumerable<VideoDialogInstance> instances);
+        void Add(IEnumerable<VideoDialogSettings> instances);
 
         void Clear();
 

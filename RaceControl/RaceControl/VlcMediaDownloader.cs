@@ -48,15 +48,7 @@ namespace RaceControl
             var option = $":sout=#std{{access=file,mux=ts,dst=\"{filename}\"}}";
             var media = new Media(_libVLC, streamUrl, FromType.FromLocation, option);
             await media.Parse();
-
-            if (_mediaPlayer.Play(media))
-            {
-                Status = DownloadStatus.Downloading;
-            }
-            else
-            {
-                Status = DownloadStatus.Failed;
-            }
+            Status = _mediaPlayer.Play(media) ? DownloadStatus.Downloading : DownloadStatus.Failed;
         }
 
         public void Dispose()

@@ -146,22 +146,20 @@ namespace RaceControl
         {
             RendererItems.Clear();
 
-            using (var rendererDiscoverer = new RendererDiscoverer(_libVLC))
+            using var rendererDiscoverer = new RendererDiscoverer(_libVLC);
+            rendererDiscoverer.ItemAdded += RendererDiscoverer_ItemAdded;
+            rendererDiscoverer.ItemDeleted += RendererDiscoverer_ItemDeleted;
+
+            if (rendererDiscoverer.Start())
             {
-                rendererDiscoverer.ItemAdded += RendererDiscoverer_ItemAdded;
-                rendererDiscoverer.ItemDeleted += RendererDiscoverer_ItemDeleted;
-
-                if (rendererDiscoverer.Start())
-                {
-                    IsScanning = true;
-                    await Task.Delay(TimeSpan.FromSeconds(10));
-                    rendererDiscoverer.Stop();
-                    IsScanning = false;
-                }
-
-                rendererDiscoverer.ItemAdded -= RendererDiscoverer_ItemAdded;
-                rendererDiscoverer.ItemDeleted -= RendererDiscoverer_ItemDeleted;
+                IsScanning = true;
+                await Task.Delay(TimeSpan.FromSeconds(10));
+                rendererDiscoverer.Stop();
+                IsScanning = false;
             }
+
+            rendererDiscoverer.ItemAdded -= RendererDiscoverer_ItemAdded;
+            rendererDiscoverer.ItemDeleted -= RendererDiscoverer_ItemDeleted;
         }
 
         public async Task ChangeRendererAsync(RendererItem renderer, string streamUrl = null)

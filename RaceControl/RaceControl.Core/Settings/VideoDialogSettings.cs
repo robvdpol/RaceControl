@@ -3,7 +3,7 @@ using System.Windows;
 
 namespace RaceControl.Core.Settings
 {
-    public class VideoDialogInstance : BindableBase
+    public class VideoDialogSettings : BindableBase
     {
         private double _top;
         private double _left;
@@ -13,24 +13,6 @@ namespace RaceControl.Core.Settings
         private WindowState _windowState;
         private bool _topmost;
         private string _channelName;
-
-        public ResizeMode ResizeMode
-        {
-            get => _resizeMode;
-            set => SetProperty(ref _resizeMode, value);
-        }
-
-        public WindowState WindowState
-        {
-            get => _windowState;
-            set => SetProperty(ref _windowState, value);
-        }
-
-        public bool Topmost
-        {
-            get => _topmost;
-            set => SetProperty(ref _topmost, value);
-        }
 
         public double Top
         {
@@ -56,10 +38,39 @@ namespace RaceControl.Core.Settings
             set => SetProperty(ref _height, value);
         }
 
+        public ResizeMode ResizeMode
+        {
+            get => _resizeMode;
+            set => SetProperty(ref _resizeMode, value);
+        }
+
+        public WindowState WindowState
+        {
+            get => _windowState;
+            set => SetProperty(ref _windowState, value);
+        }
+
+        public bool Topmost
+        {
+            get => _topmost;
+            set => SetProperty(ref _topmost, value);
+        }
+
         public string ChannelName
         {
             get => _channelName;
             set => SetProperty(ref _channelName, value);
+        }
+
+        public static VideoDialogSettings GetDefaultSettings()
+        {
+            return new VideoDialogSettings
+            {
+                ResizeMode = ResizeMode.CanResize,
+                WindowState = WindowState.Normal,
+                Width = 960,
+                Height = 550
+            };
         }
     }
 }

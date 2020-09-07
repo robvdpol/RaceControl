@@ -57,13 +57,13 @@
         <Style TargetType="Window">
             <Setter Property="prism:Dialog.WindowStartupLocation" Value="{Binding StartupLocation}" />
             <Setter Property="WindowStyle" Value="None" />
-            <Setter Property="ResizeMode" Value="{Binding Instance.ResizeMode}" />
-            <Setter Property="WindowState" Value="{Binding Instance.WindowState}" />
-            <Setter Property="Topmost" Value="{Binding Instance.Topmost}" />
-            <Setter Property="Top" Value="{Binding Instance.Top, Mode=TwoWay}" />
-            <Setter Property="Left" Value="{Binding Instance.Left, Mode=TwoWay}" />
-            <Setter Property="Width" Value="{Binding Instance.Width, Mode=TwoWay}" />
-            <Setter Property="Height" Value="{Binding Instance.Height, Mode=TwoWay}" />
+            <Setter Property="ResizeMode" Value="{Binding DialogSettings.ResizeMode}" />
+            <Setter Property="WindowState" Value="{Binding DialogSettings.WindowState}" />
+            <Setter Property="Topmost" Value="{Binding DialogSettings.Topmost}" />
+            <Setter Property="Top" Value="{Binding DialogSettings.Top, Mode=TwoWay}" />
+            <Setter Property="Left" Value="{Binding DialogSettings.Left, Mode=TwoWay}" />
+            <Setter Property="Width" Value="{Binding DialogSettings.Width, Mode=TwoWay}" />
+            <Setter Property="Height" Value="{Binding DialogSettings.Height, Mode=TwoWay}" />
             <Setter Property="ShowInTaskbar" Value="True" />
         </Style>
     </prism:Dialog.WindowStyle>
@@ -328,7 +328,7 @@
                                     <Style BasedOn="{StaticResource ControlBarButtonStyleLarge}" TargetType="Button">
                                         <Setter Property="Content" Value="{StaticResource FullscreenImage}" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Instance.WindowState, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static WindowState.Maximized}}" Value="True">
+                                            <DataTrigger Binding="{Binding DialogSettings.WindowState, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static WindowState.Maximized}}" Value="True">
                                                 <Setter Property="Content" Value="{StaticResource WindowedImage}" />
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -405,14 +405,14 @@
                                 Margin="1,0"
                                 VerticalAlignment="Center"
                                 Content="Resizable window"
-                                IsChecked="{Binding Instance.ResizeMode, Converter={StaticResource ResizeModeToBooleanConverter}}"
-                                IsEnabled="{Binding Instance.WindowState, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static WindowState.Normal}}" />
+                                IsChecked="{Binding DialogSettings.ResizeMode, Converter={StaticResource ResizeModeToBooleanConverter}}"
+                                IsEnabled="{Binding DialogSettings.WindowState, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static WindowState.Normal}}" />
                             <CheckBox
                                 Grid.Column="1"
                                 Margin="1,0"
                                 VerticalAlignment="Center"
                                 Content="Always on top"
-                                IsChecked="{Binding Instance.Topmost}" />
+                                IsChecked="{Binding DialogSettings.Topmost}" />
                         </Grid>
                         <StackPanel
                             Grid.Row="1"

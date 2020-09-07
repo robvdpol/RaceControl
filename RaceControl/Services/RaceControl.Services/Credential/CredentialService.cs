@@ -67,7 +67,7 @@ namespace RaceControl.Services.Credential
             }
         }
 
-        public bool DeleteCredential()
+        public void DeleteCredential()
         {
             _logger.Info("Deleting credentials from store...");
 
@@ -78,9 +78,7 @@ namespace RaceControl.Services.Credential
                 PersistanceType = PersistanceType.LocalComputer
             };
 
-            var deleted = credential.Delete();
-
-            if (deleted)
+            if (credential.Delete())
             {
                 _logger.Info("Credentials deleted from store.");
             }
@@ -88,8 +86,6 @@ namespace RaceControl.Services.Credential
             {
                 _logger.Warn("Credentials not deleted from store.");
             }
-
-            return deleted;
         }
     }
 }

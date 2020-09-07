@@ -15,7 +15,7 @@ namespace RaceControl.Core.Settings
         private readonly ILogger _logger;
         private readonly JsonSerializer _serializer;
 
-        private ObservableCollection<VideoDialogInstance> _instances;
+        private ObservableCollection<VideoDialogSettings> _instances;
 
         public VideoDialogLayout(ILogger logger, JsonSerializer serializer)
         {
@@ -23,18 +23,15 @@ namespace RaceControl.Core.Settings
             _serializer = serializer;
         }
 
-        public ObservableCollection<VideoDialogInstance> Instances
+        public ObservableCollection<VideoDialogSettings> Instances
         {
-            get => _instances ??= new ObservableCollection<VideoDialogInstance>();
+            get => _instances ??= new ObservableCollection<VideoDialogSettings>();
             set => SetProperty(ref _instances, value);
         }
 
-        public void Add(IEnumerable<VideoDialogInstance> instances)
+        public void Add(IEnumerable<VideoDialogSettings> instances)
         {
-            foreach (var instance in instances)
-            {
-                Instances.Add(instance);
-            }
+            Instances.AddRange(instances);
         }
 
         public void Clear()

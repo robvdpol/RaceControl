@@ -6,6 +6,6 @@
 
         void SaveCredential(string username, string password);
 
-        bool DeleteCredential();
+        void DeleteCredential();
     }
 }

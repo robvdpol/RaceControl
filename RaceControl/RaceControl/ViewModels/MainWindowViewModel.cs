@@ -402,8 +402,7 @@ namespace RaceControl.ViewModels
             var parameters = new DialogParameters
             {
                 { ParameterNames.TOKEN, _token },
-                { ParameterNames.PLAYABLE_CONTENT, playableContent },
-                { ParameterNames.INSTANCE, null }
+                { ParameterNames.PLAYABLE_CONTENT, playableContent }
             };
 
             OpenVideoDialog(parameters);
@@ -591,7 +590,7 @@ namespace RaceControl.ViewModels
         private void SaveVideoDialogLayoutExecute()
         {
             VideoDialogLayout.Clear();
-            VideoDialogLayout.Add(VideoDialogViewModels.Where(vm => vm.PlayableContent.ContentType == ContentType.Channel).Select(vm => vm.Instance));
+            VideoDialogLayout.Add(VideoDialogViewModels.Where(vm => vm.PlayableContent.ContentType == ContentType.Channel).Select(vm => vm.DialogSettings));
 
             if (VideoDialogLayout.Save())
             {
@@ -616,13 +615,13 @@ namespace RaceControl.ViewModels
             var session = GetSelectedSession();
             var playableContents = Channels.Select(channel => PlayableContent.Create(session, channel)).ToList();
 
-            foreach (var instance in VideoDialogLayout.Instances)
+            foreach (var settings in VideoDialogLayout.Instances)
             {
-                var playableContent = playableContents.FirstOrDefault(p => p.ContentType == ContentType.Channel && p.Name == instance.ChannelName);
+                var playableContent = playableContents.FirstOrDefault(p => p.ContentType == ContentType.Channel && p.Name == settings.ChannelName);
 
                 if (playableContent != null)
                 {
-                    WatchChannel(playableContent, instance);
+                    WatchChannel(playableContent, settings);
                 }
             }
         }
@@ -904,13 +903,13 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void WatchChannel(IPlayableContent playableContent, VideoDialogInstance instance = null)
+        private void WatchChannel(IPlayableContent playableContent, VideoDialogSettings settings = null)
         {
             var parameters = new DialogParameters
             {
                 { ParameterNames.TOKEN, _token },
                 { ParameterNames.PLAYABLE_CONTENT, playableContent },
-                { ParameterNames.INSTANCE, instance }
+                { ParameterNames.DIALOG_SETTINGS, settings }
             };
 
             OpenVideoDialog(parameters);
