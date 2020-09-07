@@ -233,16 +233,6 @@ namespace RaceControl.ViewModels
             base.OnDialogClosed();
         }
 
-        protected override void CloseWindowExecute()
-        {
-            var parameters = new DialogParameters
-            {
-                { ParameterNames.UNIQUE_IDENTIFIER, UniqueIdentifier }
-            };
-
-            RaiseRequestClose(new DialogResult(ButtonResult.None, parameters));
-        }
-
         private void ShowControlsTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             Application.Current.Dispatcher.Invoke(() =>

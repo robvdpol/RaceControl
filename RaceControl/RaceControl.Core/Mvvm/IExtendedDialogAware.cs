@@ -4,6 +4,6 @@ namespace RaceControl.Core.Mvvm
 {
     public interface IExtendedDialogAware : IDialogAware
     {
-        void CloseWindow(bool force = false);
+        void CloseWindow(bool forceClose = false);
     }
 }

@@ -15,9 +15,9 @@ namespace RaceControl.Core.Mvvm
         {
         }
 
-        public ICommand CloseWindowCommand => _closeWindowCommand ??= new DelegateCommand(CloseWindowExecute, CanCloseDialog).ObservesProperty(() => Initialized);
-
         public abstract string Title { get; }
+
+        public ICommand CloseWindowCommand => _closeWindowCommand ??= new DelegateCommand(CloseWindowExecute, CanCloseDialog).ObservesProperty(() => Initialized);
 
         protected bool Initialized
         {
@@ -27,7 +27,7 @@ namespace RaceControl.Core.Mvvm
 
         public event Action<IDialogResult> RequestClose;
 
-        public bool CanCloseDialog()
+        public virtual bool CanCloseDialog()
         {
             return Initialized;
         }
@@ -42,27 +42,24 @@ namespace RaceControl.Core.Mvvm
             Initialized = true;
         }
 
-        public void CloseWindow(bool force = false)
+        public void CloseWindow(bool forceClose = false)
         {
-            if (force)
+            if (forceClose)
             {
                 Initialized = true;
             }
 
-            if (CloseWindowCommand.CanExecute(null))
-            {
-                CloseWindowCommand.Execute(null);
-            }
-        }
-
-        protected virtual void CloseWindowExecute()
-        {
-            RaiseRequestClose(new DialogResult(ButtonResult.None));
+            CloseWindowExecute();
         }
 
         protected void RaiseRequestClose(IDialogResult dialogResult)
         {
             RequestClose?.Invoke(dialogResult);
+        }
+
+        private void CloseWindowExecute()
+        {
+            RaiseRequestClose(null);
         }
     }
 }
