@@ -30,7 +30,7 @@ namespace RaceControl.ViewModels
 
         public override string Title { get; } = "Login";
 
-        public ICommand LoginCommand => _loginCommand ??= new DelegateCommand(LoginExecute, CanLoginExecute).ObservesProperty(() => Email).ObservesProperty(() => Password).ObservesProperty(() => IsBusy);
+        public ICommand LoginCommand => _loginCommand ??= new DelegateCommand(LoginExecute, CanLoginExecute).ObservesProperty(() => IsBusy).ObservesProperty(() => Email).ObservesProperty(() => Password);
 
         public string Email
         {
@@ -52,23 +52,24 @@ namespace RaceControl.ViewModels
 
         public override void OnDialogOpened(IDialogParameters parameters)
         {
-            base.OnDialogOpened(parameters);
-
             if (_credentialService.LoadCredential(out var email, out var password))
             {
                 Email = email;
                 Password = password;
 
-                if (CanLoginExecute())
+                if (LoginCommand.CanExecute(null))
                 {
-                    LoginExecute();
+                    CanClose = true;
+                    LoginCommand.Execute(null);
                 }
             }
+
+            base.OnDialogOpened(parameters);
         }
 
         private bool CanLoginExecute()
         {
-            return !string.IsNullOrWhiteSpace(Email) && !string.IsNullOrWhiteSpace(Password) && !IsBusy;
+            return !IsBusy && !string.IsNullOrWhiteSpace(Email) && !string.IsNullOrWhiteSpace(Password);
         }
 
         private async void LoginExecute()

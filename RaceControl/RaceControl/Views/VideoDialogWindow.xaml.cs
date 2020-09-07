@@ -17,12 +17,7 @@ namespace RaceControl.Views
         {
             if (DataContext is IVideoDialogViewModel vm)
             {
-                var parameters = new DialogParameters
-                {
-                    { ParameterNames.UNIQUE_IDENTIFIER, vm.UniqueIdentifier }
-                };
-
-                Result = new DialogResult(ButtonResult.None, parameters);
+                Result = new DialogResult(ButtonResult.None, new DialogParameters { { ParameterNames.UNIQUE_IDENTIFIER, vm.UniqueIdentifier } });
             }
 
             Closed -= VideoDialogWindow_Closed;

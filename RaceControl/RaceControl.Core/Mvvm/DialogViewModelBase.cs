@@ -22,7 +22,7 @@ namespace RaceControl.Core.Mvvm
         protected bool CanClose
         {
             get => _canClose;
-            private set => SetProperty(ref _canClose, value);
+            set => SetProperty(ref _canClose, value);
         }
 
         public event Action<IDialogResult> RequestClose;
