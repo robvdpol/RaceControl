@@ -51,6 +51,11 @@ namespace RaceControl
             Status = _mediaPlayer.Play(media) ? DownloadStatus.Downloading : DownloadStatus.Failed;
         }
 
+        public void SetFailedStatus()
+        {
+            Status = DownloadStatus.Failed;
+        }
+
         public void Dispose()
         {
             Dispose(true);

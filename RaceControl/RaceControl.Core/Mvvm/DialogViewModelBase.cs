@@ -9,7 +9,7 @@ namespace RaceControl.Core.Mvvm
     public abstract class DialogViewModelBase : ViewModelBase, IExtendedDialogAware
     {
         private ICommand _closeWindowCommand;
-        private bool _initialized;
+        private bool _canClose;
 
         protected DialogViewModelBase(ILogger logger) : base(logger)
         {
@@ -17,36 +17,36 @@ namespace RaceControl.Core.Mvvm
 
         public abstract string Title { get; }
 
-        public ICommand CloseWindowCommand => _closeWindowCommand ??= new DelegateCommand(CloseWindowExecute, CanCloseDialog).ObservesProperty(() => Initialized);
+        public ICommand CloseWindowCommand => _closeWindowCommand ??= new DelegateCommand(CloseWindowExecute, CanCloseDialog).ObservesProperty(() => CanClose);
 
-        protected bool Initialized
+        protected bool CanClose
         {
-            get => _initialized;
-            private set => SetProperty(ref _initialized, value);
+            get => _canClose;
+            private set => SetProperty(ref _canClose, value);
         }
 
         public event Action<IDialogResult> RequestClose;
 
         public virtual bool CanCloseDialog()
         {
-            return Initialized;
+            return CanClose;
         }
 
         public virtual void OnDialogClosed()
         {
-            Initialized = false;
+            CanClose = false;
         }
 
         public virtual void OnDialogOpened(IDialogParameters parameters)
         {
-            Initialized = true;
+            CanClose = true;
         }
 
         public void CloseWindow(bool forceClose = false)
         {
             if (forceClose)
             {
-                Initialized = true;
+                CanClose = true;
             }
 
             CloseWindowExecute();

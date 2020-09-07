@@ -4,8 +4,6 @@ using RaceControl.Common.Interfaces;
 using RaceControl.Core.Mvvm;
 using RaceControl.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
-using System;
-using System.Threading.Tasks;
 
 namespace RaceControl.ViewModels
 {
@@ -13,7 +11,6 @@ namespace RaceControl.ViewModels
     {
         private readonly IApiService _apiService;
 
-        private string _token;
         private IPlayableContent _playableContent;
         private string _filename;
 
@@ -41,13 +38,20 @@ namespace RaceControl.ViewModels
 
         public override async void OnDialogOpened(IDialogParameters parameters)
         {
-            _token = parameters.GetValue<string>(ParameterNames.TOKEN);
+            var token = parameters.GetValue<string>(ParameterNames.TOKEN);
             PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.PLAYABLE_CONTENT);
             Filename = parameters.GetValue<string>(ParameterNames.FILENAME);
 
-            Logger.Info($"Downloading '{PlayableContent.Title}' to file '{Filename}'...");
-            var streamUrl = await GenerateStreamUrlAsync();
-            await MediaDownloader.StartDownloadAsync(streamUrl, Filename);
+            var (success, streamUrl) = await _apiService.TryGetTokenisedUrlAsync(token, PlayableContent);
+
+            if (success)
+            {
+                await MediaDownloader.StartDownloadAsync(streamUrl, Filename);
+            }
+            else
+            {
+                MediaDownloader.SetFailedStatus();
+            }
 
             base.OnDialogOpened(parameters);
         }
@@ -57,20 +61,6 @@ namespace RaceControl.ViewModels
             MediaDownloader.Dispose();
 
             base.OnDialogClosed();
-        }
-
-        private async Task<string> GenerateStreamUrlAsync()
-        {
-            try
-            {
-                return await _apiService.GetTokenisedUrlAsync(_token, PlayableContent);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "An error occurred while trying to get tokenised URL.");
-            }
-
-            return null;
         }
     }
 }

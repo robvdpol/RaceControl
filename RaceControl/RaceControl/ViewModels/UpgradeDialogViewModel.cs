@@ -17,9 +17,9 @@ namespace RaceControl.ViewModels
         {
         }
 
-        public ICommand CloseCommand => _closeCommand ??= new DelegateCommand<bool?>(CloseExecute);
-
         public override string Title => Release?.Name;
+
+        public ICommand CloseCommand => _closeCommand ??= new DelegateCommand<bool?>(CloseExecute);
 
         public Release Release
         {

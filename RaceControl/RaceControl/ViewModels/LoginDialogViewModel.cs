@@ -28,12 +28,9 @@ namespace RaceControl.ViewModels
             _credentialService = credentialService;
         }
 
-        public ICommand LoginCommand => _loginCommand ??= new DelegateCommand(LoginExecute, CanLoginExecute)
-            .ObservesProperty(() => Email)
-            .ObservesProperty(() => Password)
-            .ObservesProperty(() => IsBusy);
-
         public override string Title { get; } = "Login";
+
+        public ICommand LoginCommand => _loginCommand ??= new DelegateCommand(LoginExecute, CanLoginExecute).ObservesProperty(() => Email).ObservesProperty(() => Password).ObservesProperty(() => IsBusy);
 
         public string Email
         {
@@ -62,9 +59,9 @@ namespace RaceControl.ViewModels
                 Email = email;
                 Password = password;
 
-                if (LoginCommand.CanExecute(null))
+                if (CanLoginExecute())
                 {
-                    LoginCommand.Execute(null);
+                    LoginExecute();
                 }
             }
         }

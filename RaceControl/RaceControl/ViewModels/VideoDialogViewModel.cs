@@ -85,6 +85,8 @@ namespace RaceControl.ViewModels
             MediaPlayer = mediaPlayer;
         }
 
+        public override string Title => PlayableContent?.Title;
+
         public ICommand MouseDownVideoCommand => _mouseDownVideoCommand ??= new DelegateCommand<MouseButtonEventArgs>(MouseDownVideoExecute);
         public ICommand MouseMoveVideoCommand => _mouseMoveVideoCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveVideoExecute);
         public ICommand MouseEnterVideoCommand => _mouseEnterVideoCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveVideoExecute);
@@ -92,19 +94,17 @@ namespace RaceControl.ViewModels
         public ICommand MouseMoveControlBarCommand => _mouseMoveControlBarCommand ??= new DelegateCommand(MouseMoveControlBarExecute);
         public ICommand MouseEnterControlBarCommand => _mouseEnterControlBarCommand ??= new DelegateCommand(MouseEnterControlBarExecute);
         public ICommand MouseLeaveControlBarCommand => _mouseLeaveControlBarCommand ??= new DelegateCommand(MouseLeaveControlBarExecute);
-        public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute).ObservesCanExecute(() => Initialized);
-        public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand(ToggleMuteExecute).ObservesCanExecute(() => Initialized);
-        public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<string>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => Initialized).ObservesProperty(() => PlayableContent);
-        public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => Initialized).ObservesProperty(() => PlayableContent);
-        public ICommand ToggleRecordingCommand => _toggleRecordingCommand ??= new DelegateCommand(ToggleRecordingExecute, CanToggleRecordingExecute).ObservesProperty(() => Initialized).ObservesProperty(() => PlayableContent).ObservesProperty(() => IsRecording).ObservesProperty(() => MediaPlayer.IsPaused);
+        public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute).ObservesCanExecute(() => CanClose);
+        public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand(ToggleMuteExecute).ObservesCanExecute(() => CanClose);
+        public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<string>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent);
+        public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent);
+        public ICommand ToggleRecordingCommand => _toggleRecordingCommand ??= new DelegateCommand(ToggleRecordingExecute, CanToggleRecordingExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent).ObservesProperty(() => IsRecording).ObservesProperty(() => MediaPlayer.IsPaused);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand(ToggleFullScreenExecute);
         public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => DialogSettings.WindowState);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
-        public ICommand ScanChromecastCommand => _scanChromecastCommand ??= new DelegateCommand(ScanChromecastExecute, CanScanChromecastExecute).ObservesProperty(() => Initialized).ObservesProperty(() => MediaPlayer.IsScanning);
-        public ICommand StartCastVideoCommand => _startCastVideoCommand ??= new DelegateCommand(StartCastVideoExecute, CanStartCastVideoExecute).ObservesProperty(() => Initialized).ObservesProperty(() => SelectedRendererItem);
+        public ICommand ScanChromecastCommand => _scanChromecastCommand ??= new DelegateCommand(ScanChromecastExecute, CanScanChromecastExecute).ObservesProperty(() => CanClose).ObservesProperty(() => MediaPlayer.IsScanning);
+        public ICommand StartCastVideoCommand => _startCastVideoCommand ??= new DelegateCommand(StartCastVideoExecute, CanStartCastVideoExecute).ObservesProperty(() => CanClose).ObservesProperty(() => SelectedRendererItem);
         public ICommand StopCastVideoCommand => _stopCastVideoCommand ??= new DelegateCommand(StopCastVideoExecute, CanStopCastVideoExecute).ObservesProperty(() => MediaPlayer.IsCasting);
-
-        public override string Title => PlayableContent?.Title;
 
         public Guid UniqueIdentifier { get; } = Guid.NewGuid();
 
@@ -183,11 +183,11 @@ namespace RaceControl.ViewModels
                 DialogSettings.ChannelName = PlayableContent.Name;
             }
 
-            var streamUrl = await GenerateStreamUrlAsync();
+            var (success, streamUrl) = await _apiService.TryGetTokenisedUrlAsync(_token, PlayableContent);
 
-            if (streamUrl == null)
+            if (!success)
             {
-                Logger.Error("Closing video player, stream URL is empty.");
+                Logger.Error("Closing video player, could not get tokenised URL.");
                 CloseWindow(true);
                 return;
             }
@@ -320,7 +320,7 @@ namespace RaceControl.ViewModels
 
         private bool CanFastForwardExecute(string arg)
         {
-            return Initialized && !PlayableContent.IsLive;
+            return CanClose && !PlayableContent.IsLive;
         }
 
         private void FastForwardExecute(string value)
@@ -334,7 +334,7 @@ namespace RaceControl.ViewModels
 
         private bool CanSyncSessionExecute()
         {
-            return Initialized && !PlayableContent.IsLive;
+            return CanClose && !PlayableContent.IsLive;
         }
 
         private void SyncSessionExecute()
@@ -346,7 +346,7 @@ namespace RaceControl.ViewModels
 
         private bool CanToggleRecordingExecute()
         {
-            return Initialized && PlayableContent.IsLive && (IsRecording || !MediaPlayer.IsPaused);
+            return CanClose && PlayableContent.IsLive && (IsRecording || !MediaPlayer.IsPaused);
         }
 
         private async void ToggleRecordingExecute()
@@ -364,7 +364,7 @@ namespace RaceControl.ViewModels
 
         private void OnSyncSession(SyncStreamsEventPayload payload)
         {
-            if (Initialized && PlayableContent.SyncUID == payload.SyncUID && !PlayableContent.IsLive)
+            if (CanClose && PlayableContent.SyncUID == payload.SyncUID && !PlayableContent.IsLive)
             {
                 MediaPlayer.Time = payload.Time;
             }
@@ -445,7 +445,7 @@ namespace RaceControl.ViewModels
 
         private bool CanScanChromecastExecute()
         {
-            return Initialized && !MediaPlayer.IsScanning;
+            return CanClose && !MediaPlayer.IsScanning;
         }
 
         private async void ScanChromecastExecute()
@@ -457,7 +457,7 @@ namespace RaceControl.ViewModels
 
         private bool CanStartCastVideoExecute()
         {
-            return Initialized && SelectedRendererItem != null;
+            return CanClose && SelectedRendererItem != null;
         }
 
         private async void StartCastVideoExecute()
@@ -496,20 +496,6 @@ namespace RaceControl.ViewModels
             DialogSettings.ChannelName = settings.ChannelName;
         }
 
-        private async Task<string> GenerateStreamUrlAsync()
-        {
-            try
-            {
-                return await _apiService.GetTokenisedUrlAsync(_token, PlayableContent);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "An error occurred while trying to get tokenised URL.");
-            }
-
-            return null;
-        }
-
         private async Task LoadDriverImageUrlsAsync()
         {
             if (string.IsNullOrWhiteSpace(PlayableContent.DriverUID))
@@ -544,11 +530,11 @@ namespace RaceControl.ViewModels
             }
             else
             {
-                var streamUrl = await GenerateStreamUrlAsync();
+                var (success, streamUrl) = await _apiService.TryGetTokenisedUrlAsync(_token, PlayableContent);
 
-                if (streamUrl == null)
+                if (!success)
                 {
-                    Logger.Error("Renderer not changed, stream URL is empty.");
+                    Logger.Error("Renderer not changed, could not get tokenised URL.");
                     return;
                 }
 
@@ -566,11 +552,11 @@ namespace RaceControl.ViewModels
         private async Task<bool> StartRecordingAsync()
         {
             Logger.Info("Starting recording process...");
-            var streamUrl = await GenerateStreamUrlAsync();
+            var (success, streamUrl) = await _apiService.TryGetTokenisedUrlAsync(_token, PlayableContent);
 
-            if (streamUrl == null)
+            if (!success)
             {
-                Logger.Error("Recording process not started, stream URL is empty.");
+                Logger.Error("Recording process not started, could not get tokenised URL.");
                 return false;
             }
 
