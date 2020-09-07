@@ -10,11 +10,13 @@ namespace RaceControl.Interfaces
 
         bool IsPaused { get; }
 
+        bool IsMuted { get; }
+
         bool IsScanning { get; }
 
         bool IsCasting { get; }
 
-        Task StartPlaybackAsync(string streamUrl, bool isMuted, RendererItem renderer = null);
+        Task StartPlaybackAsync(string streamUrl, RendererItem renderer = null);
 
         void TogglePause();
 

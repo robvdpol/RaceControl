@@ -199,8 +199,13 @@ namespace RaceControl.ViewModels
                 streamUrl = streamlinkUrl;
             }
 
+            if (MediaPlayer.IsMuted != DialogSettings.IsMuted)
+            {
+                MediaPlayer.ToggleMute();
+            }
+
             MediaPlayer.IsMutedChanged += (isMuted) => { DialogSettings.IsMuted = isMuted; };
-            await MediaPlayer.StartPlaybackAsync(streamUrl, DialogSettings.IsMuted);
+            await MediaPlayer.StartPlaybackAsync(streamUrl);
 
             _showControlsTimer = new Timer(2000) { AutoReset = false };
             _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
