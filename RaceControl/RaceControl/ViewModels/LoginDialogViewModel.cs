@@ -4,8 +4,9 @@ using Prism.Services.Dialogs;
 using RaceControl.Core.Mvvm;
 using RaceControl.Services.Interfaces.Credential;
 using RaceControl.Services.Interfaces.F1TV;
-using RaceControl.Services.Interfaces.F1TV.Authorization;
 using System;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using DialogResult = Prism.Services.Dialogs.DialogResult;
 
@@ -18,6 +19,7 @@ namespace RaceControl.ViewModels
 
         private ICommand _loginCommand;
 
+        private string _token;
         private string _email;
         private string _password;
         private string _error;
@@ -52,15 +54,16 @@ namespace RaceControl.ViewModels
 
         public override void OnDialogOpened(IDialogParameters parameters)
         {
+            CanClose = true;
+
             if (_credentialService.LoadCredential(out var email, out var password))
             {
                 Email = email;
                 Password = password;
 
-                if (LoginCommand.CanExecute(null))
+                if (CanLoginExecute())
                 {
-                    CanClose = true;
-                    LoginCommand.Execute(null);
+                    LoginExecute();
                 }
             }
 
@@ -72,31 +75,36 @@ namespace RaceControl.ViewModels
             return !IsBusy && !string.IsNullOrWhiteSpace(Email) && !string.IsNullOrWhiteSpace(Password);
         }
 
-        private async void LoginExecute()
+        private void LoginExecute()
         {
             IsBusy = true;
-            Error = null;
-            TokenResponse token;
+            Login().Await(LoginSuccess, LoginError);
+        }
 
-            try
-            {
-                Logger.Info("Attempting to login...");
-                token = await _authorizationService.LoginAsync(Email, Password);
-                Logger.Info("Login successful.");
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "Login failed.");
-                Error = ex.Message;
-                return;
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-
+        private async Task Login()
+        {
+            Logger.Info("Attempting to login...");
+            _token = (await _authorizationService.LoginAsync(Email, Password)).Token;
             _credentialService.SaveCredential(Email, Password);
-            RaiseRequestClose(new DialogResult(ButtonResult.OK, new DialogParameters { { ParameterNames.TOKEN, token.Token } }));
+        }
+
+        private void LoginSuccess()
+        {
+            Logger.Info("Login successful.");
+            Error = null;
+            IsBusy = false;
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                RaiseRequestClose(new DialogResult(ButtonResult.OK, new DialogParameters { { ParameterNames.TOKEN, _token } }));
+            });
+        }
+
+        private void LoginError(Exception ex)
+        {
+            Logger.Error(ex, "Login failed.");
+            Error = ex.Message;
+            IsBusy = false;
         }
     }
 }
