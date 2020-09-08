@@ -58,7 +58,7 @@ namespace RaceControl.Core.Streamlink
         public void StartStreamlinkVlc(string vlcExeLocation, string streamUrl, string title)
         {
             var streamIdentifier = GetStreamIdentifier();
-            var streamlinkArguments = $"--player \"{vlcExeLocation} --file-caching=2000 --network-caching=4000\" --title \"{title}\" --hls-audio-select * \"{streamUrl}\" {streamIdentifier}";
+            var streamlinkArguments = $"--player \"{vlcExeLocation} --file-caching=5000 --network-caching=10000\" --title \"{title}\" --hls-audio-select * \"{streamUrl}\" {streamIdentifier}";
 
             _logger.Info($"Starting VLC Streamlink-instance for stream-URL '{streamUrl}' with identifier '{streamIdentifier}'...");
 

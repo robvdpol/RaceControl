@@ -86,8 +86,8 @@ namespace RaceControl
                 EnableHardwareDecoding = true,
                 EnableMouseInput = false,
                 EnableKeyInput = false,
-                FileCaching = 2000,
-                NetworkCaching = 4000
+                FileCaching = 5000,
+                NetworkCaching = 10000
             };
         }
 
