@@ -17,7 +17,7 @@ namespace RaceControl.Core.Mvvm
 
         public abstract string Title { get; }
 
-        public ICommand CloseWindowCommand => _closeWindowCommand ??= new DelegateCommand(CloseWindowExecute, CanCloseDialog).ObservesProperty(() => CanClose);
+        public ICommand CloseWindowCommand => _closeWindowCommand ??= new DelegateCommand(CloseWindow).ObservesCanExecute(() => CanClose);
 
         protected bool CanClose
         {
@@ -27,7 +27,7 @@ namespace RaceControl.Core.Mvvm
 
         public event Action<IDialogResult> RequestClose;
 
-        public virtual bool CanCloseDialog()
+        public bool CanCloseDialog()
         {
             return CanClose;
         }
@@ -42,35 +42,14 @@ namespace RaceControl.Core.Mvvm
             CanClose = true;
         }
 
-        public void CloseWindow(bool forceClose = false)
+        public void CloseWindow()
         {
-            if (forceClose)
-            {
-                CanClose = true;
-            }
-
-            CloseWindowExecute();
+            RaiseRequestClose(null);
         }
 
         protected void RaiseRequestClose(IDialogResult dialogResult)
         {
             RequestClose?.Invoke(dialogResult);
-        }
-
-        protected void HandleFatalError(Exception ex)
-        {
-            Logger.Error(ex, "A fatal error occurred, closing window.");
-            CloseWindow(true);
-        }
-
-        protected void HandleNonFatalError(Exception ex)
-        {
-            Logger.Error(ex, "A non-fatal error occurred.");
-        }
-
-        private void CloseWindowExecute()
-        {
-            RaiseRequestClose(null);
         }
     }
 }

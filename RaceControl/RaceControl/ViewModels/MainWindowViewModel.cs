@@ -17,7 +17,6 @@ using RaceControl.Services.Interfaces.F1TV.Api;
 using RaceControl.Services.Interfaces.Github;
 using RaceControl.Views;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -225,7 +224,7 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _selectedVodType, value);
         }
 
-        private async void LoadedExecute(RoutedEventArgs args)
+        private void LoadedExecute(RoutedEventArgs args)
         {
             Logger.Info("Initializing application...");
             IsBusy = true;
@@ -233,15 +232,13 @@ namespace RaceControl.ViewModels
             VideoDialogLayout.Load();
             SetVlcExeLocation();
             SetMpvExeLocation();
-
-            await CheckForUpdatesAsync();
+            CheckForUpdatesAsync().Await(HandleNonFatalError);
 
             if (Login())
             {
-                await InitializeAsync();
+                InitializeAsync().Await(NotBusyAnymore, HandleFatalError);
+                RefreshLiveSessionsAsync().Await(HandleNonFatalError);
             }
-
-            IsBusy = false;
         }
 
         private void ClosingExecute()
@@ -284,7 +281,7 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private async void SeasonSelectionChangedExecute()
+        private void SeasonSelectionChangedExecute()
         {
             ClearEvents();
 
@@ -292,23 +289,18 @@ namespace RaceControl.ViewModels
             {
                 IsBusy = true;
 
-                try
-                {
-                    var events = await _apiService.GetEventsForSeasonAsync(SelectedSeason.UID);
-                    Events.AddRange(events);
-                }
-                catch (Exception ex)
-                {
-                    var message = $"An error occurred while trying to load events for race season '{SelectedSeason.Name}'.";
-                    Logger.Error(ex, message);
-                    MessageBoxHelper.ShowError(message);
-                }
-
-                IsBusy = false;
+                _apiService
+                    .GetEventsForSeasonAsync(SelectedSeason.UID)
+                    .Await(events =>
+                    {
+                        Application.Current.Dispatcher.Invoke(() => Events.AddRange(events));
+                        NotBusyAnymore();
+                    },
+                    HandleFatalError);
             }
         }
 
-        private async void EventSelectionChangedExecute()
+        private void EventSelectionChangedExecute()
         {
             ClearSessions();
 
@@ -316,45 +308,38 @@ namespace RaceControl.ViewModels
             {
                 IsBusy = true;
 
-                try
-                {
-                    var sessions = await _apiService.GetSessionsForEventAsync(SelectedEvent.UID);
-                    Sessions.AddRange(sessions);
-                }
-                catch (Exception ex)
-                {
-                    var message = $"An error occurred while trying to load sessions for event '{SelectedEvent.Name}'.";
-                    Logger.Error(ex, message);
-                    MessageBoxHelper.ShowError(message);
-                }
-
-                IsBusy = false;
+                _apiService
+                    .GetSessionsForEventAsync(SelectedEvent.UID)
+                    .Await(sessions =>
+                    {
+                        Application.Current.Dispatcher.Invoke(() => Sessions.AddRange(sessions));
+                        NotBusyAnymore();
+                    },
+                    HandleFatalError);
             }
         }
 
-        private async void LiveSessionSelectionChangedExecute()
+        private void LiveSessionSelectionChangedExecute()
         {
             if (SelectedLiveSession != null)
             {
                 IsBusy = true;
                 SelectedSession = null;
-                await SelectSessionAsync(SelectedLiveSession);
-                IsBusy = false;
+                SelectSessionAsync(SelectedLiveSession).Await(NotBusyAnymore, HandleFatalError);
             }
         }
 
-        private async void SessionSelectionChangedExecute()
+        private void SessionSelectionChangedExecute()
         {
             if (SelectedSession != null)
             {
                 IsBusy = true;
                 SelectedLiveSession = null;
-                await SelectSessionAsync(SelectedSession);
-                IsBusy = false;
+                SelectSessionAsync(SelectedSession).Await(NotBusyAnymore, HandleFatalError);
             }
         }
 
-        private async void VodTypeSelectionChangedExecute()
+        private void VodTypeSelectionChangedExecute()
         {
             if (SelectedVodType != null)
             {
@@ -367,19 +352,14 @@ namespace RaceControl.ViewModels
                 {
                     IsBusy = true;
 
-                    try
-                    {
-                        var episodes = await DownloadHelper.BufferedDownload(_apiService.GetEpisodeAsync, SelectedVodType.ContentUrls.Select(c => c.GetUID()));
-                        Episodes.AddRange(episodes.OrderBy(e => e.Title));
-                    }
-                    catch (Exception ex)
-                    {
-                        var message = $"An error occurred while trying to load episodes for VOD-type '{SelectedVodType.Name}'.";
-                        Logger.Error(ex, message);
-                        MessageBoxHelper.ShowError(message);
-                    }
-
-                    IsBusy = false;
+                    DownloadHelper
+                        .BufferedDownload(_apiService.GetEpisodeAsync, SelectedVodType.ContentUrls.Select(c => c.GetUID()))
+                        .Await(episodes =>
+                        {
+                            Application.Current.Dispatcher.Invoke(() => Episodes.AddRange(episodes.OrderBy(e => e.Title)));
+                            NotBusyAnymore();
+                        },
+                        HandleFatalError);
                 }
             }
         }
@@ -413,25 +393,20 @@ namespace RaceControl.ViewModels
             return !string.IsNullOrWhiteSpace(VlcExeLocation) && File.Exists(VlcExeLocation) && GetSelectedSession() != null;
         }
 
-        private async void WatchVlcChannelExecute(Channel channel)
+        private void WatchVlcChannelExecute(Channel channel)
         {
             IsBusy = true;
             var session = GetSelectedSession();
             var playableContent = PlayableContent.Create(session, channel);
 
-            try
-            {
-                var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, playableContent);
-                WatchStreamInVlc(playableContent, streamUrl);
-            }
-            catch (Exception ex)
-            {
-                var message = $"An error occurred while trying to watch channel '{playableContent.Title}' in VLC.";
-                Logger.Error(ex, message);
-                MessageBoxHelper.ShowError(message);
-            }
-
-            IsBusy = false;
+            _apiService
+                .GetTokenisedUrlAsync(_token, playableContent)
+                .Await(streamUrl =>
+                {
+                    WatchStreamInVlc(playableContent, streamUrl);
+                    NotBusyAnymore();
+                },
+                HandleFatalError);
         }
 
         private bool CanWatchVlcEpisodeExecute(Episode episode)
@@ -439,24 +414,19 @@ namespace RaceControl.ViewModels
             return !string.IsNullOrWhiteSpace(VlcExeLocation) && File.Exists(VlcExeLocation);
         }
 
-        private async void WatchVlcEpisodeExecute(Episode episode)
+        private void WatchVlcEpisodeExecute(Episode episode)
         {
             IsBusy = true;
             var playableContent = PlayableContent.Create(episode);
 
-            try
-            {
-                var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, playableContent);
-                WatchStreamInVlc(playableContent, streamUrl);
-            }
-            catch (Exception ex)
-            {
-                var message = $"An error occurred while trying to watch episode '{playableContent.Title}' in VLC.";
-                Logger.Error(ex, message);
-                MessageBoxHelper.ShowError(message);
-            }
-
-            IsBusy = false;
+            _apiService
+                .GetTokenisedUrlAsync(_token, playableContent)
+                .Await(streamUrl =>
+                {
+                    WatchStreamInVlc(playableContent, streamUrl);
+                    NotBusyAnymore();
+                },
+                HandleFatalError);
         }
 
         private bool CanWatchMpvChannelExecute(Channel channel)
@@ -464,25 +434,20 @@ namespace RaceControl.ViewModels
             return !string.IsNullOrWhiteSpace(MpvExeLocation) && File.Exists(MpvExeLocation) && GetSelectedSession() != null;
         }
 
-        private async void WatchMpvChannelExecute(Channel channel)
+        private void WatchMpvChannelExecute(Channel channel)
         {
             IsBusy = true;
             var session = GetSelectedSession();
             var playableContent = PlayableContent.Create(session, channel);
 
-            try
-            {
-                var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, playableContent);
-                WatchStreamInMpv(playableContent, streamUrl);
-            }
-            catch (Exception ex)
-            {
-                var message = $"An error occurred while trying to watch channel '{playableContent.Title}' in MPV.";
-                Logger.Error(ex, message);
-                MessageBoxHelper.ShowError(message);
-            }
-
-            IsBusy = false;
+            _apiService
+                .GetTokenisedUrlAsync(_token, playableContent)
+                .Await(streamUrl =>
+                {
+                    WatchStreamInMpv(playableContent, streamUrl);
+                    NotBusyAnymore();
+                },
+                HandleFatalError);
         }
 
         private bool CanWatchMpvEpisodeExecute(Episode episode)
@@ -490,24 +455,19 @@ namespace RaceControl.ViewModels
             return !string.IsNullOrWhiteSpace(MpvExeLocation) && File.Exists(MpvExeLocation);
         }
 
-        private async void WatchMpvEpisodeExecute(Episode episode)
+        private void WatchMpvEpisodeExecute(Episode episode)
         {
             IsBusy = true;
             var playableContent = PlayableContent.Create(episode);
 
-            try
-            {
-                var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, playableContent);
-                WatchStreamInMpv(playableContent, streamUrl);
-            }
-            catch (Exception ex)
-            {
-                var message = $"An error occurred while trying to watch episode '{playableContent.Title}' in MPV.";
-                Logger.Error(ex, message);
-                MessageBoxHelper.ShowError(message);
-            }
-
-            IsBusy = false;
+            _apiService
+                .GetTokenisedUrlAsync(_token, playableContent)
+                .Await(streamUrl =>
+                {
+                    WatchStreamInMpv(playableContent, streamUrl);
+                    NotBusyAnymore();
+                },
+                HandleFatalError);
         }
 
         private bool CanCopyUrlChannelExecute(Channel channel)
@@ -515,45 +475,35 @@ namespace RaceControl.ViewModels
             return GetSelectedSession() != null;
         }
 
-        private async void CopyUrlChannelExecute(Channel channel)
+        private void CopyUrlChannelExecute(Channel channel)
         {
             IsBusy = true;
             var session = GetSelectedSession();
             var playableContent = PlayableContent.Create(session, channel);
 
-            try
-            {
-                var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, playableContent);
-                Clipboard.SetText(streamUrl);
-            }
-            catch (Exception ex)
-            {
-                var message = $"An error occurred while trying to copy URL for channel '{channel.Name}' to clipboard.";
-                Logger.Error(ex, message);
-                MessageBoxHelper.ShowError(message);
-            }
-
-            IsBusy = false;
+            _apiService
+                .GetTokenisedUrlAsync(_token, playableContent)
+                .Await(streamUrl =>
+                {
+                    Application.Current.Dispatcher.Invoke(() => Clipboard.SetText(streamUrl));
+                    NotBusyAnymore();
+                },
+                HandleFatalError);
         }
 
-        private async void CopyUrlEpisodeExecute(Episode episode)
+        private void CopyUrlEpisodeExecute(Episode episode)
         {
             IsBusy = true;
             var playableContent = PlayableContent.Create(episode);
 
-            try
-            {
-                var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, playableContent);
-                Clipboard.SetText(streamUrl);
-            }
-            catch (Exception ex)
-            {
-                var message = $"An error occurred while trying to copy URL for episode '{episode.Title}' to clipboard.";
-                Logger.Error(ex, message);
-                MessageBoxHelper.ShowError(message);
-            }
-
-            IsBusy = false;
+            _apiService
+                .GetTokenisedUrlAsync(_token, playableContent)
+                .Await(streamUrl =>
+                {
+                    Application.Current.Dispatcher.Invoke(() => Clipboard.SetText(streamUrl));
+                    NotBusyAnymore();
+                },
+                HandleFatalError);
         }
 
         private bool CanDownloadChannelExecute(Channel channel)
@@ -639,10 +589,10 @@ namespace RaceControl.ViewModels
             IsBusy = false;
         }
 
-        private async void RefreshLiveSessionsTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private void RefreshLiveSessionsTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             _refreshLiveSessionsTimer?.Stop();
-            await RefreshLiveSessionsAsync();
+            RefreshLiveSessionsAsync().Await(HandleNonFatalError);
             _refreshLiveSessionsTimer?.Start();
         }
 
@@ -680,19 +630,7 @@ namespace RaceControl.ViewModels
         {
             Logger.Info("Checking for updates...");
 
-            Release release;
-
-            try
-            {
-                release = await _githubService.GetLatestRelease();
-            }
-            catch (Exception ex)
-            {
-                const string message = "An error occurred while checking for updates.";
-                Logger.Error(ex, message);
-                MessageBoxHelper.ShowError(message);
-                return;
-            }
+            var release = await _githubService.GetLatestRelease();
 
             if (release == null || release.PreRelease || release.Draft || release.TagName == Settings.LatestRelease)
             {
@@ -748,8 +686,7 @@ namespace RaceControl.ViewModels
             await Task.WhenAll(
                 LoadSeasonsAsync(),
                 LoadSeriesAsync(),
-                LoadVodTypesAsync(),
-                RefreshLiveSessionsAsync());
+                LoadVodTypesAsync());
 
             SelectedSeason = Seasons.FirstOrDefault();
 
@@ -760,32 +697,14 @@ namespace RaceControl.ViewModels
 
         private async Task LoadSeasonsAsync()
         {
-            try
-            {
-                var seasons = await _apiService.GetSeasonsAsync();
-                Seasons.AddRange(seasons);
-            }
-            catch (Exception ex)
-            {
-                const string message = "An error occurred while trying to load race seasons.";
-                Logger.Error(ex, message);
-                MessageBoxHelper.ShowError(message);
-            }
+            var seasons = await _apiService.GetSeasonsAsync();
+            Seasons.AddRange(seasons);
         }
 
         private async Task LoadSeriesAsync()
         {
-            try
-            {
-                var series = await _apiService.GetSeriesAsync();
-                Series.AddRange(series);
-            }
-            catch (Exception ex)
-            {
-                const string message = "An error occurred while trying to load series.";
-                Logger.Error(ex, message);
-                MessageBoxHelper.ShowError(message);
-            }
+            var series = await _apiService.GetSeriesAsync();
+            Series.AddRange(series);
 
             if (!Settings.SelectedSeries.Any())
             {
@@ -800,35 +719,15 @@ namespace RaceControl.ViewModels
 
         private async Task LoadVodTypesAsync()
         {
-            try
-            {
-                var vodTypes = await _apiService.GetVodTypesAsync();
-                VodTypes.AddRange(vodTypes.Where(vt => vt.ContentUrls.Any()));
-            }
-            catch (Exception ex)
-            {
-                const string message = "An error occurred while trying to load VOD-types.";
-                Logger.Error(ex, message);
-                MessageBoxHelper.ShowError(message);
-            }
+            var vodTypes = await _apiService.GetVodTypesAsync();
+            VodTypes.AddRange(vodTypes.Where(vt => vt.ContentUrls.Any()));
         }
 
         private async Task RefreshLiveSessionsAsync()
         {
             Logger.Info("Refreshing live sessions...");
 
-            IList<Session> liveSessions;
-
-            try
-            {
-                liveSessions = (await _apiService.GetLiveSessionsAsync()).Where(session => session.IsLive).ToList();
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "An error occurred while refreshing live sessions.");
-                return;
-            }
-
+            var liveSessions = (await _apiService.GetLiveSessionsAsync()).Where(session => session.IsLive).ToList();
             var sessionsToRemove = LiveSessions.Where(existingLiveSession => liveSessions.All(liveSession => liveSession.UID != existingLiveSession.UID)).ToList();
             var sessionsToAdd = liveSessions.Where(newLiveSession => LiveSessions.All(liveSession => liveSession.UID != newLiveSession.UID)).ToList();
 
@@ -865,42 +764,24 @@ namespace RaceControl.ViewModels
 
         private async Task LoadChannelsForSessionAsync(Session session)
         {
-            try
-            {
-                var channels = await _apiService.GetChannelsForSessionAsync(session.UID);
+            var channels = await _apiService.GetChannelsForSessionAsync(session.UID);
 
-                if (session.IsLive && channels.Count > 1)
+            if (session.IsLive && channels.Count > 1)
+            {
+                channels.Add(new Channel
                 {
-                    channels.Add(new Channel
-                    {
-                        ChannelType = ChannelTypes.BACKUP,
-                        Name = "Backup stream"
-                    });
-                }
+                    ChannelType = ChannelTypes.BACKUP,
+                    Name = "Backup stream"
+                });
+            }
 
-                Channels.AddRange(channels.OrderBy(c => c.ChannelType, new ChannelTypeComparer()));
-            }
-            catch (Exception ex)
-            {
-                var message = $"An error occurred while trying to load channels for session '{session.SessionName}'.";
-                Logger.Error(ex, message);
-                MessageBoxHelper.ShowError(message);
-            }
+            Channels.AddRange(channels.OrderBy(c => c.ChannelType, new ChannelTypeComparer()));
         }
 
         private async Task LoadEpisodesForSessionAsync(Session session)
         {
-            try
-            {
-                var episodes = await _apiService.GetEpisodesForSessionAsync(session.UID);
-                Episodes.AddRange(episodes.OrderBy(e => e.Title));
-            }
-            catch (Exception ex)
-            {
-                var message = $"An error occurred while trying to load episodes for session '{session.SessionName}'.";
-                Logger.Error(ex, message);
-                MessageBoxHelper.ShowError(message);
-            }
+            var episodes = await _apiService.GetEpisodesForSessionAsync(session.UID);
+            Episodes.AddRange(episodes.OrderBy(e => e.Title));
         }
 
         private void WatchChannel(IPlayableContent playableContent, VideoDialogSettings settings = null)

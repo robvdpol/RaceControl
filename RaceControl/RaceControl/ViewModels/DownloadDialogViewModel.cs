@@ -43,7 +43,7 @@ namespace RaceControl.ViewModels
             var token = parameters.GetValue<string>(ParameterNames.TOKEN);
             PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.PLAYABLE_CONTENT);
             Filename = parameters.GetValue<string>(ParameterNames.FILENAME);
-            GetTokenisedUrlAndStartDownloadAsync(token).Await(HandleError);
+            GetTokenisedUrlAndStartDownloadAsync(token).Await(HandleDownloadError);
 
             base.OnDialogOpened(parameters);
         }
@@ -61,7 +61,7 @@ namespace RaceControl.ViewModels
             await MediaDownloader.StartDownloadAsync(streamUrl, Filename);
         }
 
-        private void HandleError(Exception ex)
+        private void HandleDownloadError(Exception ex)
         {
             Logger.Error(ex, "An error occurred while trying to download content.");
             MediaDownloader.SetFailedStatus();
