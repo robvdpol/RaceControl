@@ -57,6 +57,17 @@ namespace RaceControl.Core.Mvvm
             RequestClose?.Invoke(dialogResult);
         }
 
+        protected void HandleFatalError(Exception ex)
+        {
+            Logger.Error(ex, "A fatal error occurred, closing window.");
+            CloseWindow(true);
+        }
+
+        protected void HandleNonFatalError(Exception ex)
+        {
+            Logger.Error(ex, "A non-fatal error occurred.");
+        }
+
         private void CloseWindowExecute()
         {
             RaiseRequestClose(null);

@@ -77,8 +77,8 @@ namespace RaceControl.ViewModels
 
         private void LoginExecute()
         {
-            IsBusy = true;
             Error = null;
+            IsBusy = true;
             LoginAsync().Await(LoginSuccess, LoginError);
         }
 

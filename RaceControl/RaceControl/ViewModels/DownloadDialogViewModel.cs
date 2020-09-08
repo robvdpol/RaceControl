@@ -43,7 +43,7 @@ namespace RaceControl.ViewModels
             var token = parameters.GetValue<string>(ParameterNames.TOKEN);
             PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.PLAYABLE_CONTENT);
             Filename = parameters.GetValue<string>(ParameterNames.FILENAME);
-            GetTokenisedUrl(token, StartDownload);
+            GetTokenisedUrlAndStartDownloadAsync(token).Await(HandleError);
 
             base.OnDialogOpened(parameters);
         }
@@ -55,14 +55,10 @@ namespace RaceControl.ViewModels
             base.OnDialogClosed();
         }
 
-        private void GetTokenisedUrl(string token, Action<string> completedCallback)
+        private async Task GetTokenisedUrlAndStartDownloadAsync(string token)
         {
-            _apiService.GetTokenisedUrlAsync(token, PlayableContent).Await(completedCallback, HandleError);
-        }
-
-        private void StartDownload(string streamUrl)
-        {
-            MediaDownloader.StartDownloadAsync(streamUrl, Filename).Await(HandleError);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(token, PlayableContent);
+            await MediaDownloader.StartDownloadAsync(streamUrl, Filename);
         }
 
         private void HandleError(Exception ex)

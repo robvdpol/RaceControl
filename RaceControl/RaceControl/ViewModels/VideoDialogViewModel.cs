@@ -164,7 +164,7 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _headshotImageUrl, value);
         }
 
-        public override async void OnDialogOpened(IDialogParameters parameters)
+        public override void OnDialogOpened(IDialogParameters parameters)
         {
             _token = parameters.GetValue<string>(ParameterNames.TOKEN);
             PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.PLAYABLE_CONTENT);
@@ -182,41 +182,18 @@ namespace RaceControl.ViewModels
                 StartupLocation = WindowStartupLocation.CenterScreen;
             }
 
-            var (success, streamUrl) = await _apiService.TryGetTokenisedUrlAsync(_token, PlayableContent);
-
-            if (!success)
-            {
-                Logger.Error("Closing video player, could not get tokenised URL.");
-                CloseWindow(true);
-                return;
-            }
-
-            if (IsStreamlink)
-            {
-                var (streamlinkProcess, streamlinkUrl) = await _streamlinkLauncher.StartStreamlinkExternal(streamUrl);
-                _streamlinkProcess = streamlinkProcess;
-                streamUrl = streamlinkUrl;
-            }
-
-            if (MediaPlayer.IsMuted != DialogSettings.IsMuted)
-            {
-                MediaPlayer.ToggleMute();
-            }
-
-            await MediaPlayer.StartPlaybackAsync(streamUrl);
-
-            _showControlsTimer = new Timer(2000) { AutoReset = false };
-            _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
-            _showControlsTimer.Start();
+            StartStreamAsync().Await(HandleFatalError);
+            LoadDriverImageUrlsAsync().Await(HandleNonFatalError);
+            StartShowControlsTimer();
             _syncStreamsEventToken = _eventAggregator.GetEvent<SyncStreamsEvent>().Subscribe(OnSyncSession);
-
-            await LoadDriverImageUrlsAsync();
 
             base.OnDialogOpened(parameters);
         }
 
         public override void OnDialogClosed()
         {
+            MediaPlayer.Dispose();
+
             if (_syncStreamsEventToken != null)
             {
                 _eventAggregator.GetEvent<SyncStreamsEvent>().Unsubscribe(_syncStreamsEventToken);
@@ -228,8 +205,6 @@ namespace RaceControl.ViewModels
                 _showControlsTimer.Dispose();
                 _showControlsTimer = null;
             }
-
-            MediaPlayer.Dispose();
 
             CleanupProcess(_streamlinkProcess);
             CleanupProcess(_streamlinkRecordingProcess);
@@ -355,11 +330,11 @@ namespace RaceControl.ViewModels
             return CanClose && PlayableContent.IsLive && (IsRecording || !MediaPlayer.IsPaused);
         }
 
-        private async void ToggleRecordingExecute()
+        private void ToggleRecordingExecute()
         {
             if (!IsRecording)
             {
-                IsRecording = await StartRecordingAsync();
+                StartRecordingAsync().Await(() => IsRecording = true, HandleNonFatalError);
             }
             else
             {
@@ -431,7 +406,7 @@ namespace RaceControl.ViewModels
             DialogSettings.Height = height;
         }
 
-        private async void AudioTrackSelectionChangedExecute(SelectionChangedEventArgs args)
+        private void AudioTrackSelectionChangedExecute(SelectionChangedEventArgs args)
         {
             if (args.AddedItems.Count > 0 && args.AddedItems[0] is TrackDescription trackDescription)
             {
@@ -441,8 +416,7 @@ namespace RaceControl.ViewModels
                 if (!IsStreamlink)
                 {
                     // Workaround to fix audio out of sync after switching audio track
-                    await Task.Delay(TimeSpan.FromMilliseconds(250));
-                    MediaPlayer.Time -= 500;
+                    Task.Delay(TimeSpan.FromMilliseconds(250)).Await(() => MediaPlayer.Time -= 500);
                 }
 
                 Logger.Info("Done changing audio track.");
@@ -454,10 +428,10 @@ namespace RaceControl.ViewModels
             return CanClose && !MediaPlayer.IsScanning;
         }
 
-        private async void ScanChromecastExecute()
+        private void ScanChromecastExecute()
         {
             Logger.Info("Scanning for Chromecast devices...");
-            await MediaPlayer.ScanChromecastAsync();
+            MediaPlayer.ScanChromecastAsync().Await(HandleNonFatalError);
             Logger.Info("Done scanning for Chromecast devices.");
         }
 
@@ -466,10 +440,10 @@ namespace RaceControl.ViewModels
             return CanClose && SelectedRendererItem != null;
         }
 
-        private async void StartCastVideoExecute()
+        private void StartCastVideoExecute()
         {
             Logger.Info($"Starting casting of video with renderer '{SelectedRendererItem.Name}'...");
-            await ChangeRendererAsync(SelectedRendererItem);
+            ChangeRendererAsync(SelectedRendererItem).Await(HandleNonFatalError);
         }
 
         private bool CanStopCastVideoExecute()
@@ -477,10 +451,10 @@ namespace RaceControl.ViewModels
             return MediaPlayer.IsCasting;
         }
 
-        private async void StopCastVideoExecute()
+        private void StopCastVideoExecute()
         {
             Logger.Info("Stopping casting of video...");
-            await ChangeRendererAsync();
+            ChangeRendererAsync().Await(HandleNonFatalError);
         }
 
         private void LoadDialogSettings(VideoDialogSettings settings)
@@ -501,6 +475,25 @@ namespace RaceControl.ViewModels
             DialogSettings.IsMuted = settings.IsMuted;
         }
 
+        private async Task StartStreamAsync()
+        {
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, PlayableContent);
+
+            if (IsStreamlink)
+            {
+                var (streamlinkProcess, streamlinkUrl) = await _streamlinkLauncher.StartStreamlinkExternalAsync(streamUrl);
+                _streamlinkProcess = streamlinkProcess;
+                streamUrl = streamlinkUrl;
+            }
+
+            await MediaPlayer.StartPlaybackAsync(streamUrl);
+
+            if (MediaPlayer.IsMuted != DialogSettings.IsMuted)
+            {
+                MediaPlayer.ToggleMute();
+            }
+        }
+
         private async Task LoadDriverImageUrlsAsync()
         {
             if (string.IsNullOrWhiteSpace(PlayableContent.DriverUID))
@@ -508,43 +501,34 @@ namespace RaceControl.ViewModels
                 return;
             }
 
-            try
-            {
-                var driver = await _apiService.GetDriverAsync(PlayableContent.DriverUID);
+            var driver = await _apiService.GetDriverAsync(PlayableContent.DriverUID);
 
-                if (driver != null)
-                {
-                    CarImageUrl = driver.CarUrl;
-                    HeadshotImageUrl = driver.HeadshotUrl;
-                }
-            }
-            catch (Exception ex)
+            if (driver != null)
             {
-                Logger.Error(ex, "An error occurred while trying to get driver images.");
+                CarImageUrl = driver.CarUrl;
+                HeadshotImageUrl = driver.HeadshotUrl;
             }
+        }
+
+        private void StartShowControlsTimer()
+        {
+            _showControlsTimer = new Timer(2000) { AutoReset = false };
+            _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
+            _showControlsTimer.Start();
         }
 
         private async Task ChangeRendererAsync(RendererItem renderer = null)
         {
             Logger.Info($"Changing renderer to '{renderer?.Name}'...");
+            string streamUrl = null;
+
+            if (!IsStreamlink)
+            {
+                streamUrl = await _apiService.GetTokenisedUrlAsync(_token, PlayableContent);
+            }
+
             var time = MediaPlayer.Time;
-
-            if (IsStreamlink)
-            {
-                await MediaPlayer.ChangeRendererAsync(renderer);
-            }
-            else
-            {
-                var (success, streamUrl) = await _apiService.TryGetTokenisedUrlAsync(_token, PlayableContent);
-
-                if (!success)
-                {
-                    Logger.Error("Renderer not changed, could not get tokenised URL.");
-                    return;
-                }
-
-                await MediaPlayer.ChangeRendererAsync(renderer, streamUrl);
-            }
+            await MediaPlayer.ChangeRendererAsync(renderer, streamUrl);
 
             if (!PlayableContent.IsLive)
             {
@@ -554,21 +538,12 @@ namespace RaceControl.ViewModels
             Logger.Info("Done changing renderer.");
         }
 
-        private async Task<bool> StartRecordingAsync()
+        private async Task StartRecordingAsync()
         {
             Logger.Info("Starting recording process...");
-            var (success, streamUrl) = await _apiService.TryGetTokenisedUrlAsync(_token, PlayableContent);
-
-            if (!success)
-            {
-                Logger.Error("Recording process not started, could not get tokenised URL.");
-                return false;
-            }
-
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, PlayableContent);
             _streamlinkRecordingProcess = _streamlinkLauncher.StartStreamlinkRecording(streamUrl, PlayableContent.Title);
             Logger.Info("Recording process started.");
-
-            return true;
         }
 
         private void StopRecording()

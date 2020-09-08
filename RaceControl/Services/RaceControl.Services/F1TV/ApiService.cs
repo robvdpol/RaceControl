@@ -255,19 +255,5 @@ namespace RaceControl.Services.F1TV
 
             return url;
         }
-
-        public async Task<(bool success, string tokenisedUrl)> TryGetTokenisedUrlAsync(string token, IPlayableContent playableContent)
-        {
-            try
-            {
-                return (true, await GetTokenisedUrlAsync(token, playableContent));
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, "An error occurred while trying to get tokenised URL.");
-
-                return (false, null);
-            }
-        }
     }
 }
