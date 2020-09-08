@@ -204,7 +204,7 @@ namespace RaceControl.ViewModels
                 MediaPlayer.ToggleMute();
             }
 
-            MediaPlayer.IsMutedChanged += (isMuted) => { DialogSettings.IsMuted = isMuted; };
+            MediaPlayer.IsMutedChanged += isMuted => { DialogSettings.IsMuted = isMuted; };
             await MediaPlayer.StartPlaybackAsync(streamUrl);
 
             _showControlsTimer = new Timer(2000) { AutoReset = false };
