@@ -25,7 +25,7 @@ namespace RaceControl.Core.Streamlink
         {
             var port = SocketUtils.GetFreePort();
             var streamIdentifier = GetStreamIdentifier();
-            var streamlinkArguments = $"--player-external-http --player-external-http-port {port} --hls-audio-select * \"{streamUrl}\" {streamIdentifier}";
+            var streamlinkArguments = $"--player-external-http --player-external-http-port {port} --hls-audio-select * --hls-segment-attempts 10 --hls-segment-timeout 20 --ringbuffer-size 64M \"{streamUrl}\" {streamIdentifier}";
 
             _logger.Info($"Starting external Streamlink-instance for stream-URL '{streamUrl}' with identifier '{streamIdentifier}' on port '{port}'...");
 
@@ -43,7 +43,7 @@ namespace RaceControl.Core.Streamlink
         {
             var streamIdentifier = GetStreamIdentifier();
             var filename = GetRecordingFilename(title);
-            var streamlinkArguments = $"--output \"{filename}\" --force --hls-audio-select * \"{streamUrl}\" {streamIdentifier}";
+            var streamlinkArguments = $"--output \"{filename}\" --force --hls-audio-select * --hls-segment-attempts 10 --hls-segment-timeout 20 --ringbuffer-size 64M \"{streamUrl}\" {streamIdentifier}";
 
             _logger.Info($"Starting recording Streamlink-instance for stream-URL '{streamUrl}' with identifier '{streamIdentifier}' to file '{filename}'...");
 
@@ -58,7 +58,7 @@ namespace RaceControl.Core.Streamlink
         public void StartStreamlinkVlc(string vlcExeLocation, string streamUrl, string title)
         {
             var streamIdentifier = GetStreamIdentifier();
-            var streamlinkArguments = $"--player \"{vlcExeLocation} --file-caching=5000 --network-caching=10000\" --title \"{title}\" --hls-audio-select * \"{streamUrl}\" {streamIdentifier}";
+            var streamlinkArguments = $"--player \"{vlcExeLocation} --file-caching=5000 --network-caching=10000\" --title \"{title}\" --hls-audio-select * --hls-segment-attempts 10 --hls-segment-timeout 20 --ringbuffer-size 64M \"{streamUrl}\" {streamIdentifier}";
 
             _logger.Info($"Starting VLC Streamlink-instance for stream-URL '{streamUrl}' with identifier '{streamIdentifier}'...");
 
