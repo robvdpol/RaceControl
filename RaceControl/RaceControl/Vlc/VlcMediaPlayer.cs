@@ -96,8 +96,6 @@ namespace RaceControl.Vlc
             set => SetProperty(ref _rendererItems, value);
         }
 
-        public Action<bool> IsMutedChanged { get; set; }
-
         public async Task StartPlaybackAsync(string streamUrl, RendererItem renderer = null)
         {
             _streamUrl = streamUrl;
@@ -205,13 +203,11 @@ namespace RaceControl.Vlc
         private void MediaPlayer_Unmuted(object sender, EventArgs e)
         {
             IsMuted = false;
-            IsMutedChanged?.Invoke(IsMuted);
         }
 
         private void MediaPlayer_Muted(object sender, EventArgs e)
         {
             IsMuted = true;
-            IsMutedChanged?.Invoke(IsMuted);
         }
 
         private void MediaPlayer_TimeChanged(object sender, MediaPlayerTimeChangedEventArgs e)

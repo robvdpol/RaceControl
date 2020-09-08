@@ -27,7 +27,5 @@ namespace RaceControl.Interfaces
         Task ScanChromecastAsync();
 
         Task ChangeRendererAsync(RendererItem renderer, string streamUrl = null);
-
-        Action<bool> IsMutedChanged { get; set; }
     }
 }

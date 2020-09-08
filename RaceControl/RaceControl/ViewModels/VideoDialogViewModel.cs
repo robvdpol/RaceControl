@@ -180,7 +180,6 @@ namespace RaceControl.ViewModels
             else
             {
                 StartupLocation = WindowStartupLocation.CenterScreen;
-                DialogSettings.ChannelName = PlayableContent.Name;
             }
 
             var (success, streamUrl) = await _apiService.TryGetTokenisedUrlAsync(_token, PlayableContent);
@@ -204,7 +203,6 @@ namespace RaceControl.ViewModels
                 MediaPlayer.ToggleMute();
             }
 
-            MediaPlayer.IsMutedChanged += isMuted => { DialogSettings.IsMuted = isMuted; };
             await MediaPlayer.StartPlaybackAsync(streamUrl);
 
             _showControlsTimer = new Timer(2000) { AutoReset = false };
@@ -237,6 +235,14 @@ namespace RaceControl.ViewModels
             CleanupProcess(_streamlinkRecordingProcess);
 
             base.OnDialogClosed();
+        }
+
+        public VideoDialogSettings GetDialogSettings()
+        {
+            DialogSettings.ChannelName = PlayableContent.Name;
+            DialogSettings.IsMuted = MediaPlayer.IsMuted;
+
+            return DialogSettings;
         }
 
         private void ShowControlsTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -493,7 +499,6 @@ namespace RaceControl.ViewModels
             }
 
             DialogSettings.IsMuted = settings.IsMuted;
-            DialogSettings.ChannelName = settings.ChannelName;
         }
 
         private async Task LoadDriverImageUrlsAsync()

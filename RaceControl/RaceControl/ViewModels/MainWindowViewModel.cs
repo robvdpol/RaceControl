@@ -590,7 +590,7 @@ namespace RaceControl.ViewModels
         private void SaveVideoDialogLayoutExecute()
         {
             VideoDialogLayout.Clear();
-            VideoDialogLayout.Add(VideoDialogViewModels.Where(vm => vm.PlayableContent.ContentType == ContentType.Channel).Select(vm => vm.DialogSettings));
+            VideoDialogLayout.Add(VideoDialogViewModels.Where(vm => vm.PlayableContent.ContentType == ContentType.Channel).Select(vm => vm.GetDialogSettings()));
 
             if (VideoDialogLayout.Save())
             {
