@@ -39,12 +39,6 @@ namespace RaceControl
 
         public async Task StartDownloadAsync(string streamUrl, string filename)
         {
-            if (streamUrl == null)
-            {
-                Status = DownloadStatus.Failed;
-                return;
-            }
-
             var option = $":sout=#std{{access=file,mux=ts,dst=\"{filename}\"}}";
             var media = new Media(_libVLC, streamUrl, FromType.FromLocation, option);
             await media.Parse();

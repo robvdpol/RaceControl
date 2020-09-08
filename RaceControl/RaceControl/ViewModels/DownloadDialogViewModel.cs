@@ -4,6 +4,8 @@ using RaceControl.Common.Interfaces;
 using RaceControl.Core.Mvvm;
 using RaceControl.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
+using System;
+using System.Threading.Tasks;
 
 namespace RaceControl.ViewModels
 {
@@ -36,22 +38,12 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _filename, value);
         }
 
-        public override async void OnDialogOpened(IDialogParameters parameters)
+        public override void OnDialogOpened(IDialogParameters parameters)
         {
             var token = parameters.GetValue<string>(ParameterNames.TOKEN);
             PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.PLAYABLE_CONTENT);
             Filename = parameters.GetValue<string>(ParameterNames.FILENAME);
-
-            var (success, streamUrl) = await _apiService.TryGetTokenisedUrlAsync(token, PlayableContent);
-
-            if (success)
-            {
-                await MediaDownloader.StartDownloadAsync(streamUrl, Filename);
-            }
-            else
-            {
-                MediaDownloader.SetFailedStatus();
-            }
+            GetTokenisedUrl(token, StartDownload);
 
             base.OnDialogOpened(parameters);
         }
@@ -61,6 +53,22 @@ namespace RaceControl.ViewModels
             MediaDownloader.Dispose();
 
             base.OnDialogClosed();
+        }
+
+        private void GetTokenisedUrl(string token, Action<string> completedCallback)
+        {
+            _apiService.GetTokenisedUrlAsync(token, PlayableContent).Await(completedCallback, HandleError);
+        }
+
+        private void StartDownload(string streamUrl)
+        {
+            MediaDownloader.StartDownloadAsync(streamUrl, Filename).Await(HandleError);
+        }
+
+        private void HandleError(Exception ex)
+        {
+            Logger.Error(ex, "An error occurred while trying to download content.");
+            MediaDownloader.SetFailedStatus();
         }
     }
 }

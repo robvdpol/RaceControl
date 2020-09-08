@@ -78,10 +78,11 @@ namespace RaceControl.ViewModels
         private void LoginExecute()
         {
             IsBusy = true;
-            Login().Await(LoginSuccess, LoginError);
+            Error = null;
+            LoginAsync().Await(LoginSuccess, LoginError);
         }
 
-        private async Task Login()
+        private async Task LoginAsync()
         {
             Logger.Info("Attempting to login...");
             _token = (await _authorizationService.LoginAsync(Email, Password)).Token;
