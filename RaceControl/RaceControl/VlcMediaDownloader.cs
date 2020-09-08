@@ -3,6 +3,7 @@ using Prism.Mvvm;
 using RaceControl.Enums;
 using RaceControl.Interfaces;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RaceControl
@@ -74,17 +75,19 @@ namespace RaceControl
 
         private void MediaPlayer_PositionChanged(object sender, MediaPlayerPositionChangedEventArgs e)
         {
-            Progress = e.Position * 100;
+            Progress = Math.Min(e.Position * 100, 100);
         }
 
         private void MediaPlayer_EncounteredError(object sender, EventArgs e)
         {
+            ThreadPool.QueueUserWorkItem(_ => _mediaPlayer.Stop());
             Status = DownloadStatus.Failed;
             Progress = 0;
         }
 
         private void MediaPlayer_EndReached(object sender, EventArgs e)
         {
+            ThreadPool.QueueUserWorkItem(_ => _mediaPlayer.Stop());
             Status = DownloadStatus.Finished;
             Progress = 100;
         }
