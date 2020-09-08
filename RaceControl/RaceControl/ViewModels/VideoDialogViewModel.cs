@@ -199,13 +199,7 @@ namespace RaceControl.ViewModels
                 _eventAggregator.GetEvent<SyncStreamsEvent>().Unsubscribe(_syncStreamsEventToken);
             }
 
-            if (_showControlsTimer != null)
-            {
-                _showControlsTimer.Stop();
-                _showControlsTimer.Dispose();
-                _showControlsTimer = null;
-            }
-
+            RemoveShowControlsTimer();
             CleanupProcess(_streamlinkProcess);
             CleanupProcess(_streamlinkRecordingProcess);
 
@@ -515,6 +509,16 @@ namespace RaceControl.ViewModels
             _showControlsTimer = new Timer(2000) { AutoReset = false };
             _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
             _showControlsTimer.Start();
+        }
+
+        private void RemoveShowControlsTimer()
+        {
+            if (_showControlsTimer != null)
+            {
+                _showControlsTimer.Stop();
+                _showControlsTimer.Dispose();
+                _showControlsTimer = null;
+            }
         }
 
         private async Task ChangeRendererAsync(RendererItem renderer = null)

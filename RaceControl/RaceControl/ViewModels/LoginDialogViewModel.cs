@@ -54,8 +54,6 @@ namespace RaceControl.ViewModels
 
         public override void OnDialogOpened(IDialogParameters parameters)
         {
-            CanClose = true;
-
             if (_credentialService.LoadCredential(out var email, out var password))
             {
                 Email = email;
@@ -77,8 +75,9 @@ namespace RaceControl.ViewModels
 
         private void LoginExecute()
         {
-            Error = null;
+            CanClose = true;
             IsBusy = true;
+            Error = null;
             LoginAsync().Await(LoginSuccess, LoginError);
         }
 
