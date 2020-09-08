@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace RaceControl
+namespace RaceControl.Vlc
 {
     public class VlcMediaPlayer : BindableBase, IMediaPlayer
     {

@@ -24,6 +24,7 @@ using RaceControl.Services.Interfaces.Lark;
 using RaceControl.Services.Lark;
 using RaceControl.ViewModels;
 using RaceControl.Views;
+using RaceControl.Vlc;
 using System;
 using System.Windows;
 using System.Windows.Threading;

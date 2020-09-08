@@ -6,7 +6,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace RaceControl
+namespace RaceControl.Vlc
 {
     public class VlcMediaDownloader : BindableBase, IMediaDownloader
     {
