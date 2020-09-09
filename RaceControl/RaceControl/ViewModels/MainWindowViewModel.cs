@@ -391,7 +391,7 @@ namespace RaceControl.ViewModels
             var parameters = new DialogParameters
             {
                 { ParameterNames.TOKEN, _token },
-                { ParameterNames.PLAYABLE_CONTENT, playableContent }
+                { ParameterNames.CONTENT, playableContent }
             };
 
             OpenVideoDialog(parameters);
@@ -800,8 +800,8 @@ namespace RaceControl.ViewModels
             var parameters = new DialogParameters
             {
                 { ParameterNames.TOKEN, _token },
-                { ParameterNames.PLAYABLE_CONTENT, playableContent },
-                { ParameterNames.DIALOG_SETTINGS, settings }
+                { ParameterNames.CONTENT, playableContent },
+                { ParameterNames.SETTINGS, settings }
             };
 
             OpenVideoDialog(parameters);
@@ -815,7 +815,7 @@ namespace RaceControl.ViewModels
 
         private void OnVideoDialogClosed(IDialogResult result)
         {
-            var uniqueIdentifier = result.Parameters.GetValue<Guid>(ParameterNames.UNIQUE_IDENTIFIER);
+            var uniqueIdentifier = result.Parameters.GetValue<Guid>(ParameterNames.IDENTIFIER);
             var viewModel = VideoDialogViewModels.FirstOrDefault(vm => vm.UniqueIdentifier == uniqueIdentifier);
 
             if (viewModel != null)
@@ -852,7 +852,7 @@ namespace RaceControl.ViewModels
                 var parameters = new DialogParameters
                 {
                     { ParameterNames.TOKEN, _token },
-                    { ParameterNames.PLAYABLE_CONTENT, playableContent},
+                    { ParameterNames.CONTENT, playableContent},
                     { ParameterNames.FILENAME, filename }
                 };
 
