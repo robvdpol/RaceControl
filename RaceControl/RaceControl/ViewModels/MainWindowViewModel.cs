@@ -236,7 +236,12 @@ namespace RaceControl.ViewModels
 
             if (Login())
             {
-                InitializeAsync().Await(NotBusyAnymore, HandleFatalError);
+                InitializeAsync().Await(() =>
+                {
+                    NotBusyAnymore();
+                    SelectedSeason = Seasons.FirstOrDefault();
+                },
+                HandleFatalError);
                 RefreshLiveSessionsAsync().Await(HandleNonFatalError);
             }
         }
@@ -692,8 +697,6 @@ namespace RaceControl.ViewModels
                 LoadSeasonsAsync(),
                 LoadSeriesAsync(),
                 LoadVodTypesAsync());
-
-            SelectedSeason = Seasons.FirstOrDefault();
 
             _refreshLiveSessionsTimer = new Timer(60000) { AutoReset = false };
             _refreshLiveSessionsTimer.Elapsed += RefreshLiveSessionsTimer_Elapsed;
