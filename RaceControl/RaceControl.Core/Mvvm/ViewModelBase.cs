@@ -26,7 +26,7 @@ namespace RaceControl.Core.Mvvm
 
         protected void HandleNonCriticalError(Exception ex)
         {
-            Logger.Error(ex, "A non-critical error occurred.");
+            Logger.Warn(ex, "A non-critical error occurred.");
         }
 
         protected void HandleCriticalError(Exception ex)
