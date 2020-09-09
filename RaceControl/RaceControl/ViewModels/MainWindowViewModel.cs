@@ -293,10 +293,11 @@ namespace RaceControl.ViewModels
                     .GetEventsForSeasonAsync(SelectedSeason.UID)
                     .Await(events =>
                     {
-                        Application.Current.Dispatcher.Invoke(() => Events.AddRange(events));
+                        Events.AddRange(events);
                         NotBusyAnymore();
                     },
-                    HandleFatalError);
+                    HandleFatalError,
+                    true);
             }
         }
 
@@ -312,10 +313,11 @@ namespace RaceControl.ViewModels
                     .GetSessionsForEventAsync(SelectedEvent.UID)
                     .Await(sessions =>
                     {
-                        Application.Current.Dispatcher.Invoke(() => Sessions.AddRange(sessions));
+                        Sessions.AddRange(sessions);
                         NotBusyAnymore();
                     },
-                    HandleFatalError);
+                    HandleFatalError,
+                    true);
             }
         }
 
@@ -356,10 +358,11 @@ namespace RaceControl.ViewModels
                         .BufferedDownload(_apiService.GetEpisodeAsync, SelectedVodType.ContentUrls.Select(c => c.GetUID()))
                         .Await(episodes =>
                         {
-                            Application.Current.Dispatcher.Invoke(() => Episodes.AddRange(episodes.OrderBy(e => e.Title)));
+                            Episodes.AddRange(episodes.OrderBy(e => e.Title));
                             NotBusyAnymore();
                         },
-                        HandleFatalError);
+                        HandleFatalError,
+                        true);
                 }
             }
         }
@@ -485,10 +488,11 @@ namespace RaceControl.ViewModels
                 .GetTokenisedUrlAsync(_token, playableContent)
                 .Await(streamUrl =>
                 {
-                    Application.Current.Dispatcher.Invoke(() => Clipboard.SetText(streamUrl));
+                    Clipboard.SetText(streamUrl);
                     NotBusyAnymore();
                 },
-                HandleFatalError);
+                HandleFatalError,
+                true);
         }
 
         private void CopyUrlEpisodeExecute(Episode episode)
@@ -500,10 +504,11 @@ namespace RaceControl.ViewModels
                 .GetTokenisedUrlAsync(_token, playableContent)
                 .Await(streamUrl =>
                 {
-                    Application.Current.Dispatcher.Invoke(() => Clipboard.SetText(streamUrl));
+                    Clipboard.SetText(streamUrl);
                     NotBusyAnymore();
                 },
-                HandleFatalError);
+                HandleFatalError,
+                true);
         }
 
         private bool CanDownloadChannelExecute(Channel channel)

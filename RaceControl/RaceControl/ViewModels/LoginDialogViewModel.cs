@@ -78,7 +78,7 @@ namespace RaceControl.ViewModels
             CanClose = true;
             IsBusy = true;
             Error = null;
-            LoginAsync().Await(LoginSuccess, LoginError);
+            LoginAsync().Await(LoginSuccess, LoginError, true);
         }
 
         private async Task LoginAsync()
@@ -93,11 +93,7 @@ namespace RaceControl.ViewModels
             Logger.Info("Login successful.");
             Error = null;
             IsBusy = false;
-
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                RaiseRequestClose(new DialogResult(ButtonResult.OK, new DialogParameters { { ParameterNames.TOKEN, _token } }));
-            });
+            RaiseRequestClose(new DialogResult(ButtonResult.OK, new DialogParameters { { ParameterNames.TOKEN, _token } }));
         }
 
         private void LoginError(Exception ex)

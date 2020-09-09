@@ -61,7 +61,7 @@ namespace RaceControl.ViewModels
         private WindowStartupLocation _startupLocation = WindowStartupLocation.CenterOwner;
         private bool _isStreamlink;
         private bool _isRecording;
-        private bool _showControls;
+        private bool _showControls = true;
         private RendererItem _selectedRendererItem;
         private Timer _showControlsTimer;
         private SubscriptionToken _syncStreamsEventToken;
@@ -182,10 +182,9 @@ namespace RaceControl.ViewModels
                 StartupLocation = WindowStartupLocation.CenterScreen;
             }
 
-            StartStreamAsync().Await(HandleStartStreamError);
+            StartStreamAsync().Await(SubscribeSyncStreamsEvent, HandleStartStreamError, true);
             LoadDriverImageUrlsAsync().Await(HandleNonFatalError);
             StartShowControlsTimer();
-            _syncStreamsEventToken = _eventAggregator.GetEvent<SyncStreamsEvent>().Subscribe(OnSyncSession);
 
             base.OnDialogOpened(parameters);
         }
@@ -193,13 +192,8 @@ namespace RaceControl.ViewModels
         public override void OnDialogClosed()
         {
             MediaPlayer.Dispose();
-
-            if (_syncStreamsEventToken != null)
-            {
-                _eventAggregator.GetEvent<SyncStreamsEvent>().Unsubscribe(_syncStreamsEventToken);
-            }
-
             RemoveShowControlsTimer();
+            UnsubscribeSyncStreamsEvent();
             CleanupProcess(_streamlinkProcess);
             CleanupProcess(_streamlinkRecordingProcess);
 
@@ -491,12 +485,7 @@ namespace RaceControl.ViewModels
         private void HandleStartStreamError(Exception ex)
         {
             CanClose = true;
-
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                CloseWindow();
-            });
-
+            CloseWindow();
             HandleFatalError(ex);
         }
 
@@ -516,8 +505,34 @@ namespace RaceControl.ViewModels
             }
         }
 
+        private void SubscribeSyncStreamsEvent()
+        {
+            if (_syncStreamsEventToken != null)
+            {
+                return;
+            }
+
+            _syncStreamsEventToken = _eventAggregator.GetEvent<SyncStreamsEvent>().Subscribe(OnSyncSession);
+        }
+
+        private void UnsubscribeSyncStreamsEvent()
+        {
+            if (_syncStreamsEventToken == null)
+            {
+                return;
+            }
+
+            _eventAggregator.GetEvent<SyncStreamsEvent>().Unsubscribe(_syncStreamsEventToken);
+            _syncStreamsEventToken = null;
+        }
+
         private void StartShowControlsTimer()
         {
+            if (_showControlsTimer != null)
+            {
+                return;
+            }
+
             _showControlsTimer = new Timer(2000) { AutoReset = false };
             _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
             _showControlsTimer.Start();
@@ -525,12 +540,14 @@ namespace RaceControl.ViewModels
 
         private void RemoveShowControlsTimer()
         {
-            if (_showControlsTimer != null)
+            if (_showControlsTimer == null)
             {
-                _showControlsTimer.Stop();
-                _showControlsTimer.Dispose();
-                _showControlsTimer = null;
+                return;
             }
+
+            _showControlsTimer.Stop();
+            _showControlsTimer.Dispose();
+            _showControlsTimer = null;
         }
 
         private async Task ChangeRendererAsync(RendererItem renderer = null)
