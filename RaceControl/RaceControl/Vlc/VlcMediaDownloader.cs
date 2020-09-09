@@ -46,9 +46,9 @@ namespace RaceControl.Vlc
             Status = _mediaPlayer.Play(media) ? DownloadStatus.Downloading : DownloadStatus.Failed;
         }
 
-        public void SetFailedStatus()
+        public void SetDownloadStatus(DownloadStatus status)
         {
-            Status = DownloadStatus.Failed;
+            Status = status;
         }
 
         public void Dispose()

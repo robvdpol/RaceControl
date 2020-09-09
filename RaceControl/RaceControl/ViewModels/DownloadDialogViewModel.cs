@@ -2,6 +2,7 @@
 using Prism.Services.Dialogs;
 using RaceControl.Common.Interfaces;
 using RaceControl.Core.Mvvm;
+using RaceControl.Enums;
 using RaceControl.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
 using System.Threading.Tasks;
@@ -45,7 +46,7 @@ namespace RaceControl.ViewModels
             GetTokenisedUrlAndStartDownloadAsync(token).Await((ex) =>
             {
                 HandleNonCriticalError(ex);
-                MediaDownloader.SetFailedStatus();
+                MediaDownloader.SetDownloadStatus(DownloadStatus.Failed);
             });
 
             base.OnDialogOpened(parameters);

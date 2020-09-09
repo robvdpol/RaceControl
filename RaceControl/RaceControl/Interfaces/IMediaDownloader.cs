@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RaceControl.Enums;
+using System;
 using System.Threading.Tasks;
 
 namespace RaceControl.Interfaces
@@ -7,6 +8,6 @@ namespace RaceControl.Interfaces
     {
         Task StartDownloadAsync(string streamUrl, string filename);
 
-        void SetFailedStatus();
+        void SetDownloadStatus(DownloadStatus status);
     }
 }
