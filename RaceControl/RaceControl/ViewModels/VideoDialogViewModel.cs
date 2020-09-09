@@ -182,7 +182,7 @@ namespace RaceControl.ViewModels
                 StartupLocation = WindowStartupLocation.CenterScreen;
             }
 
-            StartStreamAsync().Await(SubscribeSyncStreamsEvent, HandleStartStreamError, true);
+            StartStreamAsync().Await(SubscribeSyncStreamsEvent, HandleFatalError);
             LoadDriverImageUrlsAsync().Await(HandleNonFatalError);
             StartShowControlsTimer();
 
@@ -480,13 +480,6 @@ namespace RaceControl.ViewModels
             {
                 MediaPlayer.ToggleMute();
             }
-        }
-
-        private void HandleStartStreamError(Exception ex)
-        {
-            CanClose = true;
-            CloseWindow();
-            HandleFatalError(ex);
         }
 
         private async Task LoadDriverImageUrlsAsync()
