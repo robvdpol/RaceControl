@@ -1,9 +1,8 @@
 ﻿using RaceControl.Common.Interfaces;
-using RaceControl.Core.Mvvm;
 using RaceControl.Core.Settings;
 using System;
 
-namespace RaceControl.Interfaces
+namespace RaceControl.Core.Mvvm
 {
     public interface IVideoDialogViewModel : IExtendedDialogAware
     {

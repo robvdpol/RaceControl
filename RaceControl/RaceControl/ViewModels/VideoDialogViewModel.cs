@@ -8,7 +8,6 @@ using RaceControl.Core.Mvvm;
 using RaceControl.Core.Settings;
 using RaceControl.Core.Streamlink;
 using RaceControl.Events;
-using RaceControl.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
 using System;
 using System.Diagnostics;

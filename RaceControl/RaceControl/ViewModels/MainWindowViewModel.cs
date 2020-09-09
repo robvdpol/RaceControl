@@ -10,7 +10,6 @@ using RaceControl.Core.Helpers;
 using RaceControl.Core.Mvvm;
 using RaceControl.Core.Settings;
 using RaceControl.Core.Streamlink;
-using RaceControl.Interfaces;
 using RaceControl.Services.Interfaces.Credential;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Api;

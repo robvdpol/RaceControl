@@ -1,5 +1,5 @@
 ﻿using Prism.Services.Dialogs;
-using RaceControl.Interfaces;
+using RaceControl.Core.Mvvm;
 
 namespace RaceControl.Views
 {
