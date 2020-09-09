@@ -4,7 +4,6 @@ using RaceControl.Common.Interfaces;
 using RaceControl.Core.Mvvm;
 using RaceControl.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
-using System;
 using System.Threading.Tasks;
 
 namespace RaceControl.ViewModels
@@ -43,7 +42,11 @@ namespace RaceControl.ViewModels
             var token = parameters.GetValue<string>(ParameterNames.TOKEN);
             PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.CONTENT);
             Filename = parameters.GetValue<string>(ParameterNames.FILENAME);
-            GetTokenisedUrlAndStartDownloadAsync(token).Await(HandleDownloadError);
+            GetTokenisedUrlAndStartDownloadAsync(token).Await((ex) =>
+            {
+                HandleNonCriticalError(ex);
+                MediaDownloader.SetFailedStatus();
+            });
 
             base.OnDialogOpened(parameters);
         }
@@ -59,12 +62,6 @@ namespace RaceControl.ViewModels
         {
             var streamUrl = await _apiService.GetTokenisedUrlAsync(token, PlayableContent);
             await MediaDownloader.StartDownloadAsync(streamUrl, Filename);
-        }
-
-        private void HandleDownloadError(Exception ex)
-        {
-            Logger.Error(ex, "An error occurred while trying to download content.");
-            MediaDownloader.SetFailedStatus();
         }
     }
 }
