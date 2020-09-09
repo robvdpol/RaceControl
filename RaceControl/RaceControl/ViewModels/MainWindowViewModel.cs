@@ -242,7 +242,8 @@ namespace RaceControl.ViewModels
                     NotBusyAnymore();
                     SelectedSeason = Seasons.FirstOrDefault();
                 },
-                HandleFatalError);
+                HandleFatalError,
+                true);
                 RefreshLiveSessionsAsync().Await(HandleNonFatalError);
             }
         }
@@ -333,7 +334,7 @@ namespace RaceControl.ViewModels
             {
                 IsBusy = true;
                 SelectedSession = null;
-                SelectSessionAsync(SelectedLiveSession).Await(NotBusyAnymore, HandleFatalError);
+                SelectSessionAsync(SelectedLiveSession).Await(NotBusyAnymore, HandleFatalError, true);
             }
         }
 
@@ -343,7 +344,7 @@ namespace RaceControl.ViewModels
             {
                 IsBusy = true;
                 SelectedLiveSession = null;
-                SelectSessionAsync(SelectedSession).Await(NotBusyAnymore, HandleFatalError);
+                SelectSessionAsync(SelectedSession).Await(NotBusyAnymore, HandleFatalError, true);
             }
         }
 
@@ -415,7 +416,8 @@ namespace RaceControl.ViewModels
                     WatchStreamInVlc(playableContent, streamUrl);
                     NotBusyAnymore();
                 },
-                HandleFatalError);
+                HandleFatalError,
+                true);
         }
 
         private bool CanWatchVlcEpisodeExecute(Episode episode)
@@ -435,7 +437,8 @@ namespace RaceControl.ViewModels
                     WatchStreamInVlc(playableContent, streamUrl);
                     NotBusyAnymore();
                 },
-                HandleFatalError);
+                HandleFatalError,
+                true);
         }
 
         private bool CanWatchMpvChannelExecute(Channel channel)
@@ -456,7 +459,8 @@ namespace RaceControl.ViewModels
                     WatchStreamInMpv(playableContent, streamUrl);
                     NotBusyAnymore();
                 },
-                HandleFatalError);
+                HandleFatalError,
+                true);
         }
 
         private bool CanWatchMpvEpisodeExecute(Episode episode)
@@ -476,7 +480,8 @@ namespace RaceControl.ViewModels
                     WatchStreamInMpv(playableContent, streamUrl);
                     NotBusyAnymore();
                 },
-                HandleFatalError);
+                HandleFatalError,
+                true);
         }
 
         private bool CanCopyUrlChannelExecute(Channel channel)

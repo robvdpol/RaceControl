@@ -182,7 +182,7 @@ namespace RaceControl.ViewModels
                 StartupLocation = WindowStartupLocation.CenterScreen;
             }
 
-            StartStreamAsync().Await(SubscribeSyncStreamsEvent, HandleFatalError);
+            StartStreamAsync().Await(SubscribeSyncStreamsEvent, HandleFatalError, true);
             LoadDriverImageUrlsAsync().Await(HandleNonFatalError);
             StartShowControlsTimer();
 
@@ -400,13 +400,6 @@ namespace RaceControl.ViewModels
             {
                 Logger.Info($"Changing audio track to '{trackDescription.Id}'...");
                 MediaPlayer.SetAudioTrack(trackDescription.Id);
-
-                if (!IsStreamlink)
-                {
-                    // Workaround to fix audio out of sync after switching audio track
-                    Task.Delay(TimeSpan.FromMilliseconds(250)).Await(() => MediaPlayer.Time -= 500);
-                }
-
                 Logger.Info("Done changing audio track.");
             }
         }
