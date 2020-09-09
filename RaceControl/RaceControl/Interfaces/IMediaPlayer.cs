@@ -26,6 +26,6 @@ namespace RaceControl.Interfaces
 
         Task ScanChromecastAsync();
 
-        Task ChangeRendererAsync(RendererItem renderer, string streamUrl = null);
+        Task ChangeRendererAsync(RendererItem renderer, string streamUrl);
     }
 }

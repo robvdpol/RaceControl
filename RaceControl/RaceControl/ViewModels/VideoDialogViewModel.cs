@@ -182,8 +182,8 @@ namespace RaceControl.ViewModels
                 StartupLocation = WindowStartupLocation.CenterScreen;
             }
 
-            StartStreamAsync().Await(SubscribeSyncStreamsEvent, HandleFatalError);
-            LoadDriverImageUrlsAsync().Await(HandleNonFatalError);
+            StartStreamAsync().Await(SubscribeSyncStreamsEvent, HandleCriticalError);
+            LoadDriverImageUrlsAsync().Await(HandleNonCriticalError);
             StartShowControlsTimer();
 
             base.OnDialogOpened(parameters);
@@ -323,7 +323,7 @@ namespace RaceControl.ViewModels
         {
             if (!IsRecording)
             {
-                StartRecordingAsync().Await(() => IsRecording = true, HandleNonFatalError);
+                StartRecordingAsync().Await(() => IsRecording = true, HandleNonCriticalError);
             }
             else
             {
@@ -413,7 +413,7 @@ namespace RaceControl.ViewModels
         private void ScanChromecastExecute()
         {
             Logger.Info("Scanning for Chromecast devices...");
-            MediaPlayer.ScanChromecastAsync().Await(HandleNonFatalError);
+            MediaPlayer.ScanChromecastAsync().Await(HandleNonCriticalError);
             Logger.Info("Done scanning for Chromecast devices.");
         }
 
@@ -425,7 +425,7 @@ namespace RaceControl.ViewModels
         private void StartCastVideoExecute()
         {
             Logger.Info($"Starting casting of video with renderer '{SelectedRendererItem.Name}'...");
-            ChangeRendererAsync(SelectedRendererItem).Await(HandleNonFatalError);
+            ChangeRendererAsync(SelectedRendererItem).Await(HandleNonCriticalError);
         }
 
         private bool CanStopCastVideoExecute()
@@ -436,7 +436,7 @@ namespace RaceControl.ViewModels
         private void StopCastVideoExecute()
         {
             Logger.Info("Stopping casting of video...");
-            ChangeRendererAsync().Await(HandleNonFatalError);
+            ChangeRendererAsync().Await(HandleNonCriticalError);
         }
 
         private void LoadDialogSettings(VideoDialogSettings settings)

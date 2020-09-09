@@ -233,17 +233,17 @@ namespace RaceControl.ViewModels
             VideoDialogLayout.Load();
             SetVlcExeLocation();
             SetMpvExeLocation();
-            CheckForUpdatesAsync().Await(HandleNonFatalError);
+            CheckForUpdatesAsync().Await(HandleNonCriticalError);
 
             if (Login())
             {
                 InitializeAsync().Await(() =>
                 {
-                    NotBusyAnymore();
+                    SetNotBusy();
                     SelectedSeason = Seasons.FirstOrDefault();
                 },
-                HandleFatalError);
-                RefreshLiveSessionsAsync().Await(HandleNonFatalError);
+                HandleCriticalError);
+                RefreshLiveSessionsAsync().Await(HandleNonCriticalError);
             }
         }
 
@@ -300,9 +300,9 @@ namespace RaceControl.ViewModels
                     .Await(events =>
                     {
                         Events.AddRange(events);
-                        NotBusyAnymore();
+                        SetNotBusy();
                     },
-                    HandleFatalError,
+                    HandleCriticalError,
                     true);
             }
         }
@@ -320,9 +320,9 @@ namespace RaceControl.ViewModels
                     .Await(sessions =>
                     {
                         Sessions.AddRange(sessions);
-                        NotBusyAnymore();
+                        SetNotBusy();
                     },
-                    HandleFatalError,
+                    HandleCriticalError,
                     true);
             }
         }
@@ -333,7 +333,7 @@ namespace RaceControl.ViewModels
             {
                 IsBusy = true;
                 SelectedSession = null;
-                SelectSessionAsync(SelectedLiveSession).Await(NotBusyAnymore, HandleFatalError);
+                SelectSessionAsync(SelectedLiveSession).Await(SetNotBusy, HandleCriticalError);
             }
         }
 
@@ -343,7 +343,7 @@ namespace RaceControl.ViewModels
             {
                 IsBusy = true;
                 SelectedLiveSession = null;
-                SelectSessionAsync(SelectedSession).Await(NotBusyAnymore, HandleFatalError);
+                SelectSessionAsync(SelectedSession).Await(SetNotBusy, HandleCriticalError);
             }
         }
 
@@ -365,9 +365,9 @@ namespace RaceControl.ViewModels
                         .Await(episodes =>
                         {
                             Episodes.AddRange(episodes.OrderBy(e => e.Title));
-                            NotBusyAnymore();
+                            SetNotBusy();
                         },
-                        HandleFatalError,
+                        HandleCriticalError,
                         true);
                 }
             }
@@ -413,9 +413,9 @@ namespace RaceControl.ViewModels
                 .Await(streamUrl =>
                 {
                     WatchStreamInVlc(playableContent, streamUrl);
-                    NotBusyAnymore();
+                    SetNotBusy();
                 },
-                HandleFatalError);
+                HandleCriticalError);
         }
 
         private bool CanWatchVlcEpisodeExecute(Episode episode)
@@ -433,9 +433,9 @@ namespace RaceControl.ViewModels
                 .Await(streamUrl =>
                 {
                     WatchStreamInVlc(playableContent, streamUrl);
-                    NotBusyAnymore();
+                    SetNotBusy();
                 },
-                HandleFatalError);
+                HandleCriticalError);
         }
 
         private bool CanWatchMpvChannelExecute(Channel channel)
@@ -454,9 +454,9 @@ namespace RaceControl.ViewModels
                 .Await(streamUrl =>
                 {
                     WatchStreamInMpv(playableContent, streamUrl);
-                    NotBusyAnymore();
+                    SetNotBusy();
                 },
-                HandleFatalError);
+                HandleCriticalError);
         }
 
         private bool CanWatchMpvEpisodeExecute(Episode episode)
@@ -474,9 +474,9 @@ namespace RaceControl.ViewModels
                 .Await(streamUrl =>
                 {
                     WatchStreamInMpv(playableContent, streamUrl);
-                    NotBusyAnymore();
+                    SetNotBusy();
                 },
-                HandleFatalError);
+                HandleCriticalError);
         }
 
         private bool CanCopyUrlChannelExecute(Channel channel)
@@ -495,9 +495,9 @@ namespace RaceControl.ViewModels
                 .Await(streamUrl =>
                 {
                     Clipboard.SetText(streamUrl);
-                    NotBusyAnymore();
+                    SetNotBusy();
                 },
-                HandleFatalError,
+                HandleCriticalError,
                 true);
         }
 
@@ -511,9 +511,9 @@ namespace RaceControl.ViewModels
                 .Await(streamUrl =>
                 {
                     Clipboard.SetText(streamUrl);
-                    NotBusyAnymore();
+                    SetNotBusy();
                 },
-                HandleFatalError,
+                HandleCriticalError,
                 true);
         }
 
@@ -603,7 +603,7 @@ namespace RaceControl.ViewModels
         private void RefreshLiveSessionsTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             _refreshLiveSessionsTimer?.Stop();
-            RefreshLiveSessionsAsync().Await(HandleNonFatalError);
+            RefreshLiveSessionsAsync().Await(HandleNonCriticalError);
             _refreshLiveSessionsTimer?.Start();
         }
 

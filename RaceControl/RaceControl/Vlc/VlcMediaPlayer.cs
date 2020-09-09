@@ -154,15 +154,15 @@ namespace RaceControl.Vlc
             {
                 IsScanning = true;
                 await Task.Delay(TimeSpan.FromSeconds(10));
-                rendererDiscoverer.Stop();
                 IsScanning = false;
+                rendererDiscoverer.Stop();
             }
 
             rendererDiscoverer.ItemAdded -= RendererDiscoverer_ItemAdded;
             rendererDiscoverer.ItemDeleted -= RendererDiscoverer_ItemDeleted;
         }
 
-        public async Task ChangeRendererAsync(RendererItem renderer, string streamUrl = null)
+        public async Task ChangeRendererAsync(RendererItem renderer, string streamUrl)
         {
             StopPlayback();
             await StartPlaybackAsync(streamUrl ?? _streamUrl, renderer);

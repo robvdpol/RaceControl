@@ -24,19 +24,19 @@ namespace RaceControl.Core.Mvvm
             set => SetProperty(ref _isBusy, value);
         }
 
-        protected void HandleNonFatalError(Exception ex)
+        protected void HandleNonCriticalError(Exception ex)
         {
-            Logger.Error(ex, "A non-fatal error occurred.");
+            Logger.Error(ex, "A non-critical error occurred.");
         }
 
-        protected void HandleFatalError(Exception ex)
+        protected void HandleCriticalError(Exception ex)
         {
-            Logger.Error(ex, "A fatal error occurred.");
+            Logger.Error(ex, "A critical error occurred.");
             Application.Current.Dispatcher.Invoke(() => MessageBoxHelper.ShowError(ex.Message));
-            NotBusyAnymore();
+            SetNotBusy();
         }
 
-        protected void NotBusyAnymore()
+        protected void SetNotBusy()
         {
             IsBusy = false;
         }
