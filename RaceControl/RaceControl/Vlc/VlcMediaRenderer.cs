@@ -12,8 +12,8 @@ namespace RaceControl.Vlc
             _rendererItem = rendererItem;
         }
 
-        public object Renderer => _rendererItem;
-
         public string Name => _rendererItem.Name;
+
+        public object Renderer => _rendererItem;
     }
 }

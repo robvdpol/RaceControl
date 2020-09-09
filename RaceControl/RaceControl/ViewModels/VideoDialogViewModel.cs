@@ -1,5 +1,4 @@
-﻿using LibVLCSharp.Shared.Structures;
-using NLog;
+﻿using NLog;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Services.Dialogs;
@@ -396,10 +395,10 @@ namespace RaceControl.ViewModels
 
         private void AudioTrackSelectionChangedExecute(SelectionChangedEventArgs args)
         {
-            if (args.AddedItems.Count > 0 && args.AddedItems[0] is TrackDescription trackDescription)
+            if (args.AddedItems.Count > 0 && args.AddedItems[0] is IMediaTrack audioTrack)
             {
-                Logger.Info($"Changing audio track to '{trackDescription.Id}'...");
-                MediaPlayer.SetAudioTrack(trackDescription.Id);
+                Logger.Info($"Changing audio track to '{audioTrack.Name}'...");
+                MediaPlayer.SetAudioTrack(audioTrack);
                 Logger.Info("Done changing audio track.");
             }
         }

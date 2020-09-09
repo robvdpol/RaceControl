@@ -1,5 +1,4 @@
 ﻿using LibVLCSharp.Shared;
-using LibVLCSharp.Shared.Structures;
 using Prism.Mvvm;
 using RaceControl.Interfaces;
 using System;
@@ -21,7 +20,7 @@ namespace RaceControl.Vlc
         private bool _isMuted;
         private bool _isScanning;
         private bool _isCasting;
-        private ObservableCollection<TrackDescription> _audioTrackDescriptions;
+        private ObservableCollection<IMediaTrack> _audioTracks;
         private ObservableCollection<IMediaRenderer> _mediaRenderers;
         private bool _disposed;
 
@@ -84,10 +83,10 @@ namespace RaceControl.Vlc
             set => SetProperty(ref _isCasting, value);
         }
 
-        public ObservableCollection<TrackDescription> AudioTrackDescriptions
+        public ObservableCollection<IMediaTrack> AudioTracks
         {
-            get => _audioTrackDescriptions ??= new ObservableCollection<TrackDescription>();
-            set => SetProperty(ref _audioTrackDescriptions, value);
+            get => _audioTracks ??= new ObservableCollection<IMediaTrack>();
+            set => SetProperty(ref _audioTracks, value);
         }
 
         public ObservableCollection<IMediaRenderer> MediaRenderers
@@ -99,7 +98,7 @@ namespace RaceControl.Vlc
         public async Task StartPlaybackAsync(string streamUrl, IMediaRenderer mediaRenderer = null)
         {
             _streamUrl = streamUrl;
-            AudioTrackDescriptions.Clear();
+            AudioTracks.Clear();
             MediaPlayer.SetRenderer(mediaRenderer?.Renderer as RendererItem);
             var media = new Media(_libVLC, _streamUrl, FromType.FromLocation);
             media.DurationChanged += Media_DurationChanged;
@@ -113,6 +112,7 @@ namespace RaceControl.Vlc
 
         public void StopPlayback()
         {
+            AudioTracks.Clear();
             MediaPlayer.Stop();
 
             if (MediaPlayer.Media != null)
@@ -120,8 +120,6 @@ namespace RaceControl.Vlc
                 MediaPlayer.Media.Dispose();
                 MediaPlayer.Media = null;
             }
-
-            AudioTrackDescriptions.Clear();
         }
 
         public void TogglePause()
@@ -137,9 +135,9 @@ namespace RaceControl.Vlc
             MediaPlayer.ToggleMute();
         }
 
-        public void SetAudioTrack(int audioTrackId)
+        public void SetAudioTrack(IMediaTrack audioTrack)
         {
-            MediaPlayer.SetAudioTrack(audioTrackId);
+            MediaPlayer.SetAudioTrack(audioTrack.Id);
         }
 
         public async Task ScanChromecastAsync()
@@ -220,11 +218,11 @@ namespace RaceControl.Vlc
                 switch (e.Type)
                 {
                     case TrackType.Audio:
-                        var audioTrackDescription = MediaPlayer.AudioTrackDescription.First(p => p.Id == e.Id);
+                        var trackDescription = MediaPlayer.AudioTrackDescription.First(td => td.Id == e.Id);
 
                         Application.Current.Dispatcher.Invoke(() =>
                         {
-                            AudioTrackDescriptions.Add(audioTrackDescription);
+                            AudioTracks.Add(new VlcMediaTrack(trackDescription));
                         });
                         break;
                 }
@@ -238,12 +236,16 @@ namespace RaceControl.Vlc
                 switch (e.Type)
                 {
                     case TrackType.Audio:
-                        var audioTrackDescription = AudioTrackDescriptions.First(p => p.Id == e.Id);
+                        var audioTrack = AudioTracks.FirstOrDefault(at => at.Id == e.Id);
 
-                        Application.Current.Dispatcher.Invoke(() =>
+                        if (audioTrack != null)
                         {
-                            AudioTrackDescriptions.Remove(audioTrackDescription);
-                        });
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                AudioTracks.Remove(audioTrack);
+                            });
+                        }
+
                         break;
                 }
             }

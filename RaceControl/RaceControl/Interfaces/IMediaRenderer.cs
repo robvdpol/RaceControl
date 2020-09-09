@@ -2,8 +2,8 @@
 {
     public interface IMediaRenderer
     {
-        object Renderer { get; }
-
         string Name { get; }
+
+        object Renderer { get; }
     }
 }
