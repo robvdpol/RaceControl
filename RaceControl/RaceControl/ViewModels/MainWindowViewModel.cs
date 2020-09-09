@@ -27,6 +27,7 @@ using System.Windows.Input;
 
 namespace RaceControl.ViewModels
 {
+    // ReSharper disable once UnusedType.Global
     public class MainWindowViewModel : ViewModelBase
     {
         private readonly IExtendedDialogService _dialogService;
@@ -767,7 +768,9 @@ namespace RaceControl.ViewModels
             Channels.Clear();
             SelectedVodType = null;
 
-            await Task.WhenAll(LoadChannelsForSessionAsync(session), LoadEpisodesForSessionAsync(session));
+            await Task.WhenAll(
+                LoadChannelsForSessionAsync(session),
+                LoadEpisodesForSessionAsync(session));
         }
 
         private async Task LoadChannelsForSessionAsync(Session session)

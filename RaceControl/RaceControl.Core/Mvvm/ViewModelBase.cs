@@ -17,6 +17,7 @@ namespace RaceControl.Core.Mvvm
             Logger = logger;
         }
 
+        // ReSharper disable once MemberCanBeProtected.Global
         public bool IsBusy
         {
             get => _isBusy;
