@@ -610,8 +610,6 @@ namespace RaceControl.ViewModels
 
                 Settings.LatestRelease = release.TagName;
             }
-
-            Logger.Info("Done checking for updates.");
         }
 
         private bool Login()
@@ -702,8 +700,6 @@ namespace RaceControl.ViewModels
                     LiveSessions.AddRange(sessionsToAdd);
                 }
             });
-
-            Logger.Info("Done refreshing live sessions.");
         }
 
         private async Task SelectSessionAsync(Session session)

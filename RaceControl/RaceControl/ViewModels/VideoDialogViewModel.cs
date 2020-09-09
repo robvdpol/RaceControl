@@ -398,7 +398,6 @@ namespace RaceControl.ViewModels
             {
                 Logger.Info($"Changing audio track to '{audioTrack.Name}'...");
                 MediaPlayer.SetAudioTrack(audioTrack);
-                Logger.Info("Done changing audio track.");
             }
         }
 
@@ -411,7 +410,6 @@ namespace RaceControl.ViewModels
         {
             Logger.Info("Scanning for Chromecast devices...");
             MediaPlayer.ScanChromecastAsync().Await(HandleNonCriticalError);
-            Logger.Info("Done scanning for Chromecast devices.");
         }
 
         private bool CanStartCastVideoExecute()
@@ -551,8 +549,6 @@ namespace RaceControl.ViewModels
             {
                 MediaPlayer.Time = time;
             }
-
-            Logger.Info("Done changing renderer.");
         }
 
         private async Task StartRecordingAsync()
@@ -560,7 +556,6 @@ namespace RaceControl.ViewModels
             Logger.Info("Starting recording process...");
             var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, PlayableContent);
             _streamlinkRecordingProcess = _streamlinkLauncher.StartStreamlinkRecording(streamUrl, PlayableContent.Title);
-            Logger.Info("Recording process started.");
         }
 
         private void StopRecording()
@@ -568,7 +563,6 @@ namespace RaceControl.ViewModels
             Logger.Info("Stopping recording process...");
             CleanupProcess(_streamlinkRecordingProcess);
             _streamlinkRecordingProcess = null;
-            Logger.Info("Recording process stopped.");
         }
 
         private void SetFullScreen()
