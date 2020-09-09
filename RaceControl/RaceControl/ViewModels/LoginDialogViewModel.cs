@@ -6,7 +6,6 @@ using RaceControl.Services.Interfaces.Credential;
 using RaceControl.Services.Interfaces.F1TV;
 using System;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 using DialogResult = Prism.Services.Dialogs.DialogResult;
 
