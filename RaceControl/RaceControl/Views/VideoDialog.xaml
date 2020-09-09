@@ -429,8 +429,8 @@
                                     Margin="2"
                                     DisplayMemberPath="Name"
                                     IsEnabled="{Binding HasItems, RelativeSource={RelativeSource Self}}"
-                                    ItemsSource="{Binding MediaPlayer.RendererItems}"
-                                    SelectedItem="{Binding SelectedRendererItem}" />
+                                    ItemsSource="{Binding MediaPlayer.MediaRenderers}"
+                                    SelectedItem="{Binding SelectedMediaRenderer}" />
                                 <TextBlock
                                     Width="180"
                                     Margin="2"
@@ -442,7 +442,7 @@
                                         <Style TargetType="TextBlock">
                                             <Setter Property="Visibility" Value="Hidden" />
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding SelectedRendererItem}" Value="{x:Null}">
+                                                <DataTrigger Binding="{Binding SelectedMediaRenderer}" Value="{x:Null}">
                                                     <Setter Property="Visibility" Value="Visible" />
                                                 </DataTrigger>
                                             </Style.Triggers>

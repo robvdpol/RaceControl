@@ -1,5 +1,4 @@
-﻿using LibVLCSharp.Shared;
-using LibVLCSharp.Shared.Structures;
+﻿using LibVLCSharp.Shared.Structures;
 using NLog;
 using Prism.Commands;
 using Prism.Events;
@@ -62,7 +61,7 @@ namespace RaceControl.ViewModels
         private bool _isStreamlink;
         private bool _isRecording;
         private bool _showControls = true;
-        private RendererItem _selectedRendererItem;
+        private IMediaRenderer _selectedMediaRenderer;
         private Timer _showControlsTimer;
         private SubscriptionToken _syncStreamsEventToken;
         private string _carImageUrl;
@@ -103,7 +102,7 @@ namespace RaceControl.ViewModels
         public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => DialogSettings.WindowState);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
         public ICommand ScanChromecastCommand => _scanChromecastCommand ??= new DelegateCommand(ScanChromecastExecute, CanScanChromecastExecute).ObservesProperty(() => CanClose).ObservesProperty(() => MediaPlayer.IsScanning);
-        public ICommand StartCastVideoCommand => _startCastVideoCommand ??= new DelegateCommand(StartCastVideoExecute, CanStartCastVideoExecute).ObservesProperty(() => CanClose).ObservesProperty(() => SelectedRendererItem);
+        public ICommand StartCastVideoCommand => _startCastVideoCommand ??= new DelegateCommand(StartCastVideoExecute, CanStartCastVideoExecute).ObservesProperty(() => CanClose).ObservesProperty(() => SelectedMediaRenderer);
         public ICommand StopCastVideoCommand => _stopCastVideoCommand ??= new DelegateCommand(StopCastVideoExecute, CanStopCastVideoExecute).ObservesProperty(() => MediaPlayer.IsCasting);
 
         public Guid UniqueIdentifier { get; } = Guid.NewGuid();
@@ -146,10 +145,10 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _showControls, value);
         }
 
-        public RendererItem SelectedRendererItem
+        public IMediaRenderer SelectedMediaRenderer
         {
-            get => _selectedRendererItem;
-            set => SetProperty(ref _selectedRendererItem, value);
+            get => _selectedMediaRenderer;
+            set => SetProperty(ref _selectedMediaRenderer, value);
         }
 
         public string CarImageUrl
@@ -419,13 +418,13 @@ namespace RaceControl.ViewModels
 
         private bool CanStartCastVideoExecute()
         {
-            return CanClose && SelectedRendererItem != null;
+            return CanClose && SelectedMediaRenderer != null;
         }
 
         private void StartCastVideoExecute()
         {
-            Logger.Info($"Starting casting of video with renderer '{SelectedRendererItem.Name}'...");
-            ChangeRendererAsync(SelectedRendererItem).Await(HandleNonCriticalError);
+            Logger.Info($"Starting casting of video with renderer '{SelectedMediaRenderer.Name}'...");
+            ChangeRendererAsync(SelectedMediaRenderer).Await(HandleNonCriticalError);
         }
 
         private bool CanStopCastVideoExecute()
@@ -537,9 +536,9 @@ namespace RaceControl.ViewModels
             _showControlsTimer = null;
         }
 
-        private async Task ChangeRendererAsync(RendererItem renderer = null)
+        private async Task ChangeRendererAsync(IMediaRenderer mediaRenderer = null)
         {
-            Logger.Info($"Changing renderer to '{renderer?.Name}'...");
+            Logger.Info($"Changing renderer to '{mediaRenderer?.Name}'...");
             string streamUrl = null;
 
             if (!IsStreamlink)
@@ -548,7 +547,7 @@ namespace RaceControl.ViewModels
             }
 
             var time = MediaPlayer.Time;
-            await MediaPlayer.ChangeRendererAsync(renderer, streamUrl);
+            await MediaPlayer.ChangeRendererAsync(mediaRenderer, streamUrl);
 
             if (!PlayableContent.IsLive)
             {

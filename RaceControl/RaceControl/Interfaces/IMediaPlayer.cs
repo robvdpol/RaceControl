@@ -1,5 +1,5 @@
-﻿using LibVLCSharp.Shared;
-using System;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
 namespace RaceControl.Interfaces
@@ -16,7 +16,9 @@ namespace RaceControl.Interfaces
 
         bool IsCasting { get; }
 
-        Task StartPlaybackAsync(string streamUrl, RendererItem renderer = null);
+        ObservableCollection<IMediaRenderer> MediaRenderers { get; }
+
+        Task StartPlaybackAsync(string streamUrl, IMediaRenderer mediaRenderer = null);
 
         void TogglePause();
 
@@ -26,6 +28,6 @@ namespace RaceControl.Interfaces
 
         Task ScanChromecastAsync();
 
-        Task ChangeRendererAsync(RendererItem renderer, string streamUrl);
+        Task ChangeRendererAsync(IMediaRenderer mediaRenderer, string streamUrl);
     }
 }
