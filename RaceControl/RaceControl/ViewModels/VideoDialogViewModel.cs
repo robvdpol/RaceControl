@@ -182,7 +182,7 @@ namespace RaceControl.ViewModels
                 StartupLocation = WindowStartupLocation.CenterScreen;
             }
 
-            StartStreamAsync().Await(SubscribeSyncStreamsEvent, HandleFatalError, true);
+            StartStreamAsync().Await(SubscribeSyncStreamsEvent, HandleFatalError);
             LoadDriverImageUrlsAsync().Await(HandleNonFatalError);
             StartShowControlsTimer();
 

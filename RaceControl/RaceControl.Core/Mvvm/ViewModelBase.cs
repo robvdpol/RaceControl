@@ -2,6 +2,7 @@
 using Prism.Mvvm;
 using RaceControl.Core.Helpers;
 using System;
+using System.Windows;
 
 namespace RaceControl.Core.Mvvm
 {
@@ -31,7 +32,7 @@ namespace RaceControl.Core.Mvvm
         protected void HandleFatalError(Exception ex)
         {
             Logger.Error(ex, "A fatal error occurred.");
-            MessageBoxHelper.ShowError(ex.Message);
+            Application.Current.Dispatcher.Invoke(() => MessageBoxHelper.ShowError(ex.Message));
             NotBusyAnymore();
         }
 
