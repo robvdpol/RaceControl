@@ -380,8 +380,7 @@ namespace RaceControl.ViewModels
 
         private void WatchChannelExecute(Channel channel)
         {
-            var session = GetSelectedSession();
-            var playableContent = PlayableContent.Create(session, channel);
+            var playableContent = PlayableContent.Create(GetSelectedSession(), channel);
             WatchChannel(playableContent);
         }
 
@@ -405,17 +404,8 @@ namespace RaceControl.ViewModels
         private void WatchVlcChannelExecute(Channel channel)
         {
             IsBusy = true;
-            var session = GetSelectedSession();
-            var playableContent = PlayableContent.Create(session, channel);
-
-            _apiService
-                .GetTokenisedUrlAsync(_token, playableContent)
-                .Await(streamUrl =>
-                {
-                    WatchStreamInVlc(playableContent, streamUrl);
-                    SetNotBusy();
-                },
-                HandleCriticalError);
+            var playableContent = PlayableContent.Create(GetSelectedSession(), channel);
+            WatchInVlcAsync(playableContent).Await(SetNotBusy, HandleCriticalError);
         }
 
         private bool CanWatchVlcEpisodeExecute(Episode episode)
@@ -427,15 +417,7 @@ namespace RaceControl.ViewModels
         {
             IsBusy = true;
             var playableContent = PlayableContent.Create(episode);
-
-            _apiService
-                .GetTokenisedUrlAsync(_token, playableContent)
-                .Await(streamUrl =>
-                {
-                    WatchStreamInVlc(playableContent, streamUrl);
-                    SetNotBusy();
-                },
-                HandleCriticalError);
+            WatchInVlcAsync(playableContent).Await(SetNotBusy, HandleCriticalError);
         }
 
         private bool CanWatchMpvChannelExecute(Channel channel)
@@ -446,17 +428,8 @@ namespace RaceControl.ViewModels
         private void WatchMpvChannelExecute(Channel channel)
         {
             IsBusy = true;
-            var session = GetSelectedSession();
-            var playableContent = PlayableContent.Create(session, channel);
-
-            _apiService
-                .GetTokenisedUrlAsync(_token, playableContent)
-                .Await(streamUrl =>
-                {
-                    WatchStreamInMpv(playableContent, streamUrl);
-                    SetNotBusy();
-                },
-                HandleCriticalError);
+            var playableContent = PlayableContent.Create(GetSelectedSession(), channel);
+            WatchInMpvAsync(playableContent).Await(SetNotBusy, HandleCriticalError);
         }
 
         private bool CanWatchMpvEpisodeExecute(Episode episode)
@@ -468,15 +441,7 @@ namespace RaceControl.ViewModels
         {
             IsBusy = true;
             var playableContent = PlayableContent.Create(episode);
-
-            _apiService
-                .GetTokenisedUrlAsync(_token, playableContent)
-                .Await(streamUrl =>
-                {
-                    WatchStreamInMpv(playableContent, streamUrl);
-                    SetNotBusy();
-                },
-                HandleCriticalError);
+            WatchInMpvAsync(playableContent).Await(SetNotBusy, HandleCriticalError);
         }
 
         private bool CanCopyUrlChannelExecute(Channel channel)
@@ -487,34 +452,15 @@ namespace RaceControl.ViewModels
         private void CopyUrlChannelExecute(Channel channel)
         {
             IsBusy = true;
-            var session = GetSelectedSession();
-            var playableContent = PlayableContent.Create(session, channel);
-
-            _apiService
-                .GetTokenisedUrlAsync(_token, playableContent)
-                .Await(streamUrl =>
-                {
-                    Clipboard.SetText(streamUrl);
-                    SetNotBusy();
-                },
-                HandleCriticalError,
-                true);
+            var playableContent = PlayableContent.Create(GetSelectedSession(), channel);
+            CopyUrlAsync(playableContent).Await(SetNotBusy, HandleCriticalError);
         }
 
         private void CopyUrlEpisodeExecute(Episode episode)
         {
             IsBusy = true;
             var playableContent = PlayableContent.Create(episode);
-
-            _apiService
-                .GetTokenisedUrlAsync(_token, playableContent)
-                .Await(streamUrl =>
-                {
-                    Clipboard.SetText(streamUrl);
-                    SetNotBusy();
-                },
-                HandleCriticalError,
-                true);
+            CopyUrlAsync(playableContent).Await(SetNotBusy, HandleCriticalError);
         }
 
         private bool CanDownloadChannelExecute(Channel channel)
@@ -524,8 +470,7 @@ namespace RaceControl.ViewModels
 
         private void DownloadChannelExecute(Channel channel)
         {
-            var session = GetSelectedSession();
-            var playableContent = PlayableContent.Create(session, channel);
+            var playableContent = PlayableContent.Create(GetSelectedSession(), channel);
             StartDownload(playableContent);
         }
 
@@ -824,8 +769,10 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void WatchStreamInVlc(IPlayableContent playableContent, string streamUrl)
+        private async Task WatchInVlcAsync(IPlayableContent playableContent)
         {
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, playableContent);
+
             if (playableContent.IsLive && !Settings.DisableStreamlink)
             {
                 _streamlinkLauncher.StartStreamlinkVlc(VlcExeLocation, streamUrl, playableContent.Title);
@@ -837,10 +784,17 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void WatchStreamInMpv(IPlayableContent playableContent, string streamUrl)
+        private async Task WatchInMpvAsync(IPlayableContent playableContent)
         {
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, playableContent);
             using var process = ProcessUtils.CreateProcess(MpvExeLocation, $"\"{streamUrl}\" --title=\"{playableContent.Title}\"");
             process.Start();
+        }
+
+        private async Task CopyUrlAsync(IPlayableContent playableContent)
+        {
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, playableContent);
+            Clipboard.SetText(streamUrl);
         }
 
         private void StartDownload(IPlayableContent playableContent)
