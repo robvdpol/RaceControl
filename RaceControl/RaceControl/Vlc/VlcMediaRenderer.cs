@@ -1,5 +1,5 @@
 ﻿using LibVLCSharp.Shared;
-using RaceControl.Interfaces;
+using RaceControl.Common.Interfaces;
 
 namespace RaceControl.Vlc
 {

@@ -1,8 +1,8 @@
-﻿using RaceControl.Enums;
+﻿using RaceControl.Common.Enums;
 using System;
 using System.Threading.Tasks;
 
-namespace RaceControl.Interfaces
+namespace RaceControl.Common.Interfaces
 {
     public interface IMediaDownloader : IDisposable
     {

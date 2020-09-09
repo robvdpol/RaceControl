@@ -2,7 +2,7 @@
 using NLog;
 using Prism.Commands;
 using Prism.Services.Dialogs;
-using RaceControl.Common.Enum;
+using RaceControl.Common.Enums;
 using RaceControl.Common.Interfaces;
 using RaceControl.Common.Utils;
 using RaceControl.Comparers;

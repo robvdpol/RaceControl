@@ -1,4 +1,4 @@
-﻿using RaceControl.Common.Enum;
+﻿using RaceControl.Common.Enums;
 using RaceControl.Common.Interfaces;
 using RaceControl.Common.Utils;
 using RaceControl.Services.Interfaces.F1TV.Api;

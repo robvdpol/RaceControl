@@ -1,9 +1,8 @@
 ﻿using NLog;
 using Prism.Services.Dialogs;
+using RaceControl.Common.Enums;
 using RaceControl.Common.Interfaces;
 using RaceControl.Core.Mvvm;
-using RaceControl.Enums;
-using RaceControl.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
 using System.Threading.Tasks;
 

@@ -1,4 +1,4 @@
-﻿namespace RaceControl.Interfaces
+﻿namespace RaceControl.Common.Interfaces
 {
     public interface IMediaTrack
     {

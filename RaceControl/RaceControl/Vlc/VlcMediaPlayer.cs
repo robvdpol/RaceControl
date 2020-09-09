@@ -1,6 +1,6 @@
 ﻿using LibVLCSharp.Shared;
 using Prism.Mvvm;
-using RaceControl.Interfaces;
+using RaceControl.Common.Interfaces;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;

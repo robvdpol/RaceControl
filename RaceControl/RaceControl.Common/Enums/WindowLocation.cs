@@ -1,4 +1,4 @@
-﻿namespace RaceControl.Enums
+﻿namespace RaceControl.Common.Enums
 {
     public enum WindowLocation
     {

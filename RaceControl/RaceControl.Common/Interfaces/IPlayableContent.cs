@@ -1,4 +1,4 @@
-﻿using RaceControl.Common.Enum;
+﻿using RaceControl.Common.Enums;
 
 namespace RaceControl.Common.Interfaces
 {

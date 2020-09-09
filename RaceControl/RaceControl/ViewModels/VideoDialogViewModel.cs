@@ -2,11 +2,11 @@
 using Prism.Commands;
 using Prism.Events;
 using Prism.Services.Dialogs;
+using RaceControl.Common.Enums;
 using RaceControl.Common.Interfaces;
 using RaceControl.Core.Mvvm;
 using RaceControl.Core.Settings;
 using RaceControl.Core.Streamlink;
-using RaceControl.Enums;
 using RaceControl.Events;
 using RaceControl.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;

@@ -1,4 +1,4 @@
-﻿namespace RaceControl.Common.Enum
+﻿namespace RaceControl.Common.Enums
 {
     public enum ContentType
     {
