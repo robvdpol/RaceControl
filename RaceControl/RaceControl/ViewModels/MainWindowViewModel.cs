@@ -216,7 +216,6 @@ namespace RaceControl.ViewModels
 
         private void LoadedExecute(RoutedEventArgs args)
         {
-            Logger.Info("Initializing application...");
             IsBusy = true;
             Settings.Load();
             VideoDialogLayout.Load();
@@ -232,7 +231,7 @@ namespace RaceControl.ViewModels
                     SelectedSeason = Seasons.FirstOrDefault();
                 },
                 HandleCriticalError);
-                RefreshLiveSessionsAsync().Await(HandleNonCriticalError);
+                RefreshLiveSessionsAsync().Await(CreateRefreshLiveSessionsTimer, HandleNonCriticalError);
             }
         }
 
@@ -246,7 +245,6 @@ namespace RaceControl.ViewModels
             }
 
             Settings.Save();
-            Logger.Info("Closing application...");
         }
 
         private static void MouseMoveExecute()
@@ -469,9 +467,13 @@ namespace RaceControl.ViewModels
 
         private void RefreshLiveSessionsTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
+            if (_refreshLiveSessionsTimer == null)
+            {
+                return;
+            }
+
             _refreshLiveSessionsTimer?.Stop();
-            RefreshLiveSessionsAsync().Await(HandleNonCriticalError);
-            _refreshLiveSessionsTimer?.Start();
+            RefreshLiveSessionsAsync().Await(() => _refreshLiveSessionsTimer?.Start(), HandleNonCriticalError);
         }
 
         private void SetVlcExeLocation()
@@ -559,14 +561,7 @@ namespace RaceControl.ViewModels
 
         private async Task InitializeAsync()
         {
-            await Task.WhenAll(
-                LoadSeasonsAsync(),
-                LoadSeriesAsync(),
-                LoadVodTypesAsync());
-
-            _refreshLiveSessionsTimer = new Timer(60000) { AutoReset = false };
-            _refreshLiveSessionsTimer.Elapsed += RefreshLiveSessionsTimer_Elapsed;
-            _refreshLiveSessionsTimer.Start();
+            await Task.WhenAll(LoadSeasonsAsync(), LoadSeriesAsync(), LoadVodTypesAsync());
         }
 
         private async Task LoadSeasonsAsync()
@@ -597,6 +592,13 @@ namespace RaceControl.ViewModels
             VodTypes.AddRange(vodTypes.Where(vt => vt.ContentUrls.Any()));
         }
 
+        private void CreateRefreshLiveSessionsTimer()
+        {
+            _refreshLiveSessionsTimer = new Timer(60000) { AutoReset = false };
+            _refreshLiveSessionsTimer.Elapsed += RefreshLiveSessionsTimer_Elapsed;
+            _refreshLiveSessionsTimer.Start();
+        }
+
         private async Task RefreshLiveSessionsAsync()
         {
             Logger.Info("Refreshing live sessions...");
@@ -605,24 +607,27 @@ namespace RaceControl.ViewModels
             var sessionsToRemove = LiveSessions.Where(existingLiveSession => liveSessions.All(liveSession => liveSession.UID != existingLiveSession.UID)).ToList();
             var sessionsToAdd = liveSessions.Where(newLiveSession => LiveSessions.All(liveSession => liveSession.UID != newLiveSession.UID)).ToList();
 
-            Application.Current.Dispatcher.Invoke(() =>
+            if (sessionsToRemove.Any() || sessionsToAdd.Any())
             {
-                foreach (var sessionToRemove in sessionsToRemove)
+                Application.Current.Dispatcher.Invoke(() =>
                 {
-                    if (SelectedLiveSession != null && SelectedLiveSession.UID == sessionToRemove.UID)
+                    foreach (var sessionToRemove in sessionsToRemove)
                     {
-                        Episodes.Clear();
-                        Channels.Clear();
+                        if (SelectedLiveSession?.UID == sessionToRemove.UID)
+                        {
+                            Episodes.Clear();
+                            Channels.Clear();
+                        }
+
+                        LiveSessions.Remove(sessionToRemove);
                     }
 
-                    LiveSessions.Remove(sessionToRemove);
-                }
-
-                if (sessionsToAdd.Any())
-                {
-                    LiveSessions.AddRange(sessionsToAdd);
-                }
-            });
+                    if (sessionsToAdd.Any())
+                    {
+                        LiveSessions.AddRange(sessionsToAdd);
+                    }
+                });
+            }
         }
 
         private async Task SelectSessionAsync(Session session)
