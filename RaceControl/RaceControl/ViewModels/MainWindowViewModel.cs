@@ -69,9 +69,9 @@ namespace RaceControl.ViewModels
         private ObservableCollection<Event> _events;
         private ObservableCollection<Session> _sessions;
         private ObservableCollection<Session> _liveSessions;
-        private ObservableCollection<Channel> _channels;
+        private ObservableCollection<IPlayableContent> _channels;
         private ObservableCollection<VodType> _vodTypes;
-        private ObservableCollection<Episode> _episodes;
+        private ObservableCollection<IPlayableContent> _episodes;
         private Season _selectedSeason;
         private Event _selectedEvent;
         private Session _selectedLiveSession;
@@ -109,16 +109,16 @@ namespace RaceControl.ViewModels
         public ICommand LiveSessionSelectionChangedCommand => _liveSessionSelectionChangedCommand ??= new DelegateCommand(LiveSessionSelectionChangedExecute);
         public ICommand SessionSelectionChangedCommand => _sessionSelectionChangedCommand ??= new DelegateCommand(SessionSelectionChangedExecute);
         public ICommand VodTypeSelectionChangedCommand => _vodTypeSelectionChangedCommand ??= new DelegateCommand(VodTypeSelectionChangedExecute);
-        public ICommand WatchChannelCommand => _watchChannelCommand ??= new DelegateCommand<Channel>(WatchChannelExecute, CanWatchChannelExecute).ObservesProperty(() => SelectedSession).ObservesProperty(() => SelectedLiveSession);
-        public ICommand WatchEpisodeCommand => _watchEpisodeCommand ??= new DelegateCommand<Episode>(WatchEpisodeExecute);
-        public ICommand WatchVlcChannelCommand => _watchVlcChannelCommand ??= new DelegateCommand<Channel>(WatchVlcChannelExecute, CanWatchVlcChannelExecute).ObservesProperty(() => VlcExeLocation).ObservesProperty(() => SelectedSession).ObservesProperty(() => SelectedLiveSession);
-        public ICommand WatchVlcEpisodeCommand => _watchVlcEpisodeCommand ??= new DelegateCommand<Episode>(WatchVlcEpisodeExecute, CanWatchVlcEpisodeExecute).ObservesProperty(() => VlcExeLocation);
-        public ICommand WatchMpvChannelCommand => _watchMpvChannelCommand ??= new DelegateCommand<Channel>(WatchMpvChannelExecute, CanWatchMpvChannelExecute).ObservesProperty(() => MpvExeLocation).ObservesProperty(() => SelectedSession).ObservesProperty(() => SelectedLiveSession);
-        public ICommand WatchMpvEpisodeCommand => _watchMpvEpisodeCommand ??= new DelegateCommand<Episode>(WatchMpvEpisodeExecute, CanWatchMpvEpisodeExecute).ObservesProperty(() => MpvExeLocation);
-        public ICommand CopyUrlChannelCommand => _copyUrlChannelCommand ??= new DelegateCommand<Channel>(CopyUrlChannelExecute, CanCopyUrlChannelExecute).ObservesProperty(() => SelectedSession).ObservesProperty(() => SelectedLiveSession);
-        public ICommand CopyUrlEpisodeCommand => _copyUrlEpisodeCommand ??= new DelegateCommand<Episode>(CopyUrlEpisodeExecute);
-        public ICommand DownloadChannelCommand => _downloadChannelCommand ??= new DelegateCommand<Channel>(DownloadChannelExecute, CanDownloadChannelExecute).ObservesProperty(() => SelectedSession).ObservesProperty(() => SelectedLiveSession);
-        public ICommand DownloadEpisodeCommand => _downloadEpisodeCommand ??= new DelegateCommand<Episode>(DownloadEpisodeExecute);
+        public ICommand WatchChannelCommand => _watchChannelCommand ??= new DelegateCommand<IPlayableContent>(WatchChannelExecute);
+        public ICommand WatchEpisodeCommand => _watchEpisodeCommand ??= new DelegateCommand<IPlayableContent>(WatchEpisodeExecute);
+        public ICommand WatchVlcChannelCommand => _watchVlcChannelCommand ??= new DelegateCommand<IPlayableContent>(WatchVlcChannelExecute, CanWatchVlcChannelExecute).ObservesProperty(() => VlcExeLocation);
+        public ICommand WatchVlcEpisodeCommand => _watchVlcEpisodeCommand ??= new DelegateCommand<IPlayableContent>(WatchVlcEpisodeExecute, CanWatchVlcEpisodeExecute).ObservesProperty(() => VlcExeLocation);
+        public ICommand WatchMpvChannelCommand => _watchMpvChannelCommand ??= new DelegateCommand<IPlayableContent>(WatchMpvChannelExecute, CanWatchMpvChannelExecute).ObservesProperty(() => MpvExeLocation);
+        public ICommand WatchMpvEpisodeCommand => _watchMpvEpisodeCommand ??= new DelegateCommand<IPlayableContent>(WatchMpvEpisodeExecute, CanWatchMpvEpisodeExecute).ObservesProperty(() => MpvExeLocation);
+        public ICommand CopyUrlChannelCommand => _copyUrlChannelCommand ??= new DelegateCommand<IPlayableContent>(CopyUrlChannelExecute);
+        public ICommand CopyUrlEpisodeCommand => _copyUrlEpisodeCommand ??= new DelegateCommand<IPlayableContent>(CopyUrlEpisodeExecute);
+        public ICommand DownloadChannelCommand => _downloadChannelCommand ??= new DelegateCommand<IPlayableContent>(DownloadChannelExecute, CanDownloadChannelExecute);
+        public ICommand DownloadEpisodeCommand => _downloadEpisodeCommand ??= new DelegateCommand<IPlayableContent>(DownloadEpisodeExecute);
         public ICommand SetRecordingLocationCommand => _setRecordingLocationCommand ??= new DelegateCommand(SetRecordingLocationExecute);
         public ICommand SaveVideoDialogLayoutCommand => _saveVideoDialogLayoutCommand ??= new DelegateCommand(SaveVideoDialogLayoutExecute, CanSaveVideoDialogLayoutExecute).ObservesProperty(() => VideoDialogViewModels.Count);
         public ICommand OpenVideoDialogLayoutCommand => _openVideoDialogLayoutCommand ??= new DelegateCommand(OpenVideoDialogLayoutExecute, CanOpenVideoDialogLayoutExecute).ObservesProperty(() => VideoDialogLayout.Instances.Count).ObservesProperty(() => Channels.Count).ObservesProperty(() => SelectedSession).ObservesProperty(() => SelectedLiveSession);
@@ -176,9 +176,9 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _liveSessions, value);
         }
 
-        public ObservableCollection<Channel> Channels
+        public ObservableCollection<IPlayableContent> Channels
         {
-            get => _channels ??= new ObservableCollection<Channel>();
+            get => _channels ??= new ObservableCollection<IPlayableContent>();
             set => SetProperty(ref _channels, value);
         }
 
@@ -188,9 +188,9 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _vodTypes, value);
         }
 
-        public ObservableCollection<Episode> Episodes
+        public ObservableCollection<IPlayableContent> Episodes
         {
-            get => _episodes ??= new ObservableCollection<Episode>();
+            get => _episodes ??= new ObservableCollection<IPlayableContent>();
             set => SetProperty(ref _episodes, value);
         }
 
@@ -363,7 +363,7 @@ namespace RaceControl.ViewModels
                         .BufferedDownload(_apiService.GetEpisodeAsync, SelectedVodType.ContentUrls.Select(c => c.GetUID()))
                         .Await(episodes =>
                         {
-                            Episodes.AddRange(episodes.OrderBy(e => e.Title));
+                            Episodes.AddRange(episodes.OrderBy(e => e.Title).Select(PlayableContent.Create));
                             SetNotBusy();
                         },
                         HandleCriticalError,
@@ -372,20 +372,13 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private bool CanWatchChannelExecute(Channel channel)
+        private void WatchChannelExecute(IPlayableContent playableContent)
         {
-            return GetSelectedSession() != null;
-        }
-
-        private void WatchChannelExecute(Channel channel)
-        {
-            var playableContent = PlayableContent.Create(GetSelectedSession(), channel);
             WatchChannel(playableContent);
         }
 
-        private void WatchEpisodeExecute(Episode episode)
+        private void WatchEpisodeExecute(IPlayableContent playableContent)
         {
-            var playableContent = PlayableContent.Create(episode);
             var parameters = new DialogParameters
             {
                 { ParameterNames.TOKEN, _token },
@@ -395,87 +388,74 @@ namespace RaceControl.ViewModels
             OpenVideoDialog(parameters);
         }
 
-        private bool CanWatchVlcChannelExecute(Channel channel)
-        {
-            return !string.IsNullOrWhiteSpace(VlcExeLocation) && File.Exists(VlcExeLocation) && GetSelectedSession() != null;
-        }
-
-        private void WatchVlcChannelExecute(Channel channel)
-        {
-            IsBusy = true;
-            var playableContent = PlayableContent.Create(GetSelectedSession(), channel);
-            WatchInVlcAsync(playableContent).Await(SetNotBusy, HandleCriticalError);
-        }
-
-        private bool CanWatchVlcEpisodeExecute(Episode episode)
+        private bool CanWatchVlcChannelExecute(IPlayableContent playableContent)
         {
             return !string.IsNullOrWhiteSpace(VlcExeLocation) && File.Exists(VlcExeLocation);
         }
 
-        private void WatchVlcEpisodeExecute(Episode episode)
+        private void WatchVlcChannelExecute(IPlayableContent playableContent)
         {
             IsBusy = true;
-            var playableContent = PlayableContent.Create(episode);
             WatchInVlcAsync(playableContent).Await(SetNotBusy, HandleCriticalError);
         }
 
-        private bool CanWatchMpvChannelExecute(Channel channel)
+        private bool CanWatchVlcEpisodeExecute(IPlayableContent playableContent)
         {
-            return !string.IsNullOrWhiteSpace(MpvExeLocation) && File.Exists(MpvExeLocation) && GetSelectedSession() != null;
+            return !string.IsNullOrWhiteSpace(VlcExeLocation) && File.Exists(VlcExeLocation);
         }
 
-        private void WatchMpvChannelExecute(Channel channel)
+        private void WatchVlcEpisodeExecute(IPlayableContent playableContent)
         {
             IsBusy = true;
-            var playableContent = PlayableContent.Create(GetSelectedSession(), channel);
-            WatchInMpvAsync(playableContent).Await(SetNotBusy, HandleCriticalError);
+            WatchInVlcAsync(playableContent).Await(SetNotBusy, HandleCriticalError);
         }
 
-        private bool CanWatchMpvEpisodeExecute(Episode episode)
+        private bool CanWatchMpvChannelExecute(IPlayableContent playableContent)
         {
             return !string.IsNullOrWhiteSpace(MpvExeLocation) && File.Exists(MpvExeLocation);
         }
 
-        private void WatchMpvEpisodeExecute(Episode episode)
+        private void WatchMpvChannelExecute(IPlayableContent playableContent)
         {
             IsBusy = true;
-            var playableContent = PlayableContent.Create(episode);
             WatchInMpvAsync(playableContent).Await(SetNotBusy, HandleCriticalError);
         }
 
-        private bool CanCopyUrlChannelExecute(Channel channel)
+        private bool CanWatchMpvEpisodeExecute(IPlayableContent playableContent)
         {
-            return GetSelectedSession() != null;
+            return !string.IsNullOrWhiteSpace(MpvExeLocation) && File.Exists(MpvExeLocation);
         }
 
-        private void CopyUrlChannelExecute(Channel channel)
+        private void WatchMpvEpisodeExecute(IPlayableContent playableContent)
         {
             IsBusy = true;
-            var playableContent = PlayableContent.Create(GetSelectedSession(), channel);
+            WatchInMpvAsync(playableContent).Await(SetNotBusy, HandleCriticalError);
+        }
+
+        private void CopyUrlChannelExecute(IPlayableContent playableContent)
+        {
+            IsBusy = true;
             CopyUrlAsync(playableContent).Await(SetNotBusy, HandleCriticalError);
         }
 
-        private void CopyUrlEpisodeExecute(Episode episode)
+        private void CopyUrlEpisodeExecute(IPlayableContent playableContent)
         {
             IsBusy = true;
-            var playableContent = PlayableContent.Create(episode);
             CopyUrlAsync(playableContent).Await(SetNotBusy, HandleCriticalError);
         }
 
-        private bool CanDownloadChannelExecute(Channel channel)
+        private static bool CanDownloadChannelExecute(IPlayableContent playableContent)
         {
-            return GetSelectedSession()?.IsReplay ?? false;
+            return !playableContent.IsLive;
         }
 
-        private void DownloadChannelExecute(Channel channel)
+        private void DownloadChannelExecute(IPlayableContent playableContent)
         {
-            var playableContent = PlayableContent.Create(GetSelectedSession(), channel);
             StartDownload(playableContent);
         }
 
-        private void DownloadEpisodeExecute(Episode episode)
+        private void DownloadEpisodeExecute(IPlayableContent playableContent)
         {
-            var playableContent = PlayableContent.Create(episode);
             StartDownload(playableContent);
         }
 
@@ -517,12 +497,9 @@ namespace RaceControl.ViewModels
                 viewModel.CloseWindow();
             }
 
-            var session = GetSelectedSession();
-            var playableContents = Channels.Select(channel => PlayableContent.Create(session, channel)).ToList();
-
             foreach (var settings in VideoDialogLayout.Instances)
             {
-                var playableContent = playableContents.FirstOrDefault(p => p.ContentType == ContentType.Channel && p.Name == settings.ChannelName);
+                var playableContent = Channels.FirstOrDefault(p => p.ContentType == ContentType.Channel && p.Name == settings.ChannelName);
 
                 if (playableContent != null)
                 {
@@ -726,13 +703,13 @@ namespace RaceControl.ViewModels
                 });
             }
 
-            Channels.AddRange(channels.OrderBy(c => c.ChannelType, new ChannelTypeComparer()));
+            Channels.AddRange(channels.OrderBy(c => c.ChannelType, new ChannelTypeComparer()).Select(c => PlayableContent.Create(session, c)));
         }
 
         private async Task LoadEpisodesForSessionAsync(Session session)
         {
             var episodes = await _apiService.GetEpisodesForSessionAsync(session.UID);
-            Episodes.AddRange(episodes.OrderBy(e => e.Title));
+            Episodes.AddRange(episodes.OrderBy(e => e.Title).Select(PlayableContent.Create));
         }
 
         private void WatchChannel(IPlayableContent playableContent, VideoDialogSettings settings = null)

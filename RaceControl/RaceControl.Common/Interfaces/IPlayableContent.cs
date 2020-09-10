@@ -6,8 +6,10 @@ namespace RaceControl.Common.Interfaces
     {
         string Title { get; }
         string Name { get; }
+        string DisplayName { get; }
         ContentType ContentType { get; }
         string ContentUrl { get; }
+        string ThumbnailUrl { get; }
         bool IsLive { get; }
         string SyncUID { get; }
         string DriverUID { get; }

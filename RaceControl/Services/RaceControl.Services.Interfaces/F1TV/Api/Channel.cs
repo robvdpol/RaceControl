@@ -26,26 +26,5 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         public static string NameField => JsonUtils.GetJsonPropertyName<Channel>(c => c.Name);
         public static string ChannelTypeField => JsonUtils.GetJsonPropertyName<Channel>(c => c.ChannelType);
         public static string DriverOccurrenceUrlsField => JsonUtils.GetJsonPropertyName<Channel>(c => c.DriverOccurrenceUrls);
-
-        public override string ToString()
-        {
-            switch (Name)
-            {
-                case "WIF":
-                    return "World Feed";
-
-                case "pit lane":
-                    return "Pit Lane";
-
-                case "driver":
-                    return "Driver Tracker";
-
-                case "data":
-                    return "Live Timing";
-
-                default:
-                    return Name;
-            }
-        }
     }
 }
