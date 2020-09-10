@@ -321,7 +321,7 @@
                                     Grid.Column="1"
                                     Width="70"
                                     Margin="2,0"
-                                    Command="{Binding DataContext.DownloadChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
+                                    Command="{Binding DataContext.DownloadContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
                                     CommandParameter="{Binding}"
                                     Content="Download"
                                     ToolTip="Save a copy to file system"
@@ -330,31 +330,31 @@
                                     Grid.Column="2"
                                     Width="50"
                                     Margin="2,0"
-                                    Command="{Binding DataContext.CopyUrlChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
+                                    Command="{Binding DataContext.CopyContentUrlCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
                                     CommandParameter="{Binding}"
                                     Content="Copy"
                                     ToolTip="Copy URL to clipboard" />
                                 <Button
-                                    Grid.Column="3"
-                                    Width="50"
-                                    Margin="2,0"
-                                    Command="{Binding DataContext.WatchVlcChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
-                                    CommandParameter="{Binding}"
-                                    Content="VLC"
-                                    ToolTip="Watch with VLC media player" />
-                                <Button
                                     Grid.Column="4"
                                     Width="50"
                                     Margin="2,0"
-                                    Command="{Binding DataContext.WatchMpvChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
+                                    Command="{Binding DataContext.WatchContentInMpvCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
                                     CommandParameter="{Binding}"
                                     Content="MPV"
                                     ToolTip="Watch with MPV" />
                                 <Button
+                                    Grid.Column="3"
+                                    Width="50"
+                                    Margin="2,0"
+                                    Command="{Binding DataContext.WatchContentInVlcCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
+                                    CommandParameter="{Binding}"
+                                    Content="VLC"
+                                    ToolTip="Watch with VLC media player" />
+                                <Button
                                     Grid.Column="5"
                                     Width="50"
                                     Margin="2,0,0,0"
-                                    Command="{Binding DataContext.WatchChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
+                                    Command="{Binding DataContext.WatchContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
                                     CommandParameter="{Binding}"
                                     Content="Watch"
                                     ToolTip="Watch with internal player" />
@@ -524,7 +524,7 @@
                                 Grid.Column="1"
                                 Width="70"
                                 Margin="2,0"
-                                Command="{Binding DataContext.DownloadEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
+                                Command="{Binding DataContext.DownloadContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
                                 CommandParameter="{Binding}"
                                 Content="Download"
                                 ToolTip="Save a copy to file system"
@@ -533,31 +533,31 @@
                                 Grid.Column="2"
                                 Width="50"
                                 Margin="2,0"
-                                Command="{Binding DataContext.CopyUrlEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
+                                Command="{Binding DataContext.CopyContentUrlCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
                                 CommandParameter="{Binding}"
                                 Content="Copy"
                                 ToolTip="Copy URL to clipboard" />
                             <Button
-                                Grid.Column="3"
-                                Width="50"
-                                Margin="2,0"
-                                Command="{Binding DataContext.WatchVlcEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
-                                CommandParameter="{Binding}"
-                                Content="VLC"
-                                ToolTip="Watch with VLC media player" />
-                            <Button
                                 Grid.Column="4"
                                 Width="50"
                                 Margin="2,0"
-                                Command="{Binding DataContext.WatchMpvEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
+                                Command="{Binding DataContext.WatchContentInMpvCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
                                 CommandParameter="{Binding}"
                                 Content="MPV"
                                 ToolTip="Watch with MPV" />
                             <Button
+                                Grid.Column="3"
+                                Width="50"
+                                Margin="2,0"
+                                Command="{Binding DataContext.WatchContentInVlcCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
+                                CommandParameter="{Binding}"
+                                Content="VLC"
+                                ToolTip="Watch with VLC media player" />
+                            <Button
                                 Grid.Column="5"
                                 Width="50"
                                 Margin="2,0,0,0"
-                                Command="{Binding DataContext.WatchEpisodeCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
+                                Command="{Binding DataContext.WatchContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"
                                 CommandParameter="{Binding}"
                                 Content="Watch"
                                 ToolTip="Watch with internal player" />
