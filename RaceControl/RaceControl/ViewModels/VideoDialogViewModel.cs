@@ -201,6 +201,7 @@ namespace RaceControl.ViewModels
         {
             DialogSettings.ChannelName = PlayableContent.Name;
             DialogSettings.IsMuted = MediaPlayer.IsMuted;
+            DialogSettings.Volume = MediaPlayer.Volume;
 
             return DialogSettings;
         }
@@ -450,6 +451,7 @@ namespace RaceControl.ViewModels
             }
 
             DialogSettings.IsMuted = settings.IsMuted;
+            DialogSettings.Volume = settings.Volume;
         }
 
         private async Task StartStreamAsync()
@@ -469,6 +471,8 @@ namespace RaceControl.ViewModels
             {
                 MediaPlayer.ToggleMute();
             }
+
+            MediaPlayer.Volume = DialogSettings.Volume;
         }
 
         private async Task LoadDriverImageUrlsAsync()

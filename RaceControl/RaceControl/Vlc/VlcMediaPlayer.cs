@@ -16,6 +16,7 @@ namespace RaceControl.Vlc
         private string _streamUrl;
         private long _time;
         private long _duration;
+        private int _volume;
         private bool _isPaused;
         private bool _isMuted;
         private bool _isScanning;
@@ -33,6 +34,7 @@ namespace RaceControl.Vlc
             MediaPlayer.Muted += MediaPlayer_Muted;
             MediaPlayer.Unmuted += MediaPlayer_Unmuted;
             MediaPlayer.TimeChanged += MediaPlayer_TimeChanged;
+            MediaPlayer.VolumeChanged += MediaPlayer_VolumeChanged;
             MediaPlayer.ESAdded += MediaPlayer_ESAdded;
             MediaPlayer.ESDeleted += MediaPlayer_ESDeleted;
         }
@@ -44,11 +46,9 @@ namespace RaceControl.Vlc
             get => _time;
             set
             {
-                var time = Math.Max(value, 0);
-
-                if (SetProperty(ref _time, time))
+                if (SetProperty(ref _time, Math.Max(value, 0)))
                 {
-                    MediaPlayer.Time = time;
+                    MediaPlayer.Time = _time;
                 }
             }
         }
@@ -57,6 +57,18 @@ namespace RaceControl.Vlc
         {
             get => _duration;
             set => SetProperty(ref _duration, value);
+        }
+
+        public int Volume
+        {
+            get => _volume;
+            set
+            {
+                if (SetProperty(ref _volume, value))
+                {
+                    MediaPlayer.Volume = _volume;
+                }
+            }
         }
 
         public bool IsPaused
@@ -209,6 +221,11 @@ namespace RaceControl.Vlc
         private void MediaPlayer_TimeChanged(object sender, MediaPlayerTimeChangedEventArgs e)
         {
             SetProperty(ref _time, e.Time, nameof(Time));
+        }
+
+        private void MediaPlayer_VolumeChanged(object sender, MediaPlayerVolumeChangedEventArgs e)
+        {
+            SetProperty(ref _volume, Convert.ToInt32(e.Volume * 100), nameof(Volume));
         }
 
         private void MediaPlayer_ESAdded(object sender, MediaPlayerESAddedEventArgs e)

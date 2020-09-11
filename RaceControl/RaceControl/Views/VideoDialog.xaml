@@ -146,6 +146,9 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <TextBlock
                             Grid.Column="0"
@@ -164,11 +167,33 @@
                             <Slider.TickFrequency>
                                 <Binding Converter="{StaticResource DivideDoubleConverter}" Path="MediaPlayer.Duration">
                                     <Binding.ConverterParameter>
-                                        <s:Double>100</s:Double>
+                                        <s:Double>60</s:Double>
                                     </Binding.ConverterParameter>
                                 </Binding>
                             </Slider.TickFrequency>
                         </Slider>
+                        <TextBlock
+                            Grid.Column="2"
+                            Margin="5,2"
+                            VerticalAlignment="Center"
+                            Text="Volume" />
+                        <Slider
+                            Grid.Column="3"
+                            Width="100"
+                            Margin="2"
+                            VerticalAlignment="Center"
+                            IsMoveToPointEnabled="True"
+                            IsSnapToTickEnabled="False"
+                            Maximum="100"
+                            TickFrequency="10"
+                            TickPlacement="BottomRight"
+                            Value="{Binding MediaPlayer.Volume}" />
+                        <TextBlock
+                            Grid.Column="4"
+                            Width="30"
+                            Margin="5,2"
+                            VerticalAlignment="Center"
+                            Text="{Binding MediaPlayer.Volume, StringFormat={}{0}%}" />
                     </Grid>
                     <Grid Grid.Row="1" Margin="2">
                         <Grid.RowDefinitions>
@@ -409,7 +434,7 @@
                                 IsEnabled="{Binding DialogSettings.WindowState, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static WindowState.Normal}}" />
                             <CheckBox
                                 Grid.Column="1"
-                                Margin="1,0"
+                                Margin="4,0"
                                 VerticalAlignment="Center"
                                 Content="Always on top"
                                 IsChecked="{Binding DialogSettings.Topmost}" />

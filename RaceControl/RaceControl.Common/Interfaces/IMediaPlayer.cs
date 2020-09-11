@@ -10,6 +10,8 @@ namespace RaceControl.Common.Interfaces
 
         long Duration { get; }
 
+        int Volume { get; set; }
+
         bool IsPaused { get; }
 
         bool IsMuted { get; }
