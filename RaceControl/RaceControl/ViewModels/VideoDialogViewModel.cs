@@ -26,6 +26,8 @@ namespace RaceControl.ViewModels
 {
     public class VideoDialogViewModel : DialogViewModelBase, IVideoDialogViewModel
     {
+        private const int MouseWheelDelta = 12;
+
         private readonly IEventAggregator _eventAggregator;
         private readonly IApiService _apiService;
         private readonly IStreamlinkLauncher _streamlinkLauncher;
@@ -35,9 +37,11 @@ namespace RaceControl.ViewModels
         private ICommand _mouseMoveVideoCommand;
         private ICommand _mouseEnterVideoCommand;
         private ICommand _mouseLeaveVideoCommand;
+        private ICommand _mouseWheelVideoCommand;
         private ICommand _mouseMoveControlBarCommand;
         private ICommand _mouseEnterControlBarCommand;
         private ICommand _mouseLeaveControlBarCommand;
+        private ICommand _mouseWheelControlBarCommand;
         private ICommand _togglePauseCommand;
         private ICommand _toggleMuteCommand;
         private ICommand _fastForwardCommand;
@@ -88,9 +92,11 @@ namespace RaceControl.ViewModels
         public ICommand MouseMoveVideoCommand => _mouseMoveVideoCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveVideoExecute);
         public ICommand MouseEnterVideoCommand => _mouseEnterVideoCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveVideoExecute);
         public ICommand MouseLeaveVideoCommand => _mouseLeaveVideoCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveVideoExecute);
+        public ICommand MouseWheelVideoCommand => _mouseWheelVideoCommand ??= new DelegateCommand<MouseWheelEventArgs>(MouseWheelVideoExecute);
         public ICommand MouseMoveControlBarCommand => _mouseMoveControlBarCommand ??= new DelegateCommand(MouseMoveControlBarExecute);
         public ICommand MouseEnterControlBarCommand => _mouseEnterControlBarCommand ??= new DelegateCommand(MouseEnterControlBarExecute);
         public ICommand MouseLeaveControlBarCommand => _mouseLeaveControlBarCommand ??= new DelegateCommand(MouseLeaveControlBarExecute);
+        public ICommand MouseWheelControlBarCommand => _mouseWheelControlBarCommand ??= new DelegateCommand<MouseWheelEventArgs>(MouseWheelControlBarExecute);
         public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute).ObservesCanExecute(() => CanClose);
         public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand(ToggleMuteExecute).ObservesCanExecute(() => CanClose);
         public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<string>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent);
@@ -245,15 +251,13 @@ namespace RaceControl.ViewModels
 
         private void MouseEnterOrLeaveOrMoveVideoExecute()
         {
-            _showControlsTimer?.Stop();
-            ShowControls = true;
+            ShowControlsAndResetTimer();
+        }
 
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                Mouse.OverrideCursor = null;
-            });
-
-            _showControlsTimer?.Start();
+        private void MouseWheelVideoExecute(MouseWheelEventArgs args)
+        {
+            MediaPlayer.Volume += args.Delta / MouseWheelDelta;
+            ShowControlsAndResetTimer();
         }
 
         private static void MouseMoveControlBarExecute()
@@ -272,6 +276,11 @@ namespace RaceControl.ViewModels
         private void MouseLeaveControlBarExecute()
         {
             _showControlsTimer?.Start();
+        }
+
+        private void MouseWheelControlBarExecute(MouseWheelEventArgs args)
+        {
+            MediaPlayer.Volume += args.Delta / MouseWheelDelta;
         }
 
         private void TogglePauseExecute()
@@ -534,6 +543,19 @@ namespace RaceControl.ViewModels
             _showControlsTimer.Stop();
             _showControlsTimer.Dispose();
             _showControlsTimer = null;
+        }
+
+        private void ShowControlsAndResetTimer()
+        {
+            _showControlsTimer?.Stop();
+            ShowControls = true;
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Mouse.OverrideCursor = null;
+            });
+
+            _showControlsTimer?.Start();
         }
 
         private async Task ChangeRendererAsync(IMediaRenderer mediaRenderer = null)

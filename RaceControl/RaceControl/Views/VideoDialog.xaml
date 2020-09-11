@@ -97,6 +97,9 @@
                     <i:EventTrigger EventName="MouseLeave">
                         <i:InvokeCommandAction Command="{Binding MouseLeaveVideoCommand}" />
                     </i:EventTrigger>
+                    <i:EventTrigger EventName="MouseWheel">
+                        <i:InvokeCommandAction Command="{Binding MouseWheelVideoCommand}" PassEventArgsToCommand="True" />
+                    </i:EventTrigger>
                 </i:Interaction.Triggers>
                 <Label
                     HorizontalAlignment="Center"
@@ -136,6 +139,9 @@
                         </i:EventTrigger>
                         <i:EventTrigger EventName="MouseLeave">
                             <i:InvokeCommandAction Command="{Binding MouseLeaveControlBarCommand}" />
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="MouseWheel">
+                            <i:InvokeCommandAction Command="{Binding MouseWheelControlBarCommand}" PassEventArgsToCommand="True" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                     <Grid.RowDefinitions>

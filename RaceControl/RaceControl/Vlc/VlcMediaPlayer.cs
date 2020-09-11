@@ -64,7 +64,7 @@ namespace RaceControl.Vlc
             get => _volume;
             set
             {
-                if (SetProperty(ref _volume, value))
+                if (SetProperty(ref _volume, Math.Min(Math.Max(value, 0), 100)))
                 {
                     MediaPlayer.Volume = _volume;
                 }
