@@ -34,6 +34,7 @@ namespace RaceControl.ViewModels
         private readonly IGithubService _githubService;
         private readonly ICredentialService _credentialService;
         private readonly IStreamlinkLauncher _streamlinkLauncher;
+        private readonly object _refreshTimerLock = new object();
 
         private ICommand _loadedCommand;
         private ICommand _closingCommand;
@@ -72,7 +73,7 @@ namespace RaceControl.ViewModels
         private Session _selectedLiveSession;
         private Session _selectedSession;
         private VodType _selectedVodType;
-        private Timer _refreshLiveSessionsTimer;
+        private Timer _refreshTimer;
 
         public MainWindowViewModel(
             ILogger logger,
@@ -231,19 +232,13 @@ namespace RaceControl.ViewModels
                     SelectedSeason = Seasons.FirstOrDefault();
                 },
                 HandleCriticalError);
-                RefreshLiveSessionsAsync().Await(CreateRefreshLiveSessionsTimer, HandleNonCriticalError);
+                RefreshLiveSessionsAsync().Await(CreateRefreshTimer, HandleNonCriticalError);
             }
         }
 
         private void ClosingExecute()
         {
-            if (_refreshLiveSessionsTimer != null)
-            {
-                _refreshLiveSessionsTimer.Stop();
-                _refreshLiveSessionsTimer.Dispose();
-                _refreshLiveSessionsTimer = null;
-            }
-
+            RemoveRefreshTimer();
             Settings.Save();
         }
 
@@ -465,15 +460,20 @@ namespace RaceControl.ViewModels
             IsBusy = false;
         }
 
-        private void RefreshLiveSessionsTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private void RefreshTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (_refreshLiveSessionsTimer == null)
+            lock (_refreshTimerLock)
             {
-                return;
+                _refreshTimer?.Stop();
             }
 
-            _refreshLiveSessionsTimer?.Stop();
-            RefreshLiveSessionsAsync().Await(() => _refreshLiveSessionsTimer?.Start(), HandleNonCriticalError);
+            RefreshLiveSessionsAsync().Await(() =>
+            {
+                lock (_refreshTimerLock)
+                {
+                    _refreshTimer?.Start();
+                }
+            }, HandleNonCriticalError);
         }
 
         private void SetVlcExeLocation()
@@ -592,11 +592,29 @@ namespace RaceControl.ViewModels
             VodTypes.AddRange(vodTypes.Where(vt => vt.ContentUrls.Any()));
         }
 
-        private void CreateRefreshLiveSessionsTimer()
+        private void CreateRefreshTimer()
         {
-            _refreshLiveSessionsTimer = new Timer(60000) { AutoReset = false };
-            _refreshLiveSessionsTimer.Elapsed += RefreshLiveSessionsTimer_Elapsed;
-            _refreshLiveSessionsTimer.Start();
+            RemoveRefreshTimer();
+
+            lock (_refreshTimerLock)
+            {
+                _refreshTimer = new Timer(60000) { AutoReset = false };
+                _refreshTimer.Elapsed += RefreshTimer_Elapsed;
+                _refreshTimer.Start();
+            }
+        }
+
+        private void RemoveRefreshTimer()
+        {
+            lock (_refreshTimerLock)
+            {
+                if (_refreshTimer != null)
+                {
+                    _refreshTimer.Stop();
+                    _refreshTimer.Dispose();
+                    _refreshTimer = null;
+                }
+            }
         }
 
         private async Task RefreshLiveSessionsAsync()

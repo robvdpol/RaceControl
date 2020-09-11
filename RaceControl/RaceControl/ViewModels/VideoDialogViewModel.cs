@@ -32,6 +32,7 @@ namespace RaceControl.ViewModels
         private readonly IApiService _apiService;
         private readonly IStreamlinkLauncher _streamlinkLauncher;
         private readonly ISettings _settings;
+        private readonly object _showControlsTimerLock = new object();
 
         private ICommand _mouseDownVideoCommand;
         private ICommand _mouseMoveVideoCommand;
@@ -67,7 +68,6 @@ namespace RaceControl.ViewModels
         private Timer _showControlsTimer;
         private SubscriptionToken _syncStreamsEventToken;
         private string _carImageUrl;
-
         private string _headshotImageUrl;
 
         public VideoDialogViewModel(
@@ -187,7 +187,7 @@ namespace RaceControl.ViewModels
 
             StartStreamAsync().Await(SubscribeSyncStreamsEvent, HandleCriticalError);
             LoadDriverImageUrlsAsync().Await(HandleNonCriticalError);
-            StartShowControlsTimer();
+            CreateShowControlsTimer();
 
             base.OnDialogOpened(parameters);
         }
@@ -270,12 +270,18 @@ namespace RaceControl.ViewModels
 
         private void MouseEnterControlBarExecute()
         {
-            _showControlsTimer?.Stop();
+            lock (_showControlsTimerLock)
+            {
+                _showControlsTimer?.Stop();
+            }
         }
 
         private void MouseLeaveControlBarExecute()
         {
-            _showControlsTimer?.Start();
+            lock (_showControlsTimerLock)
+            {
+                _showControlsTimer?.Start();
+            }
         }
 
         private void MouseWheelControlBarExecute(MouseWheelEventArgs args)
@@ -521,41 +527,45 @@ namespace RaceControl.ViewModels
             _syncStreamsEventToken = null;
         }
 
-        private void StartShowControlsTimer()
+        private void CreateShowControlsTimer()
         {
-            if (_showControlsTimer != null)
-            {
-                return;
-            }
+            RemoveShowControlsTimer();
 
-            _showControlsTimer = new Timer(2000) { AutoReset = false };
-            _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
-            _showControlsTimer.Start();
+            lock (_showControlsTimerLock)
+            {
+                _showControlsTimer = new Timer(2000) { AutoReset = false };
+                _showControlsTimer.Elapsed += ShowControlsTimer_Elapsed;
+                _showControlsTimer.Start();
+            }
         }
 
         private void RemoveShowControlsTimer()
         {
-            if (_showControlsTimer == null)
+            lock (_showControlsTimerLock)
             {
-                return;
+                if (_showControlsTimer != null)
+                {
+                    _showControlsTimer.Stop();
+                    _showControlsTimer.Dispose();
+                    _showControlsTimer = null;
+                }
             }
-
-            _showControlsTimer.Stop();
-            _showControlsTimer.Dispose();
-            _showControlsTimer = null;
         }
 
         private void ShowControlsAndResetTimer()
         {
-            _showControlsTimer?.Stop();
-            ShowControls = true;
-
-            Application.Current.Dispatcher.Invoke(() =>
+            lock (_showControlsTimerLock)
             {
-                Mouse.OverrideCursor = null;
-            });
+                _showControlsTimer?.Stop();
 
-            _showControlsTimer?.Start();
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    ShowControls = true;
+                    Mouse.OverrideCursor = null;
+                });
+
+                _showControlsTimer?.Start();
+            }
         }
 
         private async Task ChangeRendererAsync(IMediaRenderer mediaRenderer = null)
