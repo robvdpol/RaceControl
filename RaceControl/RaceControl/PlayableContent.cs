@@ -33,7 +33,6 @@ namespace RaceControl
                 DisplayName = displayName,
                 ContentType = channel.ChannelType == ChannelTypes.BACKUP ? ContentType.Backup : ContentType.Channel,
                 ContentUrl = channel.Self,
-                ThumbnailUrl = null,
                 IsLive = session.IsLive,
                 SyncUID = session.UID,
                 DriverUID = channel.DriverOccurrenceUrls?.FirstOrDefault().GetUID()
@@ -51,8 +50,7 @@ namespace RaceControl
                 ContentUrl = episode.Items?.FirstOrDefault(),
                 ThumbnailUrl = episode.ImageUrls?.FirstOrDefault(img => img.ImageType == "Thumbnail")?.Url,
                 IsLive = false,
-                SyncUID = episode.UID,
-                DriverUID = null
+                SyncUID = episode.UID
             };
         }
 
