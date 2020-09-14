@@ -4,6 +4,7 @@ using Prism.Events;
 using Prism.Services.Dialogs;
 using RaceControl.Common.Enums;
 using RaceControl.Common.Interfaces;
+using RaceControl.Core.Helpers;
 using RaceControl.Core.Mvvm;
 using RaceControl.Core.Settings;
 using RaceControl.Core.Streamlink;
@@ -11,16 +12,11 @@ using RaceControl.Events;
 using RaceControl.Services.Interfaces.F1TV;
 using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Application = System.Windows.Application;
-using Cursors = System.Windows.Input.Cursors;
-using Screen = System.Windows.Forms.Screen;
-using Timer = System.Timers.Timer;
 
 namespace RaceControl.ViewModels
 {
@@ -373,8 +369,8 @@ namespace RaceControl.ViewModels
         private void MoveToCornerExecute(WindowLocation? location)
         {
             Logger.Info($"Moving window to corner '{location}'...");
-            var screen = Screen.FromRectangle(new Rectangle((int)DialogSettings.Left, (int)DialogSettings.Top, (int)DialogSettings.Width, (int)DialogSettings.Height));
-            var scale = Math.Max(Screen.PrimaryScreen.WorkingArea.Width / SystemParameters.PrimaryScreenWidth, Screen.PrimaryScreen.WorkingArea.Height / SystemParameters.PrimaryScreenHeight);
+            var screen = ScreenHelper.GetScreen(DialogSettings);
+            var scale = ScreenHelper.GetScreenScale();
             var top = screen.WorkingArea.Top / scale;
             var left = screen.WorkingArea.Left / scale;
             var width = screen.WorkingArea.Width / 2D / scale;

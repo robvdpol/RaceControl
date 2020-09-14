@@ -5,6 +5,7 @@
     xmlns:behaviors="clr-namespace:RaceControl.Core.Behaviors;assembly=RaceControl.Core"
     xmlns:core="clr-namespace:RaceControl.Core.Converters;assembly=RaceControl.Core"
     xmlns:ctrls="clr-namespace:RaceControl.Core.Controls;assembly=RaceControl.Core"
+    xmlns:enums="clr-namespace:RaceControl.Common.Enums;assembly=RaceControl.Common"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:prism="http://prismlibrary.com/"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
@@ -423,9 +424,16 @@
                                     ToolTip="Saves the position and size of all currently open video players" />
                                 <Button
                                     Command="{Binding OpenVideoDialogLayoutCommand}"
-                                    Content="Watch in saved layout"
+                                    CommandParameter="{x:Static enums:PlayerType.Internal}"
+                                    Content="Open layout in internal player"
                                     Style="{StaticResource OptionButtonStyle}"
-                                    ToolTip="Watch the selected session in the previously saved layout" />
+                                    ToolTip="Watch the selected session in the previously saved layout using the internal player" />
+                                <Button
+                                    Command="{Binding OpenVideoDialogLayoutCommand}"
+                                    CommandParameter="{x:Static enums:PlayerType.Mpv}"
+                                    Content="Open layout in MPV"
+                                    Style="{StaticResource OptionButtonStyle}"
+                                    ToolTip="Watch the selected session in the previously saved layout using MPV" />
                             </StackPanel>
                         </GroupBox>
                         <GroupBox

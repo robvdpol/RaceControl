@@ -16,6 +16,7 @@ using RaceControl.Services.Interfaces.F1TV.Api;
 using RaceControl.Services.Interfaces.Github;
 using RaceControl.Views;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -112,7 +113,7 @@ namespace RaceControl.ViewModels
         public ICommand DownloadContentCommand => _downloadContentCommand ??= new DelegateCommand<IPlayableContent>(DownloadContentExecute, CanDownloadContentExecute);
         public ICommand SetRecordingLocationCommand => _setRecordingLocationCommand ??= new DelegateCommand(SetRecordingLocationExecute);
         public ICommand SaveVideoDialogLayoutCommand => _saveVideoDialogLayoutCommand ??= new DelegateCommand(SaveVideoDialogLayoutExecute, CanSaveVideoDialogLayoutExecute).ObservesProperty(() => VideoDialogViewModels.Count);
-        public ICommand OpenVideoDialogLayoutCommand => _openVideoDialogLayoutCommand ??= new DelegateCommand(OpenVideoDialogLayoutExecute, CanOpenVideoDialogLayoutExecute).ObservesProperty(() => VideoDialogLayout.Instances.Count).ObservesProperty(() => Channels.Count);
+        public ICommand OpenVideoDialogLayoutCommand => _openVideoDialogLayoutCommand ??= new DelegateCommand<PlayerType?>(OpenVideoDialogLayoutExecute, CanOpenVideoDialogLayoutExecute).ObservesProperty(() => VideoDialogLayout.Instances.Count).ObservesProperty(() => Channels.Count);
         public ICommand DeleteCredentialCommand => _deleteCredentialCommand ??= new DelegateCommand(DeleteCredentialExecute);
 
         public ISettings Settings { get; }
@@ -422,12 +423,12 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private bool CanOpenVideoDialogLayoutExecute()
+        private bool CanOpenVideoDialogLayoutExecute(PlayerType? playerType)
         {
-            return VideoDialogLayout.Instances.Any() && Channels.Count > 1;
+            return VideoDialogLayout.Instances.Any() && Channels.Count > 1 && (playerType == PlayerType.Internal || playerType == PlayerType.Mpv);
         }
 
-        private void OpenVideoDialogLayoutExecute()
+        private void OpenVideoDialogLayoutExecute(PlayerType? playerType)
         {
             var viewModelsToClose = VideoDialogViewModels.Where(vm => vm.PlayableContent.ContentType == ContentType.Channel).ToList();
 
@@ -442,7 +443,16 @@ namespace RaceControl.ViewModels
 
                 if (playableContent != null)
                 {
-                    WatchContent(playableContent, settings);
+                    switch (playerType)
+                    {
+                        case PlayerType.Internal:
+                            WatchContent(playableContent, settings);
+                            break;
+
+                        case PlayerType.Mpv:
+                            WatchInMpvAsync(playableContent, settings).Await(HandleCriticalError);
+                            break;
+                    }
                 }
             }
         }
@@ -720,10 +730,38 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private async Task WatchInMpvAsync(IPlayableContent playableContent)
+        private async Task WatchInMpvAsync(IPlayableContent playableContent, VideoDialogSettings settings = null)
         {
             var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, playableContent);
-            using var process = ProcessUtils.CreateProcess(MpvExeLocation, $"\"{streamUrl}\" --title=\"{playableContent.Title}\"");
+            var arguments = new List<string>
+            {
+                $"\"{streamUrl}\"",
+                $"--title=\"{playableContent.Title}\"",
+                "--no-border"
+            };
+
+            if (settings != null)
+            {
+                if (settings.WindowState == WindowState.Maximized)
+                {
+                    arguments.Add("--fs");
+                    arguments.Add($"--fs-screen={ScreenHelper.GetScreenIndex(settings)}");
+                }
+                else
+                {
+                    arguments.Add($"--geometry={settings.Width:0}x{settings.Height:0}{settings.Left:+0;-#}{settings.Top:+0;-#}");
+                }
+
+                if (settings.Topmost)
+                {
+                    arguments.Add("--ontop");
+                }
+
+                arguments.Add($"--volume={settings.Volume}");
+                arguments.Add($"--mute={settings.IsMuted.GetYesNoString()}");
+            }
+
+            using var process = ProcessUtils.CreateProcess(MpvExeLocation, string.Join(" ", arguments));
             process.Start();
         }
 

@@ -8,5 +8,10 @@ namespace RaceControl.Common.Utils
         {
             return string.Join(replaceWith, filename.Split(Path.GetInvalidFileNameChars()));
         }
+
+        public static string GetYesNoString(this bool value)
+        {
+            return value ? "yes" : "no";
+        }
     }
 }
