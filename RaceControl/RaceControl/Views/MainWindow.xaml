@@ -42,6 +42,22 @@
             <Setter Property="UseLayoutRounding" Value="True" />
         </Style>
     </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding
+            Key="S"
+            Command="{Binding SaveVideoDialogLayoutCommand}"
+            Modifiers="Ctrl" />
+        <KeyBinding
+            Key="I"
+            Command="{Binding OpenVideoDialogLayoutCommand}"
+            CommandParameter="{x:Static enums:PlayerType.Internal}"
+            Modifiers="Ctrl" />
+        <KeyBinding
+            Key="M"
+            Command="{Binding OpenVideoDialogLayoutCommand}"
+            CommandParameter="{x:Static enums:PlayerType.Mpv}"
+            Modifiers="Ctrl" />
+    </Window.InputBindings>
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding LoadedCommand}" PassEventArgsToCommand="True" />
@@ -415,25 +431,25 @@
                         <GroupBox
                             Grid.Row="1"
                             Margin="5,3"
-                            Header="Video players">
+                            Header="Video player layout">
                             <StackPanel Orientation="Vertical">
                                 <Button
                                     Command="{Binding SaveVideoDialogLayoutCommand}"
                                     Content="Save current layout"
                                     Style="{StaticResource OptionButtonStyle}"
-                                    ToolTip="Saves the position and size of all currently open video players" />
+                                    ToolTip="Saves the position and size of all currently open video players (Ctrl+S)" />
                                 <Button
                                     Command="{Binding OpenVideoDialogLayoutCommand}"
                                     CommandParameter="{x:Static enums:PlayerType.Internal}"
                                     Content="Open layout in internal player"
                                     Style="{StaticResource OptionButtonStyle}"
-                                    ToolTip="Watch the selected session in the previously saved layout using the internal player" />
+                                    ToolTip="Watch the selected session in the previously saved layout using the internal player (Ctrl+I)" />
                                 <Button
                                     Command="{Binding OpenVideoDialogLayoutCommand}"
                                     CommandParameter="{x:Static enums:PlayerType.Mpv}"
                                     Content="Open layout in MPV"
                                     Style="{StaticResource OptionButtonStyle}"
-                                    ToolTip="Watch the selected session in the previously saved layout using MPV" />
+                                    ToolTip="Watch the selected session in the previously saved layout using MPV (Ctrl+M)" />
                             </StackPanel>
                         </GroupBox>
                         <GroupBox
