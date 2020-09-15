@@ -20,22 +20,23 @@ Race Control is an open source [F1TV](https://f1tv.formula1.com) desktop client 
 
 ## Keyboard shortcuts
 The internal player supports the following keyboard shortcuts:
-| Function            | Key                 |
-|---------------------|---------------------|
-| Close window        | Escape              |
-| Toggle pause        | Space               |
-| Toggle mute         | M                   |
-| Toggle fullscreen   | F                   |
-| Toggle recording    | R                   |
-| Synchronize session | S                   |
-| Jump forward 10 sec | Right arrow         |
-| Jump backward 10 sec| Left arrow          |
-| Jump forward 1 min  | Up arrow            |
-| Jump backward 1 min | Down arrow          |
-| Jump forward 5 sec  | Shift + Right arrow |
-| Jump backward 5 sec | Shift + Left arrow  |
-| Jump forward 10 min | Shift + Up arrow    |
-| Jump backward 10 min| Shift + Down arrow  |
+| Function                     | Key                 |
+|------------------------------|---------------------|
+| Close window                 | Escape              |
+| Toggle pause                 | Space               |
+| Toggle pause for all players | Ctrl + Space        |
+| Toggle mute                  | M                   |
+| Toggle fullscreen            | F                   |
+| Toggle recording             | R                   |
+| Synchronize session          | S                   |
+| Jump forward 10 sec          | Right arrow         |
+| Jump backward 10 sec         | Left arrow          |
+| Jump forward 1 min           | Up arrow            |
+| Jump backward 1 min          | Down arrow          |
+| Jump forward 5 sec           | Shift + Right arrow |
+| Jump backward 5 sec          | Shift + Left arrow  |
+| Jump forward 10 min          | Shift + Up arrow    |
+| Jump backward 10 min         | Shift + Down arrow  |
 
 ## FAQ
 #### Why do I get a login popup? What credentials do I use to login?

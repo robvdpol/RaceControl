@@ -58,9 +58,9 @@ namespace RaceControl.ViewModels
                 Email = email;
                 Password = password;
 
-                if (CanLoginExecute())
+                if (LoginCommand.CanExecute(null))
                 {
-                    LoginExecute();
+                    LoginCommand.Execute(null);
                 }
             }
 

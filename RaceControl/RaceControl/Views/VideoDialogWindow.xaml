@@ -12,6 +12,10 @@
     <Window.InputBindings>
         <KeyBinding Key="Escape" Command="{Binding CloseWindowCommand}" />
         <KeyBinding Key="Space" Command="{Binding TogglePauseCommand}" />
+        <KeyBinding
+            Key="Space"
+            Command="{Binding TogglePauseAllCommand}"
+            Modifiers="Control" />
         <KeyBinding Key="M" Command="{Binding ToggleMuteCommand}" />
         <KeyBinding Key="F" Command="{Binding ToggleFullScreenCommand}" />
         <KeyBinding Key="R" Command="{Binding ToggleRecordingCommand}" />

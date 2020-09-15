@@ -40,6 +40,7 @@ namespace RaceControl.ViewModels
         private ICommand _mouseLeaveControlBarCommand;
         private ICommand _mouseWheelControlBarCommand;
         private ICommand _togglePauseCommand;
+        private ICommand _togglePauseAllCommand;
         private ICommand _toggleMuteCommand;
         private ICommand _fastForwardCommand;
         private ICommand _syncSessionCommand;
@@ -63,6 +64,7 @@ namespace RaceControl.ViewModels
         private IMediaRenderer _selectedMediaRenderer;
         private Timer _showControlsTimer;
         private SubscriptionToken _syncStreamsEventToken;
+        private SubscriptionToken _pauseAllEventToken;
         private string _carImageUrl;
         private string _headshotImageUrl;
 
@@ -94,6 +96,7 @@ namespace RaceControl.ViewModels
         public ICommand MouseLeaveControlBarCommand => _mouseLeaveControlBarCommand ??= new DelegateCommand(MouseLeaveControlBarExecute);
         public ICommand MouseWheelControlBarCommand => _mouseWheelControlBarCommand ??= new DelegateCommand<MouseWheelEventArgs>(MouseWheelControlBarExecute);
         public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute).ObservesCanExecute(() => CanClose);
+        public ICommand TogglePauseAllCommand => _togglePauseAllCommand ??= new DelegateCommand(TogglePauseAllExecute).ObservesCanExecute(() => CanClose);
         public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand(ToggleMuteExecute).ObservesCanExecute(() => CanClose);
         public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<string>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent);
         public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent);
@@ -181,7 +184,7 @@ namespace RaceControl.ViewModels
                 StartupLocation = WindowStartupLocation.CenterScreen;
             }
 
-            StartStreamAsync().Await(SubscribeSyncStreamsEvent, HandleCriticalError);
+            StartStreamAsync().Await(SubscribeEvents, HandleCriticalError);
             LoadDriverImageUrlsAsync().Await(HandleNonCriticalError);
             CreateShowControlsTimer();
 
@@ -192,7 +195,7 @@ namespace RaceControl.ViewModels
         {
             MediaPlayer.Dispose();
             RemoveShowControlsTimer();
-            UnsubscribeSyncStreamsEvent();
+            UnsubscribeEvents();
             CleanupProcess(_streamlinkProcess);
             CleanupProcess(_streamlinkRecordingProcess);
 
@@ -291,6 +294,12 @@ namespace RaceControl.ViewModels
             MediaPlayer.TogglePause();
         }
 
+        private void TogglePauseAllExecute()
+        {
+            Logger.Info("Toggling pause for all video players...");
+            _eventAggregator.GetEvent<PauseAllEvent>().Publish();
+        }
+
         private void ToggleMuteExecute()
         {
             Logger.Info("Toggling mute...");
@@ -341,11 +350,19 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void OnSyncSession(SyncStreamsEventPayload payload)
+        private void OnSyncStreams(SyncStreamsEventPayload payload)
         {
             if (CanClose && PlayableContent.SyncUID == payload.SyncUID && !PlayableContent.IsLive)
             {
                 MediaPlayer.Time = payload.Time;
+            }
+        }
+
+        private void OnPauseAll()
+        {
+            if (TogglePauseCommand.CanExecute(null))
+            {
+                TogglePauseCommand.Execute(null);
             }
         }
 
@@ -502,25 +519,25 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void SubscribeSyncStreamsEvent()
+        private void SubscribeEvents()
+        {
+            _syncStreamsEventToken ??= _eventAggregator.GetEvent<SyncStreamsEvent>().Subscribe(OnSyncStreams);
+            _pauseAllEventToken ??= _eventAggregator.GetEvent<PauseAllEvent>().Subscribe(OnPauseAll);
+        }
+
+        private void UnsubscribeEvents()
         {
             if (_syncStreamsEventToken != null)
             {
-                return;
+                _eventAggregator.GetEvent<SyncStreamsEvent>().Unsubscribe(_syncStreamsEventToken);
+                _syncStreamsEventToken = null;
             }
 
-            _syncStreamsEventToken = _eventAggregator.GetEvent<SyncStreamsEvent>().Subscribe(OnSyncSession);
-        }
-
-        private void UnsubscribeSyncStreamsEvent()
-        {
-            if (_syncStreamsEventToken == null)
+            if (_pauseAllEventToken != null)
             {
-                return;
+                _eventAggregator.GetEvent<PauseAllEvent>().Unsubscribe(_pauseAllEventToken);
+                _pauseAllEventToken = null;
             }
-
-            _eventAggregator.GetEvent<SyncStreamsEvent>().Unsubscribe(_syncStreamsEventToken);
-            _syncStreamsEventToken = null;
         }
 
         private void CreateShowControlsTimer()
