@@ -204,11 +204,19 @@ namespace RaceControl.ViewModels
 
         public VideoDialogSettings GetDialogSettings()
         {
-            DialogSettings.ChannelName = PlayableContent.Name;
-            DialogSettings.IsMuted = MediaPlayer.IsMuted;
-            DialogSettings.Volume = MediaPlayer.Volume;
-
-            return DialogSettings;
+            return new VideoDialogSettings
+            {
+                Top = DialogSettings.Top,
+                Left = DialogSettings.Left,
+                Width = DialogSettings.Width,
+                Height = DialogSettings.Height,
+                ResizeMode = DialogSettings.ResizeMode,
+                WindowState = DialogSettings.WindowState,
+                Topmost = DialogSettings.Topmost,
+                IsMuted = MediaPlayer.IsMuted,
+                Volume = MediaPlayer.Volume,
+                ChannelName = PlayableContent.Name
+            };
         }
 
         private void ShowControlsTimer_Elapsed(object sender, ElapsedEventArgs e)

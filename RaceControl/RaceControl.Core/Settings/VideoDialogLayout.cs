@@ -2,7 +2,6 @@
 using NLog;
 using Prism.Mvvm;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 
@@ -27,16 +26,6 @@ namespace RaceControl.Core.Settings
         {
             get => _instances ??= new ObservableCollection<VideoDialogSettings>();
             set => SetProperty(ref _instances, value);
-        }
-
-        public void Add(IEnumerable<VideoDialogSettings> instances)
-        {
-            Instances.AddRange(instances);
-        }
-
-        public void Clear()
-        {
-            Instances.Clear();
         }
 
         public void Load()
