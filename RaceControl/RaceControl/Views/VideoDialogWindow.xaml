@@ -15,7 +15,7 @@
         <KeyBinding
             Key="Space"
             Command="{Binding TogglePauseAllCommand}"
-            Modifiers="Control" />
+            Modifiers="Shift" />
         <KeyBinding Key="M" Command="{Binding ToggleMuteCommand}" />
         <KeyBinding Key="F" Command="{Binding ToggleFullScreenCommand}" />
         <KeyBinding Key="R" Command="{Binding ToggleRecordingCommand}" />

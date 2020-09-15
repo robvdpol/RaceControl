@@ -24,7 +24,7 @@ The internal player supports the following keyboard shortcuts:
 |------------------------------|---------------------|
 | Close window                 | Escape              |
 | Toggle pause                 | Space               |
-| Toggle pause for all players | Ctrl + Space        |
+| Toggle pause for all players | Shift + Space       |
 | Toggle mute                  | M                   |
 | Toggle fullscreen            | F                   |
 | Toggle recording             | R                   |
