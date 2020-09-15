@@ -28,6 +28,13 @@ namespace RaceControl.Core.Helpers
             return default;
         }
 
+        public static void GetRelativeCoordinates(int screenIndex, double absoluteLeft, double absoluteTop, out double relativeLeft, out double relativeTop)
+        {
+            var screen = Screen.AllScreens[screenIndex];
+            relativeLeft = absoluteLeft - screen.Bounds.Left;
+            relativeTop = absoluteTop - screen.Bounds.Top;
+        }
+
         public static double GetScreenScale()
         {
             return Math.Max(Screen.PrimaryScreen.WorkingArea.Width / SystemParameters.PrimaryScreenWidth, Screen.PrimaryScreen.WorkingArea.Height / SystemParameters.PrimaryScreenHeight);

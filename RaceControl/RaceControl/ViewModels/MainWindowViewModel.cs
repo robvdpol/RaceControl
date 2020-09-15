@@ -742,14 +742,19 @@ namespace RaceControl.ViewModels
 
             if (settings != null)
             {
+                var screenIndex = ScreenHelper.GetScreenIndex(settings);
+
                 if (settings.WindowState == WindowState.Maximized)
                 {
                     arguments.Add("--fs");
-                    arguments.Add($"--fs-screen={ScreenHelper.GetScreenIndex(settings)}");
+                    arguments.Add($"--screen={screenIndex}");
+                    arguments.Add($"--fs-screen={screenIndex}");
                 }
                 else
                 {
-                    arguments.Add($"--geometry={settings.Width:0}x{settings.Height:0}{settings.Left:+0;-#}{settings.Top:+0;-#}");
+                    ScreenHelper.GetRelativeCoordinates(screenIndex, settings.Left, settings.Top, out var relativeLeft, out var relativeTop);
+                    arguments.Add($"--geometry={settings.Width:0}x{settings.Height:0}+{relativeLeft:+0;-#}+{relativeTop:+0;-#}");
+                    arguments.Add($"--screen={screenIndex}");
                 }
 
                 if (settings.Topmost)

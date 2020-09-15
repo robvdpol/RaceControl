@@ -42,7 +42,7 @@ namespace RaceControl.ViewModels
             var token = parameters.GetValue<string>(ParameterNames.TOKEN);
             PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.CONTENT);
             Filename = parameters.GetValue<string>(ParameterNames.FILENAME);
-            GetTokenisedUrlAndStartDownloadAsync(token).Await((ex) =>
+            GetTokenisedUrlAndStartDownloadAsync(token).Await(ex =>
             {
                 HandleNonCriticalError(ex);
                 MediaDownloader.SetDownloadStatus(DownloadStatus.Failed);
