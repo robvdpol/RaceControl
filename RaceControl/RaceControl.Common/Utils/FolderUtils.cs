@@ -7,14 +7,7 @@ namespace RaceControl.Common.Utils
     {
         public static string GetLocalApplicationDataFolder()
         {
-            var path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RaceControl");
-
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
-
-            return path;
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RaceControl");
         }
 
         public static string GetLocalApplicationDataFilename(string filename)

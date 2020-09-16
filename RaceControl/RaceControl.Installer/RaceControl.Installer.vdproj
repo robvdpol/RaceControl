@@ -27,7 +27,7 @@
         "DisplayName" = "8:Debug"
         "IsDebugOnly" = "11:TRUE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:Debug\\RaceControl.Installer.msi"
+        "OutputFilename" = "8:Debug\\RaceControl.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -51,6 +51,11 @@
                     "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
                     "ProductCode" = "8:.NETFramework,Version=v4.7.2"
                     }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.NetCore.DesktopRuntime.3.1.x64"
+                    {
+                    "Name" = "8:.NET Desktop Runtime 3.1 (x64)"
+                    "ProductCode" = "8:Microsoft.NetCore.DesktopRuntime.3.1.x64"
+                    }
                 }
             }
         }
@@ -59,7 +64,7 @@
         "DisplayName" = "8:Release"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:Release\\RaceControl.Installer.msi"
+        "OutputFilename" = "8:Release\\RaceControl.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -200,15 +205,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Race Control"
-        "ProductCode" = "8:{AF06B7ED-7AD9-48B6-BF3A-568B663BD8AD}"
-        "PackageCode" = "8:{6ED7531D-2D94-4927-B39D-36F9A70F70B4}"
+        "ProductCode" = "8:{7BC6A599-63DE-4DEA-B781-0FC1F9143E75}"
+        "PackageCode" = "8:{B86AD498-937A-436B-995B-CFC5ED66EE1C}"
         "UpgradeCode" = "8:{AED9C889-7712-4594-8E9C-2BD1BA1CEE3A}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.7.3"
+        "ProductVersion" = "8:1.7.4"
         "Manufacturer" = "8:Rob van der Pol"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
