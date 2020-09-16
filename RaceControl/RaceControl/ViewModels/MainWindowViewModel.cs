@@ -543,7 +543,10 @@ namespace RaceControl.ViewModels
                         ProcessUtils.BrowseToUrl(asset?.BrowserDownloadUrl ?? release.HtmlUrl);
                     }
                 });
+            }
 
+            if (release != null)
+            {
                 Settings.LatestRelease = release.TagName;
             }
         }

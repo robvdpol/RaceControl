@@ -8,6 +8,7 @@ using NLog.Targets;
 using Prism.DryIoc;
 using Prism.Ioc;
 using RaceControl.Common.Interfaces;
+using RaceControl.Common.Utils;
 using RaceControl.Core.Helpers;
 using RaceControl.Core.Mvvm;
 using RaceControl.Core.Settings;
@@ -126,7 +127,7 @@ namespace RaceControl
             var config = new LoggingConfiguration();
             var logfile = new FileTarget("logfile")
             {
-                FileName = "RaceControl.log",
+                FileName = FolderUtils.GetLocalApplicationDataFileName("RaceControl.log"),
                 Layout = Layout.FromString("${longdate} ${uppercase:${level}} ${message}${onexception:inner=${newline}${exception:format=tostring}}"),
                 ArchiveAboveSize = 1024 * 1024,
                 ArchiveNumbering = ArchiveNumberingMode.Rolling,

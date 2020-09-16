@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using NLog;
 using Prism.Mvvm;
+using RaceControl.Common.Utils;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -9,7 +10,7 @@ namespace RaceControl.Core.Settings
 {
     public class VideoDialogLayout : BindableBase, IVideoDialogLayout
     {
-        private const string Filename = "RaceControl.layout.json";
+        private static readonly string Filename = FolderUtils.GetLocalApplicationDataFileName("RaceControl.layout.json");
 
         private readonly ILogger _logger;
         private readonly JsonSerializer _serializer;
