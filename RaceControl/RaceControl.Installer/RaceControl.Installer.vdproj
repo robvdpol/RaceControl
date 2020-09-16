@@ -15,7 +15,7 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_D057DB649AE94A5B9CAB18C0420D187D"
+        "MsmKey" = "8:_F867FD2856644403AF46E4B92E0A8B4E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -37,6 +37,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
         "Release"
         {
@@ -135,7 +143,7 @@
             }
             "{3C67513D-01DD-4637-8A68-80971EB9504F}:_8C370B7B2E2A4A1C8F1DE261C79191C2"
             {
-            "DefaultLocation" = "8:[ProgramFiles64Folder][Manufacturer]\\[ProductName]"
+            "DefaultLocation" = "8:[ProgramFiles64Folder]\\[ProductName]"
             "Name" = "8:#1925"
             "AlwaysCreate" = "11:FALSE"
             "Condition" = "8:"
@@ -162,11 +170,11 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Race Control"
         "ProductCode" = "8:{AF06B7ED-7AD9-48B6-BF3A-568B663BD8AD}"
-        "PackageCode" = "8:{A77D52B7-352A-4C65-ABBF-38880DBB16D0}"
+        "PackageCode" = "8:{AE817D9D-86E2-48D7-B106-0E11B861BD86}"
         "UpgradeCode" = "8:{AED9C889-7712-4594-8E9C-2BD1BA1CEE3A}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
-        "RemovePreviousVersions" = "11:FALSE"
+        "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
         "ProductVersion" = "8:1.7.3"
@@ -178,9 +186,9 @@
         "ARPCONTACT" = "8:Rob van der Pol"
         "Keywords" = "8:"
         "ARPCOMMENTS" = "8:"
-        "ARPURLINFOABOUT" = "8:"
-        "ARPPRODUCTICON" = "8:"
-        "ARPIconIndex" = "3:0"
+        "ARPURLINFOABOUT" = "8:https://github.com/robvdpol"
+        "ARPPRODUCTICON" = "8:_F867FD2856644403AF46E4B92E0A8B4E"
+        "ARPIconIndex" = "3:32512"
         "SearchPath" = "8:"
         "UseSystemSearchPath" = "11:TRUE"
         "TargetPlatform" = "3:1"
@@ -282,6 +290,34 @@
         }
         "Shortcut"
         {
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_0AE060D13C4043A2AF4416C66256E00A"
+            {
+            "Name" = "8:Race Control"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:32512"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_F867FD2856644403AF46E4B92E0A8B4E"
+            "Folder" = "8:_8B9024ED187E43448E8BB7ABD86CF2E2"
+            "WorkingFolder" = "8:_8C370B7B2E2A4A1C8F1DE261C79191C2"
+            "Icon" = "8:_F867FD2856644403AF46E4B92E0A8B4E"
+            "Feature" = "8:"
+            }
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_B965534B74914FA6A10751178C5C14D2"
+            {
+            "Name" = "8:Race Control"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:32512"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_F867FD2856644403AF46E4B92E0A8B4E"
+            "Folder" = "8:_0230068E54C84574AD2533F485026F5A"
+            "WorkingFolder" = "8:_8C370B7B2E2A4A1C8F1DE261C79191C2"
+            "Icon" = "8:_F867FD2856644403AF46E4B92E0A8B4E"
+            "Feature" = "8:"
+            }
         }
         "UserInterface"
         {
@@ -681,7 +717,7 @@
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_D057DB649AE94A5B9CAB18C0420D187D"
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_F867FD2856644403AF46E4B92E0A8B4E"
             {
             "SourcePath" = "8:..\\RaceControl\\obj\\x64\\Release\\netcoreapp3.1\\win-x64\\RaceControl.exe"
             "TargetName" = "8:"
@@ -701,7 +737,7 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             "ProjectOutputGroupRegister" = "3:1"
-            "OutputConfiguration" = "8:Release|x64"
+            "OutputConfiguration" = "8:"
             "OutputGroupCanonicalName" = "8:PublishItems"
             "OutputProjectGuid" = "8:{17E5D0D8-66FD-491B-9FDF-FDE46415F714}"
             "ShowKeyOutput" = "11:TRUE"
