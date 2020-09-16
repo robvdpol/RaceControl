@@ -127,7 +127,7 @@ namespace RaceControl
             var config = new LoggingConfiguration();
             var logfile = new FileTarget("logfile")
             {
-                FileName = FolderUtils.GetLocalApplicationDataFileName("RaceControl.log"),
+                FileName = FolderUtils.GetLocalApplicationDataFilename("RaceControl.log"),
                 Layout = Layout.FromString("${longdate} ${uppercase:${level}} ${message}${onexception:inner=${newline}${exception:format=tostring}}"),
                 ArchiveAboveSize = 1024 * 1024,
                 ArchiveNumbering = ArchiveNumberingMode.Rolling,

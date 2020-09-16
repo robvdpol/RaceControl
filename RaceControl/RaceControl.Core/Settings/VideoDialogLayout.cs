@@ -10,7 +10,7 @@ namespace RaceControl.Core.Settings
 {
     public class VideoDialogLayout : BindableBase, IVideoDialogLayout
     {
-        private static readonly string Filename = FolderUtils.GetLocalApplicationDataFileName("RaceControl.layout.json");
+        private static readonly string Filename = FolderUtils.GetLocalApplicationDataFilename("RaceControl.layout.json");
 
         private readonly ILogger _logger;
         private readonly JsonSerializer _serializer;
