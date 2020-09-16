@@ -1,4 +1,8 @@
-![GitHub closed pull requests](https://img.shields.io/github/issues-pr-closed/robvdpol/RaceControl) ![GitHub closed issues](https://img.shields.io/github/issues-closed/robvdpol/RaceControl) ![GitHub All Releases](https://img.shields.io/github/downloads/robvdpol/RaceControl/total) ![GitHub tag (latest by date)](https://img.shields.io/github/tag-date/robvdpol/RaceControl)
+![GitHub closed issues](https://img.shields.io/github/issues-closed/robvdpol/RaceControl)
+![GitHub issues](https://img.shields.io/github/issues/robvdpol/RaceControl)
+![GitHub All Releases](https://img.shields.io/github/downloads/robvdpol/RaceControl/total)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/robvdpol/RaceControl)
+![GitHub](https://img.shields.io/github/license/robvdpol/RaceControl)
 
 # Race Control
 Race Control is an open source [F1TV](https://f1tv.formula1.com) desktop client for Windows. It can be used to watch F1TV content (both live streams and video on demand) in the highest quality available, using one of three supported video players. The goal of this project is to improve the overall F1TV experience by implementing features not found in the official F1TV website and apps, while still being easy to set up and use.
