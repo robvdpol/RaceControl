@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace RaceControl.Services.Interfaces.Github
 {
@@ -21,5 +22,8 @@ namespace RaceControl.Services.Interfaces.Github
 
         [JsonProperty("body")]
         public string Body { get; set; }
+
+        [JsonProperty("assets")]
+        public List<Asset> Assets { get; set; }
     }
 }

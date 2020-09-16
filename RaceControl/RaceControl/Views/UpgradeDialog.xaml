@@ -34,7 +34,7 @@
             TextWrapping="Wrap" />
         <TextBlock
             Grid.Row="2"
-            Text="Would you like to upgrade to this release?"
+            Text="Would you like to download this release?"
             TextWrapping="Wrap" />
         <StackPanel
             Grid.Row="3"
@@ -46,14 +46,14 @@
                 Height="24"
                 Margin="10,0"
                 Command="{Binding CloseCommand}"
-                CommandParameter="{StaticResource False}"
-                Content="Ignore" />
+                CommandParameter="{StaticResource True}"
+                Content="Download" />
             <Button
                 Width="100"
                 Height="24"
                 Command="{Binding CloseCommand}"
-                CommandParameter="{StaticResource True}"
-                Content="Upgrade" />
+                CommandParameter="{StaticResource False}"
+                Content="Cancel" />
         </StackPanel>
     </Grid>
 </UserControl>

@@ -223,7 +223,6 @@ namespace RaceControl.ViewModels
             VideoDialogLayout.Load();
             SetVlcExeLocation();
             SetMpvExeLocation();
-            CheckForUpdatesAsync().Await(HandleNonCriticalError);
 
             if (Login())
             {
@@ -234,6 +233,7 @@ namespace RaceControl.ViewModels
                 },
                 HandleCriticalError);
                 RefreshLiveSessionsAsync().Await(CreateRefreshTimer, HandleNonCriticalError);
+                CheckForUpdatesAsync().Await(HandleNonCriticalError);
             }
         }
 
@@ -539,7 +539,8 @@ namespace RaceControl.ViewModels
                 {
                     if (dialogResult.Result == ButtonResult.OK)
                     {
-                        ProcessUtils.BrowseToUrl(release.HtmlUrl);
+                        var asset = release.Assets.FirstOrDefault(a => a.State == "uploaded");
+                        ProcessUtils.BrowseToUrl(asset?.BrowserDownloadUrl ?? release.HtmlUrl);
                     }
                 });
 
