@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RaceControl.Mpv", "RaceCont
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RaceControl.Streamlink", "RaceControl\RaceControl.Streamlink\RaceControl.Streamlink.csproj", "{103B7B77-2DD8-4C62-AA28-D09216A65FD0}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "RaceControl.Installer", "RaceControl\RaceControl.Installer\RaceControl.Installer.vdproj", "{24118D77-DDC8-40DB-800A-22478E220153}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -53,6 +55,9 @@ Global
 		{103B7B77-2DD8-4C62-AA28-D09216A65FD0}.Debug|x64.Build.0 = Debug|x64
 		{103B7B77-2DD8-4C62-AA28-D09216A65FD0}.Release|x64.ActiveCfg = Release|x64
 		{103B7B77-2DD8-4C62-AA28-D09216A65FD0}.Release|x64.Build.0 = Release|x64
+		{24118D77-DDC8-40DB-800A-22478E220153}.Debug|x64.ActiveCfg = Debug
+		{24118D77-DDC8-40DB-800A-22478E220153}.Release|x64.ActiveCfg = Release
+		{24118D77-DDC8-40DB-800A-22478E220153}.Release|x64.Build.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
