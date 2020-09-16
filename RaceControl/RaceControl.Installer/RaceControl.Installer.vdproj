@@ -44,6 +44,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
             }
         }
         "Release"
@@ -153,6 +161,29 @@
                 {
                 }
             }
+            "{994432C3-9487-495D-8656-3E829A8DBDDE}:_DBFF16F87E4841BFB91527CA9A391DC9"
+            {
+            "DefaultLocation" = "8:[LocalAppDataFolder]"
+            "Name" = "8:LocalAppDataFolder"
+            "AlwaysCreate" = "11:FALSE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Property" = "8:LOCALAPPDATAFOLDER"
+                "Folders"
+                {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_4C510FE07D08425A8A65F085B25EF9BC"
+                    {
+                    "Name" = "8:RaceControl"
+                    "AlwaysCreate" = "11:TRUE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_9C6F4EE876B541D89C19C2EC7B8A0FE7"
+                        "Folders"
+                        {
+                        }
+                    }
+                }
+            }
         }
         "LaunchCondition"
         {
@@ -170,7 +201,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Race Control"
         "ProductCode" = "8:{AF06B7ED-7AD9-48B6-BF3A-568B663BD8AD}"
-        "PackageCode" = "8:{AE817D9D-86E2-48D7-B106-0E11B861BD86}"
+        "PackageCode" = "8:{6ED7531D-2D94-4927-B39D-36F9A70F70B4}"
         "UpgradeCode" = "8:{AED9C889-7712-4594-8E9C-2BD1BA1CEE3A}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
