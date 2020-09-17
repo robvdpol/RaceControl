@@ -26,6 +26,8 @@ namespace RaceControl.Common.Interfaces
 
         Task StartPlaybackAsync(string streamUrl, IMediaRenderer mediaRenderer = null);
 
+        void StopPlayback();
+
         void TogglePause();
 
         void ToggleMute();

@@ -60,8 +60,8 @@
     <Resource Include="splashscreen.png" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="LibVLCSharp" Version="3.4.7" />
-    <PackageReference Include="LibVLCSharp.WPF" Version="3.4.7" />
+    <PackageReference Include="LibVLCSharp" Version="3.4.8" />
+    <PackageReference Include="LibVLCSharp.WPF" Version="3.4.8" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.19" />
     <PackageReference Include="NLog" Version="4.7.4" />
     <PackageReference Include="Prism.DryIoc" Version="8.0.0.1850-pre" />

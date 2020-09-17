@@ -53,6 +53,7 @@ namespace RaceControl.ViewModels
 
         public override void OnDialogClosed()
         {
+            MediaDownloader.StopDownload();
             MediaDownloader.Dispose();
 
             base.OnDialogClosed();

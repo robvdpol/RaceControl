@@ -124,7 +124,6 @@ namespace RaceControl.Vlc
 
         public void StopPlayback()
         {
-            AudioTracks.Clear();
             MediaPlayer.Stop();
 
             if (MediaPlayer.Media != null)
@@ -132,6 +131,8 @@ namespace RaceControl.Vlc
                 MediaPlayer.Media.Dispose();
                 MediaPlayer.Media = null;
             }
+
+            AudioTracks.Clear();
         }
 
         public void TogglePause()
