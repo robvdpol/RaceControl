@@ -19,8 +19,9 @@ Race Control is an open source [F1TV](https://f1tv.formula1.com) desktop client 
 
 ## Installation
 * Download the [latest release](https://github.com/robvdpol/RaceControl/releases/latest) and start the installer.
-* Follow the steps in the installation wizard to complete the installation.
-* Start Race Control using the desktop shortcut or start menu entry.
+* If the [.NET Core Desktop Runtime](https://dotnet.microsoft.com/download/dotnet-core/current/runtime) needs to be installed on your system you will be notified about it.
+* Follow the steps in the setup wizard to complete the installation.
+* Start Race Control using either the desktop shortcut or the start menu entry.
 
 ## Keyboard shortcuts
 The internal player supports the following keyboard shortcuts:
@@ -48,6 +49,9 @@ You need an F1TV account to watch F1TV streams. If you want to watch race replay
 
 #### What happens with my credentials when I login?
 Your F1TV login credentials are stored locally in the Windows Credential Manager, so you don't have to login every time you start the application. If you wish to switch to a different F1TV account, press the button 'Delete stored credentials' located in 'Options'. Your credentials will be removed and you will be asked to login again.
+
+#### Where does Race Control store my settings and video layout? Will they be retained when I upgrade Race Control?
+Your settings and video layout are stored in JSON-files, which are saved to %LOCALAPPDATA%\RaceControl (usually located at C:\Users\<your username>\AppData\Local\RaceControl). When you upgrade Race Control your settings and video layout will be retained.
 
 #### Why is the VLC button disabled?
 You need to have VLC media player installed on your machine. The location of your VLC installation will be automatically detected.
