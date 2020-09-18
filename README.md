@@ -1,10 +1,11 @@
+# Race Control
+
 ![GitHub closed issues](https://img.shields.io/github/issues-closed/robvdpol/RaceControl)
 ![GitHub issues](https://img.shields.io/github/issues/robvdpol/RaceControl)
 ![GitHub All Releases](https://img.shields.io/github/downloads/robvdpol/RaceControl/total)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/robvdpol/RaceControl)
 ![GitHub](https://img.shields.io/github/license/robvdpol/RaceControl)
 
-# Race Control
 Race Control is an open source [F1TV](https://f1tv.formula1.com) desktop client for Windows. It can be used to watch F1TV content (both live streams and video on demand) in the highest quality available, using one of three supported video players. The goal of this project is to improve the overall F1TV experience by implementing features not found in the official F1TV website and apps, while still being easy to set up and use.
 
 ## Features
@@ -51,7 +52,7 @@ You need an F1TV account to watch F1TV streams. If you want to watch race replay
 Your F1TV login credentials are stored locally in the Windows Credential Manager, so you don't have to login every time you start the application. If you wish to switch to a different F1TV account, press the button 'Delete stored credentials' located in 'Options'. Your credentials will be removed and you will be asked to login again.
 
 #### Where does Race Control store my settings and video layout? Will they be retained when I upgrade Race Control?
-Your settings and video layout are stored in JSON-files, which are saved to *%LOCALAPPDATA%\RaceControl* (usually located at *C:\Users\<your username>\AppData\Local\RaceControl*). When you upgrade Race Control your settings and video layout will be retained.
+Your settings and video layout are stored in JSON-files, which are saved to *%LOCALAPPDATA%\RaceControl* (usually located at *C:\Users\USERNAME\AppData\Local\RaceControl*). When you upgrade Race Control your settings and video layout will be retained.
 
 #### Why is the VLC button disabled?
 You need to have VLC media player installed on your machine. The location of your VLC installation will be automatically detected.
