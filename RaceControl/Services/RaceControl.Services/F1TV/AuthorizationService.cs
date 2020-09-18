@@ -1,8 +1,8 @@
 ﻿using NLog;
-using RaceControl.Services.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Authorization;
-using System.Collections.Generic;
+using RestSharp;
+using System;
 using System.Threading.Tasks;
 
 namespace RaceControl.Services.F1TV
@@ -15,12 +15,12 @@ namespace RaceControl.Services.F1TV
         private const string IdentityProvider = @"/api/identity-providers/iden_732298a17f9c458890a1877880d140f3/";
 
         private readonly ILogger _logger;
-        private readonly IRestClient _restClient;
+        private readonly Func<IRestClient> _restClientFactory;
 
-        public AuthorizationService(ILogger logger, IRestClient restClient)
+        public AuthorizationService(ILogger logger, Func<IRestClient> restClientFactory)
         {
             _logger = logger;
-            _restClient = restClient;
+            _restClientFactory = restClientFactory;
         }
 
         public async Task<TokenResponse> LoginAsync(string login, string password)
@@ -41,7 +41,9 @@ namespace RaceControl.Services.F1TV
             };
 
             _logger.Info("Sending token request...");
-            var tokenResponse = await _restClient.PostAsJsonAsync<TokenRequest, TokenResponse>(TokenUrl, tokenRequest);
+            var restClient = _restClientFactory();
+            var restRequest = new RestRequest(TokenUrl).AddJsonBody(tokenRequest);
+            var tokenResponse = await restClient.PostAsync<TokenResponse>(restRequest);
             _logger.Info("Received token response.");
 
             return tokenResponse;
@@ -55,13 +57,10 @@ namespace RaceControl.Services.F1TV
                 Password = password
             };
 
-            var requestHeaders = new Dictionary<string, string>
-            {
-                { "apiKey", ApiKey }
-            };
-
             _logger.Info($"Sending authorization request for login '{authRequest.Login}'...");
-            var authResponse = await _restClient.PostAsJsonAsync<AuthRequest, AuthResponse>(AuthUrl, authRequest, requestHeaders);
+            var restClient = _restClientFactory();
+            var restRequest = new RestRequest(AuthUrl).AddJsonBody(authRequest).AddHeader("apiKey", ApiKey);
+            var authResponse = await restClient.PostAsync<AuthResponse>(restRequest);
             _logger.Info("Received authorization response.");
 
             return authResponse;

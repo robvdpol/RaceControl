@@ -1,6 +1,8 @@
-﻿using RaceControl.Services.Interfaces;
+﻿using Newtonsoft.Json;
 using RaceControl.Services.Interfaces.F1TV.Api;
 using RaceControl.Services.Interfaces.Lark;
+using RestSharp;
+using System;
 using System.Threading.Tasks;
 
 namespace RaceControl.Services.Lark
@@ -9,31 +11,35 @@ namespace RaceControl.Services.Lark
     {
         private const string BackupStreamUrl = @"https://f1tv.formula1.com/dr/stream.json";
 
-        public F1TVClient(IRestClient restClient) : base(restClient, "https://f1tv.formula1.com/api")
+        public F1TVClient(Func<IRestClient> restClientFactory) : base(restClientFactory, "https://f1tv.formula1.com/api")
         {
         }
 
         public async Task<TokenisedUrl> GetTokenisedUrlForChannelAsync(string token, string channelUrl)
         {
-            var url = Endpoint + "/viewings";
-            var request = new ChannelUrl { Url = channelUrl };
-            var tokenisedUrl = await RestClient.PostAsJsonAsync<ChannelUrl, TokenisedUrl>(url, request, null, token);
+            var restClient = RestClientFactory();
+            restClient.Authenticator = new F1TVAuthenticator(token);
+            var restRequest = new RestRequest($"{Endpoint}/viewings").AddJsonBody(new ChannelUrl { Url = channelUrl });
 
-            return tokenisedUrl;
+            return await restClient.PostAsync<TokenisedUrl>(restRequest);
         }
 
         public async Task<TokenisedUrlContainer> GetTokenisedUrlForAssetAsync(string token, string assetUrl)
         {
-            var url = Endpoint + "/viewings";
-            var request = new AssetUrl { Url = assetUrl };
-            var tokenisedUrlContainer = await RestClient.PostAsJsonAsync<AssetUrl, TokenisedUrlContainer>(url, request, null, token);
+            var restClient = RestClientFactory();
+            restClient.Authenticator = new F1TVAuthenticator(token);
+            var restRequest = new RestRequest($"{Endpoint}/viewings").AddJsonBody(new AssetUrl { Url = assetUrl });
 
-            return tokenisedUrlContainer;
+            return await restClient.PostAsync<TokenisedUrlContainer>(restRequest);
         }
 
         public async Task<BackupStream> GetBackupStream()
         {
-            return await RestClient.GetAsJsonAsync<BackupStream>(BackupStreamUrl);
+            var restClient = RestClientFactory();
+            var restRequest = new RestRequest(BackupStreamUrl, DataFormat.Json);
+            var restResponse = await restClient.ExecuteGetAsync(restRequest);
+
+            return JsonConvert.DeserializeObject<BackupStream>(restResponse.Content);
         }
     }
 }

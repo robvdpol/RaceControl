@@ -1,17 +1,18 @@
-﻿using RaceControl.Services.Interfaces;
-using RaceControl.Services.Interfaces.Lark;
+﻿using RaceControl.Services.Interfaces.Lark;
+using RestSharp;
+using System;
 using System.Threading.Tasks;
 
 namespace RaceControl.Services.Lark
 {
     public abstract class LarkClient : ILarkClient
     {
-        protected readonly IRestClient RestClient;
+        protected readonly Func<IRestClient> RestClientFactory;
         protected readonly string Endpoint;
 
-        protected LarkClient(IRestClient restClient, string endpoint)
+        protected LarkClient(Func<IRestClient> restClientFactory, string endpoint)
         {
-            RestClient = restClient;
+            RestClientFactory = restClientFactory;
             Endpoint = endpoint;
         }
 
@@ -22,16 +23,18 @@ namespace RaceControl.Services.Lark
 
         public async Task<TResponse> GetItemAsync<TResponse>(ILarkRequest request)
         {
-            var url = request.GetURL();
+            var restClient = RestClientFactory();
+            var restRequest = new RestRequest(request.GetURL(), DataFormat.Json);
 
-            return await RestClient.GetAsJsonAsync<TResponse>(url);
+            return await restClient.GetAsync<TResponse>(restRequest);
         }
 
         public async Task<ILarkCollection<TResponse>> GetCollectionAsync<TResponse>(ILarkRequest request)
         {
-            var url = request.GetURL();
+            var restClient = RestClientFactory();
+            var restRequest = new RestRequest(request.GetURL(), DataFormat.Json);
 
-            return await RestClient.GetAsJsonAsync<LarkCollection<TResponse>>(url);
+            return await restClient.GetAsync<LarkCollection<TResponse>>(restRequest);
         }
     }
 }

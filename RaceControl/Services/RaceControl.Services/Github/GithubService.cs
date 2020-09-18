@@ -1,6 +1,7 @@
 ﻿using NLog;
-using RaceControl.Services.Interfaces;
 using RaceControl.Services.Interfaces.Github;
+using RestSharp;
+using System;
 using System.Threading.Tasks;
 
 namespace RaceControl.Services.Github
@@ -10,21 +11,21 @@ namespace RaceControl.Services.Github
         private const string RaceControlLatestReleaseUrl = @"https://api.github.com/repos/robvdpol/RaceControl/releases/latest";
 
         private readonly ILogger _logger;
-        private readonly IRestClient _restClient;
+        private readonly Func<IRestClient> _restClientFactory;
 
-        public GithubService(ILogger logger, IRestClient restClient)
+        public GithubService(ILogger logger, Func<IRestClient> restClientFactory)
         {
             _logger = logger;
-            _restClient = restClient;
+            _restClientFactory = restClientFactory;
         }
 
         public async Task<Release> GetLatestRelease()
         {
             _logger.Info("Getting latest release from Github...");
-            var release = await _restClient.GetAsJsonAsync<Release>(RaceControlLatestReleaseUrl, nameof(RaceControl));
-            _logger.Info($"Got release '{release.Name}' from Github.");
+            var restClient = _restClientFactory();
+            var restRequest = new RestRequest(RaceControlLatestReleaseUrl, DataFormat.Json);
 
-            return release;
+            return await restClient.GetAsync<Release>(restRequest);
         }
     }
 }

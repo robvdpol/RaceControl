@@ -13,11 +13,9 @@ using RaceControl.Core.Helpers;
 using RaceControl.Core.Mvvm;
 using RaceControl.Core.Settings;
 using RaceControl.Core.Streamlink;
-using RaceControl.Services;
 using RaceControl.Services.Credential;
 using RaceControl.Services.F1TV;
 using RaceControl.Services.Github;
-using RaceControl.Services.Interfaces;
 using RaceControl.Services.Interfaces.Credential;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.Github;
@@ -26,6 +24,8 @@ using RaceControl.Services.Lark;
 using RaceControl.ViewModels;
 using RaceControl.Views;
 using RaceControl.Vlc;
+using RestSharp;
+using RestSharp.Serializers.NewtonsoftJson;
 using System;
 using System.Windows;
 using System.Windows.Threading;
@@ -54,7 +54,6 @@ namespace RaceControl
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.GetContainer().Register(Made.Of<ILogger>(() => LogManager.GetLogger(Arg.Index<string>(0)), request => request.Parent.ImplementationType.Name));
             containerRegistry.RegisterDialogWindow<DialogWindow>();
             containerRegistry.RegisterDialogWindow<VideoDialogWindow>(nameof(VideoDialogWindow));
             containerRegistry.RegisterDialog<LoginDialog, LoginDialogViewModel>();
@@ -64,7 +63,6 @@ namespace RaceControl
 
             containerRegistry
                 .RegisterSingleton<IExtendedDialogService, ExtendedDialogService>()
-                .RegisterSingleton<IRestClient, RestClient>()
                 .RegisterSingleton<ISettings, Settings>()
                 .RegisterSingleton<IVideoDialogLayout, VideoDialogLayout>()
                 .Register<JsonSerializer>(() => new JsonSerializer { Formatting = Formatting.Indented })
@@ -78,6 +76,10 @@ namespace RaceControl
                 .Register<IMediaDownloader, VlcMediaDownloader>()
                 .Register<MediaPlayer>(CreateMediaPlayer)
                 .RegisterInstance(CreateLibVLC());
+
+            var container = containerRegistry.GetContainer();
+            container.Register(made: Made.Of(() => CreateRestClient()), setup: Setup.With(asResolutionCall: true));
+            container.Register(Made.Of<ILogger>(() => LogManager.GetLogger(Arg.Index<string>(0)), request => request.Parent.ImplementationType.Name));
         }
 
         private static MediaPlayer CreateMediaPlayer(IContainerProvider container)
@@ -120,6 +122,15 @@ namespace RaceControl
             };
 
             return libVLC;
+        }
+
+        private static IRestClient CreateRestClient()
+        {
+            var restClient = new RestClient { UserAgent = nameof(RaceControl) };
+            restClient.ThrowOnAnyError = true;
+            restClient.UseNewtonsoftJson();
+
+            return restClient;
         }
 
         private static void InitializeLogging()
