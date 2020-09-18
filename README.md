@@ -2,7 +2,7 @@
 
 [![GitHub issues](https://img.shields.io/github/issues/robvdpol/RaceControl)](https://github.com/robvdpol/RaceControl/issues?q=is%3Aopen+is%3Aissue)
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/robvdpol/RaceControl)](https://github.com/robvdpol/RaceControl/issues?q=is%3Aissue+is%3Aclosed)
-[![GitHub All Releases](https://img.shields.io/github/downloads/robvdpol/RaceControl/total)](https://github.com/robvdpol/RaceControl)
+[![GitHub All Releases](https://img.shields.io/github/downloads/robvdpol/RaceControl/total)](https://github.com/robvdpol/RaceControl/releases)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/robvdpol/RaceControl)](https://github.com/robvdpol/RaceControl/releases/latest)
 [![GitHub](https://img.shields.io/github/license/robvdpol/RaceControl)](https://github.com/robvdpol/RaceControl/blob/master/LICENSE.md)
 
