@@ -37,7 +37,14 @@ namespace RaceControl.Services.Lark
             var restRequest = new RestRequest(Constants.BackupStreamUrl, DataFormat.Json);
             var restResponse = await restClient.ExecuteGetAsync(restRequest);
 
-            return JsonConvert.DeserializeObject<BackupStream>(restResponse.Content);
+            if (restResponse.IsSuccessful)
+            {
+                return JsonConvert.DeserializeObject<BackupStream>(restResponse.Content);
+            }
+            else
+            {
+                throw new Exception($"Could not retrieve backup stream URL (HTTP status code {(int)restResponse.StatusCode}).", restResponse.ErrorException);
+            }
         }
     }
 }

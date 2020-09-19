@@ -45,10 +45,7 @@ namespace RaceControl.Services.F1TV
                 .OrderBy(Session.StartTimeField, LarkSortDirection.Descending)
                 ;
 
-            var sessions = (await _client.GetCollectionAsync<Session>(request)).Objects;
-            _logger.Info($"Found {sessions.Count} live sessions.");
-
-            return sessions;
+            return (await _client.GetCollectionAsync<Session>(request)).Objects;
         }
 
         public async Task<List<Season>> GetSeasonsAsync()
@@ -66,10 +63,7 @@ namespace RaceControl.Services.F1TV
                 .OrderBy(Season.YearField, LarkSortDirection.Descending)
                 ;
 
-            var seasons = (await _client.GetCollectionAsync<Season>(request)).Objects;
-            _logger.Info($"Found {seasons.Count} seasons.");
-
-            return seasons;
+            return (await _client.GetCollectionAsync<Season>(request)).Objects;
         }
 
         public async Task<List<Series>> GetSeriesAsync()
@@ -86,10 +80,7 @@ namespace RaceControl.Services.F1TV
                 .OrderBy(Series.NameField, LarkSortDirection.Ascending)
                 ;
 
-            var series = (await _client.GetCollectionAsync<Series>(request)).Objects;
-            _logger.Info($"Found {series.Count} series.");
-
-            return series;
+            return (await _client.GetCollectionAsync<Series>(request)).Objects;
         }
 
         public async Task<List<VodType>> GetVodTypesAsync()
@@ -103,10 +94,7 @@ namespace RaceControl.Services.F1TV
                 .WithField(VodType.ContentUrlsField)
                 ;
 
-            var vodTypes = (await _client.GetCollectionAsync<VodType>(request)).Objects;
-            _logger.Info($"Found {vodTypes.Count} VOD types.");
-
-            return vodTypes;
+            return (await _client.GetCollectionAsync<VodType>(request)).Objects;
         }
 
         public async Task<List<Event>> GetEventsForSeasonAsync(string seasonUID)
@@ -124,10 +112,7 @@ namespace RaceControl.Services.F1TV
                 .OrderBy(Event.StartDateField, LarkSortDirection.Ascending)
                 ;
 
-            var events = (await _client.GetCollectionAsync<Event>(request)).Objects;
-            _logger.Info($"Found {events.Count} events.");
-
-            return events;
+            return (await _client.GetCollectionAsync<Event>(request)).Objects;
         }
 
         public async Task<List<Session>> GetSessionsForEventAsync(string eventUID)
@@ -153,10 +138,7 @@ namespace RaceControl.Services.F1TV
                 .OrderBy(Session.StartTimeField, LarkSortDirection.Ascending)
                 ;
 
-            var sessions = (await _client.GetCollectionAsync<Session>(request)).Objects;
-            _logger.Info($"Found {sessions.Count} sessions.");
-
-            return sessions;
+            return (await _client.GetCollectionAsync<Session>(request)).Objects;
         }
 
         public async Task<List<Channel>> GetChannelsForSessionAsync(string sessionUID)
@@ -173,10 +155,7 @@ namespace RaceControl.Services.F1TV
                 .WithSubField(Session.ChannelUrlsField, Channel.DriverOccurrenceUrlsField)
                 ;
 
-            var channels = (await _client.GetItemAsync<Session>(request)).ChannelUrls;
-            _logger.Info($"Found {channels.Count} channels.");
-
-            return channels;
+            return (await _client.GetItemAsync<Session>(request)).ChannelUrls;
         }
 
         public async Task<List<Episode>> GetEpisodesForSessionAsync(string sessionUID)
@@ -196,10 +175,7 @@ namespace RaceControl.Services.F1TV
                 .WithSubSubField(Session.ContentUrlsField, Episode.ImageUrlsField, Image.UrlField)
                 ;
 
-            var episodes = (await _client.GetItemAsync<Session>(request)).ContentUrls;
-            _logger.Info($"Found {episodes.Count} episodes.");
-
-            return episodes;
+            return (await _client.GetItemAsync<Session>(request)).ContentUrls;
         }
 
         public async Task<Episode> GetEpisodeAsync(string episodeUID)
@@ -243,17 +219,13 @@ namespace RaceControl.Services.F1TV
         {
             _logger.Info($"Getting tokenised URL for content-type '{playableContent.ContentType}' and content-URL '{playableContent.ContentUrl}' using token '{token}'...");
 
-            var url = playableContent.ContentType switch
+            return playableContent.ContentType switch
             {
                 ContentType.Channel => (await _client.GetTokenisedUrlForChannelAsync(token, playableContent.ContentUrl)).Url,
                 ContentType.Asset => (await _client.GetTokenisedUrlForAssetAsync(token, playableContent.ContentUrl)).Objects.First().TokenisedUrl.Url,
                 ContentType.Backup => (await _client.GetBackupStream()).StreamManifest,
                 _ => throw new ArgumentException($"Could not generate tokenised URL for unsupported content-type '{playableContent.ContentType}'.", nameof(playableContent))
             };
-
-            _logger.Info($"Got tokenised URL '{url}'.");
-
-            return url;
         }
     }
 }
