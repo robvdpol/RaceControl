@@ -9,9 +9,7 @@ namespace RaceControl.Services.Lark
 {
     public class F1TVClient : LarkClient, IF1TVClient
     {
-        private const string BackupStreamUrl = @"https://f1tv.formula1.com/dr/stream.json";
-
-        public F1TVClient(Func<IRestClient> restClientFactory) : base(restClientFactory, "https://f1tv.formula1.com/api")
+        public F1TVClient(Func<IRestClient> restClientFactory) : base(restClientFactory, Constants.ApiEndpointUrl)
         {
         }
 
@@ -36,7 +34,7 @@ namespace RaceControl.Services.Lark
         public async Task<BackupStream> GetBackupStream()
         {
             var restClient = RestClientFactory();
-            var restRequest = new RestRequest(BackupStreamUrl, DataFormat.Json);
+            var restRequest = new RestRequest(Constants.BackupStreamUrl, DataFormat.Json);
             var restResponse = await restClient.ExecuteGetAsync(restRequest);
 
             return JsonConvert.DeserializeObject<BackupStream>(restResponse.Content);

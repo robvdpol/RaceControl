@@ -9,11 +9,6 @@ namespace RaceControl.Services.F1TV
 {
     public class AuthorizationService : IAuthorizationService
     {
-        private const string AuthUrl = @"https://api.formula1.com/v2/account/subscriber/authenticate/by-password";
-        private const string TokenUrl = @"https://f1tv-api.formula1.com/agl/1.0/unk/en/all_devices/global/authenticate";
-        private const string ApiKey = @"fCUCjWrKPu9ylJwRAv8BpGLEgiAuThx7";
-        private const string IdentityProvider = @"/api/identity-providers/iden_732298a17f9c458890a1877880d140f3/";
-
         private readonly ILogger _logger;
         private readonly Func<IRestClient> _restClientFactory;
 
@@ -30,19 +25,19 @@ namespace RaceControl.Services.F1TV
 #if !DEBUG
             if (authResponse.Data.SubscriptionStatus != "active")
             {
-                throw new System.Exception("An active F1TV subscription is required.");
+                throw new Exception("An active F1TV subscription is required.");
             }
 #endif
 
             var tokenRequest = new TokenRequest
             {
                 AccessToken = authResponse.Data.SubscriptionToken,
-                IdentityProviderUrl = IdentityProvider
+                IdentityProviderUrl = Constants.IdentityProvider
             };
 
             _logger.Info("Sending token request...");
             var restClient = _restClientFactory();
-            var restRequest = new RestRequest(TokenUrl).AddJsonBody(tokenRequest);
+            var restRequest = new RestRequest(Constants.TokenUrl).AddJsonBody(tokenRequest);
 
             return await restClient.PostAsync<TokenResponse>(restRequest);
         }
@@ -57,7 +52,7 @@ namespace RaceControl.Services.F1TV
 
             _logger.Info($"Sending authorization request for login '{authRequest.Login}'...");
             var restClient = _restClientFactory();
-            var restRequest = new RestRequest(AuthUrl).AddJsonBody(authRequest).AddHeader("apiKey", ApiKey);
+            var restRequest = new RestRequest(Constants.AuthenticateUrl).AddJsonBody(authRequest).AddHeader("apiKey", Constants.ApiKey);
 
             return await restClient.PostAsync<AuthResponse>(restRequest);
         }
