@@ -347,7 +347,7 @@ namespace RaceControl.ViewModels
                         .BufferedDownload(_apiService.GetEpisodeAsync, SelectedVodType.ContentUrls.Select(c => c.GetUID()))
                         .Await(episodes =>
                         {
-                            Episodes.AddRange(episodes.OrderBy(e => e.Title).Select(PlayableContent.Create));
+                            Episodes.AddRange(episodes.OrderBy(e => e.Title).Select(e => new PlayableEpisode(e)));
                             SetNotBusy();
                         },
                         HandleCriticalError,
@@ -686,13 +686,13 @@ namespace RaceControl.ViewModels
                 });
             }
 
-            Channels.AddRange(channels.OrderBy(c => c.ChannelType, new ChannelTypeComparer()).Select(c => PlayableContent.Create(session, c)));
+            Channels.AddRange(channels.OrderBy(c => c.ChannelType, new ChannelTypeComparer()).Select(c => new PlayableChannel(session, c)));
         }
 
         private async Task LoadEpisodesForSessionAsync(Session session)
         {
             var episodes = await _apiService.GetEpisodesForSessionAsync(session.UID);
-            Episodes.AddRange(episodes.OrderBy(e => e.Title).Select(PlayableContent.Create));
+            Episodes.AddRange(episodes.OrderBy(e => e.Title).Select(e => new PlayableEpisode(e)));
         }
 
         private void WatchContent(IPlayableContent playableContent, VideoDialogSettings settings = null)
