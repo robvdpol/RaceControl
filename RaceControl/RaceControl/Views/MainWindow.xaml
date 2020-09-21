@@ -341,7 +341,7 @@
                                     Command="{Binding DataContext.DownloadContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
                                     CommandParameter="{Binding}"
                                     Content="Download"
-                                    ToolTip="Save a copy to file system"
+                                    ToolTip="Download copy to file system"
                                     Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                 <Button
                                     Grid.Column="2"
@@ -352,7 +352,7 @@
                                     Content="Copy"
                                     ToolTip="Copy URL to clipboard" />
                                 <Button
-                                    Grid.Column="4"
+                                    Grid.Column="3"
                                     Width="50"
                                     Margin="2,0"
                                     Command="{Binding DataContext.WatchContentInMpvCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
@@ -360,7 +360,7 @@
                                     Content="MPV"
                                     ToolTip="Watch with MPV" />
                                 <Button
-                                    Grid.Column="3"
+                                    Grid.Column="4"
                                     Width="50"
                                     Margin="2,0"
                                     Command="{Binding DataContext.WatchContentInVlcCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
@@ -410,12 +410,12 @@
                                     Margin="3"
                                     Content="Use alternative CDN for live streams"
                                     IsChecked="{Binding Settings.UseAlternativeStream}"
-                                    ToolTip="Use when regular live streams do not work" />
+                                    ToolTip="Use when regular CDN does not work" />
                                 <CheckBox
                                     Margin="3"
                                     Content="Disable Streamlink for live streams"
                                     IsChecked="{Binding Settings.DisableStreamlink}"
-                                    ToolTip="Pass live stream URL directly to video player (usually only works in MPV)" />
+                                    ToolTip="Pass live stream URL directly to video player (only applies to internal player and VLC)" />
                                 <TextBlock Margin="3" Text="Recording location:" />
                                 <TextBlock
                                     Margin="3,0,3,3"
@@ -551,7 +551,7 @@
                                 Command="{Binding DataContext.DownloadContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
                                 CommandParameter="{Binding}"
                                 Content="Download"
-                                ToolTip="Save a copy to file system"
+                                ToolTip="Download copy to file system"
                                 Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
                             <Button
                                 Grid.Column="2"
@@ -562,7 +562,7 @@
                                 Content="Copy"
                                 ToolTip="Copy URL to clipboard" />
                             <Button
-                                Grid.Column="4"
+                                Grid.Column="3"
                                 Width="50"
                                 Margin="2,0"
                                 Command="{Binding DataContext.WatchContentInMpvCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
@@ -570,7 +570,7 @@
                                 Content="MPV"
                                 ToolTip="Watch with MPV" />
                             <Button
-                                Grid.Column="3"
+                                Grid.Column="4"
                                 Width="50"
                                 Margin="2,0"
                                 Command="{Binding DataContext.WatchContentInVlcCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
