@@ -22,7 +22,8 @@ namespace RaceControl.Core.Mvvm
                 InitialDirectory = initialDirectory,
                 IsFolderPicker = true,
                 Multiselect = false,
-                AllowNonFileSystemItems = true
+                AllowNonFileSystemItems = false,
+                EnsurePathExists = true
             };
 
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
