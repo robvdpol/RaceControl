@@ -2,6 +2,7 @@
 using RaceControl.Common.Utils;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace RaceControl.Services.Interfaces.F1TV.Api
@@ -72,7 +73,10 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         {
             if (IsUpcoming)
             {
-                return $"{Name} (starts {StartTime:ddd HH:mm})";
+                var day = StartTime.ToString("ddd");
+                var time = StartTime.ToString(CultureInfo.CurrentCulture.DateTimeFormat.ShortTimePattern);
+
+                return $"{Name} (starts {day} {time})";
             }
 
             if (IsLive)
