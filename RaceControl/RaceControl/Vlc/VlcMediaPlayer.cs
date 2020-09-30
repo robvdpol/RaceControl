@@ -189,7 +189,6 @@ namespace RaceControl.Vlc
 
             if (disposing)
             {
-                MediaPlayer.Media?.Dispose();
                 MediaPlayer.Dispose();
             }
 
