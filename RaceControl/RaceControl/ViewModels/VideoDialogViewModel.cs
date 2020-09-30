@@ -592,16 +592,17 @@ namespace RaceControl.ViewModels
 
         private async Task ChangeRendererAsync(IMediaRenderer mediaRenderer = null)
         {
-            Logger.Info($"Changing renderer to '{mediaRenderer?.Name}'...");
-            string streamUrl = null;
-
-            if (!IsStreamlink)
-            {
-                streamUrl = await _apiService.GetTokenisedUrlAsync(_token, PlayableContent);
-            }
-
             var time = MediaPlayer.Time;
-            await MediaPlayer.ChangeRendererAsync(mediaRenderer, streamUrl);
+
+            if (IsStreamlink)
+            {
+                await MediaPlayer.ChangeRendererAsync(mediaRenderer);
+            }
+            else
+            {
+                var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, PlayableContent);
+                await MediaPlayer.ChangeRendererAsync(mediaRenderer, streamUrl);
+            }
 
             if (!PlayableContent.IsLive)
             {

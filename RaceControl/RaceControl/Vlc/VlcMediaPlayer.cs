@@ -110,28 +110,25 @@ namespace RaceControl.Vlc
         public async Task StartPlaybackAsync(string streamUrl, IMediaRenderer mediaRenderer = null)
         {
             _streamUrl = streamUrl;
-            AudioTracks.Clear();
+
+            using var media = new Media(_libVLC, _streamUrl, FromType.FromLocation);
+            media.DurationChanged += (sender, e) => Duration = e.Duration;
+            await media.Parse(MediaParseOptions.ParseNetwork | MediaParseOptions.FetchNetwork);
             MediaPlayer.SetRenderer(mediaRenderer?.Renderer as RendererItem);
-            var media = new Media(_libVLC, _streamUrl, FromType.FromLocation);
-            media.DurationChanged += Media_DurationChanged;
-            await media.Parse();
 
             if (MediaPlayer.Play(media))
             {
                 IsCasting = mediaRenderer != null;
+            }
+            else
+            {
+                IsCasting = false;
             }
         }
 
         public void StopPlayback()
         {
             MediaPlayer.Stop();
-
-            if (MediaPlayer.Media != null)
-            {
-                MediaPlayer.Media.Dispose();
-                MediaPlayer.Media = null;
-            }
-
             AudioTracks.Clear();
         }
 
@@ -171,7 +168,7 @@ namespace RaceControl.Vlc
             rendererDiscoverer.ItemAdded -= RendererDiscoverer_ItemAdded;
         }
 
-        public async Task ChangeRendererAsync(IMediaRenderer mediaRenderer, string streamUrl)
+        public async Task ChangeRendererAsync(IMediaRenderer mediaRenderer, string streamUrl = null)
         {
             StopPlayback();
             await StartPlaybackAsync(streamUrl ?? _streamUrl, mediaRenderer);
@@ -267,11 +264,6 @@ namespace RaceControl.Vlc
                         break;
                 }
             }
-        }
-
-        private void Media_DurationChanged(object sender, MediaDurationChangedEventArgs e)
-        {
-            Duration = e.Duration;
         }
 
         private void RendererDiscoverer_ItemAdded(object sender, RendererDiscovererItemAddedEventArgs e)
