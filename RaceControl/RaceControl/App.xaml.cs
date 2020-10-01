@@ -1,4 +1,5 @@
 ﻿using DryIoc;
+using LazyCache;
 using LibVLCSharp.Shared;
 using Newtonsoft.Json;
 using NLog;
@@ -65,6 +66,7 @@ namespace RaceControl
                 .RegisterSingleton<IExtendedDialogService, ExtendedDialogService>()
                 .RegisterSingleton<ISettings, Settings>()
                 .RegisterSingleton<IVideoDialogLayout, VideoDialogLayout>()
+                .RegisterSingleton<IAppCache>(() => new CachingService())
                 .Register<JsonSerializer>(() => new JsonSerializer { Formatting = Formatting.Indented })
                 .Register<IAuthorizationService, AuthorizationService>()
                 .Register<IF1TVClient, F1TVClient>()

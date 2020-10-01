@@ -1,4 +1,5 @@
-﻿using NLog;
+﻿using LazyCache;
+using NLog;
 using RaceControl.Common.Enums;
 using RaceControl.Common.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
@@ -16,11 +17,13 @@ namespace RaceControl.Services.F1TV
         private const string SessionOccurrence = "session-occurrence";
 
         private readonly ILogger _logger;
+        private readonly IAppCache _cache;
         private readonly IF1TVClient _client;
 
-        public ApiService(ILogger logger, IF1TVClient client)
+        public ApiService(ILogger logger, IAppCache cache, IF1TVClient client)
         {
             _logger = logger;
+            _cache = cache;
             _client = client;
         }
 
@@ -112,7 +115,7 @@ namespace RaceControl.Services.F1TV
                 .OrderBy(Event.StartDateField, LarkSortDirection.Ascending)
                 ;
 
-            return (await _client.GetCollectionAsync<Event>(request)).Objects;
+            return (await _cache.GetOrAddAsync($"{nameof(ApiService)}-{nameof(GetEventsForSeasonAsync)}-{seasonUID}", () => _client.GetCollectionAsync<Event>(request))).Objects;
         }
 
         public async Task<List<Session>> GetSessionsForEventAsync(string eventUID)
@@ -194,7 +197,7 @@ namespace RaceControl.Services.F1TV
                 .WithSubField(Episode.ImageUrlsField, Image.UrlField)
                 ;
 
-            return await _client.GetItemAsync<Episode>(request);
+            return await _cache.GetOrAddAsync($"{nameof(ApiService)}-{nameof(GetEpisodeAsync)}-{episodeUID}", () => _client.GetItemAsync<Episode>(request));
         }
 
         public async Task<Driver> GetDriverAsync(string driverUID)
@@ -212,7 +215,7 @@ namespace RaceControl.Services.F1TV
                 .WithSubField(Driver.ImageUrlsField, Image.UrlField)
                 ;
 
-            return await _client.GetItemAsync<Driver>(request);
+            return await _cache.GetOrAddAsync($"{nameof(ApiService)}-{nameof(GetDriverAsync)}-{driverUID}", () => _client.GetItemAsync<Driver>(request));
         }
 
         public async Task<string> GetTokenisedUrlAsync(string token, IPlayableContent playableContent)
