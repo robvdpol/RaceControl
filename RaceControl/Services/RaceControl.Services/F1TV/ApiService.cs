@@ -141,7 +141,7 @@ namespace RaceControl.Services.F1TV
                 .OrderBy(Session.StartTimeField, LarkSortDirection.Ascending)
                 ;
 
-            return (await _client.GetCollectionAsync<Session>(request)).Objects;
+            return (await _cache.GetOrAddAsync($"{nameof(ApiService)}-{nameof(GetSessionsForEventAsync)}-{eventUID}", () => _client.GetCollectionAsync<Session>(request), DateTimeOffset.Now.AddMinutes(1))).Objects;
         }
 
         public async Task<List<Channel>> GetChannelsForSessionAsync(string sessionUID)
@@ -158,7 +158,7 @@ namespace RaceControl.Services.F1TV
                 .WithSubField(Session.ChannelUrlsField, Channel.DriverOccurrenceUrlsField)
                 ;
 
-            return (await _client.GetItemAsync<Session>(request)).ChannelUrls;
+            return (await _cache.GetOrAddAsync($"{nameof(ApiService)}-{nameof(GetChannelsForSessionAsync)}-{sessionUID}", () => _client.GetItemAsync<Session>(request), DateTimeOffset.Now.AddMinutes(1))).ChannelUrls;
         }
 
         public async Task<List<Episode>> GetEpisodesForSessionAsync(string sessionUID)
@@ -178,7 +178,7 @@ namespace RaceControl.Services.F1TV
                 .WithSubSubField(Session.ContentUrlsField, Episode.ImageUrlsField, Image.UrlField)
                 ;
 
-            return (await _client.GetItemAsync<Session>(request)).ContentUrls;
+            return (await _cache.GetOrAddAsync($"{nameof(ApiService)}-{nameof(GetEpisodesForSessionAsync)}-{sessionUID}", () => _client.GetItemAsync<Session>(request), DateTimeOffset.Now.AddMinutes(1))).ContentUrls;
         }
 
         public async Task<Episode> GetEpisodeAsync(string episodeUID)
