@@ -17,9 +17,13 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <core:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <core:CollectionContainsConverter x:Key="CollectionContainsConverter" />
+        <core:MatchesFilterConverter x:Key="MatchesFilterConverter" />
         <core:DatePassedConverter x:Key="DatePassedConverter" />
         <Style x:Key="HeaderLabelStyle" TargetType="Label">
             <Setter Property="Margin" Value="2" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="Padding" Value="5,0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="Background" Value="#DDDDDD" />
             <Setter Property="BorderBrush" Value="#ABADB3" />
             <Setter Property="BorderThickness" Value="1" />
@@ -485,8 +489,30 @@
             <Label
                 Grid.Row="2"
                 Grid.Column="2"
-                Content="Episodes"
-                Style="{StaticResource HeaderLabelStyle}" />
+                HorizontalContentAlignment="Stretch"
+                Style="{StaticResource HeaderLabelStyle}">
+                <Label.Content>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Grid.Column="0"
+                            VerticalAlignment="Center"
+                            Text="Episodes" />
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <TextBlock VerticalAlignment="Center" Text="Filter: " />
+                            <TextBox
+                                Name="FilterTextBox"
+                                Width="250"
+                                Height="22"
+                                VerticalContentAlignment="Center"
+                                MaxLength="200" />
+                        </StackPanel>
+                    </Grid>
+                </Label.Content>
+            </Label>
             <ListBox
                 Grid.Row="3"
                 Grid.Column="2"
@@ -530,6 +556,18 @@
                                 </ToolTip>
                             </Setter.Value>
                         </Setter>
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Value="True">
+                                <DataTrigger.Binding>
+                                    <MultiBinding Converter="{StaticResource MatchesFilterConverter}">
+                                        <Binding />
+                                        <Binding ElementName="FilterTextBox" Path="Text" />
+                                    </MultiBinding>
+                                </DataTrigger.Binding>
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
                     </Style>
                 </ListBox.ItemContainerStyle>
                 <ListBox.ItemTemplate>
