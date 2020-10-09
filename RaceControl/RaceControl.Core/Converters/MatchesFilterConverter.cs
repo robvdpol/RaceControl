@@ -16,7 +16,7 @@ namespace RaceControl.Core.Converters
                 return true;
             }
 
-            return item.ToString().Contains(text, StringComparison.OrdinalIgnoreCase);
+            return item.ToString()?.Contains(text, StringComparison.OrdinalIgnoreCase);
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

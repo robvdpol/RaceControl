@@ -9,7 +9,7 @@ namespace RaceControl.Services.Lark
 {
     public class F1TVClient : LarkClient, IF1TVClient
     {
-        public F1TVClient(Func<IRestClient> restClientFactory) : base(restClientFactory, Constants.ApiEndpointUrl)
+        public F1TVClient(Func<IRestClient> restClientFactory) : base(restClientFactory, Constants.API_ENDPOINT_URL)
         {
         }
 
@@ -34,17 +34,15 @@ namespace RaceControl.Services.Lark
         public async Task<BackupStream> GetBackupStream()
         {
             var restClient = RestClientFactory();
-            var restRequest = new RestRequest(Constants.BackupStreamUrl, DataFormat.Json);
+            var restRequest = new RestRequest(Constants.BACKUP_STREAM_URL, DataFormat.Json);
             var restResponse = await restClient.ExecuteGetAsync(restRequest);
 
-            if (restResponse.IsSuccessful)
-            {
-                return JsonConvert.DeserializeObject<BackupStream>(restResponse.Content);
-            }
-            else
+            if (!restResponse.IsSuccessful)
             {
                 throw new Exception($"Could not retrieve backup stream URL (HTTP status code {(int)restResponse.StatusCode}).", restResponse.ErrorException);
             }
+
+            return JsonConvert.DeserializeObject<BackupStream>(restResponse.Content);
         }
     }
 }

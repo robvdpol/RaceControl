@@ -32,12 +32,12 @@ namespace RaceControl.Services.F1TV
             var tokenRequest = new TokenRequest
             {
                 AccessToken = authResponse.Data.SubscriptionToken,
-                IdentityProviderUrl = Constants.IdentityProvider
+                IdentityProviderUrl = Constants.IDENTITY_PROVIDER
             };
 
             _logger.Info("Sending token request...");
             var restClient = _restClientFactory();
-            var restRequest = new RestRequest(Constants.TokenUrl).AddJsonBody(tokenRequest);
+            var restRequest = new RestRequest(Constants.TOKEN_URL).AddJsonBody(tokenRequest);
 
             return await restClient.PostAsync<TokenResponse>(restRequest);
         }
@@ -52,7 +52,7 @@ namespace RaceControl.Services.F1TV
 
             _logger.Info($"Sending authorization request for login '{authRequest.Login}'...");
             var restClient = _restClientFactory();
-            var restRequest = new RestRequest(Constants.AuthenticateUrl).AddJsonBody(authRequest).AddHeader("apiKey", Constants.ApiKey);
+            var restRequest = new RestRequest(Constants.AUTHENTICATE_URL).AddJsonBody(authRequest).AddHeader("apiKey", Constants.API_KEY);
 
             return await restClient.PostAsync<AuthResponse>(restRequest);
         }

@@ -38,35 +38,37 @@ namespace RaceControl
 {
     public partial class App
     {
-        protected override Window CreateShell()
+        private readonly SplashScreen _splashScreen = new SplashScreen("splashscreen.png");
+
+        protected override void OnStartup(StartupEventArgs e)
         {
-            return Container.Resolve<MainWindow>();
+            _splashScreen.Show(false);
+            base.OnStartup(e);
         }
 
         protected override void Initialize()
         {
-            var splashScreen = new SplashScreen("splashscreen.png");
-            splashScreen.Show(false);
-            LibVLCSharpCore.Initialize();
             InitializeLogging();
+            LibVLCSharpCore.Initialize();
             base.Initialize();
-            splashScreen.Close(TimeSpan.Zero);
         }
 
-        protected override void RegisterTypes(IContainerRegistry containerRegistry)
+        protected override void RegisterTypes(IContainerRegistry registry)
         {
-            containerRegistry.RegisterDialogWindow<DialogWindow>();
-            containerRegistry.RegisterDialogWindow<VideoDialogWindow>(nameof(VideoDialogWindow));
-            containerRegistry.RegisterDialog<LoginDialog, LoginDialogViewModel>();
-            containerRegistry.RegisterDialog<UpgradeDialog, UpgradeDialogViewModel>();
-            containerRegistry.RegisterDialog<DownloadDialog, DownloadDialogViewModel>();
-            containerRegistry.RegisterDialog<VideoDialog, VideoDialogViewModel>();
+            registry.RegisterDialogWindow<DialogWindow>();
+            registry.RegisterDialogWindow<VideoDialogWindow>(nameof(VideoDialogWindow));
+            registry.RegisterDialog<LoginDialog, LoginDialogViewModel>();
+            registry.RegisterDialog<UpgradeDialog, UpgradeDialogViewModel>();
+            registry.RegisterDialog<DownloadDialog, DownloadDialogViewModel>();
+            registry.RegisterDialog<VideoDialog, VideoDialogViewModel>();
 
-            containerRegistry
+            registry
                 .RegisterSingleton<IExtendedDialogService, ExtendedDialogService>()
                 .RegisterSingleton<ISettings, Settings>()
                 .RegisterSingleton<IVideoDialogLayout, VideoDialogLayout>()
                 .RegisterSingleton<IAppCache>(() => new CachingService())
+                .RegisterInstance(CreateLibVLC())
+                .Register<MediaPlayer>(CreateMediaPlayer)
                 .Register<JsonSerializer>(() => new JsonSerializer { Formatting = Formatting.Indented })
                 .Register<IAuthorizationService, AuthorizationService>()
                 .Register<IF1TVClient, F1TVClient>()
@@ -75,25 +77,43 @@ namespace RaceControl
                 .Register<ICredentialService, CredentialService>()
                 .Register<IStreamlinkLauncher, StreamlinkLauncher>()
                 .Register<IMediaPlayer, VlcMediaPlayer>()
-                .Register<IMediaDownloader, VlcMediaDownloader>()
-                .Register<MediaPlayer>(CreateMediaPlayer)
-                .RegisterInstance(CreateLibVLC());
+                .Register<IMediaDownloader, VlcMediaDownloader>();
 
-            var container = containerRegistry.GetContainer();
-            container.Register(made: Made.Of(() => CreateRestClient()), setup: Setup.With(asResolutionCall: true));
+            var container = registry.GetContainer();
+            container.Register(Made.Of(() => CreateRestClient()), setup: Setup.With(asResolutionCall: true));
             container.Register(Made.Of<ILogger>(() => LogManager.GetLogger(Arg.Index<string>(0)), request => request.Parent.ImplementationType.Name));
         }
 
-        private static MediaPlayer CreateMediaPlayer(IContainerProvider container)
+        protected override Window CreateShell()
         {
-            return new MediaPlayer(container.Resolve<LibVLC>())
+            return Container.Resolve<MainWindow>();
+        }
+
+        protected override void OnInitialized()
+        {
+            base.OnInitialized();
+            _splashScreen.Close(TimeSpan.Zero);
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            base.OnExit(e);
+            Container.Resolve<LibVLC>()?.Dispose();
+        }
+
+        private static void InitializeLogging()
+        {
+            var config = new LoggingConfiguration();
+            var logfile = new FileTarget("logfile")
             {
-                EnableHardwareDecoding = true,
-                EnableMouseInput = false,
-                EnableKeyInput = false,
-                FileCaching = 5000,
-                NetworkCaching = 10000
+                FileName = FolderUtils.GetLocalApplicationDataFilename("RaceControl.log"),
+                Layout = Layout.FromString("${longdate} ${uppercase:${level}} ${message}${onexception:inner=${newline}${exception:format=tostring}}"),
+                ArchiveAboveSize = 1024 * 1024,
+                ArchiveNumbering = ArchiveNumberingMode.Rolling,
+                MaxArchiveFiles = 2
             };
+            config.AddRule(LogLevelNLog.Info, LogLevelNLog.Fatal, logfile);
+            LogManager.Configuration = config;
         }
 
         private static LibVLC CreateLibVLC()
@@ -126,28 +146,24 @@ namespace RaceControl
             return libVLC;
         }
 
+        private static MediaPlayer CreateMediaPlayer(IContainerProvider container)
+        {
+            return new MediaPlayer(container.Resolve<LibVLC>())
+            {
+                EnableHardwareDecoding = true,
+                EnableMouseInput = false,
+                EnableKeyInput = false,
+                FileCaching = 5000,
+                NetworkCaching = 10000
+            };
+        }
+
         private static IRestClient CreateRestClient()
         {
-            var restClient = new RestClient { UserAgent = nameof(RaceControl) };
-            restClient.ThrowOnAnyError = true;
+            var restClient = new RestClient { UserAgent = nameof(RaceControl), ThrowOnAnyError = true };
             restClient.UseNewtonsoftJson();
 
             return restClient;
-        }
-
-        private static void InitializeLogging()
-        {
-            var config = new LoggingConfiguration();
-            var logfile = new FileTarget("logfile")
-            {
-                FileName = FolderUtils.GetLocalApplicationDataFilename("RaceControl.log"),
-                Layout = Layout.FromString("${longdate} ${uppercase:${level}} ${message}${onexception:inner=${newline}${exception:format=tostring}}"),
-                ArchiveAboveSize = 1024 * 1024,
-                ArchiveNumbering = ArchiveNumberingMode.Rolling,
-                MaxArchiveFiles = 2
-            };
-            config.AddRule(LogLevelNLog.Info, LogLevelNLog.Fatal, logfile);
-            LogManager.Configuration = config;
         }
 
         private void PrismApplication_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
