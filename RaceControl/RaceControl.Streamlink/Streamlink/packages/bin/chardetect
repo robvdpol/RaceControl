@@ -1,4 +1,4 @@
-#!/opt/hostedtoolcache/Python/3.6.10/x64/bin/python
+#!/opt/hostedtoolcache/Python/3.6.12/x64/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
