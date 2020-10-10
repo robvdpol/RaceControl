@@ -756,8 +756,11 @@ namespace RaceControl.ViewModels
                 }
                 else
                 {
+                    var screenScale = ScreenHelper.GetScreenScale();
+                    var scaledWidth = settings.Width * screenScale;
+                    var scaledHeight = settings.Height * screenScale;
                     ScreenHelper.GetRelativeCoordinates(screenIndex, settings.Left, settings.Top, out var relativeLeft, out var relativeTop);
-                    arguments.Add($"--geometry={settings.Width:0}x{settings.Height:0}+{relativeLeft:+0;-#}+{relativeTop:+0;-#}");
+                    arguments.Add($"--geometry={scaledWidth:0}x{scaledHeight:0}+{relativeLeft:+0;-#}+{relativeTop:+0;-#}");
                     arguments.Add($"--screen={screenIndex}");
                 }
 

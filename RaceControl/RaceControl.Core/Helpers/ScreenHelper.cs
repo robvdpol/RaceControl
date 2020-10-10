@@ -31,8 +31,9 @@ namespace RaceControl.Core.Helpers
         public static void GetRelativeCoordinates(int screenIndex, double absoluteLeft, double absoluteTop, out double relativeLeft, out double relativeTop)
         {
             var screen = Screen.AllScreens[screenIndex];
-            relativeLeft = absoluteLeft - screen.Bounds.Left;
-            relativeTop = absoluteTop - screen.Bounds.Top;
+            var screenScale = GetScreenScale();
+            relativeLeft = absoluteLeft * screenScale - screen.Bounds.Left;
+            relativeTop = absoluteTop * screenScale - screen.Bounds.Top;
         }
 
         public static double GetScreenScale()
