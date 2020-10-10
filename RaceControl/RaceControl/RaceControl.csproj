@@ -5,9 +5,9 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>RaceControl</AssemblyName>
     <SignAssembly>false</SignAssembly>
-    <AssemblyVersion>1.8.0.0</AssemblyVersion>
-    <FileVersion>1.8.0.0</FileVersion>
-    <Version>1.8.0</Version>
+    <AssemblyVersion>1.8.1.0</AssemblyVersion>
+    <FileVersion>1.8.1.0</FileVersion>
+    <Version>1.8.1</Version>
     <ApplicationIcon>f1.ico</ApplicationIcon>
     <Platforms>x64</Platforms>
   </PropertyGroup>
