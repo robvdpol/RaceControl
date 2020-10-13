@@ -11,16 +11,16 @@ Race Control is an open source [F1TV](https://f1tv.formula1.com) desktop client 
 ## Features
 * Easy to set up and use, no editing of config files needed
 * Fast and user-friendly user interface
-* Watch F1TV live streams in the highest quality available (1080p at the moment)
+* Watch F1TV live streams in the highest quality available
 * Supports three different video players (internal player, VLC and MPV)
 * Open as many streams as you like, using the layout that you like
-* Save your custom video player layout, so you don't have to position your windows manually every time you watch a session
+* Save your custom video player layout, so you don't have to position windows manually every time you watch a session
 * Cast to your Chromecast with a single click of a button (internal player and VLC only)
 * Experimental synchronization of streams (replays only at the moment)
 
 ## Installation
 * Download the [latest release](https://github.com/robvdpol/RaceControl/releases/latest) and start the installer.
-* If the [.NET Core Desktop Runtime](https://dotnet.microsoft.com/download/dotnet-core/current/runtime) needs to be installed on your system you will be notified about it.
+* If the [.NET Core 3.1 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet-core/current/runtime) needs to be installed on your system you will be notified about it.
 * Follow the steps in the setup wizard to complete the installation.
 * Start Race Control using either the desktop shortcut or the start menu entry.
 
@@ -56,7 +56,7 @@ The main window supports the following keyboard shortcuts:
 You need an F1TV account to watch F1TV streams. If you want to watch race replays, an F1TV Access subscription is required. If you want to watch live sessions, an F1TV Pro subscription is required. You can create an account and subscribe at http://f1tv.formula1.com.
 
 #### What happens with my credentials when I login?
-Your F1TV login credentials are stored locally in the Windows Credential Manager, so you don't have to login every time you start the application. If you wish to switch to a different F1TV account, press the button 'Delete stored credentials' located in 'Options'. Your credentials will be removed and you will be asked to login again.
+Your F1TV login credentials are stored locally in the Windows Credential Manager, so you don't have to login every time you start the application. If you wish to switch to a different F1TV account, press the button 'Delete stored credentials' under the 'Options' section. Your stored credentials will be removed from your system and you will be asked to login again.
 
 #### Where does Race Control store my settings and video layout? Will they be retained when I upgrade Race Control?
 Your settings and video layout are stored in JSON-files, which are saved to *%LOCALAPPDATA%\RaceControl* (usually located at *C:\Users\USERNAME\AppData\Local\RaceControl*). When you upgrade Race Control your settings and video layout will be retained.
@@ -68,10 +68,10 @@ You need to have VLC media player installed on your machine. The location of you
 No, Race Control comes with a recent version of MPV included in the release.
 
 #### Can you add support for my favourite media player?
-Maybe, please create an issue (feature request) and I will consider it. As a workaround, you can use the Copy-button to generate a tokenized link to the stream that is copied to your clipboard. Open the link with a media player of your choice to watch the stream.
+Maybe, please create an issue (feature request) and I will consider it. As a workaround, you can use the Copy-button to generate a tokenized link to the stream that is copied to your clipboard. Open the link with a media player of your choice to watch the stream. Note: the media player needs to properly support the HTTP Live Streaming (HLS) protocol.
 
 ## Acknowledgements
-* [f1viewer](https://github.com/SoMuchForSubtlety/f1viewer) for showing how to use the F1TV API
+* [F1viewer](https://github.com/SoMuchForSubtlety/f1viewer) for showing how to use the F1TV API
 * [VLC](https://www.videolan.org/vlc) for providing an excellent video player and .NET library
 * [MPV](https://mpv.io) for providing a video player that can reliably play F1TV live streams without needing workarounds
 * [Streamlink](https://streamlink.github.io) for providing a flexible stream extractor/transporter
