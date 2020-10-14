@@ -18,11 +18,13 @@ using RaceControl.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 
 namespace RaceControl.ViewModels
@@ -58,6 +60,7 @@ namespace RaceControl.ViewModels
         private ICommand _deleteCredentialCommand;
 
         private string _token;
+        private string _episodeFilterText;
         private string _vlcExeLocation;
         private string _mpvExeLocation;
         private ObservableCollection<IVideoDialogViewModel> _videoDialogViewModels;
@@ -94,6 +97,8 @@ namespace RaceControl.ViewModels
             _streamlinkLauncher = streamlinkLauncher;
             Settings = settings;
             VideoDialogLayout = videoDialogLayout;
+            EpisodesView = CollectionViewSource.GetDefaultView(Episodes);
+            EpisodesView.Filter = (episode) => string.IsNullOrEmpty(EpisodeFilterText) || episode.ToString().Contains(EpisodeFilterText, StringComparison.OrdinalIgnoreCase);
         }
 
         public ICommand LoadedCommand => _loadedCommand ??= new DelegateCommand<RoutedEventArgs>(LoadedExecute);
@@ -119,6 +124,20 @@ namespace RaceControl.ViewModels
         public ISettings Settings { get; }
 
         public IVideoDialogLayout VideoDialogLayout { get; }
+
+        public ICollectionView EpisodesView { get; private set; }
+
+        public string EpisodeFilterText
+        {
+            get => _episodeFilterText;
+            set
+            {
+                if (SetProperty(ref _episodeFilterText, value))
+                {
+                    EpisodesView.Refresh();
+                }
+            }
+        }
 
         public string VlcExeLocation
         {

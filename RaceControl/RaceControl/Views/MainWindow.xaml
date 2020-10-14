@@ -17,7 +17,6 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <core:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <core:CollectionContainsConverter x:Key="CollectionContainsConverter" />
-        <core:MatchesFilterConverter x:Key="MatchesFilterConverter" />
         <core:DatePassedConverter x:Key="DatePassedConverter" />
         <Style x:Key="HeaderLabelStyle" TargetType="Label">
             <Setter Property="Margin" Value="2" />
@@ -504,11 +503,11 @@
                         <StackPanel Grid.Column="1" Orientation="Horizontal">
                             <TextBlock VerticalAlignment="Center" Text="Filter: " />
                             <TextBox
-                                Name="FilterTextBox"
                                 Width="250"
                                 Height="22"
                                 VerticalContentAlignment="Center"
-                                MaxLength="200" />
+                                MaxLength="200"
+                                Text="{Binding EpisodeFilterText, UpdateSourceTrigger=PropertyChanged}" />
                         </StackPanel>
                     </Grid>
                 </Label.Content>
@@ -517,7 +516,7 @@
                 Grid.Row="3"
                 Grid.Column="2"
                 HorizontalContentAlignment="Stretch"
-                ItemsSource="{Binding Episodes}"
+                ItemsSource="{Binding EpisodesView}"
                 ScrollViewer.VerticalScrollBarVisibility="Visible"
                 Style="{StaticResource ContentListBoxStyle}">
                 <ListBox.ItemContainerStyle>
@@ -556,18 +555,6 @@
                                 </ToolTip>
                             </Setter.Value>
                         </Setter>
-                        <Setter Property="Visibility" Value="Collapsed" />
-                        <Style.Triggers>
-                            <DataTrigger Value="True">
-                                <DataTrigger.Binding>
-                                    <MultiBinding Converter="{StaticResource MatchesFilterConverter}">
-                                        <Binding />
-                                        <Binding ElementName="FilterTextBox" Path="Text" />
-                                    </MultiBinding>
-                                </DataTrigger.Binding>
-                                <Setter Property="Visibility" Value="Visible" />
-                            </DataTrigger>
-                        </Style.Triggers>
                     </Style>
                 </ListBox.ItemContainerStyle>
                 <ListBox.ItemTemplate>
