@@ -184,11 +184,7 @@ namespace RaceControl.ViewModels
                 StartupLocation = WindowStartupLocation.CenterScreen;
             }
 
-            StartStreamAsync().Await(SubscribeEvents, HandleCriticalError);
-            LoadDriverImageUrlsAsync().Await(HandleNonCriticalError);
-            CreateShowControlsTimer();
-
-            base.OnDialogOpened(parameters);
+            InitializeAsync().Await(InitializeCompleted, InitializeError);
         }
 
         public override void OnDialogClosed()
@@ -489,6 +485,25 @@ namespace RaceControl.ViewModels
 
             DialogSettings.IsMuted = settings.IsMuted;
             DialogSettings.Volume = settings.Volume;
+        }
+
+        private async Task InitializeAsync()
+        {
+            await StartStreamAsync();
+            await LoadDriverImageUrlsAsync();
+            SubscribeEvents();
+            CreateShowControlsTimer();
+        }
+
+        private void InitializeCompleted()
+        {
+            base.OnDialogOpened(null);
+        }
+
+        private void InitializeError(Exception ex)
+        {
+            base.OnDialogOpened(null);
+            HandleCriticalError(ex);
         }
 
         private async Task StartStreamAsync()
