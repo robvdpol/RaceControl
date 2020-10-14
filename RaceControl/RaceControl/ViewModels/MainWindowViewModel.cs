@@ -437,24 +437,7 @@ namespace RaceControl.ViewModels
                 viewModel.CloseWindow();
             }
 
-            foreach (var settings in VideoDialogLayout.Instances)
-            {
-                var playableContent = Channels.FirstOrDefault(p => p.ContentType == ContentType.Channel && p.Name == settings.ChannelName);
-
-                if (playableContent != null)
-                {
-                    switch (playerType)
-                    {
-                        case PlayerType.Internal:
-                            WatchContent(playableContent, settings);
-                            break;
-
-                        case PlayerType.Mpv:
-                            WatchInMpvAsync(playableContent, settings).Await(HandleCriticalError);
-                            break;
-                    }
-                }
-            }
+            OpenVideoDialogLayoutAsync(playerType).Await(HandleCriticalError);
         }
 
         private void DeleteCredentialExecute()
@@ -797,6 +780,33 @@ namespace RaceControl.ViewModels
                 };
 
                 _dialogService.Show(nameof(DownloadDialog), parameters, null);
+            }
+        }
+
+        private async Task OpenVideoDialogLayoutAsync(PlayerType? playerType)
+        {
+            var delaySeconds = playerType == PlayerType.Mpv ? 2 : 1;
+            var delayTimeSpan = TimeSpan.FromSeconds(delaySeconds);
+
+            foreach (var settings in VideoDialogLayout.Instances)
+            {
+                var playableContent = Channels.FirstOrDefault(c => c.ContentType == ContentType.Channel && c.Name == settings.ChannelName);
+
+                if (playableContent != null)
+                {
+                    switch (playerType)
+                    {
+                        case PlayerType.Internal:
+                            WatchContent(playableContent, settings);
+                            break;
+
+                        case PlayerType.Mpv:
+                            await WatchInMpvAsync(playableContent, settings);
+                            break;
+                    }
+                }
+
+                await Task.Delay(delayTimeSpan);
             }
         }
 
