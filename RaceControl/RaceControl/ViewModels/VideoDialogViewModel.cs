@@ -63,8 +63,6 @@ namespace RaceControl.ViewModels
         private bool _showControls = true;
         private IMediaRenderer _selectedMediaRenderer;
         private Timer _showControlsTimer;
-        private SubscriptionToken _syncStreamsEventToken;
-        private SubscriptionToken _pauseAllEventToken;
         private string _carImageUrl;
         private string _headshotImageUrl;
 
@@ -371,6 +369,14 @@ namespace RaceControl.ViewModels
             }
         }
 
+        private void OnCloseAll(ContentType contentType)
+        {
+            if (CloseWindowCommand.CanExecute(null))
+            {
+                CloseWindowCommand.Execute(null);
+            }
+        }
+
         private void ToggleFullScreenExecute()
         {
             if (DialogSettings.WindowState != WindowState.Maximized)
@@ -545,23 +551,16 @@ namespace RaceControl.ViewModels
 
         private void SubscribeEvents()
         {
-            _syncStreamsEventToken ??= _eventAggregator.GetEvent<SyncStreamsEvent>().Subscribe(OnSyncStreams);
-            _pauseAllEventToken ??= _eventAggregator.GetEvent<PauseAllEvent>().Subscribe(OnPauseAll);
+            _eventAggregator.GetEvent<SyncStreamsEvent>().Subscribe(OnSyncStreams);
+            _eventAggregator.GetEvent<PauseAllEvent>().Subscribe(OnPauseAll);
+            _eventAggregator.GetEvent<CloseAllEvent>().Subscribe(OnCloseAll, contentType => contentType == PlayableContent.ContentType);
         }
 
         private void UnsubscribeEvents()
         {
-            if (_syncStreamsEventToken != null)
-            {
-                _eventAggregator.GetEvent<SyncStreamsEvent>().Unsubscribe(_syncStreamsEventToken);
-                _syncStreamsEventToken = null;
-            }
-
-            if (_pauseAllEventToken != null)
-            {
-                _eventAggregator.GetEvent<PauseAllEvent>().Unsubscribe(_pauseAllEventToken);
-                _pauseAllEventToken = null;
-            }
+            _eventAggregator.GetEvent<SyncStreamsEvent>().Unsubscribe(OnSyncStreams);
+            _eventAggregator.GetEvent<PauseAllEvent>().Unsubscribe(OnPauseAll);
+            _eventAggregator.GetEvent<CloseAllEvent>().Unsubscribe(OnCloseAll);
         }
 
         private void CreateShowControlsTimer()

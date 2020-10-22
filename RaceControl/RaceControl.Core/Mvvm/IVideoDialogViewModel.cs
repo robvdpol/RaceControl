@@ -1,10 +1,11 @@
-﻿using RaceControl.Common.Interfaces;
+﻿using Prism.Services.Dialogs;
+using RaceControl.Common.Interfaces;
 using RaceControl.Core.Settings;
 using System;
 
 namespace RaceControl.Core.Mvvm
 {
-    public interface IVideoDialogViewModel : IExtendedDialogAware
+    public interface IVideoDialogViewModel : IDialogAware
     {
         Guid UniqueIdentifier { get; }
 

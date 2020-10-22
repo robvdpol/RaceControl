@@ -36,7 +36,7 @@ namespace RaceControl.ViewModels
 
         private void CloseExecute(bool? upgrade)
         {
-            RaiseRequestClose(new DialogResult(upgrade.HasValue && upgrade.Value ? ButtonResult.OK : ButtonResult.Cancel));
+            RaiseRequestClose(upgrade.HasValue && upgrade.Value ? ButtonResult.OK : ButtonResult.Cancel);
         }
     }
 }

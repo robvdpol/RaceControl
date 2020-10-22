@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using NLog;
 using Prism.Commands;
+using Prism.Events;
 using Prism.Services.Dialogs;
 using RaceControl.Common.Enums;
 using RaceControl.Common.Interfaces;
@@ -10,6 +11,7 @@ using RaceControl.Core.Helpers;
 using RaceControl.Core.Mvvm;
 using RaceControl.Core.Settings;
 using RaceControl.Core.Streamlink;
+using RaceControl.Events;
 using RaceControl.Services.Interfaces.Credential;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Api;
@@ -33,6 +35,7 @@ namespace RaceControl.ViewModels
     public class MainWindowViewModel : ViewModelBase
     {
         private readonly IExtendedDialogService _dialogService;
+        private readonly IEventAggregator _eventAggregator;
         private readonly IApiService _apiService;
         private readonly IGithubService _githubService;
         private readonly ICredentialService _credentialService;
@@ -82,6 +85,7 @@ namespace RaceControl.ViewModels
         public MainWindowViewModel(
             ILogger logger,
             IExtendedDialogService dialogService,
+            IEventAggregator eventAggregator,
             IApiService apiService,
             IGithubService githubService,
             ICredentialService credentialService,
@@ -91,6 +95,7 @@ namespace RaceControl.ViewModels
             : base(logger)
         {
             _dialogService = dialogService;
+            _eventAggregator = eventAggregator;
             _apiService = apiService;
             _githubService = githubService;
             _credentialService = credentialService;
@@ -449,12 +454,7 @@ namespace RaceControl.ViewModels
 
         private void OpenVideoDialogLayoutExecute(PlayerType? playerType)
         {
-            var viewModelsToClose = VideoDialogViewModels.Where(vm => vm.PlayableContent.ContentType == ContentType.Channel).ToList();
-
-            foreach (var viewModel in viewModelsToClose)
-            {
-                viewModel.CloseWindow();
-            }
+            _eventAggregator.GetEvent<CloseAllEvent>().Publish(ContentType.Channel);
 
             OpenVideoDialogLayoutAsync(playerType).Await(HandleCriticalError);
         }

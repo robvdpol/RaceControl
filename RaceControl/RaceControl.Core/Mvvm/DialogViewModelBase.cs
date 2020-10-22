@@ -6,7 +6,7 @@ using System.Windows.Input;
 
 namespace RaceControl.Core.Mvvm
 {
-    public abstract class DialogViewModelBase : ViewModelBase, IExtendedDialogAware
+    public abstract class DialogViewModelBase : ViewModelBase, IDialogAware
     {
         private ICommand _closeWindowCommand;
         private bool _canClose;
@@ -17,7 +17,7 @@ namespace RaceControl.Core.Mvvm
 
         public abstract string Title { get; }
 
-        public ICommand CloseWindowCommand => _closeWindowCommand ??= new DelegateCommand(CloseWindow).ObservesCanExecute(() => CanClose);
+        public ICommand CloseWindowCommand => _closeWindowCommand ??= new DelegateCommand(RaiseRequestClose).ObservesCanExecute(() => CanClose);
 
         protected bool CanClose
         {
@@ -27,9 +27,9 @@ namespace RaceControl.Core.Mvvm
 
         public event Action<IDialogResult> RequestClose;
 
-        public bool CanCloseDialog()
+        public virtual void OnDialogOpened(IDialogParameters parameters)
         {
-            return CanClose;
+            CanClose = true;
         }
 
         public virtual void OnDialogClosed()
@@ -37,17 +37,22 @@ namespace RaceControl.Core.Mvvm
             CanClose = false;
         }
 
-        public virtual void OnDialogOpened(IDialogParameters parameters)
+        public bool CanCloseDialog()
         {
-            CanClose = true;
+            return CanClose;
         }
 
-        public void CloseWindow()
+        protected void RaiseRequestClose(ButtonResult buttonResult, IDialogParameters dialogParameters = null)
+        {
+            RaiseRequestClose(new DialogResult(buttonResult, dialogParameters));
+        }
+
+        protected void RaiseRequestClose()
         {
             RaiseRequestClose(null);
         }
 
-        protected void RaiseRequestClose(IDialogResult dialogResult)
+        private void RaiseRequestClose(IDialogResult dialogResult)
         {
             RequestClose?.Invoke(dialogResult);
         }

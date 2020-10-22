@@ -7,7 +7,6 @@ using RaceControl.Services.Interfaces.F1TV;
 using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using DialogResult = Prism.Services.Dialogs.DialogResult;
 
 namespace RaceControl.ViewModels
 {
@@ -92,7 +91,7 @@ namespace RaceControl.ViewModels
             Logger.Info("Login successful.");
             Error = null;
             IsBusy = false;
-            RaiseRequestClose(new DialogResult(ButtonResult.OK, new DialogParameters { { ParameterNames.TOKEN, _token } }));
+            RaiseRequestClose(ButtonResult.OK, new DialogParameters { { ParameterNames.TOKEN, _token } });
         }
 
         private void LoginError(Exception ex)
