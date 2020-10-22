@@ -66,7 +66,6 @@ namespace RaceControl.ViewModels
         private string _episodeFilterText;
         private string _vlcExeLocation;
         private string _mpvExeLocation;
-        private ObservableCollection<IVideoDialogViewModel> _videoDialogViewModels;
         private ObservableCollection<Season> _seasons;
         private ObservableCollection<Series> _series;
         private ObservableCollection<Event> _events;
@@ -122,7 +121,7 @@ namespace RaceControl.ViewModels
         public ICommand CopyContentUrlCommand => _copyContentUrlCommand ??= new DelegateCommand<IPlayableContent>(CopyContentUrlExecute);
         public ICommand DownloadContentCommand => _downloadContentCommand ??= new DelegateCommand<IPlayableContent>(DownloadContentExecute, CanDownloadContentExecute);
         public ICommand SetRecordingLocationCommand => _setRecordingLocationCommand ??= new DelegateCommand(SetRecordingLocationExecute);
-        public ICommand SaveVideoDialogLayoutCommand => _saveVideoDialogLayoutCommand ??= new DelegateCommand(SaveVideoDialogLayoutExecute, CanSaveVideoDialogLayoutExecute).ObservesProperty(() => VideoDialogViewModels.Count);
+        public ICommand SaveVideoDialogLayoutCommand => _saveVideoDialogLayoutCommand ??= new DelegateCommand(SaveVideoDialogLayoutExecute);
         public ICommand OpenVideoDialogLayoutCommand => _openVideoDialogLayoutCommand ??= new DelegateCommand<PlayerType?>(OpenVideoDialogLayoutExecute, CanOpenVideoDialogLayoutExecute).ObservesProperty(() => VideoDialogLayout.Instances.Count).ObservesProperty(() => Channels.Count);
         public ICommand DeleteCredentialCommand => _deleteCredentialCommand ??= new DelegateCommand(DeleteCredentialExecute);
 
@@ -154,12 +153,6 @@ namespace RaceControl.ViewModels
         {
             get => _mpvExeLocation;
             set => SetProperty(ref _mpvExeLocation, value);
-        }
-
-        public ObservableCollection<IVideoDialogViewModel> VideoDialogViewModels
-        {
-            get => _videoDialogViewModels ??= new ObservableCollection<IVideoDialogViewModel>();
-            set => SetProperty(ref _videoDialogViewModels, value);
         }
 
         public ObservableCollection<Season> Seasons
@@ -431,19 +424,22 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private bool CanSaveVideoDialogLayoutExecute()
-        {
-            return VideoDialogViewModels.Any(vm => vm.PlayableContent.ContentType == ContentType.Channel);
-        }
-
         private void SaveVideoDialogLayoutExecute()
         {
             VideoDialogLayout.Instances.Clear();
-            VideoDialogLayout.Instances.AddRange(VideoDialogViewModels.Where(vm => vm.PlayableContent.ContentType == ContentType.Channel).Select(vm => vm.GetDialogSettings()));
+            _eventAggregator.GetEvent<SaveLayoutEvent>().Publish(ContentType.Channel);
 
-            if (VideoDialogLayout.Save())
+            if (VideoDialogLayout.Instances.Any())
             {
-                MessageBoxHelper.ShowInfo("The current window layout has been successfully saved.", "Video player layout");
+                if (VideoDialogLayout.Save())
+                {
+                    MessageBoxHelper.ShowInfo("The current window layout has been successfully saved.", "Video player layout");
+                }
+            }
+            else
+            {
+                VideoDialogLayout.Load();
+                MessageBoxHelper.ShowError("Could not find any internal player windows to save.", "Video player layout");
             }
         }
 
@@ -455,7 +451,6 @@ namespace RaceControl.ViewModels
         private void OpenVideoDialogLayoutExecute(PlayerType? playerType)
         {
             _eventAggregator.GetEvent<CloseAllEvent>().Publish(ContentType.Channel);
-
             OpenVideoDialogLayoutAsync(playerType).Await(HandleCriticalError);
         }
 
@@ -706,19 +701,7 @@ namespace RaceControl.ViewModels
                 { ParameterNames.SETTINGS, settings }
             };
 
-            var viewModel = (IVideoDialogViewModel)_dialogService.Show(nameof(VideoDialog), parameters, OnVideoDialogClosed, false, nameof(VideoDialogWindow));
-            VideoDialogViewModels.Add(viewModel);
-        }
-
-        private void OnVideoDialogClosed(IDialogResult result)
-        {
-            var uniqueIdentifier = result.Parameters.GetValue<Guid>(ParameterNames.IDENTIFIER);
-            var viewModel = VideoDialogViewModels.FirstOrDefault(vm => vm.UniqueIdentifier == uniqueIdentifier);
-
-            if (viewModel != null)
-            {
-                VideoDialogViewModels.Remove(viewModel);
-            }
+            _dialogService.Show(nameof(VideoDialog), parameters, null, false, nameof(VideoDialogWindow));
         }
 
         private async Task WatchInVlcAsync(IPlayableContent playableContent)

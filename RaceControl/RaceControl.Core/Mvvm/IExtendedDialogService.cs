@@ -9,6 +9,6 @@ namespace RaceControl.Core.Mvvm
 
         bool SelectFile(string title, string initialDirectory, string initialFilename, string defaultExtension, out string filename);
 
-        object Show(string name, IDialogParameters parameters, Action<IDialogResult> callback, bool hasOwner, string windowName = null);
+        void Show(string name, IDialogParameters parameters, Action<IDialogResult> callback, bool hasOwner, string windowName = null);
     }
 }

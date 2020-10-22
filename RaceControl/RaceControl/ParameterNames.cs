@@ -7,6 +7,5 @@
         public const string SETTINGS = nameof(SETTINGS);
         public const string RELEASE = nameof(RELEASE);
         public const string FILENAME = nameof(FILENAME);
-        public const string IDENTIFIER = nameof(IDENTIFIER);
     }
 }

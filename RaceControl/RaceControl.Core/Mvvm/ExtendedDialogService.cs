@@ -64,12 +64,12 @@ namespace RaceControl.Core.Mvvm
             return false;
         }
 
-        public object Show(string name, IDialogParameters parameters, Action<IDialogResult> callback, bool hasOwner, string windowName = null)
+        public void Show(string name, IDialogParameters parameters, Action<IDialogResult> callback, bool hasOwner, string windowName = null)
         {
-            return ShowDialogInternal(name, parameters, callback, hasOwner, windowName);
+            ShowDialogInternal(name, parameters, callback, hasOwner, windowName);
         }
 
-        private object ShowDialogInternal(string name, IDialogParameters parameters, Action<IDialogResult> callback, bool hasOwner, string windowName)
+        private void ShowDialogInternal(string name, IDialogParameters parameters, Action<IDialogResult> callback, bool hasOwner, string windowName)
         {
             var dialogWindow = CreateDialogWindow(windowName);
             ConfigureDialogWindowEvents(dialogWindow, callback);
@@ -81,8 +81,6 @@ namespace RaceControl.Core.Mvvm
             }
 
             dialogWindow.Show();
-
-            return dialogWindow.DataContext;
         }
     }
 }

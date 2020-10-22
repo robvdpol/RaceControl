@@ -20,7 +20,7 @@ using System.Windows.Input;
 
 namespace RaceControl.ViewModels
 {
-    public class VideoDialogViewModel : DialogViewModelBase, IVideoDialogViewModel
+    public class VideoDialogViewModel : DialogViewModelBase
     {
         private const int MouseWheelDelta = 12;
 
@@ -28,6 +28,7 @@ namespace RaceControl.ViewModels
         private readonly IApiService _apiService;
         private readonly IStreamlinkLauncher _streamlinkLauncher;
         private readonly ISettings _settings;
+        private readonly IVideoDialogLayout _videoDialogLayout;
         private readonly object _showControlsTimerLock = new object();
 
         private ICommand _mouseDownVideoCommand;
@@ -72,6 +73,7 @@ namespace RaceControl.ViewModels
             IApiService apiService,
             IStreamlinkLauncher streamlinkLauncher,
             ISettings settings,
+            IVideoDialogLayout videoDialogLayout,
             IMediaPlayer mediaPlayer)
             : base(logger)
         {
@@ -79,6 +81,7 @@ namespace RaceControl.ViewModels
             _apiService = apiService;
             _streamlinkLauncher = streamlinkLauncher;
             _settings = settings;
+            _videoDialogLayout = videoDialogLayout;
             MediaPlayer = mediaPlayer;
         }
 
@@ -105,8 +108,6 @@ namespace RaceControl.ViewModels
         public ICommand ScanChromecastCommand => _scanChromecastCommand ??= new DelegateCommand(ScanChromecastExecute, CanScanChromecastExecute).ObservesProperty(() => CanClose).ObservesProperty(() => MediaPlayer.IsScanning);
         public ICommand StartCastVideoCommand => _startCastVideoCommand ??= new DelegateCommand(StartCastVideoExecute, CanStartCastVideoExecute).ObservesProperty(() => CanClose).ObservesProperty(() => SelectedMediaRenderer);
         public ICommand StopCastVideoCommand => _stopCastVideoCommand ??= new DelegateCommand(StopCastVideoExecute, CanStopCastVideoExecute).ObservesProperty(() => MediaPlayer.IsCasting);
-
-        public Guid UniqueIdentifier { get; } = Guid.NewGuid();
 
         public IMediaPlayer MediaPlayer { get; }
 
@@ -195,23 +196,6 @@ namespace RaceControl.ViewModels
             CleanupProcess(_streamlinkRecordingProcess);
 
             base.OnDialogClosed();
-        }
-
-        public VideoDialogSettings GetDialogSettings()
-        {
-            return new VideoDialogSettings
-            {
-                Top = DialogSettings.Top,
-                Left = DialogSettings.Left,
-                Width = DialogSettings.Width,
-                Height = DialogSettings.Height,
-                ResizeMode = DialogSettings.ResizeMode,
-                WindowState = DialogSettings.WindowState,
-                Topmost = DialogSettings.Topmost,
-                IsMuted = MediaPlayer.IsMuted,
-                Volume = MediaPlayer.Volume,
-                ChannelName = PlayableContent.Name
-            };
         }
 
         private void ShowControlsTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -377,6 +361,12 @@ namespace RaceControl.ViewModels
             }
         }
 
+        private void OnSaveLayout(ContentType contentType)
+        {
+            var dialogSettings = GetDialogSettings();
+            _videoDialogLayout.Instances.Add(dialogSettings);
+        }
+
         private void ToggleFullScreenExecute()
         {
             if (DialogSettings.WindowState != WindowState.Maximized)
@@ -493,6 +483,23 @@ namespace RaceControl.ViewModels
             DialogSettings.Volume = settings.Volume;
         }
 
+        private VideoDialogSettings GetDialogSettings()
+        {
+            return new VideoDialogSettings
+            {
+                Top = DialogSettings.Top,
+                Left = DialogSettings.Left,
+                Width = DialogSettings.Width,
+                Height = DialogSettings.Height,
+                ResizeMode = DialogSettings.ResizeMode,
+                WindowState = DialogSettings.WindowState,
+                Topmost = DialogSettings.Topmost,
+                IsMuted = MediaPlayer.IsMuted,
+                Volume = MediaPlayer.Volume,
+                ChannelName = PlayableContent.Name
+            };
+        }
+
         private async Task InitializeAsync()
         {
             await StartStreamAsync();
@@ -554,6 +561,7 @@ namespace RaceControl.ViewModels
             _eventAggregator.GetEvent<SyncStreamsEvent>().Subscribe(OnSyncStreams);
             _eventAggregator.GetEvent<PauseAllEvent>().Subscribe(OnPauseAll);
             _eventAggregator.GetEvent<CloseAllEvent>().Subscribe(OnCloseAll, contentType => contentType == PlayableContent.ContentType);
+            _eventAggregator.GetEvent<SaveLayoutEvent>().Subscribe(OnSaveLayout, contentType => contentType == PlayableContent.ContentType);
         }
 
         private void UnsubscribeEvents()
@@ -561,6 +569,7 @@ namespace RaceControl.ViewModels
             _eventAggregator.GetEvent<SyncStreamsEvent>().Unsubscribe(OnSyncStreams);
             _eventAggregator.GetEvent<PauseAllEvent>().Unsubscribe(OnPauseAll);
             _eventAggregator.GetEvent<CloseAllEvent>().Unsubscribe(OnCloseAll);
+            _eventAggregator.GetEvent<SaveLayoutEvent>().Unsubscribe(OnSaveLayout);
         }
 
         private void CreateShowControlsTimer()
