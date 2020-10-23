@@ -38,8 +38,9 @@ namespace RaceControl.Services.F1TV
             _logger.Info("Sending token request...");
             var restClient = _restClientFactory();
             var restRequest = new RestRequest(Constants.TOKEN_URL).AddJsonBody(tokenRequest);
+            var restResponse = await restClient.ExecutePostAsync<TokenResponse>(restRequest);
 
-            return await restClient.PostAsync<TokenResponse>(restRequest);
+            return restResponse.IsSuccessful ? restResponse.Data : throw new Exception(restResponse.StatusDescription);
         }
 
         private async Task<AuthResponse> AuthenticateAsync(string login, string password)
@@ -53,8 +54,9 @@ namespace RaceControl.Services.F1TV
             _logger.Info($"Sending authorization request for login '{authRequest.Login}'...");
             var restClient = _restClientFactory();
             var restRequest = new RestRequest(Constants.AUTHENTICATE_URL).AddJsonBody(authRequest).AddHeader("apiKey", Constants.API_KEY);
+            var restResponse = await restClient.ExecutePostAsync<AuthResponse>(restRequest);
 
-            return await restClient.PostAsync<AuthResponse>(restRequest);
+            return restResponse.IsSuccessful ? restResponse.Data : throw new Exception(restResponse.StatusDescription);
         }
     }
 }
