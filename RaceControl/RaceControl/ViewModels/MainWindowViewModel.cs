@@ -102,7 +102,7 @@ namespace RaceControl.ViewModels
             Settings = settings;
             VideoDialogLayout = videoDialogLayout;
             EpisodesView = CollectionViewSource.GetDefaultView(Episodes);
-            EpisodesView.Filter = (episode) => string.IsNullOrEmpty(EpisodeFilterText) || episode.ToString().Contains(EpisodeFilterText, StringComparison.OrdinalIgnoreCase);
+            EpisodesView.Filter = EpisodesViewFilter;
         }
 
         public ICommand LoadedCommand => _loadedCommand ??= new DelegateCommand<RoutedEventArgs>(LoadedExecute);
@@ -129,7 +129,7 @@ namespace RaceControl.ViewModels
 
         public IVideoDialogLayout VideoDialogLayout { get; }
 
-        public ICollectionView EpisodesView { get; private set; }
+        public ICollectionView EpisodesView { get; }
 
         public string EpisodeFilterText
         {
@@ -810,6 +810,16 @@ namespace RaceControl.ViewModels
 
                 await Task.Delay(delayTimeSpan);
             }
+        }
+
+        private bool EpisodesViewFilter(object episode)
+        {
+            if (!string.IsNullOrEmpty(EpisodeFilterText) && episode is IPlayableContent playableContent)
+            {
+                return (playableContent.ToString() ?? string.Empty).Contains(EpisodeFilterText, StringComparison.OrdinalIgnoreCase);
+            }
+
+            return true;
         }
 
         private void ClearEvents()
