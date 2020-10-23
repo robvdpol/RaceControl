@@ -46,6 +46,8 @@ namespace RaceControl.Core.Settings
             catch (Exception ex)
             {
                 _logger.Error(ex, "An error occurred while loading video dialog layout.");
+
+                return;
             }
 
             _logger.Info("Done loading video dialog layout.");
