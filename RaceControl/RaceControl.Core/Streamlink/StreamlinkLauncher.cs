@@ -21,7 +21,7 @@ namespace RaceControl.Core.Streamlink
             _settings = settings;
         }
 
-        public async Task<(Process process, string streamlinkUrl)> StartStreamlinkExternalAsync(string streamUrl, int timeout = 15)
+        public async Task<(Process process, string streamlinkUrl)> StartStreamlinkExternalAsync(string streamUrl, int timeout = 30)
         {
             var port = SocketUtils.GetFreePort();
             var streamIdentifier = GetStreamIdentifier();
