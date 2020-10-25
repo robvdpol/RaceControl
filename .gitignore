@@ -340,4 +340,4 @@ ASALocalRun/
 healthchecksdb
 
 # Streamlink exceptions
-!**/Streamlink/[Pp]ackages/*
+!**/Streamlink/**/[Pp]ackages/*
