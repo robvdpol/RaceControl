@@ -21,6 +21,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RaceControl.Streamlink", "R
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "RaceControl.Installer", "RaceControl\RaceControl.Installer\RaceControl.Installer.vdproj", "{24118D77-DDC8-40DB-800A-22478E220153}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{114B4790-C604-4508-9E5A-1B07B513FF4E}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
