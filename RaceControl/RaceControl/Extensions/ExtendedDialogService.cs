@@ -1,9 +1,10 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
 using Prism.Ioc;
 using Prism.Services.Dialogs;
-using System;
+using RaceControl.Views;
+using System.Windows;
 
-namespace RaceControl.Core.Mvvm
+namespace RaceControl.Extensions
 {
     public class ExtendedDialogService : DialogService, IExtendedDialogService
     {
@@ -64,23 +65,14 @@ namespace RaceControl.Core.Mvvm
             return false;
         }
 
-        public void Show(string name, IDialogParameters parameters, Action<IDialogResult> callback, bool hasOwner, string windowName = null)
+        protected override void ConfigureDialogWindowProperties(IDialogWindow window, FrameworkElement dialogContent, IDialogAware viewModel)
         {
-            ShowDialogInternal(name, parameters, callback, hasOwner, windowName);
-        }
+            base.ConfigureDialogWindowProperties(window, dialogContent, viewModel);
 
-        private void ShowDialogInternal(string name, IDialogParameters parameters, Action<IDialogResult> callback, bool hasOwner, string windowName)
-        {
-            var dialogWindow = CreateDialogWindow(windowName);
-            ConfigureDialogWindowEvents(dialogWindow, callback);
-            ConfigureDialogWindowContent(name, dialogWindow, parameters);
-
-            if (!hasOwner && dialogWindow.Owner != null)
+            if (window is VideoDialogWindow)
             {
-                dialogWindow.Owner = null;
+                window.Owner = null;
             }
-
-            dialogWindow.Show();
         }
     }
 }

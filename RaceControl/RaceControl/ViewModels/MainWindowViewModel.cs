@@ -12,6 +12,7 @@ using RaceControl.Core.Mvvm;
 using RaceControl.Core.Settings;
 using RaceControl.Core.Streamlink;
 using RaceControl.Events;
+using RaceControl.Extensions;
 using RaceControl.Services.Interfaces.Credential;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Api;
@@ -701,7 +702,7 @@ namespace RaceControl.ViewModels
                 { ParameterNames.SETTINGS, settings }
             };
 
-            _dialogService.Show(nameof(VideoDialog), parameters, null, false, nameof(VideoDialogWindow));
+            _dialogService.Show(nameof(VideoDialog), parameters, null, nameof(VideoDialogWindow));
         }
 
         private async Task WatchInVlcAsync(IPlayableContent playableContent)
