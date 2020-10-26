@@ -709,6 +709,11 @@ namespace RaceControl.ViewModels
         {
             var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, playableContent);
 
+            if (!ValidateStreamUrl(streamUrl))
+            {
+                return;
+            }
+            
             if (playableContent.IsLive && !Settings.DisableStreamlink)
             {
                 _streamlinkLauncher.StartStreamlinkVlc(VlcExeLocation, streamUrl, playableContent.Title);
@@ -723,6 +728,12 @@ namespace RaceControl.ViewModels
         private async Task WatchInMpvAsync(IPlayableContent playableContent, VideoDialogSettings settings = null)
         {
             var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, playableContent);
+
+            if (!ValidateStreamUrl(streamUrl))
+            {
+                return;
+            }
+
             var arguments = new List<string>
             {
                 $"\"{streamUrl}\"",
@@ -766,6 +777,12 @@ namespace RaceControl.ViewModels
         private async Task CopyUrlAsync(IPlayableContent playableContent)
         {
             var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, playableContent);
+
+            if (!ValidateStreamUrl(streamUrl))
+            {
+                return;
+            }
+            
             Clipboard.SetText(streamUrl);
         }
 
@@ -836,6 +853,18 @@ namespace RaceControl.ViewModels
             Sessions.Clear();
             SelectedLiveSession = null;
             SelectedVodType = null;
+        }
+
+        private static bool ValidateStreamUrl(string streamUrl)
+        {
+            if (string.IsNullOrWhiteSpace(streamUrl))
+            {
+                MessageBoxHelper.ShowError("An error occurred while retrieving the stream URL.");
+
+                return false;
+            }
+
+            return true;
         }
     }
 }
