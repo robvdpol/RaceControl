@@ -10,6 +10,6 @@
         </Style>
     </Window.Style>
     <Window.InputBindings>
-        <KeyBinding Key="Escape" Command="{Binding CloseWindowCommand}" />
+        <KeyBinding Key="Esc" Command="{Binding CloseWindowCommand}" />
     </Window.InputBindings>
 </Window>

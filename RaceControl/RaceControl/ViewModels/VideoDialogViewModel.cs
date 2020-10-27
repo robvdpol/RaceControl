@@ -40,6 +40,7 @@ namespace RaceControl.ViewModels
         private ICommand _mouseEnterControlBarCommand;
         private ICommand _mouseLeaveControlBarCommand;
         private ICommand _mouseWheelControlBarCommand;
+        private ICommand _closeAllWindowsCommand;
         private ICommand _togglePauseCommand;
         private ICommand _togglePauseAllCommand;
         private ICommand _toggleMuteCommand;
@@ -96,6 +97,7 @@ namespace RaceControl.ViewModels
         public ICommand MouseEnterControlBarCommand => _mouseEnterControlBarCommand ??= new DelegateCommand(MouseEnterControlBarExecute);
         public ICommand MouseLeaveControlBarCommand => _mouseLeaveControlBarCommand ??= new DelegateCommand(MouseLeaveControlBarExecute);
         public ICommand MouseWheelControlBarCommand => _mouseWheelControlBarCommand ??= new DelegateCommand<MouseWheelEventArgs>(MouseWheelControlBarExecute);
+        public ICommand CloseAllWindowsCommand => _closeAllWindowsCommand ??= new DelegateCommand(CloseAllWindowsExecute);
         public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute).ObservesCanExecute(() => CanClose);
         public ICommand TogglePauseAllCommand => _togglePauseAllCommand ??= new DelegateCommand(TogglePauseAllExecute).ObservesCanExecute(() => CanClose);
         public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand(ToggleMuteExecute).ObservesCanExecute(() => CanClose);
@@ -275,6 +277,11 @@ namespace RaceControl.ViewModels
             MediaPlayer.Volume += args.Delta / MouseWheelDelta;
         }
 
+        private void CloseAllWindowsExecute()
+        {
+            _eventAggregator.GetEvent<CloseAllEvent>().Publish(null);
+        }
+
         private void TogglePauseExecute()
         {
             Logger.Info("Toggling pause...");
@@ -353,7 +360,7 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void OnCloseAll(ContentType contentType)
+        private void OnCloseAll(ContentType? contentType)
         {
             if (CloseWindowCommand.CanExecute(null))
             {
@@ -560,7 +567,7 @@ namespace RaceControl.ViewModels
         {
             _eventAggregator.GetEvent<SyncStreamsEvent>().Subscribe(OnSyncStreams);
             _eventAggregator.GetEvent<PauseAllEvent>().Subscribe(OnPauseAll);
-            _eventAggregator.GetEvent<CloseAllEvent>().Subscribe(OnCloseAll, contentType => contentType == PlayableContent.ContentType);
+            _eventAggregator.GetEvent<CloseAllEvent>().Subscribe(OnCloseAll, contentType => contentType == null || contentType == PlayableContent.ContentType);
             _eventAggregator.GetEvent<SaveLayoutEvent>().Subscribe(OnSaveLayout, contentType => contentType == PlayableContent.ContentType);
         }
 
