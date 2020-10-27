@@ -9,7 +9,7 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:prism="http://prismlibrary.com/"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
-    Width="1250"
+    Width="1260"
     Height="810"
     prism:ViewModelLocator.AutoWireViewModel="True"
     WindowStartupLocation="CenterScreen">
@@ -88,7 +88,7 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*" MinWidth="260" />
+                <ColumnDefinition Width="1*" MinWidth="265" />
                 <ColumnDefinition Width="1*" />
                 <ColumnDefinition Width="3*" />
             </Grid.ColumnDefinitions>
@@ -439,25 +439,40 @@
                             Grid.Row="1"
                             Margin="5,3"
                             Header="Video player layout">
-                            <StackPanel Orientation="Vertical">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
                                 <Button
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    Grid.ColumnSpan="2"
                                     Command="{Binding SaveVideoDialogLayoutCommand}"
                                     Content="Save current layout"
                                     Style="{StaticResource OptionButtonStyle}"
                                     ToolTip="Saves the position and size of all currently open video players (Ctrl+S)" />
                                 <Button
+                                    Grid.Row="1"
+                                    Grid.Column="0"
                                     Command="{Binding OpenVideoDialogLayoutCommand}"
                                     CommandParameter="{x:Static enums:PlayerType.Internal}"
-                                    Content="Open layout in internal player"
+                                    Content="Open internal"
                                     Style="{StaticResource OptionButtonStyle}"
                                     ToolTip="Watch the selected session in the previously saved layout using the internal player (Ctrl+I)" />
                                 <Button
+                                    Grid.Row="1"
+                                    Grid.Column="1"
                                     Command="{Binding OpenVideoDialogLayoutCommand}"
                                     CommandParameter="{x:Static enums:PlayerType.Mpv}"
-                                    Content="Open layout in MPV"
+                                    Content="Open in MPV"
                                     Style="{StaticResource OptionButtonStyle}"
                                     ToolTip="Watch the selected session in the previously saved layout using MPV (Ctrl+M)" />
-                            </StackPanel>
+                            </Grid>
                         </GroupBox>
                         <GroupBox
                             Grid.Row="2"
