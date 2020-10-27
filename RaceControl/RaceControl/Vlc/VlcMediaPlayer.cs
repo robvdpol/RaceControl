@@ -56,7 +56,7 @@ namespace RaceControl.Vlc
         public long Duration
         {
             get => _duration;
-            set => SetProperty(ref _duration, value);
+            private set => SetProperty(ref _duration, value);
         }
 
         public int Volume
@@ -74,25 +74,25 @@ namespace RaceControl.Vlc
         public bool IsPaused
         {
             get => _isPaused;
-            set => SetProperty(ref _isPaused, value);
+            private set => SetProperty(ref _isPaused, value);
         }
 
         public bool IsMuted
         {
             get => _isMuted;
-            set => SetProperty(ref _isMuted, value);
+            private set => SetProperty(ref _isMuted, value);
         }
 
         public bool IsScanning
         {
             get => _isScanning;
-            set => SetProperty(ref _isScanning, value);
+            private set => SetProperty(ref _isScanning, value);
         }
 
         public bool IsCasting
         {
             get => _isCasting;
-            set => SetProperty(ref _isCasting, value);
+            private set => SetProperty(ref _isCasting, value);
         }
 
         public ObservableCollection<IMediaTrack> AudioTracks
@@ -227,53 +227,59 @@ namespace RaceControl.Vlc
 
         private void MediaPlayer_ESAdded(object sender, MediaPlayerESAddedEventArgs e)
         {
-            if (e.Id >= 0)
+            if (e.Id < 0)
             {
-                switch (e.Type)
-                {
-                    case TrackType.Audio:
-                        var trackDescription = MediaPlayer.AudioTrackDescription.First(td => td.Id == e.Id);
+                return;
+            }
 
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            AudioTracks.Add(new VlcMediaTrack(trackDescription));
-                        });
-                        break;
-                }
+            switch (e.Type)
+            {
+                case TrackType.Audio:
+                    var trackDescription = MediaPlayer.AudioTrackDescription.First(td => td.Id == e.Id);
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        AudioTracks.Add(new VlcMediaTrack(trackDescription));
+                    });
+                    break;
             }
         }
 
         private void MediaPlayer_ESDeleted(object sender, MediaPlayerESDeletedEventArgs e)
         {
-            if (e.Id >= 0)
+            if (e.Id < 0)
             {
-                switch (e.Type)
-                {
-                    case TrackType.Audio:
-                        var audioTrack = AudioTracks.FirstOrDefault(at => at.Id == e.Id);
+                return;
+            }
 
-                        if (audioTrack != null)
+            switch (e.Type)
+            {
+                case TrackType.Audio:
+                    var audioTrack = AudioTracks.FirstOrDefault(at => at.Id == e.Id);
+
+                    if (audioTrack != null)
+                    {
+                        Application.Current.Dispatcher.Invoke(() =>
                         {
-                            Application.Current.Dispatcher.Invoke(() =>
-                            {
-                                AudioTracks.Remove(audioTrack);
-                            });
-                        }
+                            AudioTracks.Remove(audioTrack);
+                        });
+                    }
 
-                        break;
-                }
+                    break;
             }
         }
 
         private void RendererDiscoverer_ItemAdded(object sender, RendererDiscovererItemAddedEventArgs e)
         {
-            if (e.RendererItem.CanRenderVideo)
+            if (!e.RendererItem.CanRenderVideo)
             {
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    MediaRenderers.Add(new VlcMediaRenderer(e.RendererItem));
-                });
+                return;
             }
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                MediaRenderers.Add(new VlcMediaRenderer(e.RendererItem));
+            });
         }
     }
 }
