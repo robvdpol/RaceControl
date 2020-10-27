@@ -18,6 +18,7 @@ namespace RaceControl.Core.Settings
         private bool _lowQualityMode;
         private bool _useAlternativeStream;
         private bool _disableStreamlink;
+        private bool _disableMpvNoBorder;
         private string _recordingLocation = Environment.CurrentDirectory;
         private string _latestRelease;
         private ObservableCollection<string> _selectedSeries;
@@ -44,6 +45,12 @@ namespace RaceControl.Core.Settings
         {
             get => _disableStreamlink;
             set => SetProperty(ref _disableStreamlink, value);
+        }
+
+        public bool DisableMpvNoBorder
+        {
+            get => _disableMpvNoBorder;
+            set => SetProperty(ref _disableMpvNoBorder, value);
         }
 
         public string RecordingLocation

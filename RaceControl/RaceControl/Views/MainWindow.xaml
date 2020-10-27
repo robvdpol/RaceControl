@@ -408,17 +408,21 @@
                                     Margin="3"
                                     Content="Force lower quality live streams"
                                     IsChecked="{Binding Settings.LowQualityMode}"
-                                    ToolTip="Use in case of stuttering caused by low bandwidth connection" />
+                                    ToolTip="Use in case of stuttering caused by low bandwidth connection (only applies to internal player and VLC)" />
                                 <CheckBox
                                     Margin="3"
                                     Content="Use alternative CDN for live streams"
                                     IsChecked="{Binding Settings.UseAlternativeStream}"
-                                    ToolTip="Use when regular CDN does not work" />
+                                    ToolTip="Use when regular CDN does not work (only applies to internal player and VLC)" />
                                 <CheckBox
                                     Margin="3"
                                     Content="Disable Streamlink for live streams"
                                     IsChecked="{Binding Settings.DisableStreamlink}"
                                     ToolTip="Pass live stream URL directly to video player (only applies to internal player and VLC)" />
+                                <CheckBox
+                                    Margin="3"
+                                    Content="Disable MPV borderless mode"
+                                    IsChecked="{Binding Settings.DisableMpvNoBorder}" />
                                 <TextBlock Margin="3" Text="Recording location:" />
                                 <TextBlock
                                     Margin="3,0,3,3"

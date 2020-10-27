@@ -713,7 +713,7 @@ namespace RaceControl.ViewModels
             {
                 return;
             }
-            
+
             if (playableContent.IsLive && !Settings.DisableStreamlink)
             {
                 _streamlinkLauncher.StartStreamlinkVlc(VlcExeLocation, streamUrl, playableContent.Title);
@@ -737,9 +737,13 @@ namespace RaceControl.ViewModels
             var arguments = new List<string>
             {
                 $"\"{streamUrl}\"",
-                $"--title=\"{playableContent.Title}\"",
-                "--no-border"
+                $"--title=\"{playableContent.Title}\""
             };
+
+            if (!Settings.DisableMpvNoBorder)
+            {
+                arguments.Add("--no-border");
+            }
 
             if (settings != null)
             {
@@ -782,7 +786,7 @@ namespace RaceControl.ViewModels
             {
                 return;
             }
-            
+
             Clipboard.SetText(streamUrl);
         }
 
