@@ -28,7 +28,8 @@ Race Control is an open source [F1TV](https://f1tv.formula1.com) desktop client 
 The internal player supports the following keyboard shortcuts:
 | Function                     | Key                 |
 |------------------------------|---------------------|
-| Close window                 | Escape              |
+| Close player window          | Escape              |
+| Close all player windows     | Shift + Escape      |
 | Toggle pause                 | Space               |
 | Toggle pause for all players | Shift + Space       |
 | Toggle mute                  | M                   |
