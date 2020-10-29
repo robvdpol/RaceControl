@@ -140,9 +140,12 @@ namespace RaceControl.Vlc
             }
         }
 
-        public void ToggleMute()
+        public void ToggleMute(bool? mute)
         {
-            MediaPlayer.ToggleMute();
+            if (mute == null || mute.Value != IsMuted)
+            {
+                MediaPlayer.ToggleMute();
+            }
         }
 
         public void SetAudioTrack(IMediaTrack audioTrack)

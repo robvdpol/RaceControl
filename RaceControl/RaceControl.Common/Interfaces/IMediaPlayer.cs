@@ -30,7 +30,7 @@ namespace RaceControl.Common.Interfaces
 
         void TogglePause();
 
-        void ToggleMute();
+        void ToggleMute(bool? mute);
 
         void SetAudioTrack(IMediaTrack audioTrack);
 

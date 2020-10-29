@@ -9,6 +9,7 @@ using RaceControl.Core.Mvvm;
 using RaceControl.Core.Settings;
 using RaceControl.Core.Streamlink;
 using RaceControl.Events;
+using RaceControl.Extensions;
 using RaceControl.Services.Interfaces.F1TV;
 using System;
 using System.Diagnostics;
@@ -101,7 +102,7 @@ namespace RaceControl.ViewModels
         public ICommand CloseAllWindowsCommand => _closeAllWindowsCommand ??= new DelegateCommand(CloseAllWindowsExecute);
         public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute).ObservesCanExecute(() => CanClose);
         public ICommand TogglePauseAllCommand => _togglePauseAllCommand ??= new DelegateCommand(TogglePauseAllExecute).ObservesCanExecute(() => CanClose);
-        public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand(ToggleMuteExecute).ObservesCanExecute(() => CanClose);
+        public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand<bool?>(ToggleMuteExecute).ObservesCanExecute(() => CanClose);
         public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<int?>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent);
         public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent);
         public ICommand ToggleRecordingCommand => _toggleRecordingCommand ??= new DelegateCommand(ToggleRecordingExecute, CanToggleRecordingExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent).ObservesProperty(() => IsRecording).ObservesProperty(() => MediaPlayer.IsPaused);
@@ -230,11 +231,7 @@ namespace RaceControl.ViewModels
                     break;
 
                 case 2:
-                    if (ToggleFullScreenCommand.CanExecute(null))
-                    {
-                        ToggleFullScreenCommand.Execute(null);
-                    }
-
+                    ToggleFullScreenCommand.TryExecute();
                     break;
             }
         }
@@ -296,10 +293,10 @@ namespace RaceControl.ViewModels
             _eventAggregator.GetEvent<PauseAllEvent>().Publish();
         }
 
-        private void ToggleMuteExecute()
+        private void ToggleMuteExecute(bool? mute)
         {
             Logger.Info("Toggling mute...");
-            MediaPlayer.ToggleMute();
+            MediaPlayer.ToggleMute(mute);
         }
 
         private bool CanFastForwardExecute(int? seconds)
@@ -356,18 +353,18 @@ namespace RaceControl.ViewModels
 
         private void OnPauseAll()
         {
-            if (TogglePauseCommand.CanExecute(null))
-            {
-                TogglePauseCommand.Execute(null);
-            }
+            TogglePauseCommand.TryExecute();
+        }
+
+        private void OnMuteAll(long identifier)
+        {
+            var mute = identifier != _identifier;
+            ToggleMuteCommand.TryExecute(mute);
         }
 
         private void OnCloseAll(ContentType? contentType)
         {
-            if (CloseWindowCommand.CanExecute(null))
-            {
-                CloseWindowCommand.Execute(null);
-            }
+            CloseWindowCommand.TryExecute();
         }
 
         private void OnSaveLayout(ContentType contentType)
@@ -378,9 +375,9 @@ namespace RaceControl.ViewModels
 
         private void OnToggleFullScreen(long identifier)
         {
-            if (ToggleFullScreenCommand.CanExecute(null))
+            if (ToggleFullScreenCommand.TryExecute() && DialogSettings.WindowState == WindowState.Maximized)
             {
-                ToggleFullScreenCommand.Execute(null);
+                _eventAggregator.GetEvent<MuteAllEvent>().Publish(identifier);
             }
         }
 
@@ -555,12 +552,7 @@ namespace RaceControl.ViewModels
             }
 
             await MediaPlayer.StartPlaybackAsync(streamUrl);
-
-            if (MediaPlayer.IsMuted != DialogSettings.IsMuted)
-            {
-                MediaPlayer.ToggleMute();
-            }
-
+            MediaPlayer.ToggleMute(DialogSettings.IsMuted);
             MediaPlayer.Volume = DialogSettings.Volume;
         }
 
@@ -584,6 +576,7 @@ namespace RaceControl.ViewModels
         {
             _eventAggregator.GetEvent<SyncStreamsEvent>().Subscribe(OnSyncStreams);
             _eventAggregator.GetEvent<PauseAllEvent>().Subscribe(OnPauseAll);
+            _eventAggregator.GetEvent<MuteAllEvent>().Subscribe(OnMuteAll);
             _eventAggregator.GetEvent<CloseAllEvent>().Subscribe(OnCloseAll, contentType => contentType == null || contentType == PlayableContent.ContentType);
             _eventAggregator.GetEvent<SaveLayoutEvent>().Subscribe(OnSaveLayout, contentType => contentType == PlayableContent.ContentType);
             _eventAggregator.GetEvent<ToggleFullScreenEvent>().Subscribe(OnToggleFullScreen, identifier => identifier == _identifier);
@@ -593,6 +586,7 @@ namespace RaceControl.ViewModels
         {
             _eventAggregator.GetEvent<SyncStreamsEvent>().Unsubscribe(OnSyncStreams);
             _eventAggregator.GetEvent<PauseAllEvent>().Unsubscribe(OnPauseAll);
+            _eventAggregator.GetEvent<MuteAllEvent>().Unsubscribe(OnMuteAll);
             _eventAggregator.GetEvent<CloseAllEvent>().Unsubscribe(OnCloseAll);
             _eventAggregator.GetEvent<SaveLayoutEvent>().Unsubscribe(OnSaveLayout);
             _eventAggregator.GetEvent<ToggleFullScreenEvent>().Unsubscribe(OnToggleFullScreen);

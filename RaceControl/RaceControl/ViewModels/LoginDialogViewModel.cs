@@ -2,6 +2,7 @@
 using Prism.Commands;
 using Prism.Services.Dialogs;
 using RaceControl.Core.Mvvm;
+using RaceControl.Extensions;
 using RaceControl.Services.Interfaces.Credential;
 using RaceControl.Services.Interfaces.F1TV;
 using System;
@@ -56,11 +57,7 @@ namespace RaceControl.ViewModels
             {
                 Email = email;
                 Password = password;
-
-                if (LoginCommand.CanExecute(null))
-                {
-                    LoginCommand.Execute(null);
-                }
+                LoginCommand.TryExecute();
             }
 
             base.OnDialogOpened(parameters);
