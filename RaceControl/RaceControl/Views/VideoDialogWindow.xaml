@@ -2,6 +2,7 @@
     x:Class="RaceControl.Views.VideoDialogWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
     Title="{Binding Title}"
     WindowStartupLocation="CenterOwner">
     <Window.Style>
@@ -24,41 +25,102 @@
         <KeyBinding Key="F" Command="{Binding ToggleFullScreenCommand}" />
         <KeyBinding Key="R" Command="{Binding ToggleRecordingCommand}" />
         <KeyBinding Key="S" Command="{Binding SyncSessionCommand}" />
+        <KeyBinding Key="Right" Command="{Binding FastForwardCommand}">
+            <KeyBinding.CommandParameter>
+                <sys:Int32>10</sys:Int32>
+            </KeyBinding.CommandParameter>
+        </KeyBinding>
+        <KeyBinding Key="Left" Command="{Binding FastForwardCommand}">
+            <KeyBinding.CommandParameter>
+                <sys:Int32>-10</sys:Int32>
+            </KeyBinding.CommandParameter>
+        </KeyBinding>
+        <KeyBinding Key="Up" Command="{Binding FastForwardCommand}">
+            <KeyBinding.CommandParameter>
+                <sys:Int32>60</sys:Int32>
+            </KeyBinding.CommandParameter>
+        </KeyBinding>
+        <KeyBinding Key="Down" Command="{Binding FastForwardCommand}">
+            <KeyBinding.CommandParameter>
+                <sys:Int32>-60</sys:Int32>
+            </KeyBinding.CommandParameter>
+        </KeyBinding>
         <KeyBinding
             Key="Right"
             Command="{Binding FastForwardCommand}"
-            CommandParameter="10" />
+            Modifiers="Shift">
+            <KeyBinding.CommandParameter>
+                <sys:Int32>5</sys:Int32>
+            </KeyBinding.CommandParameter>
+        </KeyBinding>
         <KeyBinding
             Key="Left"
             Command="{Binding FastForwardCommand}"
-            CommandParameter="-10" />
+            Modifiers="Shift">
+            <KeyBinding.CommandParameter>
+                <sys:Int32>-5</sys:Int32>
+            </KeyBinding.CommandParameter>
+        </KeyBinding>
         <KeyBinding
             Key="Up"
             Command="{Binding FastForwardCommand}"
-            CommandParameter="60" />
+            Modifiers="Shift">
+            <KeyBinding.CommandParameter>
+                <sys:Int32>600</sys:Int32>
+            </KeyBinding.CommandParameter>
+        </KeyBinding>
         <KeyBinding
             Key="Down"
             Command="{Binding FastForwardCommand}"
-            CommandParameter="-60" />
-        <KeyBinding
-            Key="Right"
-            Command="{Binding FastForwardCommand}"
-            CommandParameter="5"
-            Modifiers="Shift" />
-        <KeyBinding
-            Key="Left"
-            Command="{Binding FastForwardCommand}"
-            CommandParameter="-5"
-            Modifiers="Shift" />
-        <KeyBinding
-            Key="Up"
-            Command="{Binding FastForwardCommand}"
-            CommandParameter="600"
-            Modifiers="Shift" />
-        <KeyBinding
-            Key="Down"
-            Command="{Binding FastForwardCommand}"
-            CommandParameter="-600"
-            Modifiers="Shift" />
+            Modifiers="Shift">
+            <KeyBinding.CommandParameter>
+                <sys:Int32>-600</sys:Int32>
+            </KeyBinding.CommandParameter>
+        </KeyBinding>
+        <KeyBinding Key="D1" Command="{Binding ToggleFullScreenCommand}">
+            <KeyBinding.CommandParameter>
+                <sys:Int64>1</sys:Int64>
+            </KeyBinding.CommandParameter>
+        </KeyBinding>
+        <KeyBinding Key="D2" Command="{Binding ToggleFullScreenCommand}">
+            <KeyBinding.CommandParameter>
+                <sys:Int64>2</sys:Int64>
+            </KeyBinding.CommandParameter>
+        </KeyBinding>
+        <KeyBinding Key="D3" Command="{Binding ToggleFullScreenCommand}">
+            <KeyBinding.CommandParameter>
+                <sys:Int64>3</sys:Int64>
+            </KeyBinding.CommandParameter>
+        </KeyBinding>
+        <KeyBinding Key="D4" Command="{Binding ToggleFullScreenCommand}">
+            <KeyBinding.CommandParameter>
+                <sys:Int64>4</sys:Int64>
+            </KeyBinding.CommandParameter>
+        </KeyBinding>
+        <KeyBinding Key="D5" Command="{Binding ToggleFullScreenCommand}">
+            <KeyBinding.CommandParameter>
+                <sys:Int64>5</sys:Int64>
+            </KeyBinding.CommandParameter>
+        </KeyBinding>
+        <KeyBinding Key="D6" Command="{Binding ToggleFullScreenCommand}">
+            <KeyBinding.CommandParameter>
+                <sys:Int64>6</sys:Int64>
+            </KeyBinding.CommandParameter>
+        </KeyBinding>
+        <KeyBinding Key="D7" Command="{Binding ToggleFullScreenCommand}">
+            <KeyBinding.CommandParameter>
+                <sys:Int64>7</sys:Int64>
+            </KeyBinding.CommandParameter>
+        </KeyBinding>
+        <KeyBinding Key="D8" Command="{Binding ToggleFullScreenCommand}">
+            <KeyBinding.CommandParameter>
+                <sys:Int64>8</sys:Int64>
+            </KeyBinding.CommandParameter>
+        </KeyBinding>
+        <KeyBinding Key="D9" Command="{Binding ToggleFullScreenCommand}">
+            <KeyBinding.CommandParameter>
+                <sys:Int64>9</sys:Int64>
+            </KeyBinding.CommandParameter>
+        </KeyBinding>
     </Window.InputBindings>
 </Window>

@@ -57,6 +57,7 @@ namespace RaceControl.ViewModels
         private Process _streamlinkProcess;
         private Process _streamlinkRecordingProcess;
         private string _token;
+        private long _identifier;
         private IPlayableContent _playableContent;
         private VideoDialogSettings _dialogSettings;
         private WindowStartupLocation _startupLocation = WindowStartupLocation.CenterOwner;
@@ -86,7 +87,7 @@ namespace RaceControl.ViewModels
             MediaPlayer = mediaPlayer;
         }
 
-        public override string Title => PlayableContent?.Title;
+        public override string Title => $"{_identifier}. {PlayableContent?.Title}";
 
         public ICommand MouseDownVideoCommand => _mouseDownVideoCommand ??= new DelegateCommand<MouseButtonEventArgs>(MouseDownVideoExecute);
         public ICommand MouseMoveVideoCommand => _mouseMoveVideoCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveVideoExecute);
@@ -101,10 +102,10 @@ namespace RaceControl.ViewModels
         public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute).ObservesCanExecute(() => CanClose);
         public ICommand TogglePauseAllCommand => _togglePauseAllCommand ??= new DelegateCommand(TogglePauseAllExecute).ObservesCanExecute(() => CanClose);
         public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand(ToggleMuteExecute).ObservesCanExecute(() => CanClose);
-        public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<string>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent);
+        public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<int?>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent);
         public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent);
         public ICommand ToggleRecordingCommand => _toggleRecordingCommand ??= new DelegateCommand(ToggleRecordingExecute, CanToggleRecordingExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent).ObservesProperty(() => IsRecording).ObservesProperty(() => MediaPlayer.IsPaused);
-        public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand(ToggleFullScreenExecute);
+        public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand<long?>(ToggleFullScreenExecute);
         public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => DialogSettings.WindowState);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
         public ICommand ScanChromecastCommand => _scanChromecastCommand ??= new DelegateCommand(ScanChromecastExecute, CanScanChromecastExecute).ObservesProperty(() => CanClose).ObservesProperty(() => MediaPlayer.IsScanning);
@@ -170,6 +171,7 @@ namespace RaceControl.ViewModels
         public override void OnDialogOpened(IDialogParameters parameters)
         {
             _token = parameters.GetValue<string>(ParameterNames.TOKEN);
+            _identifier = parameters.GetValue<long>(ParameterNames.IDENTIFIER);
             PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.CONTENT);
             IsStreamlink = PlayableContent.IsLive && !_settings.DisableStreamlink;
 
@@ -300,17 +302,17 @@ namespace RaceControl.ViewModels
             MediaPlayer.ToggleMute();
         }
 
-        private bool CanFastForwardExecute(string arg)
+        private bool CanFastForwardExecute(int? seconds)
         {
             return CanClose && !PlayableContent.IsLive;
         }
 
-        private void FastForwardExecute(string value)
+        private void FastForwardExecute(int? seconds)
         {
-            if (int.TryParse(value, out var seconds))
+            if (seconds.HasValue)
             {
-                Logger.Info($"Fast forwarding stream {seconds} seconds...");
-                MediaPlayer.Time += seconds * 1000;
+                Logger.Info($"Fast forwarding stream {seconds.Value} seconds...");
+                MediaPlayer.Time += seconds.Value * 1000;
             }
         }
 
@@ -374,15 +376,30 @@ namespace RaceControl.ViewModels
             _videoDialogLayout.Instances.Add(dialogSettings);
         }
 
-        private void ToggleFullScreenExecute()
+        private void OnToggleFullScreen(long identifier)
         {
-            if (DialogSettings.WindowState != WindowState.Maximized)
+            if (ToggleFullScreenCommand.CanExecute(null))
             {
-                SetFullScreen();
+                ToggleFullScreenCommand.Execute(null);
+            }
+        }
+
+        private void ToggleFullScreenExecute(long? identifier)
+        {
+            if (identifier == null)
+            {
+                if (DialogSettings.WindowState != WindowState.Maximized)
+                {
+                    SetFullScreen();
+                }
+                else
+                {
+                    SetWindowed();
+                }
             }
             else
             {
-                SetWindowed();
+                _eventAggregator.GetEvent<ToggleFullScreenEvent>().Publish(identifier.Value);
             }
         }
 
@@ -569,6 +586,7 @@ namespace RaceControl.ViewModels
             _eventAggregator.GetEvent<PauseAllEvent>().Subscribe(OnPauseAll);
             _eventAggregator.GetEvent<CloseAllEvent>().Subscribe(OnCloseAll, contentType => contentType == null || contentType == PlayableContent.ContentType);
             _eventAggregator.GetEvent<SaveLayoutEvent>().Subscribe(OnSaveLayout, contentType => contentType == PlayableContent.ContentType);
+            _eventAggregator.GetEvent<ToggleFullScreenEvent>().Subscribe(OnToggleFullScreen, identifier => identifier == _identifier);
         }
 
         private void UnsubscribeEvents()
@@ -577,6 +595,7 @@ namespace RaceControl.ViewModels
             _eventAggregator.GetEvent<PauseAllEvent>().Unsubscribe(OnPauseAll);
             _eventAggregator.GetEvent<CloseAllEvent>().Unsubscribe(OnCloseAll);
             _eventAggregator.GetEvent<SaveLayoutEvent>().Unsubscribe(OnSaveLayout);
+            _eventAggregator.GetEvent<ToggleFullScreenEvent>().Unsubscribe(OnToggleFullScreen);
         }
 
         private void CreateShowControlsTimer()

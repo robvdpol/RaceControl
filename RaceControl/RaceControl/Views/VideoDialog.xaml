@@ -6,7 +6,7 @@
     xmlns:enums="clr-namespace:RaceControl.Common.Enums;assembly=RaceControl.Common"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:prism="http://prismlibrary.com/"
-    xmlns:s="clr-namespace:System;assembly=mscorlib"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:vlc="clr-namespace:LibVLCSharp.WPF;assembly=LibVLCSharp.WPF"
     prism:ViewModelLocator.AutoWireViewModel="True">
     <UserControl.Resources>
@@ -173,7 +173,7 @@
                             <Slider.TickFrequency>
                                 <Binding Converter="{StaticResource DivideDoubleConverter}" Path="MediaPlayer.Duration">
                                     <Binding.ConverterParameter>
-                                        <s:Double>60</s:Double>
+                                        <sys:Double>60</sys:Double>
                                     </Binding.ConverterParameter>
                                 </Binding>
                             </Slider.TickFrequency>
@@ -249,39 +249,47 @@
                             </Button>
                             <Button
                                 Command="{Binding FastForwardCommand}"
-                                CommandParameter="-60"
                                 Style="{StaticResource ControlBarButtonStyle}"
                                 ToolTip="Rewind one minute">
                                 <Button.Content>
                                     <Image Source="{StaticResource Rewind60BitmapImage}" />
                                 </Button.Content>
+                                <Button.CommandParameter>
+                                    <sys:Int32>-60</sys:Int32>
+                                </Button.CommandParameter>
                             </Button>
                             <Button
                                 Command="{Binding FastForwardCommand}"
-                                CommandParameter="-10"
                                 Style="{StaticResource ControlBarButtonStyle}"
                                 ToolTip="Rewind ten seconds">
                                 <Button.Content>
                                     <Image Source="{StaticResource Rewind10BitmapImage}" />
                                 </Button.Content>
+                                <Button.CommandParameter>
+                                    <sys:Int32>-10</sys:Int32>
+                                </Button.CommandParameter>
                             </Button>
                             <Button
                                 Command="{Binding FastForwardCommand}"
-                                CommandParameter="10"
                                 Style="{StaticResource ControlBarButtonStyle}"
                                 ToolTip="Fast forward ten seconds">
                                 <Button.Content>
                                     <Image Source="{StaticResource FastForward10BitmapImage}" />
                                 </Button.Content>
+                                <Button.CommandParameter>
+                                    <sys:Int32>10</sys:Int32>
+                                </Button.CommandParameter>
                             </Button>
                             <Button
                                 Command="{Binding FastForwardCommand}"
-                                CommandParameter="60"
                                 Style="{StaticResource ControlBarButtonStyle}"
                                 ToolTip="Fast forward one minute">
                                 <Button.Content>
                                     <Image Source="{StaticResource FastForward60BitmapImage}" />
                                 </Button.Content>
+                                <Button.CommandParameter>
+                                    <sys:Int32>60</sys:Int32>
+                                </Button.CommandParameter>
                             </Button>
                             <Button
                                 Command="{Binding SyncSessionCommand}"

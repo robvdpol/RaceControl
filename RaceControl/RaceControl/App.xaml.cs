@@ -8,6 +8,7 @@ using NLog.Layouts;
 using NLog.Targets;
 using Prism.DryIoc;
 using Prism.Ioc;
+using RaceControl.Common.Generators;
 using RaceControl.Common.Interfaces;
 using RaceControl.Common.Utils;
 using RaceControl.Core.Helpers;
@@ -76,6 +77,7 @@ namespace RaceControl
                 .Register<IGithubService, GithubService>()
                 .Register<ICredentialService, CredentialService>()
                 .Register<IStreamlinkLauncher, StreamlinkLauncher>()
+                .Register<INumberGenerator, NumberGenerator>()
                 .Register<IMediaPlayer, VlcMediaPlayer>()
                 .Register<IMediaDownloader, VlcMediaDownloader>();
 

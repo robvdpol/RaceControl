@@ -4,6 +4,7 @@ using Prism.Commands;
 using Prism.Events;
 using Prism.Services.Dialogs;
 using RaceControl.Common.Enums;
+using RaceControl.Common.Generators;
 using RaceControl.Common.Interfaces;
 using RaceControl.Common.Utils;
 using RaceControl.Comparers;
@@ -41,6 +42,7 @@ namespace RaceControl.ViewModels
         private readonly IGithubService _githubService;
         private readonly ICredentialService _credentialService;
         private readonly IStreamlinkLauncher _streamlinkLauncher;
+        private readonly INumberGenerator _numberGenerator;
         private readonly object _refreshTimerLock = new object();
 
         private ICommand _loadedCommand;
@@ -90,6 +92,7 @@ namespace RaceControl.ViewModels
             IGithubService githubService,
             ICredentialService credentialService,
             IStreamlinkLauncher streamlinkLauncher,
+            INumberGenerator numberGenerator,
             ISettings settings,
             IVideoDialogLayout videoDialogLayout)
             : base(logger)
@@ -100,6 +103,7 @@ namespace RaceControl.ViewModels
             _githubService = githubService;
             _credentialService = credentialService;
             _streamlinkLauncher = streamlinkLauncher;
+            _numberGenerator = numberGenerator;
             Settings = settings;
             VideoDialogLayout = videoDialogLayout;
             EpisodesView = CollectionViewSource.GetDefaultView(Episodes);
@@ -695,14 +699,16 @@ namespace RaceControl.ViewModels
 
         private void WatchContent(IPlayableContent playableContent, VideoDialogSettings settings = null)
         {
+            var identifier = _numberGenerator.GetNextNumber();
             var parameters = new DialogParameters
             {
                 { ParameterNames.TOKEN, _token },
+                { ParameterNames.IDENTIFIER, identifier },
                 { ParameterNames.CONTENT, playableContent },
                 { ParameterNames.SETTINGS, settings }
             };
 
-            _dialogService.Show(nameof(VideoDialog), parameters, null, nameof(VideoDialogWindow));
+            _dialogService.Show(nameof(VideoDialog), parameters, (result) => _numberGenerator.RemoveNumber(identifier), nameof(VideoDialogWindow));
         }
 
         private async Task WatchInVlcAsync(IPlayableContent playableContent)
