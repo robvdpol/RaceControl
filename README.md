@@ -20,7 +20,7 @@ Race Control is an open source [F1TV](https://f1tv.formula1.com) desktop client 
 
 ## Installation
 * Download the [latest release](https://github.com/robvdpol/RaceControl/releases/latest) and start the installer.
-* If the [.NET Core 3.1 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet-core/current/runtime) needs to be installed on your system you will be notified about it.
+* If the [.NET Core 3.1 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet-core/3.1/runtime) needs to be installed on your system you will be notified about it.
 * Follow the steps in the setup wizard to complete the installation.
 * Start Race Control using either the desktop shortcut or the start menu entry.
 
