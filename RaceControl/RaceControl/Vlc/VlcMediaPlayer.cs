@@ -44,13 +44,7 @@ namespace RaceControl.Vlc
         public long Time
         {
             get => _time;
-            set
-            {
-                if (SetProperty(ref _time, Math.Max(value, 0)))
-                {
-                    MediaPlayer.Time = _time;
-                }
-            }
+            set => MediaPlayer.Time = value;
         }
 
         public long Duration
@@ -62,13 +56,7 @@ namespace RaceControl.Vlc
         public int Volume
         {
             get => _volume;
-            set
-            {
-                if (SetProperty(ref _volume, Math.Min(Math.Max(value, 0), 100)))
-                {
-                    MediaPlayer.Volume = _volume;
-                }
-            }
+            set => MediaPlayer.Volume = value;
         }
 
         public bool IsPaused
