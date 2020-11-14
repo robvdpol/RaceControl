@@ -58,8 +58,8 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="LazyCache" Version="2.1.2" />
-    <PackageReference Include="LibVLCSharp" Version="3.4.8" />
-    <PackageReference Include="LibVLCSharp.WPF" Version="3.4.8" />
+    <PackageReference Include="LibVLCSharp" Version="3.4.9" />
+    <PackageReference Include="LibVLCSharp.WPF" Version="3.4.9" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.19" />
     <PackageReference Include="NLog" Version="4.7.5" />
     <PackageReference Include="Prism.DryIoc" Version="8.0.0.1909" />
