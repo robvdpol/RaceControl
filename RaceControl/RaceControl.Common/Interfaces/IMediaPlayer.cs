@@ -20,13 +20,15 @@ namespace RaceControl.Common.Interfaces
 
         bool IsCasting { get; }
 
-        IAudioDevice AudioDevice { get; set; }
-
         ObservableCollection<IAudioDevice> AudioDevices { get; }
 
         ObservableCollection<IMediaTrack> AudioTracks { get; }
 
         ObservableCollection<IMediaRenderer> MediaRenderers { get; }
+
+        IAudioDevice AudioDevice { get; set; }
+
+        IMediaTrack AudioTrack { get; set; }
 
         Task StartPlaybackAsync(string streamUrl, IMediaRenderer mediaRenderer = null);
 
@@ -35,8 +37,6 @@ namespace RaceControl.Common.Interfaces
         void TogglePause();
 
         void ToggleMute(bool? mute);
-
-        void SetAudioTrack(IMediaTrack audioTrack);
 
         Task ScanChromecastAsync();
 

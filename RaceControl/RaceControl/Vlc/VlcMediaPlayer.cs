@@ -21,10 +21,11 @@ namespace RaceControl.Vlc
         private bool _isMuted;
         private bool _isScanning;
         private bool _isCasting;
-        private IAudioDevice _audioDevice;
         private ObservableCollection<IAudioDevice> _audioDevices;
         private ObservableCollection<IMediaTrack> _audioTracks;
         private ObservableCollection<IMediaRenderer> _mediaRenderers;
+        private IAudioDevice _audioDevice;
+        private IMediaTrack _audioTrack;
         private bool _disposed;
 
         public VlcMediaPlayer(LibVLC libVLC, MediaPlayer mediaPlayer)
@@ -39,6 +40,7 @@ namespace RaceControl.Vlc
             MediaPlayer.VolumeChanged += MediaPlayer_VolumeChanged;
             MediaPlayer.ESAdded += MediaPlayer_ESAdded;
             MediaPlayer.ESDeleted += MediaPlayer_ESDeleted;
+            MediaPlayer.ESSelected += MediaPlayer_ESSelected;
             MediaPlayer.AudioDevice += MediaPlayer_AudioDevice;
             AudioDevices.AddRange(MediaPlayer.AudioOutputDeviceEnum.Select(device => new VlcAudioDevice(device)));
         }
@@ -87,12 +89,6 @@ namespace RaceControl.Vlc
             private set => SetProperty(ref _isCasting, value);
         }
 
-        public IAudioDevice AudioDevice
-        {
-            get => _audioDevice;
-            set => MediaPlayer.SetOutputDevice(value?.Identifier);
-        }
-
         public ObservableCollection<IAudioDevice> AudioDevices
         {
             get => _audioDevices ??= new ObservableCollection<IAudioDevice>();
@@ -106,6 +102,30 @@ namespace RaceControl.Vlc
         public ObservableCollection<IMediaRenderer> MediaRenderers
         {
             get => _mediaRenderers ??= new ObservableCollection<IMediaRenderer>();
+        }
+
+        public IAudioDevice AudioDevice
+        {
+            get => _audioDevice;
+            set
+            {
+                if (value != null)
+                {
+                    MediaPlayer.SetOutputDevice(value.Identifier);
+                }
+            }
+        }
+
+        public IMediaTrack AudioTrack
+        {
+            get => _audioTrack;
+            set
+            {
+                if (value != null)
+                {
+                    MediaPlayer.SetAudioTrack(value.Id);
+                }
+            }
         }
 
         public async Task StartPlaybackAsync(string streamUrl, IMediaRenderer mediaRenderer = null)
@@ -147,11 +167,6 @@ namespace RaceControl.Vlc
             {
                 MediaPlayer.ToggleMute();
             }
-        }
-
-        public void SetAudioTrack(IMediaTrack audioTrack)
-        {
-            MediaPlayer.SetAudioTrack(audioTrack.Id);
         }
 
         public async Task ScanChromecastAsync()
@@ -273,10 +288,35 @@ namespace RaceControl.Vlc
             }
         }
 
+        private void MediaPlayer_ESSelected(object sender, MediaPlayerESSelectedEventArgs e)
+        {
+            if (e.Id < 0)
+            {
+                return;
+            }
+
+            switch (e.Type)
+            {
+                case TrackType.Audio:
+                    var audioTrack = AudioTracks.FirstOrDefault(at => at.Id == e.Id);
+
+                    if (audioTrack != null)
+                    {
+                        SetProperty(ref _audioTrack, audioTrack, nameof(AudioTrack));
+                    }
+
+                    break;
+            }
+        }
+
         private void MediaPlayer_AudioDevice(object sender, MediaPlayerAudioDeviceEventArgs e)
         {
             var audioDevice = AudioDevices.FirstOrDefault(ad => ad.Identifier == e.AudioDevice);
-            SetProperty(ref _audioDevice, audioDevice, nameof(AudioDevice));
+
+            if (audioDevice != null)
+            {
+                SetProperty(ref _audioDevice, audioDevice, nameof(AudioDevice));
+            }
         }
 
         private void RendererDiscoverer_ItemAdded(object sender, RendererDiscovererItemAddedEventArgs e)

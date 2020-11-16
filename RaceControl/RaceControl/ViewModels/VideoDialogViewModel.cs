@@ -17,7 +17,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace RaceControl.ViewModels
@@ -51,7 +50,6 @@ namespace RaceControl.ViewModels
         private ICommand _toggleRecordingCommand;
         private ICommand _toggleFullScreenCommand;
         private ICommand _moveToCornerCommand;
-        private ICommand _audioTrackSelectionChangedCommand;
         private ICommand _scanChromecastCommand;
         private ICommand _startCastVideoCommand;
         private ICommand _stopCastVideoCommand;
@@ -109,7 +107,6 @@ namespace RaceControl.ViewModels
         public ICommand ToggleRecordingCommand => _toggleRecordingCommand ??= new DelegateCommand(ToggleRecordingExecute, CanToggleRecordingExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent).ObservesProperty(() => IsRecording).ObservesProperty(() => MediaPlayer.IsPaused);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand<long?>(ToggleFullScreenExecute);
         public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => DialogSettings.WindowState);
-        public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<SelectionChangedEventArgs>(AudioTrackSelectionChangedExecute);
         public ICommand ScanChromecastCommand => _scanChromecastCommand ??= new DelegateCommand(ScanChromecastExecute, CanScanChromecastExecute).ObservesProperty(() => CanClose).ObservesProperty(() => MediaPlayer.IsScanning);
         public ICommand StartCastVideoCommand => _startCastVideoCommand ??= new DelegateCommand(StartCastVideoExecute, CanStartCastVideoExecute).ObservesProperty(() => CanClose).ObservesProperty(() => SelectedMediaRenderer);
         public ICommand StopCastVideoCommand => _stopCastVideoCommand ??= new DelegateCommand(StopCastVideoExecute, CanStopCastVideoExecute).ObservesProperty(() => MediaPlayer.IsCasting);
@@ -442,15 +439,6 @@ namespace RaceControl.ViewModels
 
             DialogSettings.Width = width;
             DialogSettings.Height = height;
-        }
-
-        private void AudioTrackSelectionChangedExecute(SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count > 0 && e.AddedItems[0] is IMediaTrack audioTrack)
-            {
-                Logger.Info($"Changing audio track to '{audioTrack.Name}'...");
-                MediaPlayer.SetAudioTrack(audioTrack);
-            }
         }
 
         private bool CanScanChromecastExecute()

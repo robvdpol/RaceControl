@@ -331,13 +331,8 @@
                                 Grid.Column="1"
                                 Margin="2"
                                 DisplayMemberPath="Name"
-                                ItemsSource="{Binding MediaPlayer.AudioTracks}">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="SelectionChanged">
-                                        <i:InvokeCommandAction Command="{Binding AudioTrackSelectionChangedCommand}" PassEventArgsToCommand="True" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </ComboBox>
+                                ItemsSource="{Binding MediaPlayer.AudioTracks}"
+                                SelectedItem="{Binding MediaPlayer.AudioTrack}" />
                         </Grid>
                         <Grid
                             Grid.Row="0"
