@@ -13,6 +13,7 @@ using RaceControl.Extensions;
 using RaceControl.Services.Interfaces.F1TV;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -213,17 +214,17 @@ namespace RaceControl.ViewModels
             });
         }
 
-        private void MouseDownVideoExecute(MouseButtonEventArgs args)
+        private void MouseDownVideoExecute(MouseButtonEventArgs e)
         {
-            if (args.ChangedButton != MouseButton.Left)
+            if (e.ChangedButton != MouseButton.Left)
             {
                 return;
             }
 
-            switch (args.ClickCount)
+            switch (e.ClickCount)
             {
                 case 1:
-                    if (args.Source is DependencyObject dependencyObject)
+                    if (e.Source is DependencyObject dependencyObject)
                     {
                         Window.GetWindow(dependencyObject)?.Owner?.DragMove();
                     }
@@ -241,9 +242,9 @@ namespace RaceControl.ViewModels
             ShowControlsAndResetTimer();
         }
 
-        private void MouseWheelVideoExecute(MouseWheelEventArgs args)
+        private void MouseWheelVideoExecute(MouseWheelEventArgs e)
         {
-            MediaPlayer.Volume += args.Delta / MouseWheelDelta;
+            MediaPlayer.Volume += e.Delta / MouseWheelDelta;
             ShowControlsAndResetTimer();
         }
 
@@ -271,9 +272,9 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void MouseWheelControlBarExecute(MouseWheelEventArgs args)
+        private void MouseWheelControlBarExecute(MouseWheelEventArgs e)
         {
-            MediaPlayer.Volume += args.Delta / MouseWheelDelta;
+            MediaPlayer.Volume += e.Delta / MouseWheelDelta;
         }
 
         private void CloseAllWindowsExecute()
@@ -443,9 +444,9 @@ namespace RaceControl.ViewModels
             DialogSettings.Height = height;
         }
 
-        private void AudioTrackSelectionChangedExecute(SelectionChangedEventArgs args)
+        private void AudioTrackSelectionChangedExecute(SelectionChangedEventArgs e)
         {
-            if (args.AddedItems.Count > 0 && args.AddedItems[0] is IMediaTrack audioTrack)
+            if (e.AddedItems.Count > 0 && e.AddedItems[0] is IMediaTrack audioTrack)
             {
                 Logger.Info($"Changing audio track to '{audioTrack.Name}'...");
                 MediaPlayer.SetAudioTrack(audioTrack);
@@ -502,6 +503,7 @@ namespace RaceControl.ViewModels
 
             DialogSettings.IsMuted = settings.IsMuted;
             DialogSettings.Volume = settings.Volume;
+            DialogSettings.AudioDevice = settings.AudioDevice;
         }
 
         private VideoDialogSettings GetDialogSettings()
@@ -517,6 +519,7 @@ namespace RaceControl.ViewModels
                 Topmost = DialogSettings.Topmost,
                 IsMuted = MediaPlayer.IsMuted,
                 Volume = MediaPlayer.Volume,
+                AudioDevice = MediaPlayer.AudioDevice?.Description,
                 ChannelName = PlayableContent.Name
             };
         }
@@ -549,6 +552,16 @@ namespace RaceControl.ViewModels
                 var (streamlinkProcess, streamlinkUrl) = await _streamlinkLauncher.StartStreamlinkExternalAsync(streamUrl);
                 _streamlinkProcess = streamlinkProcess;
                 streamUrl = streamlinkUrl;
+            }
+
+            if (!string.IsNullOrWhiteSpace(DialogSettings.AudioDevice))
+            {
+                var audioDevice = MediaPlayer.AudioDevices.FirstOrDefault(ad => ad.Description == DialogSettings.AudioDevice);
+
+                if (audioDevice != null)
+                {
+                    MediaPlayer.AudioDevice = audioDevice;
+                }
             }
 
             await MediaPlayer.StartPlaybackAsync(streamUrl);

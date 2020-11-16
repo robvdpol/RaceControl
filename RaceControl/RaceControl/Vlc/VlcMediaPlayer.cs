@@ -21,6 +21,8 @@ namespace RaceControl.Vlc
         private bool _isMuted;
         private bool _isScanning;
         private bool _isCasting;
+        private IAudioDevice _audioDevice;
+        private ObservableCollection<IAudioDevice> _audioDevices;
         private ObservableCollection<IMediaTrack> _audioTracks;
         private ObservableCollection<IMediaRenderer> _mediaRenderers;
         private bool _disposed;
@@ -37,6 +39,8 @@ namespace RaceControl.Vlc
             MediaPlayer.VolumeChanged += MediaPlayer_VolumeChanged;
             MediaPlayer.ESAdded += MediaPlayer_ESAdded;
             MediaPlayer.ESDeleted += MediaPlayer_ESDeleted;
+            MediaPlayer.AudioDevice += MediaPlayer_AudioDevice;
+            AudioDevices.AddRange(MediaPlayer.AudioOutputDeviceEnum.Select(device => new VlcAudioDevice(device)));
         }
 
         public MediaPlayer MediaPlayer { get; }
@@ -83,16 +87,25 @@ namespace RaceControl.Vlc
             private set => SetProperty(ref _isCasting, value);
         }
 
+        public IAudioDevice AudioDevice
+        {
+            get => _audioDevice;
+            set => MediaPlayer.SetOutputDevice(value?.Identifier);
+        }
+
+        public ObservableCollection<IAudioDevice> AudioDevices
+        {
+            get => _audioDevices ??= new ObservableCollection<IAudioDevice>();
+        }
+
         public ObservableCollection<IMediaTrack> AudioTracks
         {
             get => _audioTracks ??= new ObservableCollection<IMediaTrack>();
-            set => SetProperty(ref _audioTracks, value);
         }
 
         public ObservableCollection<IMediaRenderer> MediaRenderers
         {
             get => _mediaRenderers ??= new ObservableCollection<IMediaRenderer>();
-            set => SetProperty(ref _mediaRenderers, value);
         }
 
         public async Task StartPlaybackAsync(string streamUrl, IMediaRenderer mediaRenderer = null)
@@ -258,6 +271,12 @@ namespace RaceControl.Vlc
 
                     break;
             }
+        }
+
+        private void MediaPlayer_AudioDevice(object sender, MediaPlayerAudioDeviceEventArgs e)
+        {
+            var audioDevice = AudioDevices.FirstOrDefault(ad => ad.Identifier == e.AudioDevice);
+            SetProperty(ref _audioDevice, audioDevice, nameof(AudioDevice));
         }
 
         private void RendererDiscoverer_ItemAdded(object sender, RendererDiscovererItemAddedEventArgs e)

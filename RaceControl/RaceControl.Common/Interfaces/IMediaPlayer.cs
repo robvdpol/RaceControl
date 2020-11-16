@@ -20,6 +20,10 @@ namespace RaceControl.Common.Interfaces
 
         bool IsCasting { get; }
 
+        IAudioDevice AudioDevice { get; set; }
+
+        ObservableCollection<IAudioDevice> AudioDevices { get; }
+
         ObservableCollection<IMediaTrack> AudioTracks { get; }
 
         ObservableCollection<IMediaRenderer> MediaRenderers { get; }

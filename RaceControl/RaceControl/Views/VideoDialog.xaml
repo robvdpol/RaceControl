@@ -205,6 +205,7 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                             <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
@@ -500,6 +501,23 @@
                                 Style="{StaticResource ControlBarButtonStyleWide}"
                                 ToolTip="Stop casting and resume stream in window" />
                         </StackPanel>
+                        <Grid Grid.Row="2" Grid.Column="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Grid.Column="0"
+                                Margin="5,2"
+                                VerticalAlignment="Center"
+                                Text="Audio device:" />
+                            <ComboBox
+                                Grid.Column="1"
+                                Margin="2"
+                                DisplayMemberPath="Description"
+                                ItemsSource="{Binding MediaPlayer.AudioDevices}"
+                                SelectedItem="{Binding MediaPlayer.AudioDevice}" />
+                        </Grid>
                     </Grid>
                 </Grid>
             </Border>
