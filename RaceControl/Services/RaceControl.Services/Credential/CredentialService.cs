@@ -17,8 +17,6 @@ namespace RaceControl.Services.Credential
 
         public bool LoadCredential(out string username, out string password)
         {
-            _logger.Info("Loading credentials from store...");
-
             using var credential = new CredentialManagement.Credential
             {
                 Target = RaceControlF1TV,
@@ -46,8 +44,6 @@ namespace RaceControl.Services.Credential
 
         public void SaveCredential(string username, string password)
         {
-            _logger.Info("Saving credentials to store...");
-
             using var credential = new CredentialManagement.Credential
             {
                 Target = RaceControlF1TV,
@@ -69,8 +65,6 @@ namespace RaceControl.Services.Credential
 
         public void DeleteCredential()
         {
-            _logger.Info("Deleting credentials from store...");
-
             using var credential = new CredentialManagement.Credential
             {
                 Target = RaceControlF1TV,

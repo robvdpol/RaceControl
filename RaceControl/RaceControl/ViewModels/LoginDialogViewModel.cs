@@ -18,7 +18,6 @@ namespace RaceControl.ViewModels
 
         private ICommand _loginCommand;
 
-        private string _token;
         private string _email;
         private string _password;
         private string _error;
@@ -53,14 +52,14 @@ namespace RaceControl.ViewModels
 
         public override void OnDialogOpened(IDialogParameters parameters)
         {
+            base.OnDialogOpened(parameters);
+
             if (_credentialService.LoadCredential(out var email, out var password))
             {
                 Email = email;
                 Password = password;
                 LoginCommand.TryExecute();
             }
-
-            base.OnDialogOpened(parameters);
         }
 
         private bool CanLoginExecute()
@@ -70,25 +69,23 @@ namespace RaceControl.ViewModels
 
         private void LoginExecute()
         {
-            CanClose = true;
-            IsBusy = true;
             Error = null;
+            IsBusy = true;
             LoginAsync().Await(LoginSuccess, LoginError, true);
         }
 
-        private async Task LoginAsync()
+        private async Task<string> LoginAsync()
         {
-            Logger.Info("Attempting to login...");
-            _token = (await _authorizationService.LoginAsync(Email, Password)).Token;
-            _credentialService.SaveCredential(Email, Password);
+            return (await _authorizationService.LoginAsync(Email, Password)).Token;
         }
 
-        private void LoginSuccess()
+        private void LoginSuccess(string token)
         {
             Logger.Info("Login successful.");
             Error = null;
             IsBusy = false;
-            RaiseRequestClose(ButtonResult.OK, new DialogParameters { { ParameterNames.TOKEN, _token } });
+            _credentialService.SaveCredential(Email, Password);
+            RaiseRequestClose(ButtonResult.OK, new DialogParameters { { ParameterNames.TOKEN, token } });
         }
 
         private void LoginError(Exception ex)

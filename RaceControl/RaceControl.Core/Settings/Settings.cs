@@ -73,8 +73,6 @@ namespace RaceControl.Core.Settings
 
         public void Load()
         {
-            _logger.Info("Loading settings...");
-
             if (!File.Exists(Filename))
             {
                 return;
@@ -90,13 +88,11 @@ namespace RaceControl.Core.Settings
                 _logger.Error(ex, "An error occurred while loading settings.");
             }
 
-            _logger.Info("Done loading settings.");
+            _logger.Info("Settings loaded.");
         }
 
         public void Save()
         {
-            _logger.Info("Saving settings...");
-
             try
             {
                 using var file = File.CreateText(Filename);
@@ -107,7 +103,7 @@ namespace RaceControl.Core.Settings
                 _logger.Error(ex, "An error occurred while saving settings.");
             }
 
-            _logger.Info("Done saving settings.");
+            _logger.Info("Settings saved.");
         }
     }
 }
