@@ -20,31 +20,32 @@ Race Control is an open source [F1TV](https://f1tv.formula1.com) desktop client 
 
 ## Installation
 * Download the [latest release](https://github.com/robvdpol/RaceControl/releases/latest) and start the installer.
-* If the [.NET Core 3.1 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet-core/3.1/runtime) needs to be installed on your system you will be notified about it.
+* If the [.NET 5.0 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet-core/5.0/runtime) needs to be installed on your system you will be notified about it.
 * Follow the steps in the setup wizard to complete the installation.
 * Start Race Control using either the desktop shortcut or the start menu entry.
 
 ## Keyboard shortcuts
 The internal player supports the following keyboard shortcuts:
-| Function                              | Key                 |
-|---------------------------------------|---------------------|
-| Close player window                   | Escape              |
-| Close all player windows              | Shift + Escape      |
-| Toggle pause                          | Space               |
-| Toggle pause for all players          | Shift + Space       |
-| Toggle mute                           | M                   |
-| Toggle fullscreen                     | F                   |
-| Toggle fullscreen for specific player | 1 - 9               |
-| Toggle recording                      | R                   |
-| Synchronize session                   | S                   |
-| Jump forward 10 sec                   | Right arrow         |
-| Jump backward 10 sec                  | Left arrow          |
-| Jump forward 1 min                    | Up arrow            |
-| Jump backward 1 min                   | Down arrow          |
-| Jump forward 5 sec                    | Shift + Right arrow |
-| Jump backward 5 sec                   | Shift + Left arrow  |
-| Jump forward 10 min                   | Shift + Up arrow    |
-| Jump backward 10 min                  | Shift + Down arrow  |
+| Function                               | Key                 |
+|----------------------------------------|---------------------|
+| Close player                           | Escape              |
+| Close all players                      | Shift + Escape      |
+| Toggle pause                           | Space               |
+| Toggle pause for all players           | Shift + Space       |
+| Toggle mute                            | M                   |
+| Toggle fullscreen                      | F                   |
+| Toggle fullscreen for specific player  | 1 - 9               |
+| Move player to corner (3x3 layout)     | F1 - F9             |
+| Toggle recording                       | R                   |
+| Synchronize session                    | S                   |
+| Jump forward 10 sec                    | Right arrow         |
+| Jump backward 10 sec                   | Left arrow          |
+| Jump forward 1 min                     | Up arrow            |
+| Jump backward 1 min                    | Down arrow          |
+| Jump forward 5 sec                     | Shift + Right arrow |
+| Jump backward 5 sec                    | Shift + Left arrow  |
+| Jump forward 10 min                    | Shift + Up arrow    |
+| Jump backward 10 min                   | Shift + Down arrow  |
 
 The main window supports the following keyboard shortcuts:
 | Function                       | Key                 |
