@@ -31,8 +31,6 @@ namespace RaceControl.Core.Settings
 
         public void Load()
         {
-            _logger.Info("Loading video dialog layout...");
-
             if (!File.Exists(Filename))
             {
                 return;
@@ -50,13 +48,11 @@ namespace RaceControl.Core.Settings
                 return;
             }
 
-            _logger.Info("Done loading video dialog layout.");
+            _logger.Info("Video dialog layout loaded.");
         }
 
         public bool Save()
         {
-            _logger.Info("Saving video dialog layout...");
-
             try
             {
                 using var file = File.CreateText(Filename);
@@ -69,7 +65,7 @@ namespace RaceControl.Core.Settings
                 return false;
             }
 
-            _logger.Info("Done saving video dialog layout.");
+            _logger.Info("Video dialog layout saved.");
 
             return true;
         }
