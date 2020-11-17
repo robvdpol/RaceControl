@@ -5,6 +5,15 @@
         TopLeft,
         TopRight,
         BottomLeft,
-        BottomRight
+        BottomRight,
+        TopLeftSmall,
+        TopSmall,
+        TopRightSmall,
+        LeftSmall,
+        CenterSmall,
+        RightSmall,
+        BottomLeftSmall,
+        BottomSmall,
+        BottomRightSmall
     }
 }

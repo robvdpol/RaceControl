@@ -405,40 +405,20 @@ namespace RaceControl.ViewModels
 
         private void MoveToCornerExecute(WindowLocation? location)
         {
-            Logger.Info($"Moving window to corner '{location}'...");
             var screen = ScreenHelper.GetScreen(DialogSettings);
-            var scale = ScreenHelper.GetScreenScale();
-            var top = screen.WorkingArea.Top / scale;
-            var left = screen.WorkingArea.Left / scale;
-            var width = screen.WorkingArea.Width / 2D / scale;
-            var height = screen.WorkingArea.Height / 2D / scale;
+            var screenScale = ScreenHelper.GetScreenScale();
+            var screenTop = screen.WorkingArea.Top / screenScale;
+            var screenLeft = screen.WorkingArea.Left / screenScale;
+            var windowLocation = location.GetValueOrDefault();
+            var windowWidth = windowLocation.GetWindowWidthOrHeight(screen.WorkingArea.Width, screenScale);
+            var windowHeight = windowLocation.GetWindowWidthOrHeight(screen.WorkingArea.Height, screenScale);
+            windowLocation.GetWindowTopAndLeft(screenTop, screenLeft, windowWidth, windowHeight, out var windowTop, out var windowLeft);
+
             DialogSettings.ResizeMode = ResizeMode.NoResize;
-
-            switch (location)
-            {
-                case WindowLocation.TopLeft:
-                    DialogSettings.Top = top;
-                    DialogSettings.Left = left;
-                    break;
-
-                case WindowLocation.TopRight:
-                    DialogSettings.Top = top;
-                    DialogSettings.Left = left + width;
-                    break;
-
-                case WindowLocation.BottomLeft:
-                    DialogSettings.Top = top + height;
-                    DialogSettings.Left = left;
-                    break;
-
-                case WindowLocation.BottomRight:
-                    DialogSettings.Top = top + height;
-                    DialogSettings.Left = left + width;
-                    break;
-            }
-
-            DialogSettings.Width = width;
-            DialogSettings.Height = height;
+            DialogSettings.Width = windowWidth;
+            DialogSettings.Height = windowHeight;
+            DialogSettings.Top = windowTop;
+            DialogSettings.Left = windowLeft;
         }
 
         private bool CanScanChromecastExecute()
