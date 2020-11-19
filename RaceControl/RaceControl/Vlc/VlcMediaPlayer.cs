@@ -89,20 +89,11 @@ namespace RaceControl.Vlc
             private set => SetProperty(ref _isCasting, value);
         }
 
-        public ObservableCollection<IAudioDevice> AudioDevices
-        {
-            get => _audioDevices ??= new ObservableCollection<IAudioDevice>();
-        }
+        public ObservableCollection<IAudioDevice> AudioDevices => _audioDevices ??= new ObservableCollection<IAudioDevice>();
 
-        public ObservableCollection<IMediaTrack> AudioTracks
-        {
-            get => _audioTracks ??= new ObservableCollection<IMediaTrack>();
-        }
+        public ObservableCollection<IMediaTrack> AudioTracks => _audioTracks ??= new ObservableCollection<IMediaTrack>();
 
-        public ObservableCollection<IMediaRenderer> MediaRenderers
-        {
-            get => _mediaRenderers ??= new ObservableCollection<IMediaRenderer>();
-        }
+        public ObservableCollection<IMediaRenderer> MediaRenderers => _mediaRenderers ??= new ObservableCollection<IMediaRenderer>();
 
         public IAudioDevice AudioDevice
         {

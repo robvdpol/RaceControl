@@ -4,14 +4,6 @@ namespace RaceControl.Extensions
 {
     public static class WindowLocationExtensions
     {
-        public static bool IsSmall(this WindowLocation windowLocation)
-        {
-            return windowLocation != WindowLocation.TopLeft
-                && windowLocation != WindowLocation.TopRight
-                && windowLocation != WindowLocation.BottomLeft
-                && windowLocation != WindowLocation.BottomRight;
-        }
-
         public static double GetWindowWidthOrHeight(this WindowLocation windowLocation, int screenWidthOrHeight, double screenScale)
         {
             var factor = windowLocation.IsSmall() ? 3D : 2D;
@@ -91,6 +83,14 @@ namespace RaceControl.Extensions
                     left = screenLeft + windowWidth + windowWidth;
                     break;
             }
+        }
+
+        private static bool IsSmall(this WindowLocation windowLocation)
+        {
+            return windowLocation != WindowLocation.TopLeft
+                   && windowLocation != WindowLocation.TopRight
+                   && windowLocation != WindowLocation.BottomLeft
+                   && windowLocation != WindowLocation.BottomRight;
         }
     }
 }

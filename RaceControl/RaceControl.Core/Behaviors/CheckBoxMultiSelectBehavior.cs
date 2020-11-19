@@ -51,14 +51,14 @@ namespace RaceControl.Core.Behaviors
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    if (e.NewItems.Contains(AssociatedObject.Tag))
+                    if (e.NewItems != null && e.NewItems.Contains(AssociatedObject.Tag))
                     {
                         AssociatedObject.IsChecked = true;
                     }
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-                    if (e.OldItems.Contains(AssociatedObject.Tag))
+                    if (e.OldItems != null && e.OldItems.Contains(AssociatedObject.Tag))
                     {
                         AssociatedObject.IsChecked = false;
                     }

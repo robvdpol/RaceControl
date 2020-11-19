@@ -3,7 +3,6 @@
     public enum PlayerType
     {
         Internal,
-        Vlc,
         Mpv
     }
 }

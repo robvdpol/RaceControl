@@ -14,7 +14,12 @@ namespace RaceControl.Common.Utils
             using var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             socket.Bind(new IPEndPoint(IPAddress.Loopback, 0));
 
-            return ((IPEndPoint)socket.LocalEndPoint).Port;
+            if (socket.LocalEndPoint is IPEndPoint endPoint)
+            {
+                return endPoint.Port;
+            }
+
+            throw new Exception("Could not get a free port.");
         }
 
         public static async Task WaitUntilPortInUseAsync(int port, int timeoutSeconds, int intervalMilliseconds = 250)

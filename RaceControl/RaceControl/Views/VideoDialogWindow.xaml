@@ -12,9 +12,9 @@
         </Style>
     </Window.Style>
     <Window.InputBindings>
-        <KeyBinding Key="Esc" Command="{Binding CloseWindowCommand}" />
+        <KeyBinding Key="Escape" Command="{Binding CloseWindowCommand}" />
         <KeyBinding
-            Key="Esc"
+            Key="Escape"
             Command="{Binding CloseAllWindowsCommand}"
             Modifiers="Shift" />
         <KeyBinding Key="Space" Command="{Binding TogglePauseCommand}" />
