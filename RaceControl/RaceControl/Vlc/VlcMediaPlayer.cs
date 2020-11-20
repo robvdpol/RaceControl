@@ -97,7 +97,7 @@ namespace RaceControl.Vlc
 
         public IAudioDevice AudioDevice
         {
-            get => _audioDevice;
+            get => _audioDevice ??= AudioDevices.FirstOrDefault(ad => ad.Identifier == (MediaPlayer.OutputDevice ?? string.Empty));
             set
             {
                 if (value != null)
