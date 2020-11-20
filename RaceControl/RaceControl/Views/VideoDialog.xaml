@@ -71,16 +71,19 @@
     <vlc:VideoView Background="Black" MediaPlayer="{Binding MediaPlayer.MediaPlayer}">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="18" />
+                <RowDefinition Height="24" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Menu Grid.Row="0" Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <MenuItem Header="File">
+            <Menu
+                Grid.Row="0"
+                Padding="0,1"
+                Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <MenuItem Height="22" Header="File">
                     <MenuItem Command="{Binding CloseWindowCommand}" Header="Close Player" />
                     <MenuItem Command="{Binding CloseAllWindowsCommand}" Header="Close All Players" />
                 </MenuItem>
-                <MenuItem Header="Settings">
+                <MenuItem Height="22" Header="Settings">
                     <MenuItem Header="Audio Device" ItemsSource="{Binding MediaPlayer.AudioDevices}">
                         <MenuItem.ItemContainerStyle>
                             <Style TargetType="MenuItem">
