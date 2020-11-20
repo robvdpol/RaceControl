@@ -6,9 +6,9 @@ namespace RaceControl.Extensions
     {
         public static double GetWindowWidthOrHeight(this WindowLocation windowLocation, int screenWidthOrHeight, double screenScale)
         {
-            var factor = windowLocation.IsSmall() ? 3D : 2D;
+            var scaleFactor = windowLocation.IsThreeByThreeGrid() ? 3D : 2D;
 
-            return screenWidthOrHeight / factor / screenScale;
+            return screenWidthOrHeight / scaleFactor / screenScale;
         }
 
         public static void GetWindowTopAndLeft(this WindowLocation windowLocation, double screenTop, double screenLeft, double windowWidth, double windowHeight, out double top, out double left)
@@ -85,12 +85,12 @@ namespace RaceControl.Extensions
             }
         }
 
-        private static bool IsSmall(this WindowLocation windowLocation)
+        private static bool IsThreeByThreeGrid(this WindowLocation windowLocation)
         {
-            return windowLocation != WindowLocation.TopLeft
-                   && windowLocation != WindowLocation.TopRight
-                   && windowLocation != WindowLocation.BottomLeft
-                   && windowLocation != WindowLocation.BottomRight;
+            return windowLocation != WindowLocation.TopLeft &&
+                   windowLocation != WindowLocation.TopRight &&
+                   windowLocation != WindowLocation.BottomLeft &&
+                   windowLocation != WindowLocation.BottomRight;
         }
     }
 }
