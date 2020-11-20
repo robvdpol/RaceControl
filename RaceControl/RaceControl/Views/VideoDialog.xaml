@@ -77,7 +77,8 @@
             </Grid.RowDefinitions>
             <Menu Grid.Row="0" Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <MenuItem Header="File">
-                    <MenuItem Command="{Binding CloseWindowCommand}" Header="Close" />
+                    <MenuItem Command="{Binding CloseWindowCommand}" Header="Close Player" />
+                    <MenuItem Command="{Binding CloseAllWindowsCommand}" Header="Close All Players" />
                 </MenuItem>
                 <MenuItem Header="Settings">
                     <MenuItem Header="Audio Device" ItemsSource="{Binding MediaPlayer.AudioDevices}">
@@ -101,6 +102,63 @@
                                 </Style.Triggers>
                             </Style>
                         </MenuItem.ItemContainerStyle>
+                    </MenuItem>
+                    <Separator />
+                    <MenuItem Header="2x2 Layout">
+                        <MenuItem
+                            Command="{Binding MoveToCornerCommand}"
+                            CommandParameter="{x:Static enums:WindowLocation.TopLeft}"
+                            Header="Top Left" />
+                        <MenuItem
+                            Command="{Binding MoveToCornerCommand}"
+                            CommandParameter="{x:Static enums:WindowLocation.TopRight}"
+                            Header="Top Right" />
+                        <MenuItem
+                            Command="{Binding MoveToCornerCommand}"
+                            CommandParameter="{x:Static enums:WindowLocation.BottomLeft}"
+                            Header="Bottom Left" />
+                        <MenuItem
+                            Command="{Binding MoveToCornerCommand}"
+                            CommandParameter="{x:Static enums:WindowLocation.BottomRight}"
+                            Header="Bottom Right" />
+                    </MenuItem>
+                    <MenuItem Header="3x3 Layout">
+                        <MenuItem
+                            Command="{Binding MoveToCornerCommand}"
+                            CommandParameter="{x:Static enums:WindowLocation.TopLeftSmall}"
+                            Header="Top Left" />
+                        <MenuItem
+                            Command="{Binding MoveToCornerCommand}"
+                            CommandParameter="{x:Static enums:WindowLocation.TopSmall}"
+                            Header="Top" />
+                        <MenuItem
+                            Command="{Binding MoveToCornerCommand}"
+                            CommandParameter="{x:Static enums:WindowLocation.TopRightSmall}"
+                            Header="Top Right" />
+                        <MenuItem
+                            Command="{Binding MoveToCornerCommand}"
+                            CommandParameter="{x:Static enums:WindowLocation.LeftSmall}"
+                            Header="Left" />
+                        <MenuItem
+                            Command="{Binding MoveToCornerCommand}"
+                            CommandParameter="{x:Static enums:WindowLocation.CenterSmall}"
+                            Header="Center" />
+                        <MenuItem
+                            Command="{Binding MoveToCornerCommand}"
+                            CommandParameter="{x:Static enums:WindowLocation.RightSmall}"
+                            Header="Right" />
+                        <MenuItem
+                            Command="{Binding MoveToCornerCommand}"
+                            CommandParameter="{x:Static enums:WindowLocation.BottomLeftSmall}"
+                            Header="Bottom Left" />
+                        <MenuItem
+                            Command="{Binding MoveToCornerCommand}"
+                            CommandParameter="{x:Static enums:WindowLocation.BottomSmall}"
+                            Header="Bottom" />
+                        <MenuItem
+                            Command="{Binding MoveToCornerCommand}"
+                            CommandParameter="{x:Static enums:WindowLocation.BottomRightSmall}"
+                            Header="Bottom Right" />
                     </MenuItem>
                 </MenuItem>
                 <i:Interaction.Triggers>
