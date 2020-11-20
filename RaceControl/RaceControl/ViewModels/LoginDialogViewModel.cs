@@ -85,7 +85,7 @@ namespace RaceControl.ViewModels
             Error = null;
             IsBusy = false;
             _credentialService.SaveCredential(Email, Password);
-            RaiseRequestClose(ButtonResult.OK, new DialogParameters { { ParameterNames.TOKEN, token } });
+            RaiseRequestClose(ButtonResult.OK, new DialogParameters { { ParameterNames.Token, token } });
         }
 
         private void LoginError(Exception ex)

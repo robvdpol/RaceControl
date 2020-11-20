@@ -44,7 +44,7 @@ namespace RaceControl
 
         private static ContentType GetContentType(Channel channel)
         {
-            return channel.ChannelType == ChannelTypes.BACKUP ? ContentType.Backup : ContentType.Channel;
+            return channel.ChannelType == ChannelTypes.Backup ? ContentType.Backup : ContentType.Channel;
         }
     }
 }

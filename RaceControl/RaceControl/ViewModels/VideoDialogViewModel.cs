@@ -171,12 +171,12 @@ namespace RaceControl.ViewModels
 
         public override void OnDialogOpened(IDialogParameters parameters)
         {
-            _token = parameters.GetValue<string>(ParameterNames.TOKEN);
-            _identifier = parameters.GetValue<long>(ParameterNames.IDENTIFIER);
-            PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.CONTENT);
+            _token = parameters.GetValue<string>(ParameterNames.Token);
+            _identifier = parameters.GetValue<long>(ParameterNames.Identifier);
+            PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.Content);
             IsStreamlink = PlayableContent.IsLive && !_settings.DisableStreamlink;
 
-            var dialogSettings = parameters.GetValue<VideoDialogSettings>(ParameterNames.SETTINGS);
+            var dialogSettings = parameters.GetValue<VideoDialogSettings>(ParameterNames.Settings);
 
             if (dialogSettings != null)
             {

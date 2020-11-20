@@ -6,6 +6,7 @@ using System.Windows.Input;
 
 namespace RaceControl.Core.Mvvm
 {
+    // ReSharper disable MemberCanBeProtected.Global
     public abstract class DialogViewModelBase : ViewModelBase, IDialogAware
     {
         private ICommand _closeWindowCommand;

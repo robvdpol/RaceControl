@@ -24,7 +24,7 @@ namespace RaceControl.Services.Lark
         public async Task<TResponse> GetItemAsync<TResponse>(ILarkRequest request)
         {
             var restClient = RestClientFactory();
-            var restRequest = new RestRequest(request.GetURL(), DataFormat.Json);
+            var restRequest = new RestRequest(request.GetUrl(), DataFormat.Json);
 
             return await restClient.GetAsync<TResponse>(restRequest);
         }
@@ -32,7 +32,7 @@ namespace RaceControl.Services.Lark
         public async Task<ILarkCollection<TResponse>> GetCollectionAsync<TResponse>(ILarkRequest request)
         {
             var restClient = RestClientFactory();
-            var restRequest = new RestRequest(request.GetURL(), DataFormat.Json);
+            var restRequest = new RestRequest(request.GetUrl(), DataFormat.Json);
 
             return await restClient.GetAsync<LarkCollection<TResponse>>(restRequest);
         }

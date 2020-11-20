@@ -13,42 +13,42 @@ namespace RaceControl.Comparers
                 return 0;
             }
 
-            if (x == ChannelTypes.WIF)
+            if (x == ChannelTypes.Wif)
             {
                 return -1;
             }
 
-            if (y == ChannelTypes.WIF)
+            if (y == ChannelTypes.Wif)
             {
                 return 1;
             }
 
-            if (x == ChannelTypes.OTHER)
+            if (x == ChannelTypes.Other)
             {
                 return -1;
             }
 
-            if (y == ChannelTypes.OTHER)
+            if (y == ChannelTypes.Other)
             {
                 return 1;
             }
 
-            if (x == ChannelTypes.DRIVER)
+            if (x == ChannelTypes.Driver)
             {
                 return -1;
             }
 
-            if (y == ChannelTypes.DRIVER)
+            if (y == ChannelTypes.Driver)
             {
                 return 1;
             }
 
-            if (x == ChannelTypes.BACKUP)
+            if (x == ChannelTypes.Backup)
             {
                 return 1;
             }
 
-            if (y == ChannelTypes.BACKUP)
+            if (y == ChannelTypes.Backup)
             {
                 return -1;
             }

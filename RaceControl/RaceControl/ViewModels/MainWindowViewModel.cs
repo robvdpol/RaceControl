@@ -34,6 +34,7 @@ using System.Windows.Input;
 namespace RaceControl.ViewModels
 {
     // ReSharper disable once UnusedType.Global
+    // ReSharper disable UnusedMember.Global
     public class MainWindowViewModel : ViewModelBase
     {
         private readonly IExtendedDialogService _dialogService;
@@ -160,53 +161,21 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _mpvExeLocation, value);
         }
 
-        public ObservableCollection<Season> Seasons
-        {
-            get => _seasons ??= new ObservableCollection<Season>();
-            set => SetProperty(ref _seasons, value);
-        }
+        public ObservableCollection<Season> Seasons => _seasons ??= new ObservableCollection<Season>();
 
-        public ObservableCollection<Series> Series
-        {
-            get => _series ??= new ObservableCollection<Series>();
-            set => SetProperty(ref _series, value);
-        }
+        public ObservableCollection<Series> Series => _series ??= new ObservableCollection<Series>();
 
-        public ObservableCollection<Event> Events
-        {
-            get => _events ??= new ObservableCollection<Event>();
-            set => SetProperty(ref _events, value);
-        }
+        public ObservableCollection<Event> Events => _events ??= new ObservableCollection<Event>();
 
-        public ObservableCollection<Session> Sessions
-        {
-            get => _sessions ??= new ObservableCollection<Session>();
-            set => SetProperty(ref _sessions, value);
-        }
+        public ObservableCollection<Session> Sessions => _sessions ??= new ObservableCollection<Session>();
 
-        public ObservableCollection<Session> LiveSessions
-        {
-            get => _liveSessions ??= new ObservableCollection<Session>();
-            set => SetProperty(ref _liveSessions, value);
-        }
+        public ObservableCollection<Session> LiveSessions => _liveSessions ??= new ObservableCollection<Session>();
 
-        public ObservableCollection<IPlayableContent> Channels
-        {
-            get => _channels ??= new ObservableCollection<IPlayableContent>();
-            set => SetProperty(ref _channels, value);
-        }
+        public ObservableCollection<IPlayableContent> Channels => _channels ??= new ObservableCollection<IPlayableContent>();
 
-        public ObservableCollection<VodType> VodTypes
-        {
-            get => _vodTypes ??= new ObservableCollection<VodType>();
-            set => SetProperty(ref _vodTypes, value);
-        }
+        public ObservableCollection<VodType> VodTypes => _vodTypes ??= new ObservableCollection<VodType>();
 
-        public ObservableCollection<IPlayableContent> Episodes
-        {
-            get => _episodes ??= new ObservableCollection<IPlayableContent>();
-            set => SetProperty(ref _episodes, value);
-        }
+        public ObservableCollection<IPlayableContent> Episodes => _episodes ??= new ObservableCollection<IPlayableContent>();
 
         public Season SelectedSeason
         {
@@ -534,7 +503,7 @@ namespace RaceControl.ViewModels
 
                 var parameters = new DialogParameters
                 {
-                    { ParameterNames.RELEASE, release }
+                    { ParameterNames.Release, release }
                 };
 
                 _dialogService.ShowDialog(nameof(UpgradeDialog), parameters, dialogResult =>
@@ -563,7 +532,7 @@ namespace RaceControl.ViewModels
 
                 if (success)
                 {
-                    _token = dialogResult.Parameters.GetValue<string>(ParameterNames.TOKEN);
+                    _token = dialogResult.Parameters.GetValue<string>(ParameterNames.Token);
                 }
                 else
                 {
@@ -683,7 +652,7 @@ namespace RaceControl.ViewModels
             {
                 channels.Add(new Channel
                 {
-                    ChannelType = ChannelTypes.BACKUP,
+                    ChannelType = ChannelTypes.Backup,
                     Name = "Backup stream"
                 });
             }
@@ -702,10 +671,10 @@ namespace RaceControl.ViewModels
             var identifier = _numberGenerator.GetNextNumber();
             var parameters = new DialogParameters
             {
-                { ParameterNames.TOKEN, _token },
-                { ParameterNames.IDENTIFIER, identifier },
-                { ParameterNames.CONTENT, playableContent },
-                { ParameterNames.SETTINGS, settings }
+                { ParameterNames.Token, _token },
+                { ParameterNames.Identifier, identifier },
+                { ParameterNames.Content, playableContent },
+                { ParameterNames.Settings, settings }
             };
 
             _dialogService.Show(nameof(VideoDialog), parameters, (result) => _numberGenerator.RemoveNumber(identifier), nameof(VideoDialogWindow));
@@ -804,9 +773,9 @@ namespace RaceControl.ViewModels
             {
                 var parameters = new DialogParameters
                 {
-                    { ParameterNames.TOKEN, _token },
-                    { ParameterNames.CONTENT, playableContent},
-                    { ParameterNames.FILENAME, filename }
+                    { ParameterNames.Token, _token },
+                    { ParameterNames.Content, playableContent},
+                    { ParameterNames.Filename, filename }
                 };
 
                 _dialogService.Show(nameof(DownloadDialog), parameters, null);

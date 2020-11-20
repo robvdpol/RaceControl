@@ -39,9 +39,9 @@ namespace RaceControl.ViewModels
 
         public override void OnDialogOpened(IDialogParameters parameters)
         {
-            var token = parameters.GetValue<string>(ParameterNames.TOKEN);
-            PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.CONTENT);
-            Filename = parameters.GetValue<string>(ParameterNames.FILENAME);
+            var token = parameters.GetValue<string>(ParameterNames.Token);
+            PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.Content);
+            Filename = parameters.GetValue<string>(ParameterNames.Filename);
             GetTokenisedUrlAndStartDownloadAsync(token).Await(ex =>
             {
                 HandleNonCriticalError(ex);

@@ -60,7 +60,7 @@ namespace RaceControl.Services.Lark
             return this;
         }
 
-        public string GetURL()
+        public string GetUrl()
         {
             var sb = new StringBuilder();
             sb.Append(_endpoint);

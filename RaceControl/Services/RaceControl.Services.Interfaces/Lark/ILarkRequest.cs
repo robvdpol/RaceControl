@@ -12,6 +12,6 @@
 
         ILarkRequest OrderBy(string field, LarkSortDirection direction);
 
-        string GetURL();
+        string GetUrl();
     }
 }

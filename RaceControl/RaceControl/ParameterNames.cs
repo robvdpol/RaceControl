@@ -2,11 +2,11 @@
 {
     public static class ParameterNames
     {
-        public const string TOKEN = nameof(TOKEN);
-        public const string IDENTIFIER = nameof(IDENTIFIER);
-        public const string CONTENT = nameof(CONTENT);
-        public const string SETTINGS = nameof(SETTINGS);
-        public const string RELEASE = nameof(RELEASE);
-        public const string FILENAME = nameof(FILENAME);
+        public const string Token = nameof(Token);
+        public const string Identifier = nameof(Identifier);
+        public const string Content = nameof(Content);
+        public const string Settings = nameof(Settings);
+        public const string Release = nameof(Release);
+        public const string Filename = nameof(Filename);
     }
 }
