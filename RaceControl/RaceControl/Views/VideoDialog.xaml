@@ -11,6 +11,7 @@
     prism:ViewModelLocator.AutoWireViewModel="True">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <core:AreEqualConverter x:Key="AreEqualConverter" />
         <core:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <core:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
         <core:ResizeModeToBooleanConverter x:Key="ResizeModeToBooleanConverter" />
@@ -70,12 +71,53 @@
     <vlc:VideoView Background="Black" MediaPlayer="{Binding MediaPlayer.MediaPlayer}">
         <Grid>
             <Grid.RowDefinitions>
+                <RowDefinition Height="18" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
+            <Menu Grid.Row="0" Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <MenuItem Header="File">
+                    <MenuItem Command="{Binding CloseWindowCommand}" Header="Close" />
+                </MenuItem>
+                <MenuItem Header="Settings">
+                    <MenuItem Header="Audio Device" ItemsSource="{Binding MediaPlayer.AudioDevices}">
+                        <MenuItem.ItemContainerStyle>
+                            <Style TargetType="MenuItem">
+                                <Setter Property="IsCheckable" Value="True" />
+                                <Setter Property="Header" Value="{Binding Description}" />
+                                <Setter Property="Command" Value="{Binding DataContext.SelectAudioDeviceCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Menu}}" />
+                                <Setter Property="CommandParameter" Value="{Binding}" />
+                                <Setter Property="IsChecked" Value="False" />
+                                <Style.Triggers>
+                                    <DataTrigger Value="True">
+                                        <DataTrigger.Binding>
+                                            <MultiBinding Converter="{StaticResource AreEqualConverter}">
+                                                <Binding />
+                                                <Binding Path="DataContext.MediaPlayer.AudioDevice" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Menu}" />
+                                            </MultiBinding>
+                                        </DataTrigger.Binding>
+                                        <Setter Property="IsChecked" Value="True" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </MenuItem.ItemContainerStyle>
+                    </MenuItem>
+                </MenuItem>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseMove">
+                        <i:InvokeCommandAction Command="{Binding MouseMoveControlBarCommand}" />
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="MouseEnter">
+                        <i:InvokeCommandAction Command="{Binding MouseEnterControlBarCommand}" />
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="MouseLeave">
+                        <i:InvokeCommandAction Command="{Binding MouseLeaveControlBarCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </Menu>
             <Label
                 Grid.Row="0"
-                Grid.RowSpan="2"
+                Grid.RowSpan="3"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 Content="Casting..."
@@ -83,7 +125,7 @@
                 Foreground="White"
                 Visibility="{Binding MediaPlayer.IsCasting, Converter={StaticResource BooleanToVisibilityConverter}}" />
             <!--  Non-transparent background is required to capture mouse events  -->
-            <Grid Grid.Row="0" Background="#01000000">
+            <Grid Grid.Row="1" Background="#01000000">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseDown">
                         <i:InvokeCommandAction Command="{Binding MouseDownVideoCommand}" PassEventArgsToCommand="True" />
@@ -124,7 +166,7 @@
                     Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}" />
             </Grid>
             <Border
-                Grid.Row="1"
+                Grid.Row="2"
                 Height="Auto"
                 BorderBrush="#ABADB3"
                 BorderThickness="1"
@@ -203,7 +245,6 @@
                     </Grid>
                     <Grid Grid.Row="1" Margin="2">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
                             <RowDefinition Height="*" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
@@ -496,23 +537,6 @@
                                 Style="{StaticResource ControlBarButtonStyleWide}"
                                 ToolTip="Stop casting and resume stream in window" />
                         </StackPanel>
-                        <Grid Grid.Row="2" Grid.Column="0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock
-                                Grid.Column="0"
-                                Margin="5,2"
-                                VerticalAlignment="Center"
-                                Text="Audio device:" />
-                            <ComboBox
-                                Grid.Column="1"
-                                Margin="2"
-                                DisplayMemberPath="Description"
-                                ItemsSource="{Binding MediaPlayer.AudioDevices}"
-                                SelectedItem="{Binding MediaPlayer.AudioDevice}" />
-                        </Grid>
                     </Grid>
                 </Grid>
             </Border>

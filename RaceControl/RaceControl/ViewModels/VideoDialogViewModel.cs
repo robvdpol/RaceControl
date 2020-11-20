@@ -53,6 +53,7 @@ namespace RaceControl.ViewModels
         private ICommand _scanChromecastCommand;
         private ICommand _startCastVideoCommand;
         private ICommand _stopCastVideoCommand;
+        private ICommand _selectAudioDeviceCommand;
 
         private Process _streamlinkProcess;
         private Process _streamlinkRecordingProcess;
@@ -110,6 +111,7 @@ namespace RaceControl.ViewModels
         public ICommand ScanChromecastCommand => _scanChromecastCommand ??= new DelegateCommand(ScanChromecastExecute, CanScanChromecastExecute).ObservesProperty(() => CanClose).ObservesProperty(() => MediaPlayer.IsScanning);
         public ICommand StartCastVideoCommand => _startCastVideoCommand ??= new DelegateCommand(StartCastVideoExecute, CanStartCastVideoExecute).ObservesProperty(() => CanClose).ObservesProperty(() => SelectedMediaRenderer);
         public ICommand StopCastVideoCommand => _stopCastVideoCommand ??= new DelegateCommand(StopCastVideoExecute, CanStopCastVideoExecute).ObservesProperty(() => MediaPlayer.IsCasting);
+        public ICommand SelectAudioDeviceCommand => _selectAudioDeviceCommand ??= new DelegateCommand<IAudioDevice>(SelectAudioDeviceExecute, CanSelectAudioDeviceExecute).ObservesProperty(() => MediaPlayer.AudioDevice);
 
         public IMediaPlayer MediaPlayer { get; }
 
@@ -452,6 +454,16 @@ namespace RaceControl.ViewModels
         {
             Logger.Info("Stopping casting of video...");
             ChangeRendererAsync().Await(HandleNonCriticalError);
+        }
+
+        private bool CanSelectAudioDeviceExecute(IAudioDevice audioDevice)
+        {
+            return MediaPlayer.AudioDevice != audioDevice;
+        }
+
+        private void SelectAudioDeviceExecute(IAudioDevice audioDevice)
+        {
+            MediaPlayer.AudioDevice = audioDevice;
         }
 
         private void LoadDialogSettings(VideoDialogSettings settings)

@@ -130,7 +130,7 @@
                     ItemsSource="{Binding Series}"
                     Style="{StaticResource ContentListBoxStyle}">
                     <ListBox.ItemContainerStyle>
-                        <Style TargetType="{x:Type ListBoxItem}">
+                        <Style TargetType="ListBoxItem">
                             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                             <Setter Property="Focusable" Value="False" />
                             <Setter Property="Visibility" Value="Visible" />
