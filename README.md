@@ -64,6 +64,9 @@ Your F1TV login credentials are stored locally in the Windows Credential Manager
 #### Where does Race Control store my settings and video layout? Will they be retained when I upgrade Race Control?
 Your settings and video layout are stored in JSON-files, which are saved to *%LOCALAPPDATA%\RaceControl* (usually located at *C:\Users\USERNAME\AppData\Local\RaceControl*). When you upgrade Race Control your settings and video layout will be retained.
 
+#### Can I watch race seasons before 2018?
+Race seasons before 2018 were not broadcasted live through F1TV, because F1TV didn't exist at the time. However, they can be found in the Video On Demand archive. Simply select the entry 'Full Race' under 'Video On Demand' and then scroll down the episode list to find the races you want to watch. Alternatively, you can specify a search filter to find a specific race or season.
+
 #### Why is the VLC button disabled?
 You need to have VLC media player installed on your machine. The location of your VLC installation will be automatically detected.
 
