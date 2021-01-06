@@ -212,7 +212,7 @@ namespace RaceControl.ViewModels
 
         private void MouseDownVideoExecute(MouseButtonEventArgs e)
         {
-            if (e.ChangedButton != MouseButton.Left)
+            if (e.ChangedButton != MouseButton.Left || e.LeftButton != MouseButtonState.Pressed)
             {
                 return;
             }
@@ -222,7 +222,13 @@ namespace RaceControl.ViewModels
                 case 1:
                     if (e.Source is DependencyObject dependencyObject)
                     {
-                        Window.GetWindow(dependencyObject)?.Owner?.DragMove();
+                        var window = Window.GetWindow(dependencyObject)?.Owner;
+
+                        if (window != null)
+                        {
+                            window.Focus();
+                            window.DragMove();
+                        }
                     }
 
                     break;

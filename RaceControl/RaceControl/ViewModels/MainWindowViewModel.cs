@@ -33,6 +33,7 @@ using System.Windows.Input;
 
 namespace RaceControl.ViewModels
 {
+    // ReSharper disable UnusedMember.Global
     // ReSharper disable once UnusedType.Global
     public class MainWindowViewModel : ViewModelBase
     {
