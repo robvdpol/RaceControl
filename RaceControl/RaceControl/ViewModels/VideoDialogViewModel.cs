@@ -21,6 +21,7 @@ using System.Windows.Input;
 
 namespace RaceControl.ViewModels
 {
+    // ReSharper disable UnusedMember.Global
     public class VideoDialogViewModel : DialogViewModelBase
     {
         private const int MouseWheelDelta = 12;
@@ -33,9 +34,7 @@ namespace RaceControl.ViewModels
         private readonly object _showControlsTimerLock = new object();
 
         private ICommand _mouseDownVideoCommand;
-        private ICommand _mouseMoveVideoCommand;
-        private ICommand _mouseEnterVideoCommand;
-        private ICommand _mouseLeaveVideoCommand;
+        private ICommand _mouseEnterOrLeaveOrMoveVideoCommand;
         private ICommand _mouseWheelVideoCommand;
         private ICommand _mouseMoveControlBarCommand;
         private ICommand _mouseEnterControlBarCommand;
@@ -91,9 +90,7 @@ namespace RaceControl.ViewModels
         public override string Title => $"{_identifier}. {PlayableContent?.Title}";
 
         public ICommand MouseDownVideoCommand => _mouseDownVideoCommand ??= new DelegateCommand<MouseButtonEventArgs>(MouseDownVideoExecute);
-        public ICommand MouseMoveVideoCommand => _mouseMoveVideoCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveVideoExecute);
-        public ICommand MouseEnterVideoCommand => _mouseEnterVideoCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveVideoExecute);
-        public ICommand MouseLeaveVideoCommand => _mouseLeaveVideoCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveVideoExecute);
+        public ICommand MouseEnterOrLeaveOrMoveVideoCommand => _mouseEnterOrLeaveOrMoveVideoCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveVideoExecute);
         public ICommand MouseWheelVideoCommand => _mouseWheelVideoCommand ??= new DelegateCommand<MouseWheelEventArgs>(MouseWheelVideoExecute);
         public ICommand MouseMoveControlBarCommand => _mouseMoveControlBarCommand ??= new DelegateCommand(MouseMoveControlBarExecute);
         public ICommand MouseEnterControlBarCommand => _mouseEnterControlBarCommand ??= new DelegateCommand(MouseEnterControlBarExecute);
@@ -587,8 +584,6 @@ namespace RaceControl.ViewModels
 
         private void CreateShowControlsTimer()
         {
-            RemoveShowControlsTimer();
-
             lock (_showControlsTimerLock)
             {
                 _showControlsTimer = new Timer(2000) { AutoReset = false };

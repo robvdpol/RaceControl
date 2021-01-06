@@ -34,7 +34,6 @@ using System.Windows.Input;
 namespace RaceControl.ViewModels
 {
     // ReSharper disable once UnusedType.Global
-    // ReSharper disable UnusedMember.Global
     public class MainWindowViewModel : ViewModelBase
     {
         private readonly IExtendedDialogService _dialogService;
