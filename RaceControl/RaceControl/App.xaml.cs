@@ -29,6 +29,8 @@ using RaceControl.Vlc;
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
 using System;
+using System.IO;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Threading;
 using LibVLCSharpCore = LibVLCSharp.Shared.Core;
@@ -44,6 +46,14 @@ namespace RaceControl
         protected override void OnStartup(StartupEventArgs e)
         {
             _splashScreen.Show(false);
+
+            var currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            if (currentDirectory != null)
+            {
+                Environment.CurrentDirectory = currentDirectory;
+            }
+
             base.OnStartup(e);
         }
 
