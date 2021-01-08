@@ -23,7 +23,8 @@ namespace RaceControl.Services.F1TV
             var authResponse = await AuthenticateAsync(login, password);
 
 #if !DEBUG
-            if (authResponse.Data.SubscriptionStatus != "active")
+            // Allow disposable account that is used for Microsoft Store certification
+            if (authResponse.Data.SubscriptionStatus != "active" && !string.Equals(login, "yatoh98051@maksap.com", StringComparison.OrdinalIgnoreCase))
             {
                 throw new Exception("An active F1TV subscription is required.");
             }
