@@ -61,6 +61,7 @@
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
     <PackageCertificateThumbprint>9265AE0A16E7DBD407DD67EBCE3DED17D3105C69</PackageCertificateThumbprint>
     <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+    <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <AppxBundle>Never</AppxBundle>
