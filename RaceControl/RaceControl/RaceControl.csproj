@@ -60,11 +60,11 @@
     <PackageReference Include="LazyCache" Version="2.1.2" />
     <PackageReference Include="LibVLCSharp" Version="3.4.9" />
     <PackageReference Include="LibVLCSharp.WPF" Version="3.4.9" />
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.19" />
-    <PackageReference Include="NLog" Version="4.7.5" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.31" />
+    <PackageReference Include="NLog" Version="4.7.8" />
     <PackageReference Include="Prism.DryIoc" Version="8.0.0.1909" />
     <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="106.11.7" />
-    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.11" />
+    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.12" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RaceControl.Core\RaceControl.Core.csproj" />
