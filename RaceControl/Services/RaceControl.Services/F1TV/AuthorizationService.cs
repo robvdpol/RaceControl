@@ -18,33 +18,7 @@ namespace RaceControl.Services.F1TV
             _restClientFactory = restClientFactory;
         }
 
-        public async Task<TokenResponse> LoginAsync(string login, string password)
-        {
-            var authResponse = await AuthenticateAsync(login, password);
-
-#if !DEBUG
-            // Allow disposable account that is used for Microsoft Store certification
-            if (authResponse.Data.SubscriptionStatus != "active" && !string.Equals(login, "yatoh98051@maksap.com", StringComparison.OrdinalIgnoreCase))
-            {
-                throw new Exception("An active F1TV subscription is required.");
-            }
-#endif
-
-            var tokenRequest = new TokenRequest
-            {
-                AccessToken = authResponse.Data.SubscriptionToken,
-                IdentityProviderUrl = Constants.IdentityProvider
-            };
-
-            _logger.Info("Sending token request...");
-            var restClient = _restClientFactory();
-            var restRequest = new RestRequest(Constants.TokenUrl).AddJsonBody(tokenRequest);
-            var restResponse = await restClient.ExecutePostAsync<TokenResponse>(restRequest);
-
-            return restResponse.IsSuccessful ? restResponse.Data : throw new Exception(restResponse.StatusDescription);
-        }
-
-        private async Task<AuthResponse> AuthenticateAsync(string login, string password)
+        public async Task<AuthResponse> AuthenticateAsync(string login, string password)
         {
             var authRequest = new AuthRequest
             {

@@ -3,8 +3,8 @@
     public static class ChannelTypes
     {
         public const string Wif = "wif";
-        public const string Driver = "driver";
-        public const string Other = "other";
+        public const string Onboard = "obc";
+        public const string Additional = "additional";
         public const string Backup = "backup";
     }
 }

@@ -1,7 +1,5 @@
 ﻿using RaceControl.Common.Enums;
-using RaceControl.Common.Utils;
 using RaceControl.Services.Interfaces.F1TV.Api;
-using System.Linq;
 
 namespace RaceControl
 {
@@ -15,10 +13,9 @@ namespace RaceControl
             Name = channel.Name;
             DisplayName = displayName;
             ContentType = GetContentType(channel);
-            ContentUrl = channel.Self;
+            ContentUrl = channel.PlaybackUrl;
             IsLive = session.IsLive;
             SyncUID = session.UID;
-            DriverUID = channel.DriverOccurrenceUrls?.FirstOrDefault().GetUID();
         }
 
         private static string GetDisplayName(Channel channel)
@@ -28,13 +25,13 @@ namespace RaceControl
                 case "WIF":
                     return "World Feed";
 
-                case "pit lane":
+                case "PIT LANE":
                     return "Pit Lane";
 
-                case "driver":
+                case "TRACKER":
                     return "Driver Tracker";
 
-                case "data":
+                case "DATA":
                     return "Live Timing";
 
                 default:

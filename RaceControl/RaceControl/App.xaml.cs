@@ -83,7 +83,7 @@ namespace RaceControl
                 .Register<JsonSerializer>(() => new JsonSerializer { Formatting = Formatting.Indented })
                 .Register<IAuthorizationService, AuthorizationService>()
                 .Register<IF1TVClient, F1TVClient>()
-                .Register<IApiService, ApiService>()
+                .Register<IApiService, NewApiService>()
                 .Register<IGithubService, GithubService>()
                 .Register<ICredentialService, CredentialService>()
                 .Register<IStreamlinkLauncher, StreamlinkLauncher>()

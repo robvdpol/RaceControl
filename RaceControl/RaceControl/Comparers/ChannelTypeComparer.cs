@@ -23,22 +23,22 @@ namespace RaceControl.Comparers
                 return 1;
             }
 
-            if (x == ChannelTypes.Other)
+            if (x == ChannelTypes.Additional)
             {
                 return -1;
             }
 
-            if (y == ChannelTypes.Other)
+            if (y == ChannelTypes.Additional)
             {
                 return 1;
             }
 
-            if (x == ChannelTypes.Driver)
+            if (x == ChannelTypes.Onboard)
             {
                 return -1;
             }
 
-            if (y == ChannelTypes.Driver)
+            if (y == ChannelTypes.Onboard)
             {
                 return 1;
             }

@@ -76,7 +76,7 @@ namespace RaceControl.ViewModels
 
         private async Task<string> LoginAsync()
         {
-            return (await _authorizationService.LoginAsync(Email, Password)).Token;
+            return (await _authorizationService.AuthenticateAsync(Email, Password)).Data.SubscriptionToken;
         }
 
         private void LoginSuccess(string token)

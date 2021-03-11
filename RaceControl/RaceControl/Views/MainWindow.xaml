@@ -133,17 +133,11 @@
                         <Style TargetType="ListBoxItem">
                             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                             <Setter Property="Focusable" Value="False" />
-                            <Setter Property="Visibility" Value="Visible" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding HasContent}" Value="False">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
                         </Style>
                     </ListBox.ItemContainerStyle>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <CheckBox Content="{Binding}" Tag="{Binding Self}">
+                            <CheckBox Content="{Binding}" Tag="{Binding UID}">
                                 <i:Interaction.Behaviors>
                                     <behaviors:CheckBoxMultiSelectBehavior SelectedItems="{Binding DataContext.Settings.SelectedSeries, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" />
                                 </i:Interaction.Behaviors>
@@ -271,7 +265,7 @@
                                             </EventTrigger>
                                         </ToolTip.Triggers>
                                         <Image
-                                            Width="400"
+                                            Width="354"
                                             RenderOptions.BitmapScalingMode="HighQuality"
                                             Source="{Binding ThumbnailUrl, TargetNullValue={x:Null}}" />
                                     </ToolTip>
@@ -291,7 +285,7 @@
                                 <DataTrigger Value="True">
                                     <DataTrigger.Binding>
                                         <MultiBinding Converter="{StaticResource CollectionContainsConverter}">
-                                            <Binding Path="SeriesUrl" />
+                                            <Binding Path="SeriesUID" />
                                             <Binding Path="DataContext.Settings.SelectedSeries" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Window}" />
                                             <!--  Needed to trigger converter  -->
                                             <Binding Path="DataContext.Settings.SelectedSeries.Count" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Window}" />

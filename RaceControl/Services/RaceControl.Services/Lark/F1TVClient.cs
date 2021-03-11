@@ -13,15 +13,6 @@ namespace RaceControl.Services.Lark
         {
         }
 
-        public async Task<TokenisedUrl> GetTokenisedUrlForChannelAsync(string token, string channelUrl)
-        {
-            var restClient = RestClientFactory();
-            restClient.Authenticator = new F1TVAuthenticator(token);
-            var restRequest = new RestRequest($"{Endpoint}/viewings").AddJsonBody(new ChannelUrl { Url = channelUrl });
-
-            return await restClient.PostAsync<TokenisedUrl>(restRequest);
-        }
-
         public async Task<TokenisedUrlContainer> GetTokenisedUrlForAssetAsync(string token, string assetUrl)
         {
             var restClient = RestClientFactory();

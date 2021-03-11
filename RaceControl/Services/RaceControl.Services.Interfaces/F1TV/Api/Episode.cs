@@ -21,6 +21,6 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         public static string UIDField => JsonUtils.GetJsonPropertyName<Episode>(e => e.UID);
         public static string TitleField => JsonUtils.GetJsonPropertyName<Episode>(e => e.Title);
         public static string ItemsField => JsonUtils.GetJsonPropertyName<Episode>(e => e.Items);
-        public static string ImageUrlsField => JsonUtils.GetJsonPropertyName<Session>(s => s.ImageUrls);
+        public static string ImageUrlsField => JsonUtils.GetJsonPropertyName<Episode>(s => s.ImageUrls);
     }
 }

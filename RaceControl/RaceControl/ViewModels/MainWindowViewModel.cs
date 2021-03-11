@@ -270,7 +270,7 @@ namespace RaceControl.ViewModels
                 IsBusy = true;
 
                 _apiService
-                    .GetEventsForSeasonAsync(SelectedSeason.UID)
+                    .GetEventsForSeasonAsync(SelectedSeason)
                     .Await(events =>
                     {
                         Events.AddRange(events);
@@ -290,7 +290,7 @@ namespace RaceControl.ViewModels
                 IsBusy = true;
 
                 _apiService
-                    .GetSessionsForEventAsync(SelectedEvent.UID)
+                    .GetSessionsForEventAsync(SelectedEvent)
                     .Await(sessions =>
                     {
                         Sessions.AddRange(sessions);
@@ -546,28 +546,25 @@ namespace RaceControl.ViewModels
 
         private async Task InitializeAsync()
         {
-            await Task.WhenAll(LoadSeasonsAsync(), LoadSeriesAsync(), LoadVodTypesAsync());
+            LoadSeasons();
+            LoadSeries();
+            await LoadVodTypesAsync();
         }
 
-        private async Task LoadSeasonsAsync()
+        private void LoadSeasons()
         {
-            var seasons = await _apiService.GetSeasonsAsync();
+            var seasons = _apiService.GetSeasons();
             Seasons.AddRange(seasons);
         }
 
-        private async Task LoadSeriesAsync()
+        private void LoadSeries()
         {
-            var series = await _apiService.GetSeriesAsync();
+            var series = _apiService.GetSeries();
             Series.AddRange(series);
 
             if (!Settings.SelectedSeries.Any())
             {
-                var f1Series = Series.FirstOrDefault(s => s.Name == "Formula 1" && s.HasContent);
-
-                if (f1Series != null)
-                {
-                    Settings.SelectedSeries.Add(f1Series.Self);
-                }
+                Settings.SelectedSeries.Add("FORMULA 1");
             }
         }
 
@@ -646,7 +643,7 @@ namespace RaceControl.ViewModels
 
         private async Task LoadChannelsForSessionAsync(Session session)
         {
-            var channels = await _apiService.GetChannelsForSessionAsync(session.UID);
+            var channels = await _apiService.GetChannelsForSessionAsync(session);
 
             if (session.IsLive && channels.Count > 1)
             {
@@ -677,7 +674,7 @@ namespace RaceControl.ViewModels
                 { ParameterNames.Settings, settings }
             };
 
-            _dialogService.Show(nameof(VideoDialog), parameters, (result) => _numberGenerator.RemoveNumber(identifier), nameof(VideoDialogWindow));
+            _dialogService.Show(nameof(VideoDialog), parameters, result => _numberGenerator.RemoveNumber(identifier), nameof(VideoDialogWindow));
         }
 
         private async Task WatchInVlcAsync(IPlayableContent playableContent)
