@@ -38,7 +38,7 @@ namespace RaceControl.Services.F1TV
 
             return apiResponse.ResultObj.Containers
                 .SelectMany(c1 => c1.RetrieveItems.ResultObj.Containers
-                    .Where(c2 => c2.Metadata.Entitlement != "Access")
+                    .Where(c2 => c2.Metadata.ContentType == "VIDEO" && c2.Metadata.ContentSubtype == "LIVE")
                     .Select(CreateSession))
                 .ToList();
         }
@@ -121,7 +121,11 @@ namespace RaceControl.Services.F1TV
 
             var apiResponse = await QueryEventSessionsAsync(evt.UID);
 
-            return apiResponse.ResultObj.Containers.Select(CreateSession).ToList();
+            return apiResponse.ResultObj.Containers
+                .Where(c => c.Metadata.ContentType == "VIDEO")
+                .Where(c => c.Metadata.ContentSubtype == "REPLAY" || c.Metadata.ContentSubtype == "LIVE")
+                .Select(CreateSession)
+                .ToList();
         }
 
         public async Task<List<Channel>> GetChannelsForSessionAsync(Session session)
@@ -136,8 +140,8 @@ namespace RaceControl.Services.F1TV
                 // Add the world feed seperately
                 new()
                 {
-                    Name = "WIF", 
-                    ChannelType = ChannelTypes.Wif, 
+                    Name = "WIF",
+                    ChannelType = ChannelTypes.Wif,
                     PlaybackUrl = $"CONTENT/PLAY?contentId={metadata.ContentId}"
                 }
             };
@@ -260,7 +264,7 @@ namespace RaceControl.Services.F1TV
             restClient.BaseUrl = new Uri(Constants.NewApiEndpointUrl);
 
             var restRequest = new RestRequest("2.0/R/ENG/BIG_SCREEN_DASH/ALL/PAGE/SEARCH/VOD/F1_TV_Pro_Annual/2", DataFormat.Json);
-            restRequest.AddQueryParameter("filter_objectSubtype", "Replay");
+            //restRequest.AddQueryParameter("filter_objectSubtype", "Replay");
             restRequest.AddQueryParameter("orderBy", "session_index");
             restRequest.AddQueryParameter("sortOrder", "asc");
             restRequest.AddQueryParameter("filter_MeetingKey", meetingKey);
@@ -307,6 +311,8 @@ namespace RaceControl.Services.F1TV
             {
                 UID = container.Id,
                 ContentID = container.Metadata.ContentId,
+                ContentType = container.Metadata.ContentType,
+                ContentSubtype = container.Metadata.ContentSubtype,
                 Name = container.Metadata.TitleBrief,
                 SessionName = container.Metadata.Title,
                 SeriesUID = container.Properties.First().Series

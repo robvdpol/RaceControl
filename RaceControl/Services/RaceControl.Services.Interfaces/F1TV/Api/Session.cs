@@ -7,6 +7,8 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
     {
         public string UID { get; set; }
         public int ContentID { get; set; }
+        public string ContentType { get; set; } // VIDEO, BUNDLE
+        public string ContentSubtype { get; set; } // LIVE, FEATURE, DOCUMENTARY, REPLAY, SHOW, PRESS CONFERENCE, ANALYSIS, HIGHLIGHTS, EXTENDED HIGHLIGHTS, MEETING
         public string Name { get; set; }
         public string SessionName { get; set; }
         public string Status { get; set; }
@@ -14,9 +16,9 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         public string SeriesUID { get; set; }
         public string ThumbnailUrl { get; set; }
 
-        public bool IsUpcoming => Status == "upcoming";
-        public bool IsLive => Status == "live";
-        public bool IsExpired => Status == "expired";
+        public bool IsLive => ContentType == "LIVE";
+        public bool IsUpcoming => false;
+        public bool IsExpired => false;
 
         public override string ToString()
         {
