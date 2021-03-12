@@ -3,6 +3,7 @@ using RaceControl.Common.Enums;
 using RaceControl.Common.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Api;
+using RaceControl.Services.Interfaces.F1TV.Constants;
 using RaceControl.Services.Interfaces.Lark;
 using RestSharp;
 using System;
@@ -67,23 +68,23 @@ namespace RaceControl.Services.F1TV
             {
                 new()
                 {
-                    UID = "FORMULA 1",
-                    Name = "Formula 1"
+                    UID = SeriesIds.Formula1,
+                    Name = SeriesNames.Formula1
                 },
                 new()
                 {
-                    UID = "FORMULA 2",
-                    Name = "Formula 2"
+                    UID = SeriesIds.Formula2,
+                    Name = SeriesNames.Formula2
                 },
                 new()
                 {
-                    UID = "FORMULA 3",
-                    Name = "Formula 3"
-                },
+                    UID = SeriesIds.Formula3,
+                    Name = SeriesNames.Formula3
+        },
                 new()
                 {
-                    UID = "PORSCHE",
-                    Name = "Porsche Supercup"
+                    UID = SeriesIds.PorscheSupercup,
+                    Name = SeriesNames.PorscheSupercup
                 },
             };
         }
