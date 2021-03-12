@@ -80,7 +80,7 @@ namespace RaceControl
                 .Register<JsonSerializer>(() => new JsonSerializer { Formatting = Formatting.Indented })
                 .Register<IAuthorizationService, AuthorizationService>()
                 .Register<IF1TVClient, F1TVClient>()
-                .Register<IApiService, NewApiService>()
+                .Register<IApiService, ApiService>()
                 .Register<IGithubService, GithubService>()
                 .Register<ICredentialService, CredentialService>()
                 .Register<INumberGenerator, NumberGenerator>()

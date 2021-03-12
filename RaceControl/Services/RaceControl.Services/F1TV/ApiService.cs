@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace RaceControl.Services.F1TV
 {
-    public class NewApiService : IApiService
+    public class ApiService : IApiService
     {
         private const int F1TVLaunchYear = 2018;
         private const string StreamType = "BIG_SCREEN_HLS";
@@ -21,7 +21,7 @@ namespace RaceControl.Services.F1TV
         private readonly IF1TVClient _client;
         private readonly Func<IRestClient> _restClientFactory;
 
-        public NewApiService(ILogger logger, IF1TVClient client, Func<IRestClient> restClientFactory)
+        public ApiService(ILogger logger, IF1TVClient client, Func<IRestClient> restClientFactory)
         {
             _logger = logger;
             _client = client;
