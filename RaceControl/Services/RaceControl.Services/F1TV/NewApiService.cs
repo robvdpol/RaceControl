@@ -131,22 +131,28 @@ namespace RaceControl.Services.F1TV
             var apiResponse = await QuerySessionChannelsAsync(session.ContentID);
             var metadata = apiResponse.ResultObj.Containers.First().Metadata;
 
-            var channels = metadata.AdditionalStreams
-                .Select(s => new Channel
-                {
-                    Name = s.Type == "obc" ? $"{s.DriverFirstName} {s.DriverLastName}" : s.Title,
-                    ChannelType = s.Type,
-                    PlaybackUrl = s.PlaybackUrl
-                })
-                .ToList();
-
-            // Add the world feed seperately
-            channels.Add(new Channel
+            var channels = new List<Channel>
             {
-                Name = "WIF",
-                ChannelType = ChannelTypes.Wif,
-                PlaybackUrl = $"CONTENT/PLAY?contentId={metadata.ContentId}"
-            });
+                // Add the world feed seperately
+                new()
+                {
+                    Name = "WIF", 
+                    ChannelType = ChannelTypes.Wif, 
+                    PlaybackUrl = $"CONTENT/PLAY?contentId={metadata.ContentId}"
+                }
+            };
+
+            if (metadata.AdditionalStreams != null && metadata.AdditionalStreams.Any())
+            {
+                channels.AddRange(metadata.AdditionalStreams
+                      .Select(s => new Channel
+                      {
+                          Name = s.Type == "obc" ? $"{s.DriverFirstName} {s.DriverLastName}" : s.Title,
+                          ChannelType = s.Type,
+                          PlaybackUrl = s.PlaybackUrl
+                      })
+                      .ToList());
+            }
 
             return channels;
         }

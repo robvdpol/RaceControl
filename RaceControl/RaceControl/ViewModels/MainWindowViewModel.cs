@@ -603,7 +603,7 @@ namespace RaceControl.ViewModels
         {
             Logger.Info("Refreshing live sessions...");
 
-            var liveSessions = (await _apiService.GetLiveSessionsAsync()).Where(session => session.IsLive).ToList();
+            var liveSessions = (await _apiService.GetLiveSessionsAsync()).ToList();
             var sessionsToRemove = LiveSessions.Where(existingLiveSession => liveSessions.All(liveSession => liveSession.UID != existingLiveSession.UID)).ToList();
             var sessionsToAdd = liveSessions.Where(newLiveSession => LiveSessions.All(liveSession => liveSession.UID != newLiveSession.UID)).ToList();
 
