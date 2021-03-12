@@ -7,13 +7,14 @@ namespace RaceControl
     {
         public PlayableEpisode(Episode episode)
         {
-            Title = $"{episode.SessionName} - {episode.Name}";
-            Name = episode.Name;
-            DisplayName = episode.Name;
+            Title = episode.LongName;
+            Name = episode.ShortName;
+            DisplayName = episode.LongName;
             ContentType = ContentType.Asset;
             ContentUrl = episode.PlaybackUrl;
             ThumbnailUrl = episode.ThumbnailUrl;
             SyncUID = episode.UID;
+            SeriesUID = episode.SeriesUID;
         }
     }
 }

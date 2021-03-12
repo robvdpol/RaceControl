@@ -151,12 +151,12 @@ namespace RaceControl.Services.F1TV
 
             var channels = new List<Channel>
             {
-                // Add the world feed seperately
                 new()
                 {
-                    Name = "WIF",
+                    // Add the world feed seperately
+                    Name = ChannelNames.Wif,
                     ChannelType = ChannelTypes.Wif,
-                    PlaybackUrl = $"CONTENT/PLAY?contentId={metadata.ContentId}"
+                    PlaybackUrl = GetPlaybackUrl(metadata.ContentId)
                 }
             };
 
@@ -285,8 +285,8 @@ namespace RaceControl.Services.F1TV
                 ContentID = container.Metadata.ContentId,
                 ContentType = container.Metadata.ContentType,
                 ContentSubtype = container.Metadata.ContentSubtype,
-                Name = container.Metadata.TitleBrief,
-                SessionName = container.Metadata.Title,
+                ShortName = container.Metadata.TitleBrief,
+                LongName = container.Metadata.Title,
                 SeriesUID = container.Properties.First().Series
             };
 
@@ -306,10 +306,10 @@ namespace RaceControl.Services.F1TV
                 ContentID = container.Metadata.ContentId,
                 ContentType = container.Metadata.ContentType,
                 ContentSubtype = container.Metadata.ContentSubtype,
-                Name = container.Metadata.TitleBrief,
-                SessionName = container.Metadata.Title,
+                ShortName = container.Metadata.TitleBrief,
+                LongName = container.Metadata.Title,
                 SeriesUID = container.Properties.First().Series,
-                PlaybackUrl = $"CONTENT/PLAY?contentId={container.Metadata.ContentId}"
+                PlaybackUrl = GetPlaybackUrl(container.Metadata.ContentId)
             };
 
             if (!string.IsNullOrWhiteSpace(container.Metadata.PictureUrl))
@@ -318,6 +318,11 @@ namespace RaceControl.Services.F1TV
             }
 
             return episode;
+        }
+
+        private static string GetPlaybackUrl(int contentId)
+        {
+            return $"CONTENT/PLAY?contentId={contentId}";
         }
     }
 }

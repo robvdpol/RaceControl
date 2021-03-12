@@ -9,29 +9,30 @@ namespace RaceControl
         {
             var displayName = GetDisplayName(channel);
 
-            Title = $"{session.SessionName} - {displayName}";
+            Title = $"{session.LongName} - {displayName}";
             Name = channel.Name;
             DisplayName = displayName;
             ContentType = GetContentType(channel);
             ContentUrl = channel.PlaybackUrl;
             IsLive = session.IsLive;
             SyncUID = session.UID;
+            SeriesUID = session.SeriesUID;
         }
 
         private static string GetDisplayName(Channel channel)
         {
             switch (channel.Name)
             {
-                case "WIF":
+                case ChannelNames.Wif:
                     return "World Feed";
 
-                case "PIT LANE":
+                case ChannelNames.PitLane:
                     return "Pit Lane";
 
-                case "TRACKER":
+                case ChannelNames.Tracker:
                     return "Driver Tracker";
 
-                case "DATA":
+                case ChannelNames.Data:
                     return "Live Timing";
 
                 default:

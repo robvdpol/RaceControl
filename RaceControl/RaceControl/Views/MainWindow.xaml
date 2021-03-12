@@ -390,7 +390,7 @@
                         <GroupBox
                             Grid.Row="0"
                             Margin="5,3"
-                            Header="Live broadcasts">
+                            Header="Settings">
                             <StackPanel Orientation="Vertical">
                                 <CheckBox
                                     Margin="3"
@@ -547,6 +547,20 @@
                                 </ToolTip>
                             </Setter.Value>
                         </Setter>
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Value="True">
+                                <DataTrigger.Binding>
+                                    <MultiBinding Converter="{StaticResource CollectionContainsConverter}">
+                                        <Binding Path="SeriesUID" />
+                                        <Binding Path="DataContext.Settings.SelectedSeries" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Window}" />
+                                        <!--  Needed to trigger converter  -->
+                                        <Binding Path="DataContext.Settings.SelectedSeries.Count" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Window}" />
+                                    </MultiBinding>
+                                </DataTrigger.Binding>
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
                     </Style>
                 </ListBox.ItemContainerStyle>
                 <ListBox.ItemTemplate>

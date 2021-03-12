@@ -294,7 +294,7 @@ namespace RaceControl.ViewModels
             {
                 IsBusy = true;
                 SelectedSession = null;
-                SelectSessionAsync(SelectedLiveSession).Await(SetNotBusy, HandleCriticalError);
+                SelectSessionAsync(SelectedLiveSession, true).Await(SetNotBusy, HandleCriticalError);
             }
         }
 
@@ -304,7 +304,7 @@ namespace RaceControl.ViewModels
             {
                 IsBusy = true;
                 SelectedLiveSession = null;
-                SelectSessionAsync(SelectedSession).Await(SetNotBusy, HandleCriticalError);
+                SelectSessionAsync(SelectedSession, false).Await(SetNotBusy, HandleCriticalError);
             }
         }
 
@@ -635,15 +635,17 @@ namespace RaceControl.ViewModels
             Episodes.AddRange(episodes.Select(e => new PlayableEpisode(e)));
         }
 
-        private async Task SelectSessionAsync(Session session)
+        private async Task SelectSessionAsync(Session session, bool clearEpisodes)
         {
-            Episodes.Clear();
+            if (clearEpisodes)
+            {
+                Episodes.Clear();
+            }
+
             Channels.Clear();
             SelectedVodType = null;
 
-            await Task.WhenAll(
-                LoadChannelsForSessionAsync(session),
-                LoadEpisodesForSessionAsync(session));
+            await LoadChannelsForSessionAsync(session);
         }
 
         private async Task LoadChannelsForSessionAsync(Session session)
@@ -660,13 +662,6 @@ namespace RaceControl.ViewModels
             }
 
             Channels.AddRange(channels.OrderBy(c => c.ChannelType, new ChannelTypeComparer()).Select(c => new PlayableChannel(session, c)));
-        }
-
-        private async Task LoadEpisodesForSessionAsync(Session session)
-        {
-            // todo
-            //var episodes = await _apiService.GetEpisodesForSessionAsync(session.UID);
-            //Episodes.AddRange(episodes.OrderBy(e => e.Title).Select(e => new PlayableEpisode(e)));
         }
 
         private void WatchContent(IPlayableContent playableContent, VideoDialogSettings settings = null)

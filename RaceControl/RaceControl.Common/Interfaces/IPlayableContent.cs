@@ -13,5 +13,6 @@ namespace RaceControl.Common.Interfaces
         bool IsLive { get; }
         string SyncUID { get; }
         string DriverUID { get; }
+        string SeriesUID { get; set; }
     }
 }
