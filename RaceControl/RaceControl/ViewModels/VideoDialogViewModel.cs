@@ -7,12 +7,10 @@ using RaceControl.Common.Interfaces;
 using RaceControl.Core.Helpers;
 using RaceControl.Core.Mvvm;
 using RaceControl.Core.Settings;
-using RaceControl.Core.Streamlink;
 using RaceControl.Events;
 using RaceControl.Extensions;
 using RaceControl.Services.Interfaces.F1TV;
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
@@ -28,10 +26,8 @@ namespace RaceControl.ViewModels
 
         private readonly IEventAggregator _eventAggregator;
         private readonly IApiService _apiService;
-        private readonly IStreamlinkLauncher _streamlinkLauncher;
-        private readonly ISettings _settings;
         private readonly IVideoDialogLayout _videoDialogLayout;
-        private readonly object _showControlsTimerLock = new object();
+        private readonly object _showControlsTimerLock = new();
 
         private ICommand _mouseDownVideoCommand;
         private ICommand _mouseEnterOrLeaveOrMoveVideoCommand;
@@ -54,14 +50,11 @@ namespace RaceControl.ViewModels
         private ICommand _stopCastVideoCommand;
         private ICommand _selectAudioDeviceCommand;
 
-        private Process _streamlinkProcess;
-        private Process _streamlinkRecordingProcess;
         private string _token;
         private long _identifier;
         private IPlayableContent _playableContent;
         private VideoDialogSettings _dialogSettings;
         private WindowStartupLocation _startupLocation = WindowStartupLocation.CenterOwner;
-        private bool _isStreamlink;
         private bool _isRecording;
         private bool _showControls = true;
         private IMediaRenderer _selectedMediaRenderer;
@@ -73,16 +66,12 @@ namespace RaceControl.ViewModels
             ILogger logger,
             IEventAggregator eventAggregator,
             IApiService apiService,
-            IStreamlinkLauncher streamlinkLauncher,
-            ISettings settings,
             IVideoDialogLayout videoDialogLayout,
             IMediaPlayer mediaPlayer)
             : base(logger)
         {
             _eventAggregator = eventAggregator;
             _apiService = apiService;
-            _streamlinkLauncher = streamlinkLauncher;
-            _settings = settings;
             _videoDialogLayout = videoDialogLayout;
             MediaPlayer = mediaPlayer;
         }
@@ -130,12 +119,6 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _startupLocation, value);
         }
 
-        public bool IsStreamlink
-        {
-            get => _isStreamlink;
-            set => SetProperty(ref _isStreamlink, value);
-        }
-
         public bool IsRecording
         {
             get => _isRecording;
@@ -171,7 +154,6 @@ namespace RaceControl.ViewModels
             _token = parameters.GetValue<string>(ParameterNames.Token);
             _identifier = parameters.GetValue<long>(ParameterNames.Identifier);
             PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.Content);
-            IsStreamlink = PlayableContent.IsLive && !_settings.DisableStreamlink;
 
             var dialogSettings = parameters.GetValue<VideoDialogSettings>(ParameterNames.Settings);
 
@@ -194,8 +176,6 @@ namespace RaceControl.ViewModels
             MediaPlayer.Dispose();
             RemoveShowControlsTimer();
             UnsubscribeEvents();
-            CleanupProcess(_streamlinkProcess);
-            CleanupProcess(_streamlinkRecordingProcess);
 
             base.OnDialogClosed();
         }
@@ -528,15 +508,6 @@ namespace RaceControl.ViewModels
 
         private async Task StartStreamAsync()
         {
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, PlayableContent);
-
-            if (IsStreamlink)
-            {
-                var (streamlinkProcess, streamlinkUrl) = await _streamlinkLauncher.StartStreamlinkExternalAsync(streamUrl);
-                _streamlinkProcess = streamlinkProcess;
-                streamUrl = streamlinkUrl;
-            }
-
             if (!string.IsNullOrWhiteSpace(DialogSettings.AudioDevice))
             {
                 var audioDevice = MediaPlayer.AudioDevices.FirstOrDefault(ad => ad.Description == DialogSettings.AudioDevice);
@@ -547,6 +518,7 @@ namespace RaceControl.ViewModels
                 }
             }
 
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, PlayableContent);
             await MediaPlayer.StartPlaybackAsync(streamUrl);
             MediaPlayer.ToggleMute(DialogSettings.IsMuted);
             MediaPlayer.Volume = DialogSettings.Volume;
@@ -630,16 +602,8 @@ namespace RaceControl.ViewModels
         private async Task ChangeRendererAsync(IMediaRenderer mediaRenderer = null)
         {
             var time = MediaPlayer.Time;
-
-            if (IsStreamlink)
-            {
-                await MediaPlayer.ChangeRendererAsync(mediaRenderer);
-            }
-            else
-            {
-                var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, PlayableContent);
-                await MediaPlayer.ChangeRendererAsync(mediaRenderer, streamUrl);
-            }
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, PlayableContent);
+            await MediaPlayer.ChangeRendererAsync(mediaRenderer, streamUrl);
 
             if (!PlayableContent.IsLive)
             {
@@ -650,15 +614,13 @@ namespace RaceControl.ViewModels
         private async Task StartRecordingAsync()
         {
             Logger.Info("Starting recording process...");
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, PlayableContent);
-            _streamlinkRecordingProcess = _streamlinkLauncher.StartStreamlinkRecording(streamUrl, PlayableContent.Title);
+            // todo
         }
 
         private void StopRecording()
         {
             Logger.Info("Stopping recording process...");
-            CleanupProcess(_streamlinkRecordingProcess);
-            _streamlinkRecordingProcess = null;
+            // todo
         }
 
         private void SetFullScreen()
@@ -672,26 +634,6 @@ namespace RaceControl.ViewModels
         {
             Logger.Info("Changing to windowed mode...");
             DialogSettings.WindowState = WindowState.Normal;
-        }
-
-        private void CleanupProcess(Process process)
-        {
-            if (process != null)
-            {
-                if (!process.HasExited)
-                {
-                    try
-                    {
-                        process.Kill(true);
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Error(ex, $"An error occurred while trying to kill process with id '{process.Id}' and name '{process.ProcessName}'.");
-                    }
-                }
-
-                process.Dispose();
-            }
         }
     }
 }

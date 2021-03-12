@@ -15,9 +15,6 @@ namespace RaceControl.Core.Settings
         private readonly ILogger _logger;
         private readonly JsonSerializer _serializer;
 
-        private bool _lowQualityMode;
-        private bool _useAlternativeStream;
-        private bool _disableStreamlink;
         private bool _disableMpvNoBorder;
         private string _recordingLocation = Environment.CurrentDirectory;
         private string _latestRelease;
@@ -27,24 +24,6 @@ namespace RaceControl.Core.Settings
         {
             _logger = logger;
             _serializer = serializer;
-        }
-
-        public bool LowQualityMode
-        {
-            get => _lowQualityMode;
-            set => SetProperty(ref _lowQualityMode, value);
-        }
-
-        public bool UseAlternativeStream
-        {
-            get => _useAlternativeStream;
-            set => SetProperty(ref _useAlternativeStream, value);
-        }
-
-        public bool DisableStreamlink
-        {
-            get => _disableStreamlink;
-            set => SetProperty(ref _disableStreamlink, value);
         }
 
         public bool DisableMpvNoBorder

@@ -13,7 +13,6 @@ using RaceControl.Common.Interfaces;
 using RaceControl.Common.Utils;
 using RaceControl.Core.Helpers;
 using RaceControl.Core.Settings;
-using RaceControl.Core.Streamlink;
 using RaceControl.Extensions;
 using RaceControl.Services.Credential;
 using RaceControl.Services.F1TV;
@@ -86,7 +85,6 @@ namespace RaceControl
                 .Register<IApiService, NewApiService>()
                 .Register<IGithubService, GithubService>()
                 .Register<ICredentialService, CredentialService>()
-                .Register<IStreamlinkLauncher, StreamlinkLauncher>()
                 .Register<INumberGenerator, NumberGenerator>()
                 .Register<IMediaPlayer, VlcMediaPlayer>()
                 .Register<IMediaDownloader, VlcMediaDownloader>();

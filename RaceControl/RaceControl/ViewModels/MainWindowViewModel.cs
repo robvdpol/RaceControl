@@ -11,7 +11,6 @@ using RaceControl.Comparers;
 using RaceControl.Core.Helpers;
 using RaceControl.Core.Mvvm;
 using RaceControl.Core.Settings;
-using RaceControl.Core.Streamlink;
 using RaceControl.Events;
 using RaceControl.Extensions;
 using RaceControl.Services.Interfaces.Credential;
@@ -42,7 +41,6 @@ namespace RaceControl.ViewModels
         private readonly IApiService _apiService;
         private readonly IGithubService _githubService;
         private readonly ICredentialService _credentialService;
-        private readonly IStreamlinkLauncher _streamlinkLauncher;
         private readonly INumberGenerator _numberGenerator;
         private readonly object _refreshTimerLock = new object();
 
@@ -92,7 +90,6 @@ namespace RaceControl.ViewModels
             IApiService apiService,
             IGithubService githubService,
             ICredentialService credentialService,
-            IStreamlinkLauncher streamlinkLauncher,
             INumberGenerator numberGenerator,
             ISettings settings,
             IVideoDialogLayout videoDialogLayout)
@@ -103,7 +100,6 @@ namespace RaceControl.ViewModels
             _apiService = apiService;
             _githubService = githubService;
             _credentialService = credentialService;
-            _streamlinkLauncher = streamlinkLauncher;
             _numberGenerator = numberGenerator;
             Settings = settings;
             VideoDialogLayout = videoDialogLayout;
@@ -686,15 +682,8 @@ namespace RaceControl.ViewModels
                 return;
             }
 
-            if (playableContent.IsLive && !Settings.DisableStreamlink)
-            {
-                _streamlinkLauncher.StartStreamlinkVlc(VlcExeLocation, streamUrl, playableContent.Title);
-            }
-            else
-            {
-                using var process = ProcessUtils.CreateProcess(VlcExeLocation, $"\"{streamUrl}\" --meta-title=\"{playableContent.Title}\"");
-                process.Start();
-            }
+            using var process = ProcessUtils.CreateProcess(VlcExeLocation, $"\"{streamUrl}\" --meta-title=\"{playableContent.Title}\"");
+            process.Start();
         }
 
         private async Task WatchInMpvAsync(IPlayableContent playableContent, VideoDialogSettings settings = null)

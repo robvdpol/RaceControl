@@ -4,12 +4,6 @@ namespace RaceControl.Core.Settings
 {
     public interface ISettings
     {
-        bool LowQualityMode { get; set; }
-
-        bool UseAlternativeStream { get; set; }
-
-        bool DisableStreamlink { get; set; }
-
         bool DisableMpvNoBorder { get; set; }
 
         string RecordingLocation { get; set; }
