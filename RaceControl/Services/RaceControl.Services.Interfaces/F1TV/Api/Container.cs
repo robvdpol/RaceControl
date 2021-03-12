@@ -33,7 +33,7 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         public RetrieveItems RetrieveItems { get; set; }
 
         [JsonProperty("contentId")]
-        public int ContentId { get; set; }
+        public long ContentId { get; set; }
 
         [JsonProperty("suggest")]
         public Suggest Suggest { get; set; }

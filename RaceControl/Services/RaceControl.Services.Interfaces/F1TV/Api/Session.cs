@@ -3,7 +3,7 @@
     public class Session
     {
         public string UID { get; init; }
-        public int ContentID { get; init; }
+        public long ContentID { get; init; }
         public string ContentType { get; init; } // VIDEO, BUNDLE
         public string ContentSubtype { get; init; } // LIVE, FEATURE, DOCUMENTARY, REPLAY, SHOW, PRESS CONFERENCE, ANALYSIS, HIGHLIGHTS, EXTENDED HIGHLIGHTS, MEETING
         public string ShortName { get; init; }

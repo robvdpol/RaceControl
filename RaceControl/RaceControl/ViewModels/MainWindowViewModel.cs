@@ -54,7 +54,7 @@ namespace RaceControl.ViewModels
         private ICommand _eventSelectionChangedCommand;
         private ICommand _liveSessionSelectionChangedCommand;
         private ICommand _sessionSelectionChangedCommand;
-        private ICommand _vodTypeSelectionChangedCommand;
+        private ICommand _vodGenreSelectionChangedCommand;
         private ICommand _watchContentCommand;
         private ICommand _watchContentInVlcCommand;
         private ICommand _watchContentInMpvCommand;
@@ -75,13 +75,13 @@ namespace RaceControl.ViewModels
         private ObservableCollection<Session> _sessions;
         private ObservableCollection<Session> _liveSessions;
         private ObservableCollection<IPlayableContent> _channels;
-        private ObservableCollection<VodType> _vodTypes;
+        private ObservableCollection<string> _vodGenres;
         private ObservableCollection<IPlayableContent> _episodes;
         private Season _selectedSeason;
         private Event _selectedEvent;
         private Session _selectedLiveSession;
         private Session _selectedSession;
-        private VodType _selectedVodType;
+        private string _selectedVodGenre;
         private Timer _refreshTimer;
 
         public MainWindowViewModel(
@@ -117,7 +117,7 @@ namespace RaceControl.ViewModels
         public ICommand EventSelectionChangedCommand => _eventSelectionChangedCommand ??= new DelegateCommand(EventSelectionChangedExecute);
         public ICommand LiveSessionSelectionChangedCommand => _liveSessionSelectionChangedCommand ??= new DelegateCommand(LiveSessionSelectionChangedExecute);
         public ICommand SessionSelectionChangedCommand => _sessionSelectionChangedCommand ??= new DelegateCommand(SessionSelectionChangedExecute);
-        public ICommand VodTypeSelectionChangedCommand => _vodTypeSelectionChangedCommand ??= new DelegateCommand(VodTypeSelectionChangedExecute);
+        public ICommand VodGenreSelectionChangedCommand => _vodGenreSelectionChangedCommand ??= new DelegateCommand(VodGenreSelectionChangedExecute);
         public ICommand WatchContentCommand => _watchContentCommand ??= new DelegateCommand<IPlayableContent>(WatchContentExecute);
         public ICommand WatchContentInVlcCommand => _watchContentInVlcCommand ??= new DelegateCommand<IPlayableContent>(WatchContentInVlcExecute, CanWatchContentInVlcExecute).ObservesProperty(() => VlcExeLocation);
         public ICommand WatchContentInMpvCommand => _watchContentInMpvCommand ??= new DelegateCommand<IPlayableContent>(WatchContentInMpvExecute, CanWatchContentInMpvExecute).ObservesProperty(() => MpvExeLocation);
@@ -170,7 +170,7 @@ namespace RaceControl.ViewModels
 
         public ObservableCollection<IPlayableContent> Channels => _channels ??= new ObservableCollection<IPlayableContent>();
 
-        public ObservableCollection<VodType> VodTypes => _vodTypes ??= new ObservableCollection<VodType>();
+        public ObservableCollection<string> VodGenres => _vodGenres ??= new ObservableCollection<string>();
 
         public ObservableCollection<IPlayableContent> Episodes => _episodes ??= new ObservableCollection<IPlayableContent>();
 
@@ -198,10 +198,10 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _selectedSession, value);
         }
 
-        public VodType SelectedVodType
+        public string SelectedVodGenre
         {
-            get => _selectedVodType;
-            set => SetProperty(ref _selectedVodType, value);
+            get => _selectedVodGenre;
+            set => SetProperty(ref _selectedVodGenre, value);
         }
 
         private void LoadedExecute(RoutedEventArgs args)
@@ -309,30 +309,16 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void VodTypeSelectionChangedExecute()
+        private void VodGenreSelectionChangedExecute()
         {
-            if (SelectedVodType != null)
+            if (!string.IsNullOrWhiteSpace(SelectedVodGenre))
             {
+                IsBusy = true;
                 Episodes.Clear();
                 Channels.Clear();
                 SelectedLiveSession = null;
                 SelectedSession = null;
-
-                if (SelectedVodType.ContentUrls.Any())
-                {
-                    // todo
-                    //IsBusy = true;
-
-                    //DownloadHelper
-                    //    .BufferedDownload(_apiService.GetEpisodeAsync, SelectedVodType.ContentUrls.Select(c => c.GetUID()))
-                    //    .Await(episodes =>
-                    //    {
-                    //        Episodes.AddRange(episodes.OrderBy(e => e.Title).Select(e => new PlayableEpisode(e)));
-                    //        SetNotBusy();
-                    //    },
-                    //    HandleCriticalError,
-                    //    true);
-                }
+                LoadEpisodesForGenreAsync(SelectedVodGenre).Await(SetNotBusy, HandleCriticalError);
             }
         }
 
@@ -537,7 +523,7 @@ namespace RaceControl.ViewModels
         {
             LoadSeasons();
             LoadSeries();
-            await LoadVodTypesAsync();
+            await LoadVodGenresAsync();
         }
 
         private void LoadSeasons()
@@ -557,10 +543,9 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private async Task LoadVodTypesAsync()
+        private async Task LoadVodGenresAsync()
         {
-            var vodTypes = await _apiService.GetVodTypesAsync();
-            VodTypes.AddRange(vodTypes.Where(vt => vt.ContentUrls.Any()));
+            VodGenres.AddRange(await _apiService.GetVodGenresAsync());
         }
 
         private void CreateRefreshTimer()
@@ -636,6 +621,12 @@ namespace RaceControl.ViewModels
             Episodes.AddRange(episodes.Select(e => new PlayableEpisode(e)));
         }
 
+        private async Task LoadEpisodesForGenreAsync(string genre)
+        {
+            var episodes = await _apiService.GetEpisodesForGenreAsync(genre);
+            Episodes.AddRange(episodes.Select(e => new PlayableEpisode(e)));
+        }
+
         private async Task SelectSessionAsync(Session session, bool clearEpisodes)
         {
             if (clearEpisodes)
@@ -644,7 +635,7 @@ namespace RaceControl.ViewModels
             }
 
             Channels.Clear();
-            SelectedVodType = null;
+            SelectedVodGenre = null;
 
             await LoadChannelsForSessionAsync(session);
         }
@@ -823,7 +814,7 @@ namespace RaceControl.ViewModels
             Channels.Clear();
             Sessions.Clear();
             SelectedLiveSession = null;
-            SelectedVodType = null;
+            SelectedVodGenre = null;
         }
 
         private static bool ValidateStreamUrl(string streamUrl)

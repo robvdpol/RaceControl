@@ -54,7 +54,7 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         public int PcLevel { get; set; }
 
         [JsonProperty("contentId")]
-        public int ContentId { get; set; }
+        public long ContentId { get; set; }
 
         [JsonProperty("starRating")]
         public int StarRating { get; set; }

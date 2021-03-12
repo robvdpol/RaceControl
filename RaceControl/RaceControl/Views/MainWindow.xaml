@@ -468,12 +468,12 @@
             <ListBox
                 Grid.Row="3"
                 Grid.Column="1"
-                ItemsSource="{Binding VodTypes}"
-                SelectedItem="{Binding SelectedVodType}"
+                ItemsSource="{Binding VodGenres}"
+                SelectedItem="{Binding SelectedVodGenre}"
                 Style="{StaticResource ContentListBoxStyle}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectionChanged">
-                        <i:InvokeCommandAction Command="{Binding VodTypeSelectionChangedCommand}" />
+                        <i:InvokeCommandAction Command="{Binding VodGenreSelectionChangedCommand}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </ListBox>

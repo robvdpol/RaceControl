@@ -13,13 +13,15 @@ namespace RaceControl.Services.Interfaces.F1TV
 
         List<Series> GetSeries();
 
-        Task<List<VodType>> GetVodTypesAsync();
+        Task<List<string>> GetVodGenresAsync();
 
         Task<List<Event>> GetEventsForSeasonAsync(Season season);
 
         Task<List<Session>> GetSessionsForEventAsync(Event evt);
 
         Task<List<Episode>> GetEpisodesForEventAsync(Event evt);
+
+        Task<List<Episode>> GetEpisodesForGenreAsync(string genre);
 
         Task<List<Channel>> GetChannelsForSessionAsync(Session session);
 
