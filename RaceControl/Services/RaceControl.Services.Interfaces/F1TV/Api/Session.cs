@@ -12,22 +12,10 @@
         public string ThumbnailUrl { get; set; }
 
         public bool IsLive => ContentType == "LIVE";
-        public bool IsUpcoming => false;
-        public bool IsExpired => false;
 
         public override string ToString()
         {
-            if (IsLive)
-            {
-                return $"{Name} (live)";
-            }
-
-            if (IsExpired)
-            {
-                return $"{Name} (expired)";
-            }
-
-            return Name;
+            return IsLive ? $"{Name} (live)" : Name;
         }
     }
 }

@@ -16,6 +16,7 @@ namespace RaceControl.Services.F1TV
     public class NewApiService : IApiService
     {
         private const int F1TVLaunchYear = 2018;
+        private const string StreamType = "BIG_SCREEN_HLS";
 
         private readonly ILogger _logger;
         private readonly IAppCache _cache;
@@ -210,7 +211,7 @@ namespace RaceControl.Services.F1TV
             var restClient = _restClientFactory();
             restClient.BaseUrl = new Uri(Constants.NewApiEndpointUrl);
 
-            var restRequest = new RestRequest("2.0/R/ENG/BIG_SCREEN_DASH/ALL/PAGE/395/F1_TV_Pro_Annual/2", DataFormat.Json);
+            var restRequest = new RestRequest($"2.0/R/ENG/{StreamType}/ALL/PAGE/395/F1_TV_Pro_Annual/2", DataFormat.Json);
 
             return await restClient.GetAsync<ApiResponse>(restRequest);
         }
@@ -220,7 +221,7 @@ namespace RaceControl.Services.F1TV
             var restClient = _restClientFactory();
             restClient.BaseUrl = new Uri(Constants.NewApiEndpointUrl);
 
-            var restRequest = new RestRequest("2.0/R/ENG/BIG_SCREEN_DASH/ALL/PAGE/SEARCH/VOD/F1_TV_Pro_Annual/2", DataFormat.Json);
+            var restRequest = new RestRequest($"2.0/R/ENG/{StreamType}/ALL/PAGE/SEARCH/VOD/F1_TV_Pro_Annual/2", DataFormat.Json);
             restRequest.AddQueryParameter("filter_objectSubtype", "Meeting");
             restRequest.AddQueryParameter("orderBy", "meeting_End_Date");
             restRequest.AddQueryParameter("sortOrder", "asc");
@@ -235,7 +236,7 @@ namespace RaceControl.Services.F1TV
             var restClient = _restClientFactory();
             restClient.BaseUrl = new Uri(Constants.NewApiEndpointUrl);
 
-            var restRequest = new RestRequest("2.0/R/ENG/BIG_SCREEN_DASH/ALL/PAGE/SEARCH/VOD/F1_TV_Pro_Annual/2", DataFormat.Json);
+            var restRequest = new RestRequest($"2.0/R/ENG/{StreamType}/ALL/PAGE/SEARCH/VOD/F1_TV_Pro_Annual/2", DataFormat.Json);
             restRequest.AddQueryParameter("orderBy", "session_index");
             restRequest.AddQueryParameter("sortOrder", "asc");
             restRequest.AddQueryParameter("filter_MeetingKey", meetingKey);
@@ -249,7 +250,7 @@ namespace RaceControl.Services.F1TV
             var restClient = _restClientFactory();
             restClient.BaseUrl = new Uri(Constants.NewApiEndpointUrl);
 
-            var restRequest = new RestRequest($"2.0/R/ENG/BIG_SCREEN_DASH/ALL/CONTENT/VIDEO/{contentID}/F1_TV_Pro_Annual/2", DataFormat.Json);
+            var restRequest = new RestRequest($"2.0/R/ENG/{StreamType}/ALL/CONTENT/VIDEO/{contentID}/F1_TV_Pro_Annual/2", DataFormat.Json);
 
             return await restClient.GetAsync<ApiResponse>(restRequest);
         }
@@ -259,7 +260,7 @@ namespace RaceControl.Services.F1TV
             var restClient = _restClientFactory();
             restClient.BaseUrl = new Uri(Constants.NewApiEndpointUrl);
 
-            var restRequest = new RestRequest($"/1.0/R/ENG/BIG_SCREEN_DASH/ALL/{contentUrl}", DataFormat.Json);
+            var restRequest = new RestRequest($"/1.0/R/ENG/{StreamType}/ALL/{contentUrl}", DataFormat.Json);
             restRequest.AddHeader("ascendontoken", token);
 
             return await restClient.GetAsync<ApiResponse>(restRequest);

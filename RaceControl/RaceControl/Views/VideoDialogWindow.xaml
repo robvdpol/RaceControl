@@ -24,7 +24,6 @@
             Modifiers="Shift" />
         <KeyBinding Key="M" Command="{Binding ToggleMuteCommand}" />
         <KeyBinding Key="F" Command="{Binding ToggleFullScreenCommand}" />
-        <KeyBinding Key="R" Command="{Binding ToggleRecordingCommand}" />
         <KeyBinding Key="S" Command="{Binding SyncSessionCommand}" />
         <KeyBinding Key="Right" Command="{Binding FastForwardCommand}">
             <KeyBinding.CommandParameter>

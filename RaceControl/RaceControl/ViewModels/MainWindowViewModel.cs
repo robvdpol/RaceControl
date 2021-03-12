@@ -59,7 +59,7 @@ namespace RaceControl.ViewModels
         private ICommand _watchContentInMpvCommand;
         private ICommand _copyContentUrlCommand;
         private ICommand _downloadContentCommand;
-        private ICommand _setRecordingLocationCommand;
+        private ICommand _setDownloadLocationCommand;
         private ICommand _saveVideoDialogLayoutCommand;
         private ICommand _openVideoDialogLayoutCommand;
         private ICommand _deleteCredentialCommand;
@@ -122,7 +122,7 @@ namespace RaceControl.ViewModels
         public ICommand WatchContentInMpvCommand => _watchContentInMpvCommand ??= new DelegateCommand<IPlayableContent>(WatchContentInMpvExecute, CanWatchContentInMpvExecute).ObservesProperty(() => MpvExeLocation);
         public ICommand CopyContentUrlCommand => _copyContentUrlCommand ??= new DelegateCommand<IPlayableContent>(CopyContentUrlExecute);
         public ICommand DownloadContentCommand => _downloadContentCommand ??= new DelegateCommand<IPlayableContent>(DownloadContentExecute, CanDownloadContentExecute);
-        public ICommand SetRecordingLocationCommand => _setRecordingLocationCommand ??= new DelegateCommand(SetRecordingLocationExecute);
+        public ICommand SetDownloadLocationCommand => _setDownloadLocationCommand ??= new DelegateCommand(SetDownloadLocationExecute);
         public ICommand SaveVideoDialogLayoutCommand => _saveVideoDialogLayoutCommand ??= new DelegateCommand(SaveVideoDialogLayoutExecute);
         public ICommand OpenVideoDialogLayoutCommand => _openVideoDialogLayoutCommand ??= new DelegateCommand<PlayerType?>(OpenVideoDialogLayoutExecute, CanOpenVideoDialogLayoutExecute).ObservesProperty(() => VideoDialogLayout.Instances.Count).ObservesProperty(() => Channels.Count);
         public ICommand DeleteCredentialCommand => _deleteCredentialCommand ??= new DelegateCommand(DeleteCredentialExecute);
@@ -378,11 +378,11 @@ namespace RaceControl.ViewModels
             StartDownload(playableContent);
         }
 
-        private void SetRecordingLocationExecute()
+        private void SetDownloadLocationExecute()
         {
-            if (_dialogService.SelectFolder("Select a recording location", Settings.RecordingLocation, out var recordingLocation))
+            if (_dialogService.SelectFolder("Select a download location", Settings.DownloadLocation, out var downloadLocation))
             {
-                Settings.RecordingLocation = recordingLocation;
+                Settings.DownloadLocation = downloadLocation;
             }
         }
 
@@ -765,7 +765,7 @@ namespace RaceControl.ViewModels
         {
             var defaultFilename = $"{playableContent.Title}.ts".RemoveInvalidFileNameChars();
 
-            if (_dialogService.SelectFile("Select a filename", Settings.RecordingLocation, defaultFilename, ".ts", out var filename))
+            if (_dialogService.SelectFile("Select a filename", Settings.DownloadLocation, defaultFilename, ".ts", out var filename))
             {
                 var parameters = new DialogParameters
                 {

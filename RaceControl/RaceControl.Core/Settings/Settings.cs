@@ -16,7 +16,7 @@ namespace RaceControl.Core.Settings
         private readonly JsonSerializer _serializer;
 
         private bool _disableMpvNoBorder;
-        private string _recordingLocation = Environment.CurrentDirectory;
+        private string _downloadLocation = Environment.CurrentDirectory;
         private string _latestRelease;
         private ObservableCollection<string> _selectedSeries;
 
@@ -32,10 +32,10 @@ namespace RaceControl.Core.Settings
             set => SetProperty(ref _disableMpvNoBorder, value);
         }
 
-        public string RecordingLocation
+        public string DownloadLocation
         {
-            get => _recordingLocation;
-            set => SetProperty(ref _recordingLocation, value);
+            get => _downloadLocation;
+            set => SetProperty(ref _downloadLocation, value);
         }
 
         public string LatestRelease

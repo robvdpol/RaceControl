@@ -42,7 +42,6 @@ namespace RaceControl.ViewModels
         private ICommand _toggleMuteCommand;
         private ICommand _fastForwardCommand;
         private ICommand _syncSessionCommand;
-        private ICommand _toggleRecordingCommand;
         private ICommand _toggleFullScreenCommand;
         private ICommand _moveToCornerCommand;
         private ICommand _scanChromecastCommand;
@@ -55,7 +54,6 @@ namespace RaceControl.ViewModels
         private IPlayableContent _playableContent;
         private VideoDialogSettings _dialogSettings;
         private WindowStartupLocation _startupLocation = WindowStartupLocation.CenterOwner;
-        private bool _isRecording;
         private bool _showControls = true;
         private IMediaRenderer _selectedMediaRenderer;
         private Timer _showControlsTimer;
@@ -91,7 +89,6 @@ namespace RaceControl.ViewModels
         public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand<bool?>(ToggleMuteExecute).ObservesCanExecute(() => CanClose);
         public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<int?>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent);
         public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent);
-        public ICommand ToggleRecordingCommand => _toggleRecordingCommand ??= new DelegateCommand(ToggleRecordingExecute, CanToggleRecordingExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent).ObservesProperty(() => IsRecording).ObservesProperty(() => MediaPlayer.IsPaused);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand<long?>(ToggleFullScreenExecute);
         public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => DialogSettings.WindowState);
         public ICommand ScanChromecastCommand => _scanChromecastCommand ??= new DelegateCommand(ScanChromecastExecute, CanScanChromecastExecute).ObservesProperty(() => CanClose).ObservesProperty(() => MediaPlayer.IsScanning);
@@ -117,12 +114,6 @@ namespace RaceControl.ViewModels
         {
             get => _startupLocation;
             set => SetProperty(ref _startupLocation, value);
-        }
-
-        public bool IsRecording
-        {
-            get => _isRecording;
-            set => SetProperty(ref _isRecording, value);
         }
 
         public bool ShowControls
@@ -306,24 +297,6 @@ namespace RaceControl.ViewModels
             var payload = new SyncStreamsEventPayload(PlayableContent.SyncUID, MediaPlayer.Time);
             Logger.Info($"Syncing streams with sync-UID '{payload.SyncUID}' to timestamp '{payload.Time}'...");
             _eventAggregator.GetEvent<SyncStreamsEvent>().Publish(payload);
-        }
-
-        private bool CanToggleRecordingExecute()
-        {
-            return CanClose && PlayableContent.IsLive && (IsRecording || !MediaPlayer.IsPaused);
-        }
-
-        private void ToggleRecordingExecute()
-        {
-            if (!IsRecording)
-            {
-                StartRecordingAsync().Await(() => IsRecording = true, HandleNonCriticalError);
-            }
-            else
-            {
-                StopRecording();
-                IsRecording = false;
-            }
         }
 
         private void OnSyncStreams(SyncStreamsEventPayload payload)
@@ -609,18 +582,6 @@ namespace RaceControl.ViewModels
             {
                 MediaPlayer.Time = time;
             }
-        }
-
-        private async Task StartRecordingAsync()
-        {
-            Logger.Info("Starting recording process...");
-            // todo
-        }
-
-        private void StopRecording()
-        {
-            Logger.Info("Stopping recording process...");
-            // todo
         }
 
         private void SetFullScreen()

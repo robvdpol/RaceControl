@@ -273,14 +273,8 @@
                             </Setter>
                             <Setter Property="Visibility" Value="Collapsed" />
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsUpcoming}" Value="True">
-                                    <Setter Property="Background" Value="#FFB266" />
-                                </DataTrigger>
                                 <DataTrigger Binding="{Binding IsLive}" Value="True">
                                     <Setter Property="Background" Value="LightGreen" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding IsExpired}" Value="True">
-                                    <Setter Property="Background" Value="#FF6666" />
                                 </DataTrigger>
                                 <DataTrigger Value="True">
                                     <DataTrigger.Binding>
@@ -402,16 +396,16 @@
                                     Margin="3"
                                     Content="Disable MPV borderless mode"
                                     IsChecked="{Binding Settings.DisableMpvNoBorder}" />
-                                <TextBlock Margin="3" Text="Recording location:" />
+                                <TextBlock Margin="3" Text="Download location:" />
                                 <TextBlock
                                     Margin="3,0,3,3"
-                                    Text="{Binding Settings.RecordingLocation}"
+                                    Text="{Binding Settings.DownloadLocation}"
                                     TextWrapping="Wrap" />
                                 <Button
-                                    Command="{Binding SetRecordingLocationCommand}"
-                                    Content="Change recording location"
+                                    Command="{Binding SetDownloadLocationCommand}"
+                                    Content="Change download location"
                                     Style="{StaticResource OptionButtonStyle}"
-                                    ToolTip="Change the location where recordings of live streams are saved" />
+                                    ToolTip="Change the location where downloads are saved by default" />
                             </StackPanel>
                         </GroupBox>
                         <GroupBox
