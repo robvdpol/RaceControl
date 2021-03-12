@@ -2,8 +2,8 @@
 {
     public class Channel
     {
-        public string Name { get; set; }
-        public string ChannelType { get; set; }
-        public string PlaybackUrl { get; set; }
+        public string Name { get; init; }
+        public string ChannelType { get; init; }
+        public string PlaybackUrl { get; init; }
     }
 }

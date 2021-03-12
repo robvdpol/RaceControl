@@ -12,7 +12,6 @@ namespace RaceControl.Common.Interfaces
         string ThumbnailUrl { get; }
         bool IsLive { get; }
         string SyncUID { get; }
-        string DriverUID { get; }
         string SeriesUID { get; set; }
     }
 }

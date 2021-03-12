@@ -209,20 +209,6 @@
                     FontSize="22"
                     Foreground="White"
                     Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                <Image
-                    Width="275"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Bottom"
-                    RenderOptions.BitmapScalingMode="HighQuality"
-                    Source="{Binding CarImageUrl, TargetNullValue={x:Null}}"
-                    Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                <Image
-                    Width="175"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Bottom"
-                    RenderOptions.BitmapScalingMode="HighQuality"
-                    Source="{Binding HeadshotImageUrl, TargetNullValue={x:Null}}"
-                    Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}" />
             </Grid>
             <Border
                 Grid.Row="2"

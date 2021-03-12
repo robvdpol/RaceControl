@@ -1,5 +1,4 @@
 ﻿using DryIoc;
-using LazyCache;
 using LibVLCSharp.Shared;
 using Newtonsoft.Json;
 using NLog;
@@ -76,7 +75,6 @@ namespace RaceControl
                 .RegisterSingleton<IExtendedDialogService, ExtendedDialogService>()
                 .RegisterSingleton<ISettings, Settings>()
                 .RegisterSingleton<IVideoDialogLayout, VideoDialogLayout>()
-                .RegisterSingleton<IAppCache>(() => new CachingService())
                 .RegisterInstance(CreateLibVLC())
                 .Register<MediaPlayer>(CreateMediaPlayer)
                 .Register<JsonSerializer>(() => new JsonSerializer { Formatting = Formatting.Indented })

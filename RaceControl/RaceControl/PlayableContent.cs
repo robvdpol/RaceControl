@@ -13,7 +13,6 @@ namespace RaceControl
         public string ThumbnailUrl { get; protected set; }
         public bool IsLive { get; protected set; }
         public string SyncUID { get; protected set; }
-        public string DriverUID { get; protected set; }
         public string SeriesUID { get; set; }
 
         public override string ToString()

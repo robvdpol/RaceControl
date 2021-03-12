@@ -23,8 +23,6 @@ namespace RaceControl.Services.Interfaces.F1TV
 
         Task<List<Channel>> GetChannelsForSessionAsync(Session session);
 
-        Task<Driver> GetDriverAsync(string driverUID);
-
         Task<string> GetTokenisedUrlAsync(string token, IPlayableContent playableContent);
     }
 }

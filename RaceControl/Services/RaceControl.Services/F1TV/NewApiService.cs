@@ -1,5 +1,4 @@
-﻿using LazyCache;
-using NLog;
+﻿using NLog;
 using RaceControl.Common.Enums;
 using RaceControl.Common.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
@@ -19,14 +18,12 @@ namespace RaceControl.Services.F1TV
         private const string StreamType = "BIG_SCREEN_HLS";
 
         private readonly ILogger _logger;
-        private readonly IAppCache _cache;
         private readonly IF1TVClient _client;
         private readonly Func<IRestClient> _restClientFactory;
 
-        public NewApiService(ILogger logger, IAppCache cache, IF1TVClient client, Func<IRestClient> restClientFactory)
+        public NewApiService(ILogger logger, IF1TVClient client, Func<IRestClient> restClientFactory)
         {
             _logger = logger;
-            _cache = cache;
             _client = client;
             _restClientFactory = restClientFactory;
         }
@@ -173,24 +170,6 @@ namespace RaceControl.Services.F1TV
             }
 
             return channels;
-        }
-
-        public async Task<Driver> GetDriverAsync(string driverUID)
-        {
-            _logger.Info($"Querying driver with UID '{driverUID}'...");
-
-            var request = _client
-                .NewRequest("driver-occurrence", driverUID)
-                .WithField(Driver.UIDField)
-                .WithField(Driver.NameField)
-                .WithField(Driver.ImageUrlsField, true)
-                .WithSubField(Driver.ImageUrlsField, Image.UIDField)
-                .WithSubField(Driver.ImageUrlsField, Image.TitleField)
-                .WithSubField(Driver.ImageUrlsField, Image.ImageTypeField)
-                .WithSubField(Driver.ImageUrlsField, Image.UrlField)
-                ;
-
-            return await _cache.GetOrAddAsync($"{nameof(NewApiService)}-{nameof(GetDriverAsync)}-{driverUID}", () => _client.GetItemAsync<Driver>(request));
         }
 
         public async Task<string> GetTokenisedUrlAsync(string token, IPlayableContent playableContent)

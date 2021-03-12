@@ -57,8 +57,6 @@ namespace RaceControl.ViewModels
         private bool _showControls = true;
         private IMediaRenderer _selectedMediaRenderer;
         private Timer _showControlsTimer;
-        private string _carImageUrl;
-        private string _headshotImageUrl;
 
         public VideoDialogViewModel(
             ILogger logger,
@@ -126,18 +124,6 @@ namespace RaceControl.ViewModels
         {
             get => _selectedMediaRenderer;
             set => SetProperty(ref _selectedMediaRenderer, value);
-        }
-
-        public string CarImageUrl
-        {
-            get => _carImageUrl;
-            set => SetProperty(ref _carImageUrl, value);
-        }
-
-        public string HeadshotImageUrl
-        {
-            get => _headshotImageUrl;
-            set => SetProperty(ref _headshotImageUrl, value);
         }
 
         public override void OnDialogOpened(IDialogParameters parameters)
@@ -463,7 +449,6 @@ namespace RaceControl.ViewModels
         private async Task InitializeAsync()
         {
             await StartStreamAsync();
-            await LoadDriverImageUrlsAsync();
             SubscribeEvents();
             CreateShowControlsTimer();
         }
@@ -495,22 +480,6 @@ namespace RaceControl.ViewModels
             await MediaPlayer.StartPlaybackAsync(streamUrl);
             MediaPlayer.ToggleMute(DialogSettings.IsMuted);
             MediaPlayer.Volume = DialogSettings.Volume;
-        }
-
-        private async Task LoadDriverImageUrlsAsync()
-        {
-            if (string.IsNullOrWhiteSpace(PlayableContent.DriverUID))
-            {
-                return;
-            }
-
-            var driver = await _apiService.GetDriverAsync(PlayableContent.DriverUID);
-
-            if (driver != null)
-            {
-                CarImageUrl = driver.CarUrl;
-                HeadshotImageUrl = driver.HeadshotUrl;
-            }
         }
 
         private void SubscribeEvents()
