@@ -5,15 +5,15 @@ namespace RaceControl
 {
     public abstract class PlayableContent : IPlayableContent
     {
-        public string Title { get; protected set; }
-        public string Name { get; protected set; }
-        public string DisplayName { get; protected set; }
-        public ContentType ContentType { get; protected set; }
-        public string ContentUrl { get; protected set; }
-        public string ThumbnailUrl { get; protected set; }
-        public bool IsLive { get; protected set; }
-        public string SyncUID { get; protected set; }
-        public string SeriesUID { get; set; }
+        public string Title { get; protected init; }
+        public string Name { get; protected init; }
+        public string DisplayName { get; protected init; }
+        public ContentType ContentType { get; protected init; }
+        public string ContentUrl { get; protected init; }
+        public string ThumbnailUrl { get; protected init; }
+        public bool IsLive { get; protected init; }
+        public string SyncUID { get; protected init; }
+        public string SeriesUID { get; protected init; }
 
         public override string ToString()
         {

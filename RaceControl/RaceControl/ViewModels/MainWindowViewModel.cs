@@ -450,7 +450,7 @@ namespace RaceControl.ViewModels
         {
             var registryKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\VideoLAN\VLC") ?? Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\VideoLAN\VLC");
 
-            if (registryKey != null && registryKey.GetValue(null) is string vlcExeLocation && File.Exists(vlcExeLocation))
+            if (registryKey?.GetValue(null) is string vlcExeLocation && File.Exists(vlcExeLocation))
             {
                 VlcExeLocation = vlcExeLocation;
                 Logger.Info($"Found VLC installation at '{vlcExeLocation}'.");
@@ -676,7 +676,7 @@ namespace RaceControl.ViewModels
                 { ParameterNames.Settings, settings }
             };
 
-            _dialogService.Show(nameof(VideoDialog), parameters, result => _numberGenerator.RemoveNumber(identifier), nameof(VideoDialogWindow));
+            _dialogService.Show(nameof(VideoDialog), parameters, _ => _numberGenerator.RemoveNumber(identifier), nameof(VideoDialogWindow));
         }
 
         private async Task WatchInVlcAsync(IPlayableContent playableContent)

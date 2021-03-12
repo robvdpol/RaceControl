@@ -80,7 +80,7 @@ namespace RaceControl.Services.F1TV
                 {
                     UID = SeriesIds.Formula3,
                     Name = SeriesNames.Formula3
-        },
+                },
                 new()
                 {
                     UID = SeriesIds.PorscheSupercup,
@@ -267,13 +267,9 @@ namespace RaceControl.Services.F1TV
                 ContentSubtype = container.Metadata.ContentSubtype,
                 ShortName = container.Metadata.TitleBrief,
                 LongName = container.Metadata.Title,
-                SeriesUID = container.Properties.First().Series
+                SeriesUID = container.Properties.First().Series,
+                ThumbnailUrl = GetThumbnailUrl(container.Metadata.PictureUrl)
             };
-
-            if (!string.IsNullOrWhiteSpace(container.Metadata.PictureUrl))
-            {
-                session.ThumbnailUrl = $"{Constants.ImageUrl}/{container.Metadata.PictureUrl}?w=354&h=199&q=HI&o=L";
-            }
 
             return session;
         }
@@ -289,13 +285,9 @@ namespace RaceControl.Services.F1TV
                 ShortName = container.Metadata.TitleBrief,
                 LongName = container.Metadata.Title,
                 SeriesUID = container.Properties.First().Series,
-                PlaybackUrl = GetPlaybackUrl(container.Metadata.ContentId)
+                PlaybackUrl = GetPlaybackUrl(container.Metadata.ContentId),
+                ThumbnailUrl = GetThumbnailUrl(container.Metadata.PictureUrl)
             };
-
-            if (!string.IsNullOrWhiteSpace(container.Metadata.PictureUrl))
-            {
-                episode.ThumbnailUrl = $"{Constants.ImageUrl}/{container.Metadata.PictureUrl}?w=354&h=199&q=HI&o=L";
-            }
 
             return episode;
         }
@@ -303,6 +295,11 @@ namespace RaceControl.Services.F1TV
         private static string GetPlaybackUrl(int contentId)
         {
             return $"CONTENT/PLAY?contentId={contentId}";
+        }
+
+        private static string GetThumbnailUrl(string pictureUrl)
+        {
+            return !string.IsNullOrWhiteSpace(pictureUrl) ? $"{Constants.ImageUrl}/{pictureUrl}?w=354&h=199&q=HI&o=L" : null;
         }
     }
 }

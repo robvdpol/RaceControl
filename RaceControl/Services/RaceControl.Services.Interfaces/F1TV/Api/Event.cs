@@ -4,10 +4,10 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
 {
     public class Event
     {
-        public string UID { get; set; }
-        public string Name { get; set; }
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
+        public string UID { get; init; }
+        public string Name { get; init; }
+        public DateTime? StartDate { get; init; }
+        public DateTime? EndDate { get; init; }
 
         public override string ToString()
         {

@@ -2,8 +2,8 @@
 {
     public class Series
     {
-        public string UID { get; set; }
-        public string Name { get; set; }
+        public string UID { get; init; }
+        public string Name { get; init; }
 
         public override string ToString()
         {

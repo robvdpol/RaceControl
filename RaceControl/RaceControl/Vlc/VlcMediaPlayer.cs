@@ -124,7 +124,7 @@ namespace RaceControl.Vlc
             _streamUrl = streamUrl;
 
             using var media = new Media(_libVLC, _streamUrl, FromType.FromLocation);
-            media.DurationChanged += (sender, e) => Duration = e.Duration;
+            media.DurationChanged += (_, e) => Duration = e.Duration;
             await media.Parse(MediaParseOptions.ParseNetwork | MediaParseOptions.FetchNetwork);
             MediaPlayer.SetRenderer(mediaRenderer?.Renderer as RendererItem);
 

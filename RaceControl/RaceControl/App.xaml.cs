@@ -39,7 +39,7 @@ namespace RaceControl
 {
     public partial class App
     {
-        private readonly SplashScreen _splashScreen = new SplashScreen("splashscreen.png");
+        private readonly SplashScreen _splashScreen = new("splashscreen.png");
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -129,7 +129,7 @@ namespace RaceControl
             var libVLC = new LibVLC();
             var logger = LogManager.GetLogger(libVLC.GetType().FullName);
 
-            libVLC.Log += (sender, args) =>
+            libVLC.Log += (_, args) =>
             {
                 switch (args.Level)
                 {
