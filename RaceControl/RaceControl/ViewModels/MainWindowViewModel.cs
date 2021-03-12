@@ -42,7 +42,7 @@ namespace RaceControl.ViewModels
         private readonly IGithubService _githubService;
         private readonly ICredentialService _credentialService;
         private readonly INumberGenerator _numberGenerator;
-        private readonly object _refreshTimerLock = new object();
+        private readonly object _refreshTimerLock = new();
 
         private ICommand _loadedCommand;
         private ICommand _closingCommand;
@@ -284,16 +284,7 @@ namespace RaceControl.ViewModels
             if (SelectedEvent != null)
             {
                 IsBusy = true;
-
-                _apiService
-                    .GetSessionsForEventAsync(SelectedEvent)
-                    .Await(sessions =>
-                    {
-                        Sessions.AddRange(sessions);
-                        SetNotBusy();
-                    },
-                    HandleCriticalError,
-                    true);
+                SelectEventAsync(SelectedEvent).Await(SetNotBusy, HandleCriticalError);
             }
         }
 
@@ -328,17 +319,18 @@ namespace RaceControl.ViewModels
 
                 if (SelectedVodType.ContentUrls.Any())
                 {
-                    IsBusy = true;
+                    // todo
+                    //IsBusy = true;
 
-                    DownloadHelper
-                        .BufferedDownload(_apiService.GetEpisodeAsync, SelectedVodType.ContentUrls.Select(c => c.GetUID()))
-                        .Await(episodes =>
-                        {
-                            Episodes.AddRange(episodes.OrderBy(e => e.Title).Select(e => new PlayableEpisode(e)));
-                            SetNotBusy();
-                        },
-                        HandleCriticalError,
-                        true);
+                    //DownloadHelper
+                    //    .BufferedDownload(_apiService.GetEpisodeAsync, SelectedVodType.ContentUrls.Select(c => c.GetUID()))
+                    //    .Await(episodes =>
+                    //    {
+                    //        Episodes.AddRange(episodes.OrderBy(e => e.Title).Select(e => new PlayableEpisode(e)));
+                    //        SetNotBusy();
+                    //    },
+                    //    HandleCriticalError,
+                    //    true);
                 }
             }
         }
@@ -626,6 +618,23 @@ namespace RaceControl.ViewModels
             }
         }
 
+        private async Task SelectEventAsync(Event evt)
+        {
+            await Task.WhenAll(LoadSessionsForEventAsync(evt), LoadEpisodesForEventAsync(evt));
+        }
+
+        private async Task LoadSessionsForEventAsync(Event evt)
+        {
+            var sessions = await _apiService.GetSessionsForEventAsync(evt);
+            Sessions.AddRange(sessions);
+        }
+
+        private async Task LoadEpisodesForEventAsync(Event evt)
+        {
+            var episodes = await _apiService.GetEpisodesForEventAsync(evt);
+            Episodes.AddRange(episodes.Select(e => new PlayableEpisode(e)));
+        }
+
         private async Task SelectSessionAsync(Session session)
         {
             Episodes.Clear();
@@ -655,8 +664,9 @@ namespace RaceControl.ViewModels
 
         private async Task LoadEpisodesForSessionAsync(Session session)
         {
-            var episodes = await _apiService.GetEpisodesForSessionAsync(session.UID);
-            Episodes.AddRange(episodes.OrderBy(e => e.Title).Select(e => new PlayableEpisode(e)));
+            // todo
+            //var episodes = await _apiService.GetEpisodesForSessionAsync(session.UID);
+            //Episodes.AddRange(episodes.OrderBy(e => e.Title).Select(e => new PlayableEpisode(e)));
         }
 
         private void WatchContent(IPlayableContent playableContent, VideoDialogSettings settings = null)

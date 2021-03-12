@@ -119,12 +119,25 @@ namespace RaceControl.Services.F1TV
         {
             _logger.Info($"Querying sessions for event with UID '{evt.UID}'...");
 
-            var apiResponse = await QueryEventSessionsAsync(evt.UID);
+            var apiResponse = await QueryEventVideosAsync(evt.UID);
 
             return apiResponse.ResultObj.Containers
                 .Where(c => c.Metadata.ContentType == "VIDEO")
                 .Where(c => c.Metadata.ContentSubtype == "REPLAY" || c.Metadata.ContentSubtype == "LIVE")
                 .Select(CreateSession)
+                .ToList();
+        }
+
+        public async Task<List<Episode>> GetEpisodesForEventAsync(Event evt)
+        {
+            _logger.Info($"Querying sessions for event with UID '{evt.UID}'...");
+
+            var apiResponse = await QueryEventVideosAsync(evt.UID);
+
+            return apiResponse.ResultObj.Containers
+                .Where(c => c.Metadata.ContentType == "VIDEO")
+                .Where(c => c.Metadata.ContentSubtype != "REPLAY" && c.Metadata.ContentSubtype != "LIVE")
+                .Select(CreateEpisode)
                 .ToList();
         }
 
@@ -161,47 +174,6 @@ namespace RaceControl.Services.F1TV
             return channels;
         }
 
-        public async Task<List<Episode>> GetEpisodesForSessionAsync(string sessionUID)
-        {
-            _logger.Info($"Querying episodes for session with UID '{sessionUID}'...");
-
-            //var request = _client
-            //    .NewRequest(SessionOccurrence, sessionUID)
-            //    .WithField(Session.ContentUrlsField, true)
-            //    .WithSubField(Session.ContentUrlsField, Episode.UIDField)
-            //    .WithSubField(Session.ContentUrlsField, Episode.TitleField)
-            //    .WithSubField(Session.ContentUrlsField, Episode.ItemsField)
-            //    .WithSubField(Session.ContentUrlsField, Episode.ImageUrlsField, true)
-            //    .WithSubSubField(Session.ContentUrlsField, Episode.ImageUrlsField, Image.UIDField)
-            //    .WithSubSubField(Session.ContentUrlsField, Episode.ImageUrlsField, Image.TitleField)
-            //    .WithSubSubField(Session.ContentUrlsField, Episode.ImageUrlsField, Image.ImageTypeField)
-            //    .WithSubSubField(Session.ContentUrlsField, Episode.ImageUrlsField, Image.UrlField)
-            //    ;
-
-            //return (await _cache.GetOrAddAsync($"{nameof(NewApiService)}-{nameof(GetEpisodesForSessionAsync)}-{sessionUID}", () => _client.GetItemAsync<Session>(request), DateTimeOffset.Now.AddMinutes(1))).ContentUrls;
-
-            return new List<Episode>();
-        }
-
-        public async Task<Episode> GetEpisodeAsync(string episodeUID)
-        {
-            _logger.Info($"Querying episode with UID '{episodeUID}'...");
-
-            var request = _client
-                .NewRequest("episodes", episodeUID)
-                .WithField(Episode.UIDField)
-                .WithField(Episode.TitleField)
-                .WithField(Episode.ItemsField)
-                .WithField(Episode.ImageUrlsField, true)
-                .WithSubField(Episode.ImageUrlsField, Image.UIDField)
-                .WithSubField(Episode.ImageUrlsField, Image.TitleField)
-                .WithSubField(Episode.ImageUrlsField, Image.ImageTypeField)
-                .WithSubField(Episode.ImageUrlsField, Image.UrlField)
-                ;
-
-            return await _cache.GetOrAddAsync($"{nameof(NewApiService)}-{nameof(GetEpisodeAsync)}-{episodeUID}", () => _client.GetItemAsync<Episode>(request));
-        }
-
         public async Task<Driver> GetDriverAsync(string driverUID)
         {
             _logger.Info($"Querying driver with UID '{driverUID}'...");
@@ -227,7 +199,7 @@ namespace RaceControl.Services.F1TV
             return playableContent.ContentType switch
             {
                 ContentType.Channel => (await QueryTokenisedUrlAsync(token, playableContent.ContentUrl)).ResultObj.Url,
-                ContentType.Asset => (await _client.GetTokenisedUrlForAssetAsync(token, playableContent.ContentUrl)).Objects.First().TokenisedUrl.Url,
+                ContentType.Asset => (await QueryTokenisedUrlAsync(token, playableContent.ContentUrl)).ResultObj.Url,
                 ContentType.Backup => (await _client.GetBackupStream()).StreamManifest,
                 _ => throw new ArgumentException($"Could not generate tokenised URL for unsupported content-type '{playableContent.ContentType}'.", nameof(playableContent))
             };
@@ -258,13 +230,12 @@ namespace RaceControl.Services.F1TV
             return await restClient.GetAsync<ApiResponse>(restRequest);
         }
 
-        private async Task<ApiResponse> QueryEventSessionsAsync(string meetingKey)
+        private async Task<ApiResponse> QueryEventVideosAsync(string meetingKey)
         {
             var restClient = _restClientFactory();
             restClient.BaseUrl = new Uri(Constants.NewApiEndpointUrl);
 
             var restRequest = new RestRequest("2.0/R/ENG/BIG_SCREEN_DASH/ALL/PAGE/SEARCH/VOD/F1_TV_Pro_Annual/2", DataFormat.Json);
-            //restRequest.AddQueryParameter("filter_objectSubtype", "Replay");
             restRequest.AddQueryParameter("orderBy", "session_index");
             restRequest.AddQueryParameter("sortOrder", "asc");
             restRequest.AddQueryParameter("filter_MeetingKey", meetingKey);
@@ -324,6 +295,28 @@ namespace RaceControl.Services.F1TV
             }
 
             return session;
+        }
+
+        private static Episode CreateEpisode(Container container)
+        {
+            var episode = new Episode
+            {
+                UID = container.Id,
+                ContentID = container.Metadata.ContentId,
+                ContentType = container.Metadata.ContentType,
+                ContentSubtype = container.Metadata.ContentSubtype,
+                Name = container.Metadata.TitleBrief,
+                SessionName = container.Metadata.Title,
+                SeriesUID = container.Properties.First().Series,
+                PlaybackUrl = $"CONTENT/PLAY?contentId={container.Metadata.ContentId}"
+            };
+
+            if (!string.IsNullOrWhiteSpace(container.Metadata.PictureUrl))
+            {
+                episode.ThumbnailUrl = $"{Constants.ImageUrl}/{container.Metadata.PictureUrl}?w=354&h=199&q=HI&o=L";
+            }
+
+            return episode;
         }
     }
 }

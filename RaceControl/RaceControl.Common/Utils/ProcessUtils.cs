@@ -6,7 +6,7 @@ namespace RaceControl.Common.Utils
     {
         public static Process CreateProcess(string filename, string arguments, bool createNoWindow = false, bool redirectOutput = false)
         {
-            return new Process
+            return new()
             {
                 StartInfo = new ProcessStartInfo
                 {

@@ -85,7 +85,7 @@ namespace RaceControl.Core.Settings
 
         public static VideoDialogSettings GetDefaultSettings()
         {
-            return new VideoDialogSettings
+            return new()
             {
                 ResizeMode = ResizeMode.CanResize,
                 WindowState = WindowState.Normal,

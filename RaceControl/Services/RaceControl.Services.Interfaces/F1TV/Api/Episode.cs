@@ -1,26 +1,20 @@
-﻿using Newtonsoft.Json;
-using RaceControl.Common.Utils;
-using System.Collections.Generic;
-
-namespace RaceControl.Services.Interfaces.F1TV.Api
+﻿namespace RaceControl.Services.Interfaces.F1TV.Api
 {
     public class Episode
     {
-        [JsonProperty("uid")]
         public string UID { get; set; }
+        public int ContentID { get; set; }
+        public string ContentType { get; set; } // VIDEO, BUNDLE
+        public string ContentSubtype { get; set; } // LIVE, FEATURE, DOCUMENTARY, REPLAY, SHOW, PRESS CONFERENCE, ANALYSIS, HIGHLIGHTS, EXTENDED HIGHLIGHTS, MEETING
+        public string Name { get; set; }
+        public string SessionName { get; set; }
+        public string SeriesUID { get; set; }
+        public string PlaybackUrl { get; set; }
+        public string ThumbnailUrl { get; set; }
 
-        [JsonProperty("title")]
-        public string Title { get; set; }
-
-        [JsonProperty("items")]
-        public List<string> Items { get; set; }
-
-        [JsonProperty("image_urls")]
-        public List<Image> ImageUrls { get; set; }
-
-        public static string UIDField => JsonUtils.GetJsonPropertyName<Episode>(e => e.UID);
-        public static string TitleField => JsonUtils.GetJsonPropertyName<Episode>(e => e.Title);
-        public static string ItemsField => JsonUtils.GetJsonPropertyName<Episode>(e => e.Items);
-        public static string ImageUrlsField => JsonUtils.GetJsonPropertyName<Episode>(s => s.ImageUrls);
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

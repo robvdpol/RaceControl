@@ -471,7 +471,7 @@ namespace RaceControl.ViewModels
 
         private VideoDialogSettings GetDialogSettings()
         {
-            return new VideoDialogSettings
+            return new()
             {
                 Top = DialogSettings.Top,
                 Left = DialogSettings.Left,

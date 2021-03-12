@@ -158,7 +158,7 @@ namespace RaceControl
 
         private static MediaPlayer CreateMediaPlayer(IContainerProvider container)
         {
-            return new MediaPlayer(container.Resolve<LibVLC>())
+            return new(container.Resolve<LibVLC>())
             {
                 EnableHardwareDecoding = true,
                 EnableMouseInput = false,

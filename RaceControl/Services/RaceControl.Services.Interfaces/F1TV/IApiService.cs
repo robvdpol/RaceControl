@@ -19,11 +19,9 @@ namespace RaceControl.Services.Interfaces.F1TV
 
         Task<List<Session>> GetSessionsForEventAsync(Event evt);
 
+        Task<List<Episode>> GetEpisodesForEventAsync(Event evt);
+
         Task<List<Channel>> GetChannelsForSessionAsync(Session session);
-
-        Task<List<Episode>> GetEpisodesForSessionAsync(string sessionUID);
-
-        Task<Episode> GetEpisodeAsync(string episodeUID);
 
         Task<Driver> GetDriverAsync(string driverUID);
 

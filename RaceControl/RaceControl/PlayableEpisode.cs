@@ -1,6 +1,5 @@
 ﻿using RaceControl.Common.Enums;
 using RaceControl.Services.Interfaces.F1TV.Api;
-using System.Linq;
 
 namespace RaceControl
 {
@@ -8,12 +7,12 @@ namespace RaceControl
     {
         public PlayableEpisode(Episode episode)
         {
-            Title = episode.Title;
-            Name = episode.Title;
-            DisplayName = episode.Title;
+            Title = $"{episode.SessionName} - {episode.Name}";
+            Name = episode.Name;
+            DisplayName = episode.Name;
             ContentType = ContentType.Asset;
-            ContentUrl = episode.Items?.FirstOrDefault();
-            ThumbnailUrl = episode.ImageUrls?.FirstOrDefault(img => img.ImageType == "Thumbnail")?.Url;
+            ContentUrl = episode.PlaybackUrl;
+            ThumbnailUrl = episode.ThumbnailUrl;
             SyncUID = episode.UID;
         }
     }

@@ -4,8 +4,8 @@ namespace RaceControl.Common.Generators
 {
     public class NumberGenerator : INumberGenerator
     {
-        private readonly List<long> _numbers = new List<long>();
-        private readonly object _numbersLock = new object();
+        private readonly List<long> _numbers = new();
+        private readonly object _numbersLock = new();
 
         public long GetNextNumber()
         {

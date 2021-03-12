@@ -1,7 +1,4 @@
-﻿using System;
-using System.Globalization;
-
-namespace RaceControl.Services.Interfaces.F1TV.Api
+﻿namespace RaceControl.Services.Interfaces.F1TV.Api
 {
     public class Session
     {
@@ -11,8 +8,6 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
         public string ContentSubtype { get; set; } // LIVE, FEATURE, DOCUMENTARY, REPLAY, SHOW, PRESS CONFERENCE, ANALYSIS, HIGHLIGHTS, EXTENDED HIGHLIGHTS, MEETING
         public string Name { get; set; }
         public string SessionName { get; set; }
-        public string Status { get; set; }
-        public DateTime StartTime { get; set; }
         public string SeriesUID { get; set; }
         public string ThumbnailUrl { get; set; }
 
@@ -22,14 +17,6 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
 
         public override string ToString()
         {
-            if (IsUpcoming)
-            {
-                var day = StartTime.ToString("ddd");
-                var time = StartTime.ToString(CultureInfo.CurrentCulture.DateTimeFormat.ShortTimePattern);
-
-                return $"{Name} (starts {day} {time})";
-            }
-
             if (IsLive)
             {
                 return $"{Name} (live)";
