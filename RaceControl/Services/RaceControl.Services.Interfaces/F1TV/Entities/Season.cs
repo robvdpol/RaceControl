@@ -2,7 +2,7 @@
 {
     public class Season
     {
-        public int? Year { get; init; }
+        public int Year { get; init; }
         public string Name { get; init; }
 
         public override string ToString()

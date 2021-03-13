@@ -16,8 +16,9 @@ namespace RaceControl.Services.F1TV
 {
     public class ApiService : IApiService
     {
-        private const int F1TVLaunchYear = 2018;
-        private const string DefaultStreamType = "BIG_SCREEN_HLS";
+        private const int F1TVArchiveStartYear = 1981;
+        private const string DefaultStreamType = @"BIG_SCREEN_HLS";
+        private const string SearchVodUrl = @"2.0/R/ENG/BIG_SCREEN_HLS/ALL/PAGE/SEARCH/VOD/F1_TV_Pro_Annual/2";
 
         private readonly ILogger _logger;
         private readonly Func<IRestClient> _restClientFactory;
@@ -63,7 +64,7 @@ namespace RaceControl.Services.F1TV
 
             var seasons = new List<Season>();
 
-            for (var year = DateTime.Now.Year; year >= F1TVLaunchYear; year--)
+            for (var year = DateTime.Now.Year; year >= F1TVArchiveStartYear; year--)
             {
                 seasons.Add(new Season
                 {
@@ -92,10 +93,21 @@ namespace RaceControl.Services.F1TV
         {
             _logger.Info($"Querying events for season '{season.Name}'...");
 
-            var apiResponse = await QuerySeasonEventsAsync(season.Year.GetValueOrDefault());
+            var apiResponse = await QuerySeasonEventsAsync(season.Year);
 
             return apiResponse.ResultObj.Containers
                 .Select(CreateEvent)
+                .ToList();
+        }
+
+        public async Task<List<Episode>> GetEpisodesForSeasonAsync(Season season)
+        {
+            _logger.Info($"Querying episodes for season '{season.Name}'...");
+
+            var apiResponse = await QuerySeasonEpisodesAsync(season.Year);
+
+            return apiResponse.ResultObj.Containers
+                .Select(CreateEpisode)
                 .ToList();
         }
 
@@ -212,12 +224,28 @@ namespace RaceControl.Services.F1TV
             var restClient = _restClientFactory();
             restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
 
-            var restRequest = new RestRequest($"2.0/R/ENG/{DefaultStreamType}/ALL/PAGE/SEARCH/VOD/F1_TV_Pro_Annual/2", DataFormat.Json);
+            var restRequest = new RestRequest(SearchVodUrl, DataFormat.Json);
             restRequest.AddQueryParameter("orderBy", "meeting_End_Date");
             restRequest.AddQueryParameter("sortOrder", "asc");
             restRequest.AddQueryParameter("filter_objectSubtype", "Meeting");
             restRequest.AddQueryParameter("filter_season", year.ToString());
             restRequest.AddQueryParameter("filter_orderByFom", "Y");
+            restRequest.AddQueryParameter("filter_fetchAll", "Y");
+
+            return await restClient.GetAsync<ApiResponse>(restRequest);
+        }
+
+        private async Task<ApiResponse> QuerySeasonEpisodesAsync(int year)
+        {
+            var restClient = _restClientFactory();
+            restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
+
+            var restRequest = new RestRequest(SearchVodUrl, DataFormat.Json);
+            restRequest.AddQueryParameter("orderBy", "meeting_Number");
+            restRequest.AddQueryParameter("sortOrder", "asc");
+            restRequest.AddQueryParameter("filter_year", year.ToString());
+            restRequest.AddQueryParameter("filter_orderByFom", "Y");
+            restRequest.AddQueryParameter("filter_fetchAll", "Y");
 
             return await restClient.GetAsync<ApiResponse>(restRequest);
         }
@@ -227,12 +255,13 @@ namespace RaceControl.Services.F1TV
             var restClient = _restClientFactory();
             restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
 
-            var restRequest = new RestRequest($"2.0/R/ENG/{DefaultStreamType}/ALL/PAGE/SEARCH/VOD/F1_TV_Pro_Annual/2", DataFormat.Json);
+            var restRequest = new RestRequest(SearchVodUrl, DataFormat.Json);
             restRequest.AddQueryParameter("orderBy", "meeting_End_Date");
             restRequest.AddQueryParameter("sortOrder", "asc");
             restRequest.AddQueryParameter("filter_MeetingKey", meetingKey);
             restRequest.AddQueryParameter("filter_orderByFom", "Y");
-
+            restRequest.AddQueryParameter("filter_fetchAll", "Y");
+            
             return await restClient.GetAsync<ApiResponse>(restRequest);
         }
 
@@ -261,11 +290,12 @@ namespace RaceControl.Services.F1TV
             var restClient = _restClientFactory();
             restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
 
-            var restRequest = new RestRequest($"2.0/R/ENG/{DefaultStreamType}/ALL/PAGE/SEARCH/VOD/F1_TV_Pro_Annual/2", DataFormat.Json);
+            var restRequest = new RestRequest(SearchVodUrl, DataFormat.Json);
             restRequest.AddQueryParameter("orderBy", "meeting_Number");
             restRequest.AddQueryParameter("sortOrder", "asc");
             restRequest.AddQueryParameter("filter_genres", genre);
             restRequest.AddQueryParameter("filter_orderByFom", "Y");
+            restRequest.AddQueryParameter("filter_fetchAll", "Y");
 
             return await restClient.GetAsync<ApiResponse>(restRequest);
         }

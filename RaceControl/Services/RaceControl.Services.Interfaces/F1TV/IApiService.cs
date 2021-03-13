@@ -15,6 +15,8 @@ namespace RaceControl.Services.Interfaces.F1TV
 
         Task<List<Event>> GetEventsForSeasonAsync(Season season);
 
+        Task<List<Episode>> GetEpisodesForSeasonAsync(Season season);
+
         Task<List<Session>> GetSessionsForEventAsync(Event evt);
 
         Task<List<Episode>> GetEpisodesForEventAsync(Event evt);

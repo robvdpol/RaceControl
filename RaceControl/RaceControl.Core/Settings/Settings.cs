@@ -18,7 +18,7 @@ namespace RaceControl.Core.Settings
 
         private bool _disableMpvNoBorder;
         private string _additionalMpvParameters;
-        private string _streamType = StreamTypeNames.BigScreenHls;
+        private string _streamType = StreamTypeKeys.BigScreenHls;
         private string _downloadLocation = Environment.CurrentDirectory;
         private string _latestRelease;
         private ObservableCollection<string> _selectedSeries;

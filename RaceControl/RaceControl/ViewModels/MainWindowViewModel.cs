@@ -136,8 +136,8 @@ namespace RaceControl.ViewModels
 
         public IDictionary<string, string> StreamTypes { get; } = new Dictionary<string, string>
         {
-            { StreamTypeNames.BigScreenHls, "HLS (non-adaptive)" },
-            { StreamTypeNames.BigScreenDash, "DASH (adaptive)" }
+            { StreamTypeKeys.BigScreenHls, "HLS (non-adaptive)" },
+            { StreamTypeKeys.BigScreenDash, "DASH (adaptive)" }
         };
 
         public string EpisodeFilterText
@@ -271,16 +271,7 @@ namespace RaceControl.ViewModels
             if (SelectedSeason != null)
             {
                 IsBusy = true;
-
-                _apiService
-                    .GetEventsForSeasonAsync(SelectedSeason)
-                    .Await(events =>
-                    {
-                        Events.AddRange(events);
-                        SetNotBusy();
-                    },
-                    HandleCriticalError,
-                    true);
+                SelectSeasonAsync(SelectedSeason).Await(SetNotBusy, HandleCriticalError);
             }
         }
 
@@ -320,11 +311,7 @@ namespace RaceControl.ViewModels
             if (!string.IsNullOrWhiteSpace(SelectedVodGenre))
             {
                 IsBusy = true;
-                Episodes.Clear();
-                Channels.Clear();
-                SelectedLiveSession = null;
-                SelectedSession = null;
-                LoadEpisodesForGenreAsync(SelectedVodGenre).Await(SetNotBusy, HandleCriticalError);
+                SelectGenreAsync(SelectedVodGenre).Await(SetNotBusy, HandleCriticalError);
             }
         }
 
@@ -609,27 +596,21 @@ namespace RaceControl.ViewModels
             }
         }
 
+        private async Task SelectSeasonAsync(Season season)
+        {
+            if (season.Year >= 2018)
+            {
+                await LoadEventsForSeasonAsync(season);
+            }
+            else
+            {
+                await LoadEpisodesForSeasonAsync(season);
+            }
+        }
+
         private async Task SelectEventAsync(Event evt)
         {
             await Task.WhenAll(LoadSessionsForEventAsync(evt), LoadEpisodesForEventAsync(evt));
-        }
-
-        private async Task LoadSessionsForEventAsync(Event evt)
-        {
-            var sessions = await _apiService.GetSessionsForEventAsync(evt);
-            Sessions.AddRange(sessions);
-        }
-
-        private async Task LoadEpisodesForEventAsync(Event evt)
-        {
-            var episodes = await _apiService.GetEpisodesForEventAsync(evt);
-            Episodes.AddRange(episodes.Select(e => new PlayableEpisode(e)));
-        }
-
-        private async Task LoadEpisodesForGenreAsync(string genre)
-        {
-            var episodes = await _apiService.GetEpisodesForGenreAsync(genre);
-            Episodes.AddRange(episodes.Select(e => new PlayableEpisode(e)));
         }
 
         private async Task SelectSessionAsync(Session session, bool clearEpisodes)
@@ -643,6 +624,41 @@ namespace RaceControl.ViewModels
             SelectedVodGenre = null;
 
             await LoadChannelsForSessionAsync(session);
+        }
+
+        private async Task SelectGenreAsync(string genre)
+        {
+            Episodes.Clear();
+            Channels.Clear();
+            Sessions.Clear();
+            SelectedLiveSession = null;
+            SelectedSession = null;
+
+            await LoadEpisodesForGenreAsync(genre);
+        }
+
+        private async Task LoadEventsForSeasonAsync(Season season)
+        {
+            var events = await _apiService.GetEventsForSeasonAsync(season);
+            Events.AddRange(events);
+        }
+
+        private async Task LoadEpisodesForSeasonAsync(Season season)
+        {
+            var episodes = await _apiService.GetEpisodesForSeasonAsync(season);
+            Episodes.AddRange(episodes.Select(e => new PlayableEpisode(e)));
+        }
+
+        private async Task LoadSessionsForEventAsync(Event evt)
+        {
+            var sessions = await _apiService.GetSessionsForEventAsync(evt);
+            Sessions.AddRange(sessions);
+        }
+
+        private async Task LoadEpisodesForEventAsync(Event evt)
+        {
+            var episodes = await _apiService.GetEpisodesForEventAsync(evt);
+            Episodes.AddRange(episodes.Select(e => new PlayableEpisode(e)));
         }
 
         private async Task LoadChannelsForSessionAsync(Session session)
@@ -659,6 +675,12 @@ namespace RaceControl.ViewModels
             }
 
             Channels.AddRange(channels.OrderBy(c => c.ChannelType, new ChannelTypeComparer()).Select(c => new PlayableChannel(session, c)));
+        }
+
+        private async Task LoadEpisodesForGenreAsync(string genre)
+        {
+            var episodes = await _apiService.GetEpisodesForGenreAsync(genre);
+            Episodes.AddRange(episodes.Select(e => new PlayableEpisode(e)));
         }
 
         private void WatchContent(IPlayableContent playableContent, VideoDialogSettings settings = null)
