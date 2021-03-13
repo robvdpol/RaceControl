@@ -7,13 +7,11 @@ namespace RaceControl.Services.Interfaces.F1TV
 {
     public interface IApiService
     {
-        Task<List<Session>> GetLiveSessionsAsync();
+        List<Series> GetSeries();
 
         List<Season> GetSeasons();
 
-        List<Series> GetSeries();
-
-        Task<List<string>> GetVodGenresAsync();
+        Task<List<Session>> GetLiveSessionsAsync();
 
         Task<List<Event>> GetEventsForSeasonAsync(Season season);
 
@@ -21,9 +19,11 @@ namespace RaceControl.Services.Interfaces.F1TV
 
         Task<List<Episode>> GetEpisodesForEventAsync(Event evt);
 
-        Task<List<Episode>> GetEpisodesForGenreAsync(string genre);
-
         Task<List<Channel>> GetChannelsForSessionAsync(Session session);
+
+        Task<List<string>> GetVodGenresAsync();
+
+        Task<List<Episode>> GetEpisodesForGenreAsync(string genre);
 
         Task<string> GetTokenisedUrlAsync(string token, string streamType, IPlayableContent playableContent);
     }

@@ -481,7 +481,7 @@
             <Label
                 Grid.Row="2"
                 Grid.Column="1"
-                Content="Video On Demand"
+                Content="Archive"
                 Style="{StaticResource HeaderLabelStyle}" />
             <ListBox
                 Grid.Row="3"

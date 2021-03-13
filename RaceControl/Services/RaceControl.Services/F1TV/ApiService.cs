@@ -28,37 +28,6 @@ namespace RaceControl.Services.F1TV
             _restClientFactory = restClientFactory;
         }
 
-        public async Task<List<Session>> GetLiveSessionsAsync()
-        {
-            _logger.Info("Querying live sessions...");
-
-            var apiResponse = await QueryLiveSessionsAsync();
-
-            return apiResponse.ResultObj.Containers
-                .SelectMany(c1 => c1.RetrieveItems.ResultObj.Containers
-                    .Where(c2 => c2.Metadata.ContentType == "VIDEO" && c2.Metadata.ContentSubtype == "LIVE")
-                    .Select(CreateSession))
-                .ToList();
-        }
-
-        public List<Season> GetSeasons()
-        {
-            _logger.Info("Querying seasons...");
-
-            var seasons = new List<Season>();
-
-            for (var year = DateTime.Now.Year; year >= F1TVLaunchYear; year--)
-            {
-                seasons.Add(new Season
-                {
-                    Year = year,
-                    Name = $"{year} season"
-                });
-            }
-
-            return seasons;
-        }
-
         public List<Series> GetSeries()
         {
             _logger.Info("Querying series...");
@@ -88,17 +57,34 @@ namespace RaceControl.Services.F1TV
             };
         }
 
-        public async Task<List<string>> GetVodGenresAsync()
+        public List<Season> GetSeasons()
         {
-            _logger.Info("Querying vod genres...");
+            _logger.Info("Querying seasons...");
 
-            var apiResponse = await QueryVodGenresAsync();
+            var seasons = new List<Season>();
+
+            for (var year = DateTime.Now.Year; year >= F1TVLaunchYear; year--)
+            {
+                seasons.Add(new Season
+                {
+                    Year = year,
+                    Name = $"{year} season"
+                });
+            }
+
+            return seasons;
+        }
+
+        public async Task<List<Session>> GetLiveSessionsAsync()
+        {
+            _logger.Info("Querying live sessions...");
+
+            var apiResponse = await QueryLiveSessionsAsync();
 
             return apiResponse.ResultObj.Containers
-                .Where(c => c.RetrieveItems.ResultObj.Containers != null)
                 .SelectMany(c1 => c1.RetrieveItems.ResultObj.Containers
-                    .SelectMany(c2 => c2.Metadata.Genres))
-                .Distinct()
+                    .Where(c2 => c2.Metadata.ContentType == "VIDEO" && c2.Metadata.ContentSubtype == "LIVE")
+                    .Select(CreateSession))
                 .ToList();
         }
 
@@ -139,18 +125,6 @@ namespace RaceControl.Services.F1TV
                 .ToList();
         }
 
-        public async Task<List<Episode>> GetEpisodesForGenreAsync(string genre)
-        {
-            _logger.Info($"Querying episodes for vod genre '{genre}'...");
-
-            var apiResponse = await QueryGenreVideosAsync(genre);
-
-            return apiResponse.ResultObj.Containers
-                .Where(c => c.Metadata.ContentType == "VIDEO")
-                .Select(CreateEpisode)
-                .ToList();
-        }
-
         public async Task<List<Channel>> GetChannelsForSessionAsync(Session session)
         {
             _logger.Info($"Querying channels for session with UID '{session.UID}'...");
@@ -172,16 +146,42 @@ namespace RaceControl.Services.F1TV
             if (metadata.AdditionalStreams != null && metadata.AdditionalStreams.Any())
             {
                 channels.AddRange(metadata.AdditionalStreams
-                      .Select(s => new Channel
-                      {
-                          Name = s.Type == "obc" ? $"{s.DriverFirstName} {s.DriverLastName}" : s.Title,
-                          ChannelType = s.Type,
-                          PlaybackUrl = s.PlaybackUrl
-                      })
-                      .ToList());
+                    .Select(s => new Channel
+                    {
+                        Name = s.Type == "obc" ? $"{s.DriverFirstName} {s.DriverLastName}" : s.Title,
+                        ChannelType = s.Type,
+                        PlaybackUrl = s.PlaybackUrl
+                    })
+                    .ToList());
             }
 
             return channels;
+        }
+
+        public async Task<List<string>> GetVodGenresAsync()
+        {
+            _logger.Info("Querying vod genres...");
+
+            var apiResponse = await QueryVodGenresAsync();
+
+            return apiResponse.ResultObj.Containers
+                .Where(c => c.RetrieveItems.ResultObj.Containers != null)
+                .SelectMany(c1 => c1.RetrieveItems.ResultObj.Containers
+                    .SelectMany(c2 => c2.Metadata.Genres))
+                .Distinct()
+                .ToList();
+        }
+
+        public async Task<List<Episode>> GetEpisodesForGenreAsync(string genre)
+        {
+            _logger.Info($"Querying episodes for vod genre '{genre}'...");
+
+            var apiResponse = await QueryGenreVideosAsync(genre);
+
+            return apiResponse.ResultObj.Containers
+                .Where(c => c.Metadata.ContentType == "VIDEO")
+                .Select(CreateEpisode)
+                .ToList();
         }
 
         public async Task<string> GetTokenisedUrlAsync(string token, string streamType, IPlayableContent playableContent)
@@ -207,25 +207,15 @@ namespace RaceControl.Services.F1TV
             return await restClient.GetAsync<ApiResponse>(restRequest);
         }
 
-        private async Task<ApiResponse> QueryVodGenresAsync()
-        {
-            var restClient = _restClientFactory();
-            restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
-
-            var restRequest = new RestRequest($"2.0/R/ENG/{DefaultStreamType}/ALL/PAGE/410/F1_TV_Pro_Annual/2", DataFormat.Json);
-
-            return await restClient.GetAsync<ApiResponse>(restRequest);
-        }
-
         private async Task<ApiResponse> QuerySeasonEventsAsync(int year)
         {
             var restClient = _restClientFactory();
             restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
 
             var restRequest = new RestRequest($"2.0/R/ENG/{DefaultStreamType}/ALL/PAGE/SEARCH/VOD/F1_TV_Pro_Annual/2", DataFormat.Json);
-            restRequest.AddQueryParameter("filter_objectSubtype", "Meeting");
             restRequest.AddQueryParameter("orderBy", "meeting_End_Date");
             restRequest.AddQueryParameter("sortOrder", "asc");
+            restRequest.AddQueryParameter("filter_objectSubtype", "Meeting");
             restRequest.AddQueryParameter("filter_season", year.ToString());
             restRequest.AddQueryParameter("filter_orderByFom", "Y");
 
@@ -238,10 +228,30 @@ namespace RaceControl.Services.F1TV
             restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
 
             var restRequest = new RestRequest($"2.0/R/ENG/{DefaultStreamType}/ALL/PAGE/SEARCH/VOD/F1_TV_Pro_Annual/2", DataFormat.Json);
-            restRequest.AddQueryParameter("orderBy", "session_index");
+            restRequest.AddQueryParameter("orderBy", "meeting_End_Date");
             restRequest.AddQueryParameter("sortOrder", "asc");
             restRequest.AddQueryParameter("filter_MeetingKey", meetingKey);
             restRequest.AddQueryParameter("filter_orderByFom", "Y");
+
+            return await restClient.GetAsync<ApiResponse>(restRequest);
+        }
+
+        private async Task<ApiResponse> QuerySessionChannelsAsync(long contentID)
+        {
+            var restClient = _restClientFactory();
+            restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
+
+            var restRequest = new RestRequest($"2.0/R/ENG/{DefaultStreamType}/ALL/CONTENT/VIDEO/{contentID}/F1_TV_Pro_Annual/2", DataFormat.Json);
+
+            return await restClient.GetAsync<ApiResponse>(restRequest);
+        }
+
+        private async Task<ApiResponse> QueryVodGenresAsync()
+        {
+            var restClient = _restClientFactory();
+            restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
+
+            var restRequest = new RestRequest($"2.0/R/ENG/{DefaultStreamType}/ALL/PAGE/410/F1_TV_Pro_Annual/2", DataFormat.Json);
 
             return await restClient.GetAsync<ApiResponse>(restRequest);
         }
@@ -256,16 +266,6 @@ namespace RaceControl.Services.F1TV
             restRequest.AddQueryParameter("sortOrder", "asc");
             restRequest.AddQueryParameter("filter_genres", genre);
             restRequest.AddQueryParameter("filter_orderByFom", "Y");
-
-            return await restClient.GetAsync<ApiResponse>(restRequest);
-        }
-
-        private async Task<ApiResponse> QuerySessionChannelsAsync(long contentID)
-        {
-            var restClient = _restClientFactory();
-            restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
-
-            var restRequest = new RestRequest($"2.0/R/ENG/{DefaultStreamType}/ALL/CONTENT/VIDEO/{contentID}/F1_TV_Pro_Annual/2", DataFormat.Json);
 
             return await restClient.GetAsync<ApiResponse>(restRequest);
         }
