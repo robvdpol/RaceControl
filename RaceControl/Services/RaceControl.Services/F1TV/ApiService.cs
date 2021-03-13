@@ -5,6 +5,7 @@ using RaceControl.Common.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Api;
 using RaceControl.Services.Interfaces.F1TV.Constants;
+using RaceControl.Services.Interfaces.F1TV.Entities;
 using RestSharp;
 using System;
 using System.Collections.Generic;

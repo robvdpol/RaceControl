@@ -1,8 +1,8 @@
-﻿namespace RaceControl.Services.Interfaces.F1TV.Api
+﻿namespace RaceControl.Services.Interfaces.F1TV.Entities
 {
-    public class Series
+    public class Season
     {
-        public string UID { get; init; }
+        public int? Year { get; init; }
         public string Name { get; init; }
 
         public override string ToString()

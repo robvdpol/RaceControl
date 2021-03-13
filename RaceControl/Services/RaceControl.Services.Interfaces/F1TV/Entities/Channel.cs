@@ -1,4 +1,4 @@
-﻿namespace RaceControl.Services.Interfaces.F1TV.Api
+﻿namespace RaceControl.Services.Interfaces.F1TV.Entities
 {
     public class Channel
     {
