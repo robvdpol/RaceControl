@@ -86,6 +86,6 @@ Maybe, please create an issue (feature request) and I will consider it. As a wor
 * [CredentialManagement.Standard NuGet package](https://www.nuget.org/packages/CredentialManagement.Standard)
 
 ## Screenshots
-![preview image](https://imgur.com/KqAgWPm.png)
+![preview image](https://imgur.com/Ngos9JZ.png)
 
-![preview image](https://imgur.com/9u5auqd.png)
+![preview image](https://imgur.com/m46BzZj.png)
