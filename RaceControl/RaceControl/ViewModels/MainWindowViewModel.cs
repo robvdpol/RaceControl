@@ -702,6 +702,11 @@ namespace RaceControl.ViewModels
                 arguments.Add("--no-border");
             }
 
+            if (!string.IsNullOrWhiteSpace(Settings.AdditionalMpvParameters))
+            {
+                arguments.Add(Settings.AdditionalMpvParameters.Trim());
+            }
+
             if (settings != null)
             {
                 var screenIndex = ScreenHelper.GetScreenIndex(settings);

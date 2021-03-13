@@ -396,9 +396,11 @@
                                     Margin="3"
                                     Content="Disable MPV borderless mode"
                                     IsChecked="{Binding Settings.DisableMpvNoBorder}" />
+                                <TextBlock Margin="3" Text="Additional MPV parameters:" />
+                                <TextBox Margin="3" Text="{Binding Settings.AdditionalMpvParameters}" />
                                 <TextBlock Margin="3" Text="Download location:" />
                                 <TextBlock
-                                    Margin="3,0,3,3"
+                                    Margin="3"
                                     Text="{Binding Settings.DownloadLocation}"
                                     TextWrapping="Wrap" />
                                 <Button

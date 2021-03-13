@@ -6,6 +6,8 @@ namespace RaceControl.Core.Settings
     {
         bool DisableMpvNoBorder { get; set; }
 
+        string AdditionalMpvParameters { get; set; }
+
         string DownloadLocation { get; set; }
 
         string LatestRelease { get; set; }
