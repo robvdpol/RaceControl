@@ -11,7 +11,7 @@
         public string SeriesUID { get; init; }
         public string ThumbnailUrl { get; init; }
 
-        public bool IsLive => ContentType == "LIVE";
+        public bool IsLive => ContentSubtype == "LIVE";
 
         public override string ToString()
         {
