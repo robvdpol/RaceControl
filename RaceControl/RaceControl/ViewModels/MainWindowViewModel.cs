@@ -3,6 +3,7 @@ using NLog;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Services.Dialogs;
+using RaceControl.Common.Constants;
 using RaceControl.Common.Enums;
 using RaceControl.Common.Generators;
 using RaceControl.Common.Interfaces;
@@ -15,7 +16,6 @@ using RaceControl.Events;
 using RaceControl.Extensions;
 using RaceControl.Services.Interfaces.Credential;
 using RaceControl.Services.Interfaces.F1TV;
-using RaceControl.Services.Interfaces.F1TV.Constants;
 using RaceControl.Services.Interfaces.F1TV.Entities;
 using RaceControl.Services.Interfaces.Github;
 using RaceControl.Views;
@@ -74,8 +74,8 @@ namespace RaceControl.ViewModels
         private ObservableCollection<Event> _events;
         private ObservableCollection<Session> _sessions;
         private ObservableCollection<Session> _liveSessions;
-        private ObservableCollection<IPlayableContent> _channels;
         private ObservableCollection<string> _vodGenres;
+        private ObservableCollection<IPlayableContent> _channels;
         private ObservableCollection<IPlayableContent> _episodes;
         private Season _selectedSeason;
         private Event _selectedEvent;
@@ -134,6 +134,12 @@ namespace RaceControl.ViewModels
 
         public ICollectionView EpisodesView { get; }
 
+        public IDictionary<string, string> StreamTypes { get; } = new Dictionary<string, string>
+        {
+            { StreamTypeNames.BigScreenHls, "HLS (non-adaptive)" },
+            { StreamTypeNames.BigScreenDash, "DASH (adaptive)" }
+        };
+
         public string EpisodeFilterText
         {
             get => _episodeFilterText;
@@ -168,9 +174,9 @@ namespace RaceControl.ViewModels
 
         public ObservableCollection<Session> LiveSessions => _liveSessions ??= new ObservableCollection<Session>();
 
-        public ObservableCollection<IPlayableContent> Channels => _channels ??= new ObservableCollection<IPlayableContent>();
-
         public ObservableCollection<string> VodGenres => _vodGenres ??= new ObservableCollection<string>();
+
+        public ObservableCollection<IPlayableContent> Channels => _channels ??= new ObservableCollection<IPlayableContent>();
 
         public ObservableCollection<IPlayableContent> Episodes => _episodes ??= new ObservableCollection<IPlayableContent>();
 
@@ -671,7 +677,7 @@ namespace RaceControl.ViewModels
 
         private async Task WatchInVlcAsync(IPlayableContent playableContent)
         {
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, playableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, Settings.StreamType, playableContent);
 
             if (!ValidateStreamUrl(streamUrl))
             {
@@ -684,7 +690,7 @@ namespace RaceControl.ViewModels
 
         private async Task WatchInMpvAsync(IPlayableContent playableContent, VideoDialogSettings settings = null)
         {
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, playableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, Settings.StreamType, playableContent);
 
             if (!ValidateStreamUrl(streamUrl))
             {
@@ -742,7 +748,7 @@ namespace RaceControl.ViewModels
 
         private async Task CopyUrlAsync(IPlayableContent playableContent)
         {
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, playableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, Settings.StreamType, playableContent);
 
             if (!ValidateStreamUrl(streamUrl))
             {

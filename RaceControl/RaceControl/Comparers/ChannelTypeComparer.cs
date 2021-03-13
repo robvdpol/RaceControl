@@ -1,4 +1,4 @@
-﻿using RaceControl.Services.Interfaces.F1TV.Constants;
+﻿using RaceControl.Common.Constants;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 

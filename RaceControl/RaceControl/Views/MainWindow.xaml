@@ -392,15 +392,31 @@
                             Margin="5,3"
                             Header="Settings">
                             <StackPanel Orientation="Vertical">
+                                <Grid Margin="0,3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock
+                                        Grid.Column="0"
+                                        Margin="3"
+                                        Text="Stream type:" />
+                                    <ComboBox
+                                        Grid.Column="1"
+                                        DisplayMemberPath="Value"
+                                        ItemsSource="{Binding StreamTypes}"
+                                        SelectedValue="{Binding Settings.StreamType}"
+                                        SelectedValuePath="Key" />
+                                </Grid>
                                 <CheckBox
                                     Margin="3"
                                     Content="Disable MPV borderless mode"
                                     IsChecked="{Binding Settings.DisableMpvNoBorder}" />
                                 <TextBlock Margin="3" Text="Additional MPV parameters:" />
-                                <TextBox Margin="3" Text="{Binding Settings.AdditionalMpvParameters}" />
+                                <TextBox Margin="3,1" Text="{Binding Settings.AdditionalMpvParameters}" />
                                 <TextBlock Margin="3" Text="Download location:" />
                                 <TextBlock
-                                    Margin="3"
+                                    Margin="3,1"
                                     Text="{Binding Settings.DownloadLocation}"
                                     TextWrapping="Wrap" />
                                 <Button

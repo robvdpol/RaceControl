@@ -1,4 +1,4 @@
-﻿namespace RaceControl.Services.Interfaces.F1TV.Constants
+﻿namespace RaceControl.Common.Constants
 {
     public static class SeriesNames
     {

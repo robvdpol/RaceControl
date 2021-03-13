@@ -25,6 +25,7 @@ namespace RaceControl.ViewModels
         private const int MouseWheelDelta = 12;
 
         private readonly IEventAggregator _eventAggregator;
+        private readonly ISettings _settings;
         private readonly IApiService _apiService;
         private readonly IVideoDialogLayout _videoDialogLayout;
         private readonly object _showControlsTimerLock = new();
@@ -61,12 +62,14 @@ namespace RaceControl.ViewModels
         public VideoDialogViewModel(
             ILogger logger,
             IEventAggregator eventAggregator,
+            ISettings settings,
             IApiService apiService,
             IVideoDialogLayout videoDialogLayout,
             IMediaPlayer mediaPlayer)
             : base(logger)
         {
             _eventAggregator = eventAggregator;
+            _settings = settings;
             _apiService = apiService;
             _videoDialogLayout = videoDialogLayout;
             MediaPlayer = mediaPlayer;
@@ -476,7 +479,7 @@ namespace RaceControl.ViewModels
                 }
             }
 
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, PlayableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, _settings.StreamType, PlayableContent);
             await MediaPlayer.StartPlaybackAsync(streamUrl);
             MediaPlayer.ToggleMute(DialogSettings.IsMuted);
             MediaPlayer.Volume = DialogSettings.Volume;
@@ -544,7 +547,7 @@ namespace RaceControl.ViewModels
         private async Task ChangeRendererAsync(IMediaRenderer mediaRenderer = null)
         {
             var time = MediaPlayer.Time;
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, PlayableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, _settings.StreamType, PlayableContent);
             await MediaPlayer.ChangeRendererAsync(mediaRenderer, streamUrl);
 
             if (!PlayableContent.IsLive)

@@ -1,5 +1,5 @@
-﻿using RaceControl.Common.Enums;
-using RaceControl.Services.Interfaces.F1TV.Constants;
+﻿using RaceControl.Common.Constants;
+using RaceControl.Common.Enums;
 using RaceControl.Services.Interfaces.F1TV.Entities;
 
 namespace RaceControl
