@@ -40,6 +40,6 @@ namespace RaceControl.Common.Interfaces
 
         Task ScanChromecastAsync();
 
-        Task ChangeRendererAsync(IMediaRenderer mediaRenderer, string streamUrl = null);
+        Task ChangeRendererAsync(IMediaRenderer mediaRenderer, string streamUrl);
     }
 }

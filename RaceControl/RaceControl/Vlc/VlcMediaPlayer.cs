@@ -13,7 +13,6 @@ namespace RaceControl.Vlc
     {
         private readonly LibVLC _libVLC;
 
-        private string _streamUrl;
         private long _time;
         private long _duration;
         private int _volume;
@@ -121,9 +120,7 @@ namespace RaceControl.Vlc
 
         public async Task StartPlaybackAsync(string streamUrl, IMediaRenderer mediaRenderer = null)
         {
-            _streamUrl = streamUrl;
-
-            using var media = new Media(_libVLC, _streamUrl, FromType.FromLocation);
+            using var media = new Media(_libVLC, streamUrl, FromType.FromLocation);
             media.DurationChanged += (_, e) => Duration = e.Duration;
             await media.Parse(MediaParseOptions.ParseNetwork | MediaParseOptions.FetchNetwork);
             MediaPlayer.SetRenderer(mediaRenderer?.Renderer as RendererItem);
@@ -178,10 +175,10 @@ namespace RaceControl.Vlc
             rendererDiscoverer.ItemAdded -= RendererDiscoverer_ItemAdded;
         }
 
-        public async Task ChangeRendererAsync(IMediaRenderer mediaRenderer, string streamUrl = null)
+        public async Task ChangeRendererAsync(IMediaRenderer mediaRenderer, string streamUrl)
         {
             StopPlayback();
-            await StartPlaybackAsync(streamUrl ?? _streamUrl, mediaRenderer);
+            await StartPlaybackAsync(streamUrl, mediaRenderer);
         }
 
         public void Dispose()
