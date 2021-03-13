@@ -36,7 +36,6 @@ The internal player supports the following keyboard shortcuts:
 | Toggle fullscreen                      | F                   |
 | Toggle fullscreen for specific player  | 1 - 9               |
 | Move player to corner (3x3 layout)     | F1 - F9             |
-| Toggle recording                       | R                   |
 | Synchronize session                    | S                   |
 | Jump forward 10 sec                    | Right arrow         |
 | Jump backward 10 sec                   | Left arrow          |
@@ -77,17 +76,16 @@ No, Race Control comes with a recent version of MPV included in the release.
 Maybe, please create an issue (feature request) and I will consider it. As a workaround, you can use the Copy-button to generate a tokenized link to the stream that is copied to your clipboard. Open the link with a media player of your choice to watch the stream. Note: the media player needs to properly support the HTTP Live Streaming (HLS) protocol.
 
 ## Acknowledgements
-* [F1viewer](https://github.com/SoMuchForSubtlety/f1viewer) for showing how to use the F1TV API
 * [VLC](https://www.videolan.org/vlc) for providing an excellent video player and .NET library
 * [MPV](https://mpv.io) for providing a video player that can reliably play F1TV live streams without needing workarounds
-* [Streamlink](https://streamlink.github.io) for providing a flexible stream extractor/transporter
 * [Flaticon](https://www.flaticon.com) for providing the application icon
 * [Prism Library](https://prismlibrary.com)
 * [Newtonsoft Json.NET](https://www.newtonsoft.com/json)
+* [RestSharp](https://restsharp.dev)
 * [NLog](https://nlog-project.org)
 * [CredentialManagement.Standard NuGet package](https://www.nuget.org/packages/CredentialManagement.Standard)
 
 ## Screenshots
-![preview image](https://imgur.com/KqAgWPm.png)
+![preview image](https://imgur.com/Ngos9JZ.png)
 
-![preview image](https://imgur.com/9u5auqd.png)
+![preview image](https://imgur.com/m46BzZj.png)
