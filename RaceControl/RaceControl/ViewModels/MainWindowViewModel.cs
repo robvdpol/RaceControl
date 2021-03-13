@@ -485,8 +485,7 @@ namespace RaceControl.ViewModels
                 {
                     if (dialogResult.Result == ButtonResult.OK)
                     {
-                        var asset = release.Assets.FirstOrDefault(a => a.State == "uploaded");
-                        ProcessUtils.BrowseToUrl(asset?.BrowserDownloadUrl ?? release.HtmlUrl);
+                        ProcessUtils.BrowseToUrl(release.HtmlUrl);
                     }
                 });
             }

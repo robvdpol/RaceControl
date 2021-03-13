@@ -22,6 +22,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TextBlock
             Grid.Row="0"
@@ -34,10 +35,16 @@
             TextWrapping="Wrap" />
         <TextBlock
             Grid.Row="2"
-            Text="Would you like to download this release?"
+            Text="Would you like to go to Github to download this release?"
+            TextWrapping="Wrap" />
+        <TextBlock
+            Grid.Row="3"
+            Margin="0,10"
+            FontStyle="Italic"
+            Text="Note: if you're using the Microsoft store app, please go to the Microsoft store to update the app."
             TextWrapping="Wrap" />
         <StackPanel
-            Grid.Row="3"
+            Grid.Row="4"
             Margin="0,10"
             HorizontalAlignment="Right"
             Orientation="Horizontal">
@@ -47,7 +54,7 @@
                 Margin="10,0"
                 Command="{Binding CloseCommand}"
                 CommandParameter="{StaticResource True}"
-                Content="Download" />
+                Content="Go to Github" />
             <Button
                 Width="100"
                 Height="24"
