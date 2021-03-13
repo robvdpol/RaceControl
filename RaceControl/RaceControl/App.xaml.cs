@@ -19,8 +19,6 @@ using RaceControl.Services.Github;
 using RaceControl.Services.Interfaces.Credential;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.Github;
-using RaceControl.Services.Interfaces.Lark;
-using RaceControl.Services.Lark;
 using RaceControl.ViewModels;
 using RaceControl.Views;
 using RaceControl.Vlc;
@@ -79,7 +77,6 @@ namespace RaceControl
                 .Register<MediaPlayer>(CreateMediaPlayer)
                 .Register<JsonSerializer>(() => new JsonSerializer { Formatting = Formatting.Indented })
                 .Register<IAuthorizationService, AuthorizationService>()
-                .Register<IF1TVClient, F1TVClient>()
                 .Register<IApiService, ApiService>()
                 .Register<IGithubService, GithubService>()
                 .Register<ICredentialService, CredentialService>()

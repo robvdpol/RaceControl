@@ -2,8 +2,7 @@
 {
     public static class Constants
     {
-        public const string NewApiEndpointUrl = @"https://f1tv.formula1.com";
-        public const string ApiEndpointUrl = @"https://f1tv.formula1.com/api";
+        public const string ApiEndpointUrl = @"https://f1tv.formula1.com";
         public const string BackupStreamUrl = @"https://f1tv.formula1.com/dr/stream.json";
         public const string AuthenticateUrl = @"https://api.formula1.com/v2/account/subscriber/authenticate/by-password";
         public const string ImageUrl = @"https://ott.formula1.com/image-resizer/image";

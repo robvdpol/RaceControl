@@ -1,10 +1,10 @@
-﻿using NLog;
+﻿using Newtonsoft.Json;
+using NLog;
 using RaceControl.Common.Enums;
 using RaceControl.Common.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Api;
 using RaceControl.Services.Interfaces.F1TV.Constants;
-using RaceControl.Services.Interfaces.Lark;
 using RestSharp;
 using System;
 using System.Collections.Generic;
@@ -19,13 +19,11 @@ namespace RaceControl.Services.F1TV
         private const string StreamType = "BIG_SCREEN_HLS";
 
         private readonly ILogger _logger;
-        private readonly IF1TVClient _client;
         private readonly Func<IRestClient> _restClientFactory;
 
-        public ApiService(ILogger logger, IF1TVClient client, Func<IRestClient> restClientFactory)
+        public ApiService(ILogger logger, Func<IRestClient> restClientFactory)
         {
             _logger = logger;
-            _client = client;
             _restClientFactory = restClientFactory;
         }
 
@@ -193,7 +191,7 @@ namespace RaceControl.Services.F1TV
             {
                 ContentType.Channel => (await QueryTokenisedUrlAsync(token, playableContent.ContentUrl)).ResultObj.Url,
                 ContentType.Asset => (await QueryTokenisedUrlAsync(token, playableContent.ContentUrl)).ResultObj.Url,
-                ContentType.Backup => (await _client.GetBackupStream()).StreamManifest,
+                ContentType.Backup => (await GetBackupStream()).StreamManifest,
                 _ => throw new ArgumentException($"Could not generate tokenised URL for unsupported content-type '{playableContent.ContentType}'.", nameof(playableContent))
             };
         }
@@ -201,7 +199,7 @@ namespace RaceControl.Services.F1TV
         private async Task<ApiResponse> QueryLiveSessionsAsync()
         {
             var restClient = _restClientFactory();
-            restClient.BaseUrl = new Uri(Constants.NewApiEndpointUrl);
+            restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
 
             var restRequest = new RestRequest($"2.0/R/ENG/{StreamType}/ALL/PAGE/395/F1_TV_Pro_Annual/2", DataFormat.Json);
 
@@ -211,7 +209,7 @@ namespace RaceControl.Services.F1TV
         private async Task<ApiResponse> QueryVodGenresAsync()
         {
             var restClient = _restClientFactory();
-            restClient.BaseUrl = new Uri(Constants.NewApiEndpointUrl);
+            restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
 
             var restRequest = new RestRequest($"2.0/R/ENG/{StreamType}/ALL/PAGE/410/F1_TV_Pro_Annual/2", DataFormat.Json);
 
@@ -221,7 +219,7 @@ namespace RaceControl.Services.F1TV
         private async Task<ApiResponse> QuerySeasonEventsAsync(int year)
         {
             var restClient = _restClientFactory();
-            restClient.BaseUrl = new Uri(Constants.NewApiEndpointUrl);
+            restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
 
             var restRequest = new RestRequest($"2.0/R/ENG/{StreamType}/ALL/PAGE/SEARCH/VOD/F1_TV_Pro_Annual/2", DataFormat.Json);
             restRequest.AddQueryParameter("filter_objectSubtype", "Meeting");
@@ -236,7 +234,7 @@ namespace RaceControl.Services.F1TV
         private async Task<ApiResponse> QueryEventVideosAsync(string meetingKey)
         {
             var restClient = _restClientFactory();
-            restClient.BaseUrl = new Uri(Constants.NewApiEndpointUrl);
+            restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
 
             var restRequest = new RestRequest($"2.0/R/ENG/{StreamType}/ALL/PAGE/SEARCH/VOD/F1_TV_Pro_Annual/2", DataFormat.Json);
             restRequest.AddQueryParameter("orderBy", "session_index");
@@ -250,7 +248,7 @@ namespace RaceControl.Services.F1TV
         private async Task<ApiResponse> QueryGenreVideosAsync(string genre)
         {
             var restClient = _restClientFactory();
-            restClient.BaseUrl = new Uri(Constants.NewApiEndpointUrl);
+            restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
 
             var restRequest = new RestRequest($"2.0/R/ENG/{StreamType}/ALL/PAGE/SEARCH/VOD/F1_TV_Pro_Annual/2", DataFormat.Json);
             restRequest.AddQueryParameter("orderBy", "meeting_Number");
@@ -264,7 +262,7 @@ namespace RaceControl.Services.F1TV
         private async Task<ApiResponse> QuerySessionChannelsAsync(long contentID)
         {
             var restClient = _restClientFactory();
-            restClient.BaseUrl = new Uri(Constants.NewApiEndpointUrl);
+            restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
 
             var restRequest = new RestRequest($"2.0/R/ENG/{StreamType}/ALL/CONTENT/VIDEO/{contentID}/F1_TV_Pro_Annual/2", DataFormat.Json);
 
@@ -274,12 +272,26 @@ namespace RaceControl.Services.F1TV
         private async Task<ApiResponse> QueryTokenisedUrlAsync(string token, string contentUrl)
         {
             var restClient = _restClientFactory();
-            restClient.BaseUrl = new Uri(Constants.NewApiEndpointUrl);
+            restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
 
             var restRequest = new RestRequest($"/1.0/R/ENG/{StreamType}/ALL/{contentUrl}", DataFormat.Json);
             restRequest.AddHeader("ascendontoken", token);
 
             return await restClient.GetAsync<ApiResponse>(restRequest);
+        }
+
+        private async Task<BackupStream> GetBackupStream()
+        {
+            var restClient = _restClientFactory();
+            var restRequest = new RestRequest(Constants.BackupStreamUrl, DataFormat.Json);
+            var restResponse = await restClient.ExecuteGetAsync(restRequest);
+
+            if (!restResponse.IsSuccessful)
+            {
+                throw new Exception($"Could not retrieve backup stream URL (HTTP status code {(int)restResponse.StatusCode}).", restResponse.ErrorException);
+            }
+
+            return JsonConvert.DeserializeObject<BackupStream>(restResponse.Content);
         }
 
         private static Event CreateEvent(Container container)
