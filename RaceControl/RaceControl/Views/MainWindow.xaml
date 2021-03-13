@@ -214,7 +214,7 @@
                     Grid.Row="1"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
-                    DisplayMemberPath="SessionName"
+                    DisplayMemberPath="LongName"
                     ItemsSource="{Binding LiveSessions}"
                     ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                     SelectedItem="{Binding SelectedLiveSession}"
