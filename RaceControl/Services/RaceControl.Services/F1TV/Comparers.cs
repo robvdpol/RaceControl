@@ -1,6 +1,5 @@
 ﻿using RaceControl.Services.Interfaces.F1TV.Entities;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace RaceControl.Services.F1TV
 {
@@ -11,7 +10,7 @@ namespace RaceControl.Services.F1TV
             return x?.ContentID == y?.ContentID;
         }
 
-        public int GetHashCode([DisallowNull] Session session)
+        public int GetHashCode(Session session)
         {
             return session.ContentID.GetHashCode();
         }
