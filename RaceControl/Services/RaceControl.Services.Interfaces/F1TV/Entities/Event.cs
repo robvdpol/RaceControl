@@ -11,7 +11,15 @@ namespace RaceControl.Services.Interfaces.F1TV.Entities
 
         public override string ToString()
         {
-            return Name;
+            var startDate = StartDate?.ToString("dd\\/MM");
+            var endDate = EndDate?.ToString("dd\\/MM");
+
+            var hasDate = StartDate.HasValue || EndDate.HasValue;
+            var hasBothDatesAndDifferent = hasDate && StartDate != EndDate;
+
+            var dateString = !hasDate ? null : $" ({startDate}{(hasBothDatesAndDifferent ? "-" : "")}{endDate})";
+
+            return Name + dateString;
         }
     }
 }

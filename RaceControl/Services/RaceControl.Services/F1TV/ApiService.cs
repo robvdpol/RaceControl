@@ -22,11 +22,13 @@ namespace RaceControl.Services.F1TV
 
         private readonly ILogger _logger;
         private readonly Func<IRestClient> _restClientFactory;
+        private readonly IEqualityComparer<Session> _sessionComparer;
 
         public ApiService(ILogger logger, Func<IRestClient> restClientFactory)
         {
             _logger = logger;
             _restClientFactory = restClientFactory;
+            _sessionComparer = new SessionComparer(); 
         }
 
         public List<Series> GetSeries()
@@ -84,6 +86,7 @@ namespace RaceControl.Services.F1TV
                 .SelectMany(c1 => c1.RetrieveItems.ResultObj.Containers
                     .Where(c2 => c2.Metadata.ContentType == "VIDEO" && c2.Metadata.ContentSubtype == "LIVE")
                     .Select(CreateSession))
+                    .Distinct(_sessionComparer)
                 .ToList();
         }
 
@@ -119,6 +122,7 @@ namespace RaceControl.Services.F1TV
                 .Where(c => c.Metadata.ContentType == "VIDEO")
                 .Where(c => c.Metadata.ContentSubtype == "REPLAY" || c.Metadata.ContentSubtype == "LIVE")
                 .Select(CreateSession)
+                .Distinct(_sessionComparer)
                 .ToList();
         }
 
