@@ -198,15 +198,9 @@ namespace RaceControl.Services.F1TV
 
         public async Task<string> GetTokenisedUrlAsync(string token, string streamType, IPlayableContent playableContent)
         {
-            _logger.Info($"Getting tokenised URL for content-type '{playableContent.ContentType}' and content-URL '{playableContent.ContentUrl}' using token '{token}'...");
+            _logger.Info($"Getting tokenised URL for content-type '{playableContent.ContentType}' and content-URL '{playableContent.ContentUrl}'...");
 
-            return playableContent.ContentType switch
-            {
-                ContentType.Channel => (await QueryTokenisedUrlAsync(token, streamType, playableContent.ContentUrl)).ResultObj.Url,
-                ContentType.Asset => (await QueryTokenisedUrlAsync(token, streamType, playableContent.ContentUrl)).ResultObj.Url,
-                ContentType.Backup => (await GetBackupStream()).StreamManifest,
-                _ => throw new ArgumentException($"Could not generate tokenised URL for unsupported content-type '{playableContent.ContentType}'.", nameof(playableContent))
-            };
+            return playableContent.ContentType == ContentType.Backup ? (await GetBackupStream()).StreamManifest : (await QueryTokenisedUrlAsync(token, streamType, playableContent.ContentUrl)).ResultObj.Url;
         }
 
         private async Task<ApiResponse> QueryLiveSessionsAsync()
@@ -338,7 +332,7 @@ namespace RaceControl.Services.F1TV
 
         private static Session CreateSession(Container container)
         {
-            var session = new Session
+            return new()
             {
                 UID = container.Id,
                 ContentID = container.Metadata.ContentId,
@@ -349,13 +343,11 @@ namespace RaceControl.Services.F1TV
                 SeriesUID = container.Properties.First().Series,
                 ThumbnailUrl = GetThumbnailUrl(container.Metadata.PictureUrl)
             };
-
-            return session;
         }
 
         private static Episode CreateEpisode(Container container)
         {
-            var episode = new Episode
+            return new()
             {
                 UID = container.Id,
                 ContentID = container.Metadata.ContentId,
@@ -367,8 +359,6 @@ namespace RaceControl.Services.F1TV
                 PlaybackUrl = GetPlaybackUrl(container.Metadata.ContentId),
                 ThumbnailUrl = GetThumbnailUrl(container.Metadata.PictureUrl)
             };
-
-            return episode;
         }
 
         private static string GetPlaybackUrl(long contentId)

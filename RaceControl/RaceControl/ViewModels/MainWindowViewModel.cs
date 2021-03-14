@@ -589,7 +589,7 @@ namespace RaceControl.ViewModels
 
             if (!Settings.SelectedSeries.Any())
             {
-                Settings.SelectedSeries.Add("FORMULA 1");
+                Settings.SelectedSeries.Add(SeriesIds.Formula1);
             }
         }
 

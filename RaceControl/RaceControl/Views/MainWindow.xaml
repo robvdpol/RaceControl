@@ -350,7 +350,7 @@
                                     Command="{Binding DataContext.CastContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
                                     CommandParameter="{Binding}"
                                     Content="Cast"
-                                    ToolTip="Cast to selected device" />
+                                    ToolTip="Cast to selected Chromecast device" />
                                 <Button
                                     Grid.Column="4"
                                     Width="50"
@@ -489,7 +489,7 @@
                                     Command="{Binding ScanReceiversCommand}"
                                     Content="Scan"
                                     Style="{StaticResource OptionButtonStyle}"
-                                    ToolTip="Scan for devices in local network" />
+                                    ToolTip="Scan for Chromecast devices in local network" />
                                 <ComboBox
                                     Grid.Column="1"
                                     Margin="3"
@@ -652,7 +652,7 @@
                                 Command="{Binding DataContext.CastContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
                                 CommandParameter="{Binding}"
                                 Content="Cast"
-                                ToolTip="Cast to selected device" />
+                                ToolTip="Cast to selected Chromecast device" />
                             <Button
                                 Grid.Column="4"
                                 Width="50"
