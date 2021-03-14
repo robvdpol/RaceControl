@@ -1,4 +1,4 @@
-﻿namespace RaceControl.Services
+﻿namespace RaceControl.Services.F1TV
 {
     public static class Constants
     {

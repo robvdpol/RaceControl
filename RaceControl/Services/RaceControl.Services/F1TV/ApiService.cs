@@ -261,7 +261,7 @@ namespace RaceControl.Services.F1TV
             restRequest.AddQueryParameter("filter_MeetingKey", meetingKey);
             restRequest.AddQueryParameter("filter_orderByFom", "Y");
             restRequest.AddQueryParameter("filter_fetchAll", "Y");
-            
+
             return await restClient.GetAsync<ApiResponse>(restRequest);
         }
 
