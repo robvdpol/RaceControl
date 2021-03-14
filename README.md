@@ -89,3 +89,10 @@ Maybe, please create an issue (feature request) and I will consider it. As a wor
 ![preview image](https://imgur.com/Ngos9JZ.png)
 
 ![preview image](https://imgur.com/m46BzZj.png)
+
+## Development
+To open and build the solution, you need:
+
+* Visual Studio 2019 (v16.8.0 or newer)
+* [.NET 5.0 SDK](https://dotnet.microsoft.com/download/visual-studio-sdks)
+* The extension [Microsoft Visual Studio Installer Projects](https://marketplace.visualstudio.com/items?itemName=VisualStudioClient.MicrosoftVisualStudio2017InstallerProjects) to open the RaceControl.Installer project
