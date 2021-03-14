@@ -1,5 +1,4 @@
 # Race Control
-
 [![GitHub issues](https://img.shields.io/github/issues/robvdpol/RaceControl)](https://github.com/robvdpol/RaceControl/issues?q=is%3Aopen+is%3Aissue)
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/robvdpol/RaceControl)](https://github.com/robvdpol/RaceControl/issues?q=is%3Aissue+is%3Aclosed)
 [![GitHub All Releases](https://img.shields.io/github/downloads/robvdpol/RaceControl/total)](https://github.com/robvdpol/RaceControl/releases)
@@ -15,7 +14,7 @@ Race Control is an open source [F1TV](https://f1tv.formula1.com) desktop client 
 * Supports three different video players (internal player, VLC and MPV)
 * Open as many streams as you like, using the layout that you like
 * Save your custom video player layout, so you don't have to position windows manually every time you watch a session
-* Cast to your Chromecast with a single click of a button (internal player and VLC only)
+* Cast to your Chromecast with a single click of a button
 * Experimental synchronization of streams (replays only at the moment)
 
 ## Installation
@@ -63,17 +62,20 @@ Your F1TV login credentials are stored locally in the Windows Credential Manager
 #### Where does Race Control store my settings and video layout? Will they be retained when I upgrade Race Control?
 Your settings and video layout are stored in JSON-files, which are saved to *%LOCALAPPDATA%\RaceControl* (usually located at *C:\Users\USERNAME\AppData\Local\RaceControl*). When you upgrade Race Control your settings and video layout will be retained.
 
-#### Can I watch race seasons before 2018?
-Race seasons before 2018 were not broadcasted live through F1TV, because F1TV didn't exist at the time. However, they can be found in the Video On Demand archive. Simply select the entry 'Full Race' under 'Video On Demand' and then scroll down the episode list to find the races you want to watch. Alternatively, you can specify a search filter to find a specific race or season.
-
 #### Why is the VLC button disabled?
-You need to have VLC media player installed on your machine. The location of your VLC installation will be automatically detected.
+You need to have VLC media player installed on your machine. The location of your VLC installation will be read from the Windows registry.
 
 #### Do I need to install MPV separately to use it with Race Control?
 No, Race Control comes with a recent version of MPV included in the release.
 
 #### Can you add support for my favourite media player?
 Maybe, please create an issue (feature request) and I will consider it. As a workaround, you can use the Copy-button to generate a tokenized link to the stream that is copied to your clipboard. Open the link with a media player of your choice to watch the stream. Note: the media player needs to properly support the HTTP Live Streaming (HLS) protocol.
+
+## Contributing
+To open and build the solution you need:
+* Visual Studio 2019 (v16.8.0 or newer)
+* [.NET 5.0 SDK](https://dotnet.microsoft.com/download/visual-studio-sdks)
+* The extension [Microsoft Visual Studio Installer Projects](https://marketplace.visualstudio.com/items?itemName=VisualStudioClient.MicrosoftVisualStudio2017InstallerProjects) to open the RaceControl.Installer project
 
 ## Acknowledgements
 * [VLC](https://www.videolan.org/vlc) for providing an excellent video player and .NET library
@@ -89,10 +91,3 @@ Maybe, please create an issue (feature request) and I will consider it. As a wor
 ![preview image](https://imgur.com/Ngos9JZ.png)
 
 ![preview image](https://imgur.com/m46BzZj.png)
-
-## Development
-To open and build the solution, you need:
-
-* Visual Studio 2019 (v16.8.0 or newer)
-* [.NET 5.0 SDK](https://dotnet.microsoft.com/download/visual-studio-sdks)
-* The extension [Microsoft Visual Studio Installer Projects](https://marketplace.visualstudio.com/items?itemName=VisualStudioClient.MicrosoftVisualStudio2017InstallerProjects) to open the RaceControl.Installer project
