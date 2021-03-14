@@ -1,4 +1,5 @@
 ﻿using DryIoc;
+using GoogleCast;
 using LibVLCSharp.Shared;
 using Newtonsoft.Json;
 using NLog;
@@ -29,6 +30,7 @@ using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Threading;
+using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 using LibVLCSharpCore = LibVLCSharp.Shared.Core;
 using LogLevelNLog = NLog.LogLevel;
 using LogLevelVLC = LibVLCSharp.Shared.LogLevel;
@@ -81,6 +83,7 @@ namespace RaceControl
                 .Register<IGithubService, GithubService>()
                 .Register<ICredentialService, CredentialService>()
                 .Register<INumberGenerator, NumberGenerator>()
+                .Register<IDeviceLocator, DeviceLocator>()
                 .Register<IMediaPlayer, VlcMediaPlayer>()
                 .Register<IMediaDownloader, VlcMediaDownloader>();
 

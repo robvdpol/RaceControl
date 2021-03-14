@@ -18,11 +18,8 @@ namespace RaceControl.Vlc
         private int _volume;
         private bool _isPaused;
         private bool _isMuted;
-        private bool _isScanning;
-        private bool _isCasting;
         private ObservableCollection<IAudioDevice> _audioDevices;
         private ObservableCollection<IMediaTrack> _audioTracks;
-        private ObservableCollection<IMediaRenderer> _mediaRenderers;
         private IAudioDevice _audioDevice;
         private IMediaTrack _audioTrack;
         private bool _disposed;
@@ -76,23 +73,9 @@ namespace RaceControl.Vlc
             private set => SetProperty(ref _isMuted, value);
         }
 
-        public bool IsScanning
-        {
-            get => _isScanning;
-            private set => SetProperty(ref _isScanning, value);
-        }
-
-        public bool IsCasting
-        {
-            get => _isCasting;
-            private set => SetProperty(ref _isCasting, value);
-        }
-
         public ObservableCollection<IAudioDevice> AudioDevices => _audioDevices ??= new ObservableCollection<IAudioDevice>();
 
         public ObservableCollection<IMediaTrack> AudioTracks => _audioTracks ??= new ObservableCollection<IMediaTrack>();
-
-        public ObservableCollection<IMediaRenderer> MediaRenderers => _mediaRenderers ??= new ObservableCollection<IMediaRenderer>();
 
         public IAudioDevice AudioDevice
         {
@@ -118,21 +101,12 @@ namespace RaceControl.Vlc
             }
         }
 
-        public async Task StartPlaybackAsync(string streamUrl, IMediaRenderer mediaRenderer = null)
+        public async Task StartPlaybackAsync(string streamUrl)
         {
             using var media = new Media(_libVLC, streamUrl, FromType.FromLocation);
             media.DurationChanged += (_, e) => Duration = e.Duration;
             await media.Parse(MediaParseOptions.ParseNetwork | MediaParseOptions.FetchNetwork);
-            MediaPlayer.SetRenderer(mediaRenderer?.Renderer as RendererItem);
-
-            if (MediaPlayer.Play(media))
-            {
-                IsCasting = mediaRenderer != null;
-            }
-            else
-            {
-                IsCasting = false;
-            }
+            MediaPlayer.Play(media);
         }
 
         public void StopPlayback()
@@ -155,30 +129,6 @@ namespace RaceControl.Vlc
             {
                 MediaPlayer.ToggleMute();
             }
-        }
-
-        public async Task ScanChromecastAsync()
-        {
-            MediaRenderers.Clear();
-
-            using var rendererDiscoverer = new RendererDiscoverer(_libVLC);
-            rendererDiscoverer.ItemAdded += RendererDiscoverer_ItemAdded;
-
-            if (rendererDiscoverer.Start())
-            {
-                IsScanning = true;
-                await Task.Delay(TimeSpan.FromSeconds(10));
-                IsScanning = false;
-                rendererDiscoverer.Stop();
-            }
-
-            rendererDiscoverer.ItemAdded -= RendererDiscoverer_ItemAdded;
-        }
-
-        public async Task ChangeRendererAsync(IMediaRenderer mediaRenderer, string streamUrl)
-        {
-            StopPlayback();
-            await StartPlaybackAsync(streamUrl, mediaRenderer);
         }
 
         public void Dispose()
@@ -305,19 +255,6 @@ namespace RaceControl.Vlc
             {
                 SetProperty(ref _audioDevice, audioDevice, nameof(AudioDevice));
             }
-        }
-
-        private void RendererDiscoverer_ItemAdded(object sender, RendererDiscovererItemAddedEventArgs e)
-        {
-            if (!e.RendererItem.CanRenderVideo)
-            {
-                return;
-            }
-
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                MediaRenderers.Add(new VlcMediaRenderer(e.RendererItem));
-            });
         }
     }
 }

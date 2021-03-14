@@ -23,12 +23,6 @@
             <Setter Property="Height" Value="24" />
         </Style>
         <Style
-            x:Key="ControlBarButtonStyleWide"
-            BasedOn="{StaticResource ControlBarButtonStyle}"
-            TargetType="Button">
-            <Setter Property="Width" Value="42" />
-        </Style>
-        <Style
             x:Key="ControlBarButtonStyleLarge"
             BasedOn="{StaticResource ControlBarButtonStyle}"
             TargetType="Button">
@@ -174,15 +168,6 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </Menu>
-            <Label
-                Grid.Row="0"
-                Grid.RowSpan="3"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Content="Casting..."
-                FontSize="22"
-                Foreground="White"
-                Visibility="{Binding MediaPlayer.IsCasting, Converter={StaticResource BooleanToVisibilityConverter}}" />
             <!--  Non-transparent background is required to capture mouse events  -->
             <Grid Grid.Row="1" Background="#01000000">
                 <i:Interaction.Triggers>
@@ -519,53 +504,6 @@
                                 Content="Always on top"
                                 IsChecked="{Binding DialogSettings.Topmost}" />
                         </Grid>
-                        <StackPanel
-                            Grid.Row="1"
-                            Grid.Column="2"
-                            Orientation="Horizontal">
-                            <Button
-                                Command="{Binding ScanChromecastCommand}"
-                                Content="Scan"
-                                Style="{StaticResource ControlBarButtonStyleWide}"
-                                ToolTip="Scan for Chromecast devices in local network" />
-                            <Grid>
-                                <ComboBox
-                                    Width="180"
-                                    Margin="2"
-                                    DisplayMemberPath="Name"
-                                    IsEnabled="{Binding HasItems, RelativeSource={RelativeSource Self}}"
-                                    ItemsSource="{Binding MediaPlayer.MediaRenderers}"
-                                    SelectedItem="{Binding SelectedMediaRenderer}" />
-                                <TextBlock
-                                    Width="180"
-                                    Margin="2"
-                                    Padding="6,0,0,2"
-                                    VerticalAlignment="Center"
-                                    IsHitTestVisible="False"
-                                    Text="Select Chromecast device...">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Visibility" Value="Hidden" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding SelectedMediaRenderer}" Value="{x:Null}">
-                                                    <Setter Property="Visibility" Value="Visible" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </Grid>
-                            <Button
-                                Command="{Binding StartCastVideoCommand}"
-                                Content="Cast"
-                                Style="{StaticResource ControlBarButtonStyleWide}"
-                                ToolTip="Cast stream to selected Chromecast device" />
-                            <Button
-                                Command="{Binding StopCastVideoCommand}"
-                                Content="Stop"
-                                Style="{StaticResource ControlBarButtonStyleWide}"
-                                ToolTip="Stop casting and resume stream in window" />
-                        </StackPanel>
                     </Grid>
                 </Grid>
             </Border>

@@ -191,8 +191,8 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="5*" />
                 </Grid.ColumnDefinitions>
                 <Label
                     Grid.Row="0"
@@ -323,6 +323,7 @@
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="{Binding}" />
                                 <Button
@@ -346,12 +347,20 @@
                                     Grid.Column="3"
                                     Width="50"
                                     Margin="2,0"
+                                    Command="{Binding DataContext.CastContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                    CommandParameter="{Binding}"
+                                    Content="Cast"
+                                    ToolTip="Cast to selected device" />
+                                <Button
+                                    Grid.Column="4"
+                                    Width="50"
+                                    Margin="2,0"
                                     Command="{Binding DataContext.WatchContentInMpvCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
                                     CommandParameter="{Binding}"
                                     Content="MPV"
                                     ToolTip="Watch with MPV" />
                                 <Button
-                                    Grid.Column="4"
+                                    Grid.Column="5"
                                     Width="50"
                                     Margin="2,0"
                                     Command="{Binding DataContext.WatchContentInVlcCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
@@ -359,7 +368,7 @@
                                     Content="VLC"
                                     ToolTip="Watch with VLC media player" />
                                 <Button
-                                    Grid.Column="5"
+                                    Grid.Column="6"
                                     Width="50"
                                     Margin="2,0,0,0"
                                     Command="{Binding DataContext.WatchContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
@@ -383,6 +392,7 @@
                 <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                     <Grid>
                         <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
@@ -467,6 +477,30 @@
                         </GroupBox>
                         <GroupBox
                             Grid.Row="2"
+                            Margin="5,3"
+                            Header="Chromecast">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Button
+                                    Grid.Column="0"
+                                    Command="{Binding ScanReceiversCommand}"
+                                    Content="Scan"
+                                    Style="{StaticResource OptionButtonStyle}"
+                                    ToolTip="Scan for devices in local network" />
+                                <ComboBox
+                                    Grid.Column="1"
+                                    Margin="3"
+                                    DisplayMemberPath="FriendlyName"
+                                    IsEnabled="{Binding HasItems, RelativeSource={RelativeSource Self}}"
+                                    ItemsSource="{Binding Receivers}"
+                                    SelectedItem="{Binding SelectedReceiver}" />
+                            </Grid>
+                        </GroupBox>
+                        <GroupBox
+                            Grid.Row="3"
                             Margin="5,3"
                             Header="Account">
                             <Button
@@ -591,6 +625,7 @@
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="{Binding}" />
                             <Button
@@ -614,12 +649,20 @@
                                 Grid.Column="3"
                                 Width="50"
                                 Margin="2,0"
+                                Command="{Binding DataContext.CastContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                CommandParameter="{Binding}"
+                                Content="Cast"
+                                ToolTip="Cast to selected device" />
+                            <Button
+                                Grid.Column="4"
+                                Width="50"
+                                Margin="2,0"
                                 Command="{Binding DataContext.WatchContentInMpvCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
                                 CommandParameter="{Binding}"
                                 Content="MPV"
                                 ToolTip="Watch with MPV" />
                             <Button
-                                Grid.Column="4"
+                                Grid.Column="5"
                                 Width="50"
                                 Margin="2,0"
                                 Command="{Binding DataContext.WatchContentInVlcCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
@@ -627,7 +670,7 @@
                                 Content="VLC"
                                 ToolTip="Watch with VLC media player" />
                             <Button
-                                Grid.Column="5"
+                                Grid.Column="6"
                                 Width="50"
                                 Margin="2,0,0,0"
                                 Command="{Binding DataContext.WatchContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"

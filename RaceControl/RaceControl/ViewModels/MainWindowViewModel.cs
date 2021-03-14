@@ -1,4 +1,7 @@
-﻿using Microsoft.Win32;
+﻿using GoogleCast;
+using GoogleCast.Channels;
+using GoogleCast.Models.Media;
+using Microsoft.Win32;
 using NLog;
 using Prism.Commands;
 using Prism.Events;
@@ -30,6 +33,7 @@ using System.Timers;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using Channel = RaceControl.Services.Interfaces.F1TV.Entities.Channel;
 
 namespace RaceControl.ViewModels
 {
@@ -43,6 +47,7 @@ namespace RaceControl.ViewModels
         private readonly IGithubService _githubService;
         private readonly ICredentialService _credentialService;
         private readonly INumberGenerator _numberGenerator;
+        private readonly IDeviceLocator _deviceLocator;
         private readonly object _refreshTimerLock = new();
 
         private ICommand _loadedCommand;
@@ -58,11 +63,13 @@ namespace RaceControl.ViewModels
         private ICommand _watchContentCommand;
         private ICommand _watchContentInVlcCommand;
         private ICommand _watchContentInMpvCommand;
+        private ICommand _castContentCommand;
         private ICommand _copyContentUrlCommand;
         private ICommand _downloadContentCommand;
         private ICommand _setDownloadLocationCommand;
         private ICommand _saveVideoDialogLayoutCommand;
         private ICommand _openVideoDialogLayoutCommand;
+        private ICommand _scanReceiversCommand;
         private ICommand _deleteCredentialCommand;
 
         private string _token;
@@ -77,11 +84,14 @@ namespace RaceControl.ViewModels
         private ObservableCollection<string> _vodGenres;
         private ObservableCollection<IPlayableContent> _channels;
         private ObservableCollection<IPlayableContent> _episodes;
+        private ObservableCollection<IReceiver> _receivers;
         private Season _selectedSeason;
         private Event _selectedEvent;
         private Session _selectedLiveSession;
         private Session _selectedSession;
         private string _selectedVodGenre;
+        private IReceiver _selectedReceiver;
+        private bool _isScanning;
         private Timer _refreshTimer;
 
         public MainWindowViewModel(
@@ -92,6 +102,7 @@ namespace RaceControl.ViewModels
             IGithubService githubService,
             ICredentialService credentialService,
             INumberGenerator numberGenerator,
+            IDeviceLocator deviceLocator,
             ISettings settings,
             IVideoDialogLayout videoDialogLayout)
             : base(logger)
@@ -102,6 +113,7 @@ namespace RaceControl.ViewModels
             _githubService = githubService;
             _credentialService = credentialService;
             _numberGenerator = numberGenerator;
+            _deviceLocator = deviceLocator;
             Settings = settings;
             VideoDialogLayout = videoDialogLayout;
             EpisodesView = CollectionViewSource.GetDefaultView(Episodes);
@@ -121,11 +133,13 @@ namespace RaceControl.ViewModels
         public ICommand WatchContentCommand => _watchContentCommand ??= new DelegateCommand<IPlayableContent>(WatchContentExecute);
         public ICommand WatchContentInVlcCommand => _watchContentInVlcCommand ??= new DelegateCommand<IPlayableContent>(WatchContentInVlcExecute, CanWatchContentInVlcExecute).ObservesProperty(() => VlcExeLocation);
         public ICommand WatchContentInMpvCommand => _watchContentInMpvCommand ??= new DelegateCommand<IPlayableContent>(WatchContentInMpvExecute, CanWatchContentInMpvExecute).ObservesProperty(() => MpvExeLocation);
+        public ICommand CastContentCommand => _castContentCommand ??= new DelegateCommand<IPlayableContent>(CastContentExecute, CanCastContentExecute).ObservesProperty(() => SelectedReceiver);
         public ICommand CopyContentUrlCommand => _copyContentUrlCommand ??= new DelegateCommand<IPlayableContent>(CopyContentUrlExecute);
         public ICommand DownloadContentCommand => _downloadContentCommand ??= new DelegateCommand<IPlayableContent>(DownloadContentExecute, CanDownloadContentExecute);
         public ICommand SetDownloadLocationCommand => _setDownloadLocationCommand ??= new DelegateCommand(SetDownloadLocationExecute);
         public ICommand SaveVideoDialogLayoutCommand => _saveVideoDialogLayoutCommand ??= new DelegateCommand(SaveVideoDialogLayoutExecute);
         public ICommand OpenVideoDialogLayoutCommand => _openVideoDialogLayoutCommand ??= new DelegateCommand<PlayerType?>(OpenVideoDialogLayoutExecute, CanOpenVideoDialogLayoutExecute).ObservesProperty(() => VideoDialogLayout.Instances.Count).ObservesProperty(() => Channels.Count);
+        public ICommand ScanReceiversCommand => _scanReceiversCommand ??= new DelegateCommand(ScanReceiversExecute, CanScanReceiversExecute).ObservesProperty(() => IsScanning);
         public ICommand DeleteCredentialCommand => _deleteCredentialCommand ??= new DelegateCommand(DeleteCredentialExecute);
 
         public ISettings Settings { get; }
@@ -180,6 +194,8 @@ namespace RaceControl.ViewModels
 
         public ObservableCollection<IPlayableContent> Episodes => _episodes ??= new ObservableCollection<IPlayableContent>();
 
+        public ObservableCollection<IReceiver> Receivers => _receivers ??= new ObservableCollection<IReceiver>();
+
         public Season SelectedSeason
         {
             get => _selectedSeason;
@@ -208,6 +224,18 @@ namespace RaceControl.ViewModels
         {
             get => _selectedVodGenre;
             set => SetProperty(ref _selectedVodGenre, value);
+        }
+
+        public IReceiver SelectedReceiver
+        {
+            get => _selectedReceiver;
+            set => SetProperty(ref _selectedReceiver, value);
+        }
+
+        public bool IsScanning
+        {
+            get => _isScanning;
+            set => SetProperty(ref _isScanning, value);
         }
 
         private void LoadedExecute(RoutedEventArgs args)
@@ -342,6 +370,17 @@ namespace RaceControl.ViewModels
             WatchInMpvAsync(playableContent).Await(SetNotBusy, HandleCriticalError);
         }
 
+        private bool CanCastContentExecute(IPlayableContent playableContent)
+        {
+            return SelectedReceiver != null;
+        }
+
+        private void CastContentExecute(IPlayableContent playableContent)
+        {
+            IsBusy = true;
+            CastContentAsync(playableContent, SelectedReceiver).Await(SetNotBusy, HandleCriticalError);
+        }
+
         private void CopyContentUrlExecute(IPlayableContent playableContent)
         {
             IsBusy = true;
@@ -394,6 +433,25 @@ namespace RaceControl.ViewModels
         {
             _eventAggregator.GetEvent<CloseAllEvent>().Publish(ContentType.Channel);
             OpenVideoDialogLayoutAsync(playerType).Await(HandleCriticalError);
+        }
+
+        private bool CanScanReceiversExecute()
+        {
+            return !IsScanning;
+        }
+
+        private void ScanReceiversExecute()
+        {
+            IsScanning = true;
+            FindReceivers().Await(() => { IsScanning = false; }, HandleCriticalError);
+        }
+
+        private async Task FindReceivers()
+        {
+            Receivers.Clear();
+            var receivers = await _deviceLocator.FindReceiversAsync();
+            Receivers.AddRange(receivers);
+            SelectedReceiver = Receivers.FirstOrDefault();
         }
 
         private void DeleteCredentialExecute()
@@ -766,6 +824,16 @@ namespace RaceControl.ViewModels
 
             using var process = ProcessUtils.CreateProcess(MpvExeLocation, string.Join(" ", arguments));
             process.Start();
+        }
+
+        private async Task CastContentAsync(IPlayableContent playableContent, IReceiver receiver)
+        {
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, Settings.StreamType, playableContent);
+            var sender = new Sender();
+            await sender.ConnectAsync(receiver);
+            var mediaChannel = sender.GetChannel<IMediaChannel>();
+            await sender.LaunchAsync(mediaChannel);
+            await mediaChannel.LoadAsync(new MediaInformation { ContentId = streamUrl });
         }
 
         private async Task CopyUrlAsync(IPlayableContent playableContent)

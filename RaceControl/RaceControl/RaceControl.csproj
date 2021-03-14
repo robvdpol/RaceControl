@@ -53,6 +53,7 @@
     <Resource Include="splashscreen.png" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="GoogleCast" Version="1.6.7" />
     <PackageReference Include="LibVLCSharp" Version="3.4.9" />
     <PackageReference Include="LibVLCSharp.WPF" Version="3.4.9" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.31" />

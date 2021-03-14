@@ -45,9 +45,6 @@ namespace RaceControl.ViewModels
         private ICommand _syncSessionCommand;
         private ICommand _toggleFullScreenCommand;
         private ICommand _moveToCornerCommand;
-        private ICommand _scanChromecastCommand;
-        private ICommand _startCastVideoCommand;
-        private ICommand _stopCastVideoCommand;
         private ICommand _selectAudioDeviceCommand;
 
         private string _token;
@@ -56,7 +53,6 @@ namespace RaceControl.ViewModels
         private VideoDialogSettings _dialogSettings;
         private WindowStartupLocation _startupLocation = WindowStartupLocation.CenterOwner;
         private bool _showControls = true;
-        private IMediaRenderer _selectedMediaRenderer;
         private Timer _showControlsTimer;
 
         public VideoDialogViewModel(
@@ -92,9 +88,6 @@ namespace RaceControl.ViewModels
         public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand<long?>(ToggleFullScreenExecute);
         public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => DialogSettings.WindowState);
-        public ICommand ScanChromecastCommand => _scanChromecastCommand ??= new DelegateCommand(ScanChromecastExecute, CanScanChromecastExecute).ObservesProperty(() => CanClose).ObservesProperty(() => MediaPlayer.IsScanning);
-        public ICommand StartCastVideoCommand => _startCastVideoCommand ??= new DelegateCommand(StartCastVideoExecute, CanStartCastVideoExecute).ObservesProperty(() => CanClose).ObservesProperty(() => SelectedMediaRenderer);
-        public ICommand StopCastVideoCommand => _stopCastVideoCommand ??= new DelegateCommand(StopCastVideoExecute, CanStopCastVideoExecute).ObservesProperty(() => MediaPlayer.IsCasting);
         public ICommand SelectAudioDeviceCommand => _selectAudioDeviceCommand ??= new DelegateCommand<IAudioDevice>(SelectAudioDeviceExecute, CanSelectAudioDeviceExecute).ObservesProperty(() => MediaPlayer.AudioDevice);
 
         public IMediaPlayer MediaPlayer { get; }
@@ -121,12 +114,6 @@ namespace RaceControl.ViewModels
         {
             get => _showControls;
             set => SetProperty(ref _showControls, value);
-        }
-
-        public IMediaRenderer SelectedMediaRenderer
-        {
-            get => _selectedMediaRenderer;
-            set => SetProperty(ref _selectedMediaRenderer, value);
         }
 
         public override void OnDialogOpened(IDialogParameters parameters)
@@ -368,39 +355,6 @@ namespace RaceControl.ViewModels
             DialogSettings.Left = windowLeft;
         }
 
-        private bool CanScanChromecastExecute()
-        {
-            return CanClose && !MediaPlayer.IsScanning;
-        }
-
-        private void ScanChromecastExecute()
-        {
-            Logger.Info("Scanning for Chromecast devices...");
-            MediaPlayer.ScanChromecastAsync().Await(HandleNonCriticalError);
-        }
-
-        private bool CanStartCastVideoExecute()
-        {
-            return CanClose && SelectedMediaRenderer != null;
-        }
-
-        private void StartCastVideoExecute()
-        {
-            Logger.Info($"Starting casting of video with renderer '{SelectedMediaRenderer.Name}'...");
-            ChangeRendererAsync(SelectedMediaRenderer).Await(HandleNonCriticalError);
-        }
-
-        private bool CanStopCastVideoExecute()
-        {
-            return MediaPlayer.IsCasting;
-        }
-
-        private void StopCastVideoExecute()
-        {
-            Logger.Info("Stopping casting of video...");
-            ChangeRendererAsync().Await(HandleNonCriticalError);
-        }
-
         private bool CanSelectAudioDeviceExecute(IAudioDevice audioDevice)
         {
             return MediaPlayer.AudioDevice != audioDevice;
@@ -541,18 +495,6 @@ namespace RaceControl.ViewModels
                 });
 
                 _showControlsTimer?.Start();
-            }
-        }
-
-        private async Task ChangeRendererAsync(IMediaRenderer mediaRenderer = null)
-        {
-            var time = MediaPlayer.Time;
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, _settings.StreamType, PlayableContent);
-            await MediaPlayer.ChangeRendererAsync(mediaRenderer, streamUrl);
-
-            if (!PlayableContent.IsLive)
-            {
-                MediaPlayer.Time = time;
             }
         }
 
