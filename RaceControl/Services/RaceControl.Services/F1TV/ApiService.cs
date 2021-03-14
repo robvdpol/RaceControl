@@ -31,9 +31,7 @@ namespace RaceControl.Services.F1TV
 
         public List<Series> GetSeries()
         {
-            _logger.Info("Querying series...");
-
-            return new List<Series>
+            return new()
             {
                 new()
                 {
@@ -160,7 +158,7 @@ namespace RaceControl.Services.F1TV
                 channels.AddRange(metadata.AdditionalStreams
                     .Select(s => new Channel
                     {
-                        Name = s.Type == "obc" ? $"{s.DriverFirstName} {s.DriverLastName}" : s.Title,
+                        Name = s.Type == ChannelTypes.Onboard ? $"{s.DriverFirstName} {s.DriverLastName}" : s.Title,
                         ChannelType = s.Type,
                         PlaybackUrl = s.PlaybackUrl
                     })
@@ -192,6 +190,7 @@ namespace RaceControl.Services.F1TV
 
             return apiResponse.ResultObj.Containers
                 .Where(c => c.Metadata.ContentType == "VIDEO")
+                .Where(c => c.Metadata.ContentSubtype != "LIVE")
                 .Select(CreateEpisode)
                 .ToList();
         }
