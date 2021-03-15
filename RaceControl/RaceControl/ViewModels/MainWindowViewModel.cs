@@ -66,7 +66,6 @@ namespace RaceControl.ViewModels
         private ICommand _castContentCommand;
         private ICommand _copyContentUrlCommand;
         private ICommand _downloadContentCommand;
-        private ICommand _setDownloadLocationCommand;
         private ICommand _saveVideoDialogLayoutCommand;
         private ICommand _openVideoDialogLayoutCommand;
         private ICommand _scanReceiversCommand;
@@ -137,7 +136,6 @@ namespace RaceControl.ViewModels
         public ICommand CastContentCommand => _castContentCommand ??= new DelegateCommand<IPlayableContent>(CastContentExecute, CanCastContentExecute).ObservesProperty(() => SelectedReceiver);
         public ICommand CopyContentUrlCommand => _copyContentUrlCommand ??= new DelegateCommand<IPlayableContent>(CopyContentUrlExecute);
         public ICommand DownloadContentCommand => _downloadContentCommand ??= new DelegateCommand<IPlayableContent>(DownloadContentExecute, CanDownloadContentExecute);
-        public ICommand SetDownloadLocationCommand => _setDownloadLocationCommand ??= new DelegateCommand(SetDownloadLocationExecute);
         public ICommand SaveVideoDialogLayoutCommand => _saveVideoDialogLayoutCommand ??= new DelegateCommand(SaveVideoDialogLayoutExecute);
         public ICommand OpenVideoDialogLayoutCommand => _openVideoDialogLayoutCommand ??= new DelegateCommand<PlayerType?>(OpenVideoDialogLayoutExecute, CanOpenVideoDialogLayoutExecute).ObservesProperty(() => VideoDialogLayout.Instances.Count).ObservesProperty(() => Channels.Count);
         public ICommand ScanReceiversCommand => _scanReceiversCommand ??= new DelegateCommand(ScanReceiversExecute, CanScanReceiversExecute).ObservesProperty(() => IsScanning);
@@ -410,14 +408,6 @@ namespace RaceControl.ViewModels
             StartDownload(playableContent);
         }
 
-        private void SetDownloadLocationExecute()
-        {
-            if (_dialogService.SelectFolder("Select a download location", Settings.DownloadLocation, out var downloadLocation))
-            {
-                Settings.DownloadLocation = downloadLocation;
-            }
-        }
-
         private void SaveVideoDialogLayoutExecute()
         {
             VideoDialogLayout.Instances.Clear();
@@ -563,6 +553,8 @@ namespace RaceControl.ViewModels
         private bool Login()
         {
             var success = false;
+            SubscriptionToken = null;
+            SubscriptionStatus = null;
 
             _dialogService.ShowDialog(nameof(LoginDialog), null, dialogResult =>
             {
@@ -866,7 +858,7 @@ namespace RaceControl.ViewModels
         {
             var defaultFilename = $"{playableContent.Title}.ts".RemoveInvalidFileNameChars();
 
-            if (_dialogService.SelectFile("Select a filename", Settings.DownloadLocation, defaultFilename, ".ts", out var filename))
+            if (_dialogService.SelectFile("Select a filename", Environment.CurrentDirectory, defaultFilename, ".ts", out var filename))
             {
                 var parameters = new DialogParameters
                 {

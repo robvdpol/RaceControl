@@ -10,7 +10,7 @@
     xmlns:prism="http://prismlibrary.com/"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     Width="1260"
-    Height="810"
+    Height="829"
     prism:ViewModelLocator.AutoWireViewModel="True"
     WindowStartupLocation="CenterScreen">
     <Window.Resources>
@@ -98,7 +98,7 @@
                 Grid.Column="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
+                    <RowDefinition Height="2*" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
@@ -423,17 +423,12 @@
                                     Content="Disable MPV borderless mode"
                                     IsChecked="{Binding Settings.DisableMpvNoBorder}" />
                                 <TextBlock Margin="3" Text="Additional MPV parameters:" />
-                                <TextBox Margin="3,1" Text="{Binding Settings.AdditionalMpvParameters}" />
-                                <TextBlock Margin="3" Text="Download location:" />
-                                <TextBlock
+                                <TextBox
+                                    Height="22"
                                     Margin="3,1"
-                                    Text="{Binding Settings.DownloadLocation}"
-                                    TextWrapping="Wrap" />
-                                <Button
-                                    Command="{Binding SetDownloadLocationCommand}"
-                                    Content="Change download location"
-                                    Style="{StaticResource OptionButtonStyle}"
-                                    ToolTip="Change the location where downloads are saved by default" />
+                                    VerticalContentAlignment="Center"
+                                    MaxLength="200"
+                                    Text="{Binding Settings.AdditionalMpvParameters, UpdateSourceTrigger=PropertyChanged}" />
                             </StackPanel>
                         </GroupBox>
                         <GroupBox

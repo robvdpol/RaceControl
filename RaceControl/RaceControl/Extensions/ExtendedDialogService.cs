@@ -12,31 +12,6 @@ namespace RaceControl.Extensions
         {
         }
 
-        public bool SelectFolder(string title, string initialDirectory, out string folder)
-        {
-            folder = null;
-
-            var dialog = new CommonOpenFileDialog
-            {
-                Title = title,
-                DefaultDirectory = initialDirectory,
-                InitialDirectory = initialDirectory,
-                IsFolderPicker = true,
-                Multiselect = false,
-                AllowNonFileSystemItems = false,
-                EnsurePathExists = true
-            };
-
-            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-            {
-                folder = dialog.FileName;
-
-                return true;
-            }
-
-            return false;
-        }
-
         public bool SelectFile(string title, string initialDirectory, string initialFilename, string defaultExtension, out string filename)
         {
             filename = null;

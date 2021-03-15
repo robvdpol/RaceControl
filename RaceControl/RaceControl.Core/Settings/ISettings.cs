@@ -10,8 +10,6 @@ namespace RaceControl.Core.Settings
 
         string StreamType { get; set; }
 
-        string DownloadLocation { get; set; }
-
         string LatestRelease { get; set; }
 
         ObservableCollection<string> SelectedSeries { get; set; }
