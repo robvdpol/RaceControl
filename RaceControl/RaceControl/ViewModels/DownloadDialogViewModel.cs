@@ -42,10 +42,10 @@ namespace RaceControl.ViewModels
 
         public override void OnDialogOpened(IDialogParameters parameters)
         {
-            var token = parameters.GetValue<string>(ParameterNames.Token);
+            var subscriptionToken = parameters.GetValue<string>(ParameterNames.SubscriptionToken);
             PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.Content);
             Filename = parameters.GetValue<string>(ParameterNames.Filename);
-            GetTokenisedUrlAndStartDownloadAsync(token).Await(ex =>
+            GetTokenisedUrlAndStartDownloadAsync(subscriptionToken).Await(ex =>
             {
                 HandleNonCriticalError(ex);
                 MediaDownloader.SetDownloadStatus(DownloadStatus.Failed);
@@ -62,9 +62,9 @@ namespace RaceControl.ViewModels
             base.OnDialogClosed();
         }
 
-        private async Task GetTokenisedUrlAndStartDownloadAsync(string token)
+        private async Task GetTokenisedUrlAndStartDownloadAsync(string subscriptionToken)
         {
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(token, _settings.StreamType, PlayableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(subscriptionToken, _settings.StreamType, PlayableContent);
             await MediaDownloader.StartDownloadAsync(streamUrl, Filename);
         }
     }

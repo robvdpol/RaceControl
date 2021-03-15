@@ -5,6 +5,7 @@ using RaceControl.Core.Mvvm;
 using RaceControl.Extensions;
 using RaceControl.Services.Interfaces.Credential;
 using RaceControl.Services.Interfaces.F1TV;
+using RaceControl.Services.Interfaces.F1TV.Authorization;
 using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -74,18 +75,23 @@ namespace RaceControl.ViewModels
             LoginAsync().Await(LoginSuccess, LoginError, true);
         }
 
-        private async Task<string> LoginAsync()
+        private async Task<AuthResponse> LoginAsync()
         {
-            return (await _authorizationService.AuthenticateAsync(Email, Password)).Data.SubscriptionToken;
+            return await _authorizationService.AuthenticateAsync(Email, Password);
         }
 
-        private void LoginSuccess(string token)
+        private void LoginSuccess(AuthResponse authResponse)
         {
             Logger.Info("Login successful.");
             Error = null;
             IsBusy = false;
             _credentialService.SaveCredential(Email, Password);
-            RaiseRequestClose(ButtonResult.OK, new DialogParameters { { ParameterNames.Token, token } });
+
+            RaiseRequestClose(ButtonResult.OK, new DialogParameters
+            {
+                { ParameterNames.SubscriptionToken, authResponse.Data.SubscriptionToken },
+                { ParameterNames.SubscriptionStatus, authResponse.Data.SubscriptionStatus }
+            });
         }
 
         private void LoginError(Exception ex)

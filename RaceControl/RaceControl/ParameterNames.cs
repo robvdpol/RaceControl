@@ -2,7 +2,8 @@
 {
     public static class ParameterNames
     {
-        public const string Token = nameof(Token);
+        public const string SubscriptionToken = nameof(SubscriptionToken);
+        public const string SubscriptionStatus = nameof(SubscriptionStatus);
         public const string Identifier = nameof(Identifier);
         public const string Content = nameof(Content);
         public const string Settings = nameof(Settings);

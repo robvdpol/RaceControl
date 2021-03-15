@@ -503,11 +503,22 @@
                             Grid.Row="3"
                             Margin="5,3"
                             Header="Account">
-                            <Button
-                                Command="{Binding DeleteCredentialCommand}"
-                                Content="Delete stored credentials"
-                                Style="{StaticResource OptionButtonStyle}"
-                                ToolTip="Removes your credentials from the system, useful if you want to login with different credentials" />
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0" Margin="3">
+                                    <Run Text="Subscription status:" />
+                                    <Run Text="{Binding SubscriptionStatus}" />
+                                </TextBlock>
+                                <Button
+                                    Grid.Row="1"
+                                    Command="{Binding DeleteCredentialCommand}"
+                                    Content="Delete stored credentials"
+                                    Style="{StaticResource OptionButtonStyle}"
+                                    ToolTip="Removes your credentials from the system, useful if you want to login with different credentials" />
+                            </Grid>
                         </GroupBox>
                     </Grid>
                 </ScrollViewer>

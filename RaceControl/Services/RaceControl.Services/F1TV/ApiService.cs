@@ -196,11 +196,11 @@ namespace RaceControl.Services.F1TV
                 .ToList();
         }
 
-        public async Task<string> GetTokenisedUrlAsync(string token, string streamType, IPlayableContent playableContent)
+        public async Task<string> GetTokenisedUrlAsync(string subscriptionToken, string streamType, IPlayableContent playableContent)
         {
             _logger.Info($"Getting tokenised URL for content-type '{playableContent.ContentType}' and content-URL '{playableContent.ContentUrl}'...");
 
-            return playableContent.ContentType == ContentType.Backup ? (await GetBackupStream()).StreamManifest : (await QueryTokenisedUrlAsync(token, streamType, playableContent.ContentUrl)).ResultObj.Url;
+            return playableContent.ContentType == ContentType.Backup ? (await GetBackupStream()).StreamManifest : (await QueryTokenisedUrlAsync(subscriptionToken, streamType, playableContent.ContentUrl)).ResultObj.Url;
         }
 
         private async Task<ApiResponse> QueryLiveSessionsAsync()
@@ -294,13 +294,13 @@ namespace RaceControl.Services.F1TV
             return await restClient.GetAsync<ApiResponse>(restRequest);
         }
 
-        private async Task<ApiResponse> QueryTokenisedUrlAsync(string token, string streamType, string contentUrl)
+        private async Task<ApiResponse> QueryTokenisedUrlAsync(string subscriptionToken, string streamType, string contentUrl)
         {
             var restClient = _restClientFactory();
             restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
 
             var restRequest = new RestRequest($"/1.0/R/ENG/{streamType}/ALL/{contentUrl}", DataFormat.Json);
-            restRequest.AddHeader("ascendontoken", token);
+            restRequest.AddHeader("ascendontoken", subscriptionToken);
 
             return await restClient.GetAsync<ApiResponse>(restRequest);
         }

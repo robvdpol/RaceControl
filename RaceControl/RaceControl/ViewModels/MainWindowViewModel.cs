@@ -72,7 +72,8 @@ namespace RaceControl.ViewModels
         private ICommand _scanReceiversCommand;
         private ICommand _deleteCredentialCommand;
 
-        private string _token;
+        private string _subscriptionToken;
+        private string _subscriptionStatus;
         private string _episodeFilterText;
         private string _vlcExeLocation;
         private string _mpvExeLocation;
@@ -153,6 +154,18 @@ namespace RaceControl.ViewModels
             { StreamTypeKeys.BigScreenHls, "HLS (non-adaptive)" },
             { StreamTypeKeys.BigScreenDash, "DASH (adaptive)" }
         };
+
+        public string SubscriptionToken
+        {
+            get => _subscriptionToken;
+            set => SetProperty(ref _subscriptionToken, value);
+        }
+
+        public string SubscriptionStatus
+        {
+            get => _subscriptionStatus;
+            set => SetProperty(ref _subscriptionStatus, value);
+        }
 
         public string EpisodeFilterText
         {
@@ -557,7 +570,8 @@ namespace RaceControl.ViewModels
 
                 if (success)
                 {
-                    _token = dialogResult.Parameters.GetValue<string>(ParameterNames.Token);
+                    SubscriptionToken = dialogResult.Parameters.GetValue<string>(ParameterNames.SubscriptionToken);
+                    SubscriptionStatus = dialogResult.Parameters.GetValue<string>(ParameterNames.SubscriptionStatus);
                 }
                 else
                 {
@@ -746,7 +760,7 @@ namespace RaceControl.ViewModels
             var identifier = _numberGenerator.GetNextNumber();
             var parameters = new DialogParameters
             {
-                { ParameterNames.Token, _token },
+                { ParameterNames.SubscriptionToken, SubscriptionToken },
                 { ParameterNames.Identifier, identifier },
                 { ParameterNames.Content, playableContent },
                 { ParameterNames.Settings, settings }
@@ -757,7 +771,7 @@ namespace RaceControl.ViewModels
 
         private async Task WatchInVlcAsync(IPlayableContent playableContent)
         {
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, Settings.StreamType, playableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, Settings.StreamType, playableContent);
 
             if (!ValidateStreamUrl(streamUrl))
             {
@@ -770,7 +784,7 @@ namespace RaceControl.ViewModels
 
         private async Task WatchInMpvAsync(IPlayableContent playableContent, VideoDialogSettings settings = null)
         {
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, Settings.StreamType, playableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, Settings.StreamType, playableContent);
 
             if (!ValidateStreamUrl(streamUrl))
             {
@@ -828,7 +842,7 @@ namespace RaceControl.ViewModels
 
         private async Task CastContentAsync(IPlayableContent playableContent, IReceiver receiver)
         {
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, Settings.StreamType, playableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, Settings.StreamType, playableContent);
             var sender = new Sender();
             await sender.ConnectAsync(receiver);
             var mediaChannel = sender.GetChannel<IMediaChannel>();
@@ -838,7 +852,7 @@ namespace RaceControl.ViewModels
 
         private async Task CopyUrlAsync(IPlayableContent playableContent)
         {
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, Settings.StreamType, playableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, Settings.StreamType, playableContent);
 
             if (!ValidateStreamUrl(streamUrl))
             {
@@ -856,7 +870,7 @@ namespace RaceControl.ViewModels
             {
                 var parameters = new DialogParameters
                 {
-                    { ParameterNames.Token, _token },
+                    { ParameterNames.SubscriptionToken, SubscriptionToken },
                     { ParameterNames.Content, playableContent},
                     { ParameterNames.Filename, filename }
                 };

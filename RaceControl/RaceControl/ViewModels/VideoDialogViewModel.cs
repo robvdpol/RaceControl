@@ -47,7 +47,7 @@ namespace RaceControl.ViewModels
         private ICommand _moveToCornerCommand;
         private ICommand _selectAudioDeviceCommand;
 
-        private string _token;
+        private string _subscriptionToken;
         private long _identifier;
         private IPlayableContent _playableContent;
         private VideoDialogSettings _dialogSettings;
@@ -118,7 +118,7 @@ namespace RaceControl.ViewModels
 
         public override void OnDialogOpened(IDialogParameters parameters)
         {
-            _token = parameters.GetValue<string>(ParameterNames.Token);
+            _subscriptionToken = parameters.GetValue<string>(ParameterNames.SubscriptionToken);
             _identifier = parameters.GetValue<long>(ParameterNames.Identifier);
             PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.Content);
 
@@ -433,7 +433,7 @@ namespace RaceControl.ViewModels
                 }
             }
 
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(_token, _settings.StreamType, PlayableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(_subscriptionToken, _settings.StreamType, PlayableContent);
             await MediaPlayer.StartPlaybackAsync(streamUrl);
             MediaPlayer.ToggleMute(DialogSettings.IsMuted);
             MediaPlayer.Volume = DialogSettings.Volume;
