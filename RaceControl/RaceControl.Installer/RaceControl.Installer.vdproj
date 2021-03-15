@@ -172,7 +172,7 @@
             }
             "{3C67513D-01DD-4637-8A68-80971EB9504F}:_8C370B7B2E2A4A1C8F1DE261C79191C2"
             {
-            "DefaultLocation" = "8:[WindowsVolume]\\[ProductName]"
+            "DefaultLocation" = "8:[ProgramFiles64Folder]\\[ProductName]"
             "Name" = "8:#1925"
             "AlwaysCreate" = "11:FALSE"
             "Condition" = "8:"
