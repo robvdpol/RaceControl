@@ -48,6 +48,7 @@ namespace RaceControl.ViewModels
         private readonly ICredentialService _credentialService;
         private readonly INumberGenerator _numberGenerator;
         private readonly IDeviceLocator _deviceLocator;
+        private readonly ISender _sender;
         private readonly object _refreshTimerLock = new();
 
         private ICommand _loadedCommand;
@@ -103,6 +104,7 @@ namespace RaceControl.ViewModels
             ICredentialService credentialService,
             INumberGenerator numberGenerator,
             IDeviceLocator deviceLocator,
+            ISender sender,
             ISettings settings,
             IVideoDialogLayout videoDialogLayout)
             : base(logger)
@@ -114,6 +116,7 @@ namespace RaceControl.ViewModels
             _credentialService = credentialService;
             _numberGenerator = numberGenerator;
             _deviceLocator = deviceLocator;
+            _sender = sender;
             Settings = settings;
             VideoDialogLayout = videoDialogLayout;
             EpisodesView = CollectionViewSource.GetDefaultView(Episodes);
@@ -835,11 +838,23 @@ namespace RaceControl.ViewModels
         private async Task CastContentAsync(IPlayableContent playableContent, IReceiver receiver)
         {
             var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, Settings.StreamType, playableContent);
-            var sender = new Sender();
-            await sender.ConnectAsync(receiver);
-            var mediaChannel = sender.GetChannel<IMediaChannel>();
-            await sender.LaunchAsync(mediaChannel);
-            await mediaChannel.LoadAsync(new MediaInformation { ContentId = streamUrl });
+
+            if (!ValidateStreamUrl(streamUrl))
+            {
+                return;
+            }
+
+            try
+            {
+                await _sender.ConnectAsync(receiver);
+                var mediaChannel = _sender.GetChannel<IMediaChannel>();
+                await _sender.LaunchAsync(mediaChannel);
+                await mediaChannel.LoadAsync(new MediaInformation { ContentId = streamUrl });
+            }
+            finally
+            {
+                _sender.Disconnect();
+            }
         }
 
         private async Task CopyUrlAsync(IPlayableContent playableContent)

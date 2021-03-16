@@ -84,6 +84,7 @@ namespace RaceControl
                 .Register<ICredentialService, CredentialService>()
                 .Register<INumberGenerator, NumberGenerator>()
                 .Register<IDeviceLocator, DeviceLocator>()
+                .Register<ISender>(() => new Sender())
                 .Register<IMediaPlayer, VlcMediaPlayer>()
                 .Register<IMediaDownloader, VlcMediaDownloader>();
 
