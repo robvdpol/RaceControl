@@ -1,4 +1,4 @@
-﻿using LibVLCSharp.Shared.Structures;
+﻿using LibVLCSharp;
 using RaceControl.Common.Interfaces;
 
 namespace RaceControl.Vlc

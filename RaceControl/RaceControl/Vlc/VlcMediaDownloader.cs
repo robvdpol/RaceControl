@@ -1,4 +1,4 @@
-﻿using LibVLCSharp.Shared;
+﻿using LibVLCSharp;
 using Prism.Mvvm;
 using RaceControl.Common.Enums;
 using RaceControl.Common.Interfaces;

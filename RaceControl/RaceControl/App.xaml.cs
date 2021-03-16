@@ -1,6 +1,6 @@
 ﻿using DryIoc;
 using GoogleCast;
-using LibVLCSharp.Shared;
+using LibVLCSharp;
 using Newtonsoft.Json;
 using NLog;
 using NLog.Config;
@@ -31,9 +31,9 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Threading;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
-using LibVLCSharpCore = LibVLCSharp.Shared.Core;
+using LibVLCSharpCore = LibVLCSharp.Core;
 using LogLevelNLog = NLog.LogLevel;
-using LogLevelVLC = LibVLCSharp.Shared.LogLevel;
+using LogLevelVLC = LibVLCSharp.LogLevel;
 
 namespace RaceControl
 {

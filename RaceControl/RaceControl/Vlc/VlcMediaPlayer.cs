@@ -1,4 +1,4 @@
-﻿using LibVLCSharp.Shared;
+﻿using LibVLCSharp;
 using Prism.Mvvm;
 using RaceControl.Common.Interfaces;
 using System;
@@ -46,7 +46,7 @@ namespace RaceControl.Vlc
         public long Time
         {
             get => _time;
-            set => MediaPlayer.Time = value;
+            set => MediaPlayer.SetTime(value);
         }
 
         public long Duration
@@ -96,7 +96,7 @@ namespace RaceControl.Vlc
             {
                 if (value != null)
                 {
-                    MediaPlayer.SetAudioTrack(value.Id);
+                    MediaPlayer.Select(TrackType.Audio, value.Id);
                 }
             }
         }
@@ -184,19 +184,19 @@ namespace RaceControl.Vlc
 
         private void MediaPlayer_ESAdded(object sender, MediaPlayerESAddedEventArgs e)
         {
-            if (e.Id < 0)
-            {
-                return;
-            }
+            //if (e.Id < 0)
+            //{
+            //    return;
+            //}
 
             switch (e.Type)
             {
                 case TrackType.Audio:
-                    var trackDescription = MediaPlayer.AudioTrackDescription.First(td => td.Id == e.Id);
+                    var mediaTrack = MediaPlayer.TrackFromId(e.Id);
 
                     Application.Current.Dispatcher.Invoke(() =>
                     {
-                        AudioTracks.Add(new VlcMediaTrack(trackDescription));
+                        AudioTracks.Add(new VlcMediaTrack(mediaTrack));
                     });
                     break;
             }
@@ -204,10 +204,10 @@ namespace RaceControl.Vlc
 
         private void MediaPlayer_ESDeleted(object sender, MediaPlayerESDeletedEventArgs e)
         {
-            if (e.Id < 0)
-            {
-                return;
-            }
+            //if (e.Id < 0)
+            //{
+            //    return;
+            //}
 
             switch (e.Type)
             {
@@ -228,10 +228,10 @@ namespace RaceControl.Vlc
 
         private void MediaPlayer_ESSelected(object sender, MediaPlayerESSelectedEventArgs e)
         {
-            if (e.Id < 0)
-            {
-                return;
-            }
+            //if (e.Id < 0)
+            //{
+            //    return;
+            //}
 
             switch (e.Type)
             {

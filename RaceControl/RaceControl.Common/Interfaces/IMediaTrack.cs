@@ -2,7 +2,7 @@
 {
     public interface IMediaTrack
     {
-        int Id { get; }
+        string Id { get; }
 
         string Name { get; }
     }

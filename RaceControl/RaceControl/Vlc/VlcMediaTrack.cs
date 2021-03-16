@@ -1,19 +1,19 @@
-﻿using LibVLCSharp.Shared.Structures;
+﻿using LibVLCSharp;
 using RaceControl.Common.Interfaces;
 
 namespace RaceControl.Vlc
 {
     public class VlcMediaTrack : IMediaTrack
     {
-        private readonly TrackDescription _trackDescription;
+        private readonly MediaTrack _mediaTrack;
 
-        public VlcMediaTrack(TrackDescription trackDescription)
+        public VlcMediaTrack(MediaTrack mediaTrack)
         {
-            _trackDescription = trackDescription;
+            _mediaTrack = mediaTrack;
         }
 
-        public int Id => _trackDescription.Id;
+        public string Id => _mediaTrack.Id;
 
-        public string Name => _trackDescription.Name;
+        public string Name => _mediaTrack.Name;
     }
 }
