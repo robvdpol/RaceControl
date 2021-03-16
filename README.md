@@ -79,7 +79,7 @@ To open and build the solution you need:
 
 ## Acknowledgements
 * [VLC](https://www.videolan.org/vlc) for providing an excellent video player and .NET library
-* [MPV](https://mpv.io) for providing a video player that can reliably play F1TV live streams without needing workarounds
+* [MPV](https://mpv.io) for providing an excellent video player
 * [Flaticon](https://www.flaticon.com) for providing the application icon
 * [Prism Library](https://prismlibrary.com)
 * [Newtonsoft Json.NET](https://www.newtonsoft.com/json)
