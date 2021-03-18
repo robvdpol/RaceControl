@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using MoreLinq;
+using Newtonsoft.Json;
 using NLog;
 using RaceControl.Common.Constants;
 using RaceControl.Common.Enums;
@@ -84,7 +85,7 @@ namespace RaceControl.Services.F1TV
                 .SelectMany(c1 => c1.RetrieveItems.ResultObj.Containers
                     .Where(c2 => c2.Metadata.ContentType == "VIDEO" && c2.Metadata.ContentSubtype == "LIVE")
                     .Select(CreateSession))
-                    .Distinct(new SessionComparer())
+                    .DistinctBy(p => p.ContentID)
                 .ToList();
         }
 
