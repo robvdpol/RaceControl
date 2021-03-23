@@ -225,7 +225,7 @@ namespace RaceControl.Services.F1TV
             restRequest.AddQueryParameter("filter_objectSubtype", "Meeting");
             restRequest.AddQueryParameter("filter_season", year.ToString());
             restRequest.AddQueryParameter("filter_orderByFom", "Y");
-            restRequest.AddQueryParameter("filter_fetchAll", "Y");
+            restRequest.AddQueryParameter("maxResults", "100");
 
             return await restClient.GetAsync<ApiResponse>(restRequest);
         }
@@ -240,7 +240,7 @@ namespace RaceControl.Services.F1TV
             restRequest.AddQueryParameter("sortOrder", "asc");
             restRequest.AddQueryParameter("filter_year", year.ToString());
             restRequest.AddQueryParameter("filter_orderByFom", "Y");
-            restRequest.AddQueryParameter("filter_fetchAll", "Y");
+            restRequest.AddQueryParameter("maxResults", "100");
 
             return await restClient.GetAsync<ApiResponse>(restRequest);
         }
@@ -255,7 +255,7 @@ namespace RaceControl.Services.F1TV
             restRequest.AddQueryParameter("sortOrder", "asc");
             restRequest.AddQueryParameter("filter_MeetingKey", meetingKey);
             restRequest.AddQueryParameter("filter_orderByFom", "Y");
-            restRequest.AddQueryParameter("filter_fetchAll", "Y");
+            restRequest.AddQueryParameter("maxResults", "100");
 
             return await restClient.GetAsync<ApiResponse>(restRequest);
         }
@@ -290,7 +290,7 @@ namespace RaceControl.Services.F1TV
             restRequest.AddQueryParameter("sortOrder", "asc");
             restRequest.AddQueryParameter("filter_genres", genre);
             restRequest.AddQueryParameter("filter_orderByFom", "Y");
-            restRequest.AddQueryParameter("filter_fetchAll", "Y");
+            restRequest.AddQueryParameter("maxResults", "100");
 
             return await restClient.GetAsync<ApiResponse>(restRequest);
         }
