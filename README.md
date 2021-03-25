@@ -18,6 +18,11 @@ Race Control is an open source [F1TV](https://f1tv.formula1.com) desktop client 
 * Experimental synchronization of streams (replays only at the moment)
 
 ## Installation
+#### Microsoft Store
+* Go to the Microsoft Store and search for 'F1 Race Control' or use the [direct link](https://www.microsoft.com/en-us/p/f1-race-control/9mwc9pj4jfww).
+* Install and launch the app.
+
+#### Manual installation
 * Download the [latest release](https://github.com/robvdpol/RaceControl/releases/latest) and start the installer.
 * If the [.NET 5.0 Desktop Runtime (x64)](https://dotnet.microsoft.com/download/dotnet-core/5.0/runtime) needs to be installed on your system you will be notified about it.
 * Follow the steps in the setup wizard to complete the installation.
