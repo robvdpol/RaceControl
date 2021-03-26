@@ -4,6 +4,7 @@ using NLog;
 using RaceControl.Common.Constants;
 using RaceControl.Common.Enums;
 using RaceControl.Common.Interfaces;
+using RaceControl.Common.Utils;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Api;
 using RaceControl.Services.Interfaces.F1TV.Entities;
@@ -85,7 +86,8 @@ namespace RaceControl.Services.F1TV
                 .SelectMany(c1 => c1.RetrieveItems.ResultObj.Containers
                     .Where(c2 => c2.Metadata.ContentType == "VIDEO" && c2.Metadata.ContentSubtype == "LIVE")
                     .Select(CreateSession))
-                    .DistinctBy(p => p.ContentID)
+                .DistinctBy(s => s.ContentID)
+                .OrderBy(s => s.StartDate)
                 .ToList();
         }
 
@@ -121,6 +123,7 @@ namespace RaceControl.Services.F1TV
                 .Where(c => c.Metadata.ContentType == "VIDEO")
                 .Where(c => c.Metadata.ContentSubtype == "REPLAY" || c.Metadata.ContentSubtype == "LIVE")
                 .Select(CreateSession)
+                .OrderBy(s => s.StartDate)
                 .ToList();
         }
 
@@ -342,7 +345,9 @@ namespace RaceControl.Services.F1TV
                 ShortName = container.Metadata.TitleBrief,
                 LongName = container.Metadata.Title,
                 SeriesUID = container.Properties.First().Series,
-                ThumbnailUrl = GetThumbnailUrl(container.Metadata.PictureUrl)
+                ThumbnailUrl = GetThumbnailUrl(container.Metadata.PictureUrl),
+                StartDate = container.Metadata.EmfAttributes.SessionStartDate.GetDateTimeFromEpoch(),
+                EndDate = container.Metadata.EmfAttributes.SessionEndDate.GetDateTimeFromEpoch()
             };
         }
 
