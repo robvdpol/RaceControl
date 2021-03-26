@@ -11,6 +11,7 @@ using RaceControl.Events;
 using RaceControl.Extensions;
 using RaceControl.Services.Interfaces.F1TV;
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
@@ -46,6 +47,7 @@ namespace RaceControl.ViewModels
         private ICommand _toggleFullScreenCommand;
         private ICommand _moveToCornerCommand;
         private ICommand _selectAudioDeviceCommand;
+        private ICommand _selectChannelCommand;
 
         private string _subscriptionToken;
         private long _identifier;
@@ -89,8 +91,10 @@ namespace RaceControl.ViewModels
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand<long?>(ToggleFullScreenExecute);
         public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => DialogSettings.WindowState);
         public ICommand SelectAudioDeviceCommand => _selectAudioDeviceCommand ??= new DelegateCommand<IAudioDevice>(SelectAudioDeviceExecute, CanSelectAudioDeviceExecute).ObservesProperty(() => MediaPlayer.AudioDevice);
-
+        public ICommand SelectChannelCommand => _selectChannelCommand ??= new DelegateCommand<IPlayableChannel>(SelectChannelExecute, CanSelectChannelExecute).ObservesProperty(() => Channels.CurrentChannel);
+        
         public IMediaPlayer MediaPlayer { get; }
+        public IChannelCollection Channels { get; private set; }
 
         public IPlayableContent PlayableContent
         {
@@ -121,6 +125,7 @@ namespace RaceControl.ViewModels
             _subscriptionToken = parameters.GetValue<string>(ParameterNames.SubscriptionToken);
             _identifier = parameters.GetValue<long>(ParameterNames.Identifier);
             PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.Content);
+            Channels = new ChannelCollection(parameters.GetValue<ObservableCollection<IPlayableChannel>>(ParameterNames.Channels), PlayableContent as IPlayableChannel);
 
             var dialogSettings = parameters.GetValue<VideoDialogSettings>(ParameterNames.Settings);
 
@@ -363,6 +368,16 @@ namespace RaceControl.ViewModels
         private void SelectAudioDeviceExecute(IAudioDevice audioDevice)
         {
             MediaPlayer.AudioDevice = audioDevice;
+        }
+
+        private bool CanSelectChannelExecute(IPlayableChannel channel)
+        {
+            return Channels.CurrentChannel != channel;
+        }
+
+        private void SelectChannelExecute(IPlayableChannel channel)
+        {
+            Channels.CurrentChannel = channel;
         }
 
         private void LoadDialogSettings(VideoDialogSettings settings)

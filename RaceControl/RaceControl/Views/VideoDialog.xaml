@@ -45,6 +45,24 @@
         <BitmapImage x:Key="RightDownBitmapImage" UriSource="/Icons/right_down_48px.png" />
         <BitmapImage x:Key="RightUpBitmapImage" UriSource="/Icons/right_up_48px.png" />
         <BitmapImage x:Key="ShutdownBitmapImage" UriSource="/Icons/shutdown_96px.png" />
+        <Style x:Key="ChannelMenuItemContainerStyle" TargetType="MenuItem">
+            <Setter Property="IsCheckable" Value="True" />
+            <Setter Property="Header" Value="{Binding DisplayName}" />
+            <Setter Property="Command" Value="{Binding DataContext.SelectChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Menu}}" />
+            <Setter Property="CommandParameter" Value="{Binding}" />
+            <Setter Property="IsChecked" Value="False" />
+            <Style.Triggers>
+                <DataTrigger Value="True">
+                    <DataTrigger.Binding>
+                        <MultiBinding Converter="{StaticResource AreEqualConverter}">
+                            <Binding />
+                            <Binding Path="DataContext.Channels.CurrentChannel" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Menu}" />
+                        </MultiBinding>
+                    </DataTrigger.Binding>
+                    <Setter Property="IsChecked" Value="True" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
     </UserControl.Resources>
     <prism:Dialog.WindowStyle>
         <Style TargetType="Window">
@@ -155,6 +173,11 @@
                             CommandParameter="{x:Static enums:WindowLocation.BottomRightSmall}"
                             Header="Bottom Right" />
                     </MenuItem>
+                </MenuItem>
+                <MenuItem Height="22" Header="Channel">
+                    <MenuItem Header="Globals" ItemsSource="{Binding Channels.Globals}" ItemContainerStyle="{StaticResource ChannelMenuItemContainerStyle}" />
+                    <MenuItem Header="Graphs" ItemsSource="{Binding Channels.Graphs}" ItemContainerStyle="{StaticResource ChannelMenuItemContainerStyle}" />
+                    <MenuItem Header="Onboards" ItemsSource="{Binding Channels.Onboards}" ItemContainerStyle="{StaticResource ChannelMenuItemContainerStyle}" />
                 </MenuItem>
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseMove">
