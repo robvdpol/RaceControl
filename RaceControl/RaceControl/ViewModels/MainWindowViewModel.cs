@@ -837,7 +837,8 @@ namespace RaceControl.ViewModels
 
         private async Task CastContentAsync(IPlayableContent playableContent, IReceiver receiver)
         {
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, Settings.StreamType, playableContent);
+            // Chromecast doesn't support DASH, so force HLS here
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, StreamTypeKeys.BigScreenHls, playableContent);
 
             if (!ValidateStreamUrl(streamUrl))
             {
