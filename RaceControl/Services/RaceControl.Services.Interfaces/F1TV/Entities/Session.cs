@@ -14,6 +14,7 @@ namespace RaceControl.Services.Interfaces.F1TV.Entities
         public string ThumbnailUrl { get; init; }
         public DateTime? StartDate { get; init; }
         public DateTime? EndDate { get; init; }
+        public long SessionIndex { get; init; }
 
         public bool IsLive => ContentSubtype == "LIVE";
 
