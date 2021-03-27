@@ -111,7 +111,7 @@ namespace RaceControl.Services.F1TV
 
             return apiResponse.ResultObj.Containers
                 .Select(CreateEpisode)
-                .OrderBy(e => e.StartDate)
+                .OrderByDescending(e => e.SessionIndex)
                 .ToList();
         }
 
@@ -140,7 +140,7 @@ namespace RaceControl.Services.F1TV
                 .Where(c => c.Metadata.ContentType == "VIDEO")
                 .Where(c => c.Metadata.ContentSubtype != "REPLAY" && c.Metadata.ContentSubtype != "LIVE")
                 .Select(CreateEpisode)
-                .OrderBy(e => e.StartDate)
+                .OrderByDescending(e => e.SessionIndex)
                 .ToList();
         }
 
@@ -201,7 +201,7 @@ namespace RaceControl.Services.F1TV
                 .Where(c => c.Metadata.ContentType == "VIDEO")
                 .Where(c => c.Metadata.ContentSubtype != "LIVE")
                 .Select(CreateEpisode)
-                .OrderBy(e => e.StartDate)
+                .OrderByDescending(e => e.SessionIndex)
                 .ToList();
         }
 
