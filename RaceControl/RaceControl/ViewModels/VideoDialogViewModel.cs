@@ -375,9 +375,19 @@ namespace RaceControl.ViewModels
             return Channels.CurrentChannel != channel;
         }
 
-        private void SelectChannelExecute(IPlayableChannel channel)
+        private async void SelectChannelExecute(IPlayableChannel channel)
         {
+            var currentTime = MediaPlayer.Time;
+            MediaPlayer.StopPlayback();
+            
             Channels.CurrentChannel = channel;
+            PlayableContent = channel;
+            
+            await StartStreamAsync();
+            if (!PlayableContent.IsLive)
+            {
+                MediaPlayer.Time = currentTime;
+            }
         }
 
         private void LoadDialogSettings(VideoDialogSettings settings)
