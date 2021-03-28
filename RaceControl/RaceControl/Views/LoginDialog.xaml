@@ -82,7 +82,7 @@
                 HorizontalAlignment="Right"
                 VerticalAlignment="Top"
                 Command="{Binding LoginCommand}"
-                Content="Login"
+                Content="Sign in"
                 IsDefault="True" />
         </Grid>
     </Grid>

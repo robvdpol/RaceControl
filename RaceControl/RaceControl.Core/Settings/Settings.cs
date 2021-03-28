@@ -18,7 +18,7 @@ namespace RaceControl.Core.Settings
 
         private bool _disableMpvNoBorder;
         private string _additionalMpvParameters;
-        private string _streamType = StreamTypeKeys.BigScreenHls;
+        private string _streamType = StreamTypeKeys.Auto;
         private string _latestRelease;
         private ObservableCollection<string> _selectedSeries;
 
@@ -91,6 +91,11 @@ namespace RaceControl.Core.Settings
             }
 
             _logger.Info("Settings saved.");
+        }
+
+        public string GetStreamType(string autoStreamType)
+        {
+            return StreamType == StreamTypeKeys.Auto ? autoStreamType : StreamType;
         }
     }
 }

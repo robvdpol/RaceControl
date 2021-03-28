@@ -17,5 +17,7 @@ namespace RaceControl.Core.Settings
         void Load();
 
         void Save();
+
+        string GetStreamType(string autoStreamType);
     }
 }

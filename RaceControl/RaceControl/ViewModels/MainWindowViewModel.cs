@@ -70,6 +70,8 @@ namespace RaceControl.ViewModels
         private ICommand _saveVideoDialogLayoutCommand;
         private ICommand _openVideoDialogLayoutCommand;
         private ICommand _scanReceiversCommand;
+        private ICommand _receiverSelectionChangedCommand;
+        private ICommand _audioTrackSelectionChangedCommand;
         private ICommand _deleteCredentialCommand;
 
         private string _subscriptionToken;
@@ -86,13 +88,13 @@ namespace RaceControl.ViewModels
         private ObservableCollection<IPlayableChannel> _channels;
         private ObservableCollection<IPlayableContent> _episodes;
         private ObservableCollection<IReceiver> _receivers;
+        private ObservableCollection<Track> _audioTracks;
         private Season _selectedSeason;
         private Event _selectedEvent;
         private Session _selectedLiveSession;
         private Session _selectedSession;
         private string _selectedVodGenre;
         private IReceiver _selectedReceiver;
-        private bool _isScanning;
         private Timer _refreshTimer;
 
         public MainWindowViewModel(
@@ -141,7 +143,9 @@ namespace RaceControl.ViewModels
         public ICommand DownloadContentCommand => _downloadContentCommand ??= new DelegateCommand<IPlayableContent>(DownloadContentExecute, CanDownloadContentExecute);
         public ICommand SaveVideoDialogLayoutCommand => _saveVideoDialogLayoutCommand ??= new DelegateCommand(SaveVideoDialogLayoutExecute);
         public ICommand OpenVideoDialogLayoutCommand => _openVideoDialogLayoutCommand ??= new DelegateCommand<PlayerType?>(OpenVideoDialogLayoutExecute, CanOpenVideoDialogLayoutExecute).ObservesProperty(() => VideoDialogLayout.Instances.Count).ObservesProperty(() => Channels.Count);
-        public ICommand ScanReceiversCommand => _scanReceiversCommand ??= new DelegateCommand(ScanReceiversExecute, CanScanReceiversExecute).ObservesProperty(() => IsScanning);
+        public ICommand ScanReceiversCommand => _scanReceiversCommand ??= new DelegateCommand(ScanReceiversExecute);
+        public ICommand ReceiverSelectionChangedCommand => _receiverSelectionChangedCommand ??= new DelegateCommand(ReceiverSelectionChangedExecute);
+        public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<Track>(AudioTrackSelectionChangedExecute);
         public ICommand DeleteCredentialCommand => _deleteCredentialCommand ??= new DelegateCommand(DeleteCredentialExecute);
 
         public ISettings Settings { get; }
@@ -152,8 +156,9 @@ namespace RaceControl.ViewModels
 
         public IDictionary<string, string> StreamTypes { get; } = new Dictionary<string, string>
         {
-            { StreamTypeKeys.BigScreenHls, "HLS (non-adaptive)" },
-            { StreamTypeKeys.BigScreenDash, "DASH (adaptive)" }
+            { StreamTypeKeys.Auto, "Automatic" },
+            { StreamTypeKeys.BigScreenHls, "HLS" },
+            { StreamTypeKeys.BigScreenDash, "DASH" }
         };
 
         public string SubscriptionToken
@@ -210,6 +215,8 @@ namespace RaceControl.ViewModels
 
         public ObservableCollection<IReceiver> Receivers => _receivers ??= new ObservableCollection<IReceiver>();
 
+        public ObservableCollection<Track> AudioTracks => _audioTracks ??= new ObservableCollection<Track>();
+
         public Season SelectedSeason
         {
             get => _selectedSeason;
@@ -244,12 +251,6 @@ namespace RaceControl.ViewModels
         {
             get => _selectedReceiver;
             set => SetProperty(ref _selectedReceiver, value);
-        }
-
-        public bool IsScanning
-        {
-            get => _isScanning;
-            set => SetProperty(ref _isScanning, value);
         }
 
         private void LoadedExecute(RoutedEventArgs args)
@@ -392,7 +393,7 @@ namespace RaceControl.ViewModels
         private void CastContentExecute(IPlayableContent playableContent)
         {
             IsBusy = true;
-            CastContentAsync(playableContent, SelectedReceiver).Await(SetNotBusy, HandleCriticalError);
+            CastContentAsync(SelectedReceiver, playableContent).Await(SetNotBusy, HandleCriticalError);
         }
 
         private void CopyContentUrlExecute(IPlayableContent playableContent)
@@ -441,23 +442,40 @@ namespace RaceControl.ViewModels
             OpenVideoDialogLayoutAsync(playerType).Await(HandleCriticalError);
         }
 
-        private bool CanScanReceiversExecute()
-        {
-            return !IsScanning;
-        }
-
         private void ScanReceiversExecute()
         {
-            IsScanning = true;
-            FindReceivers().Await(() => { IsScanning = false; }, HandleCriticalError);
+            IsBusy = true;
+            FindReceiversAsync().Await(() =>
+            {
+                SetNotBusy();
+
+                if (Receivers.Any())
+                {
+                    SelectedReceiver = Receivers.First();
+                }
+            }, HandleCriticalError);
         }
 
-        private async Task FindReceivers()
+        private void ReceiverSelectionChangedExecute()
         {
-            Receivers.Clear();
-            var receivers = await _deviceLocator.FindReceiversAsync();
-            Receivers.AddRange(receivers);
-            SelectedReceiver = Receivers.FirstOrDefault();
+            if (SelectedReceiver == null)
+            {
+                return;
+            }
+
+            IsBusy = true;
+            FindAudioTracksAsync(SelectedReceiver).Await(SetNotBusy, HandleCriticalError);
+        }
+
+        private void AudioTrackSelectionChangedExecute(Track audioTrack)
+        {
+            if (audioTrack == null)
+            {
+                return;
+            }
+
+            IsBusy = true;
+            ChangeAudioTrackAsync(SelectedReceiver, audioTrack).Await(SetNotBusy, HandleCriticalError);
         }
 
         private void DeleteCredentialExecute()
@@ -767,7 +785,9 @@ namespace RaceControl.ViewModels
 
         private async Task WatchInVlcAsync(IPlayableContent playableContent)
         {
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, Settings.StreamType, playableContent);
+            // DASH works best for live streams, HLS for replays
+            var streamType = Settings.GetStreamType(playableContent.IsLive ? StreamTypeKeys.BigScreenDash : StreamTypeKeys.BigScreenHls);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, streamType, playableContent);
 
             if (!ValidateStreamUrl(streamUrl))
             {
@@ -780,7 +800,8 @@ namespace RaceControl.ViewModels
 
         private async Task WatchInMpvAsync(IPlayableContent playableContent, VideoDialogSettings settings = null)
         {
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, Settings.StreamType, playableContent);
+            var streamType = Settings.GetStreamType(StreamTypeKeys.BigScreenHls);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, streamType, playableContent);
 
             if (!ValidateStreamUrl(streamUrl))
             {
@@ -836,21 +857,26 @@ namespace RaceControl.ViewModels
             process.Start();
         }
 
-        private async Task CastContentAsync(IPlayableContent playableContent, IReceiver receiver)
+        private async Task CastContentAsync(IReceiver receiver, IPlayableContent playableContent)
         {
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, Settings.StreamType, playableContent);
+            var streamType = Settings.GetStreamType(StreamTypeKeys.BigScreenHls);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, streamType, playableContent);
 
             if (!ValidateStreamUrl(streamUrl))
             {
                 return;
             }
 
+            AudioTracks.Clear();
+
             try
             {
                 await _sender.ConnectAsync(receiver);
                 var mediaChannel = _sender.GetChannel<IMediaChannel>();
                 await _sender.LaunchAsync(mediaChannel);
-                await mediaChannel.LoadAsync(new MediaInformation { ContentId = streamUrl });
+                var status = await mediaChannel.LoadAsync(new MediaInformation { ContentId = streamUrl });
+                var audioTracks = status.Media.Tracks.Where(t => t.Type == TrackType.Audio);
+                AudioTracks.AddRange(audioTracks);
             }
             finally
             {
@@ -860,7 +886,8 @@ namespace RaceControl.ViewModels
 
         private async Task CopyUrlAsync(IPlayableContent playableContent)
         {
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, Settings.StreamType, playableContent);
+            var streamType = Settings.GetStreamType(StreamTypeKeys.BigScreenHls);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, streamType, playableContent);
 
             if (!ValidateStreamUrl(streamUrl))
             {
@@ -911,6 +938,51 @@ namespace RaceControl.ViewModels
                 }
 
                 await Task.Delay(delayTimeSpan);
+            }
+        }
+
+        private async Task FindReceiversAsync()
+        {
+            Receivers.Clear();
+            AudioTracks.Clear();
+            var receivers = await _deviceLocator.FindReceiversAsync();
+            Receivers.AddRange(receivers);
+        }
+
+        private async Task FindAudioTracksAsync(IReceiver receiver)
+        {
+            AudioTracks.Clear();
+
+            try
+            {
+                await _sender.ConnectAsync(receiver);
+                var mediaChannel = _sender.GetChannel<IMediaChannel>();
+                var status = await mediaChannel.GetStatusAsync();
+                var audioTracks = status.Media.Tracks.Where(t => t.Type == TrackType.Audio);
+                AudioTracks.AddRange(audioTracks);
+            }
+            catch (InvalidOperationException ex)
+            {
+                HandleNonCriticalError(ex);
+            }
+            finally
+            {
+                _sender.Disconnect();
+            }
+        }
+
+        private async Task ChangeAudioTrackAsync(IReceiver receiver, Track audioTrack)
+        {
+            try
+            {
+                await _sender.ConnectAsync(receiver);
+                var mediaChannel = _sender.GetChannel<IMediaChannel>();
+                await mediaChannel.GetStatusAsync();
+                await mediaChannel.EditTracksInfoAsync(activeTrackIds: new[] { audioTrack.TrackId });
+            }
+            finally
+            {
+                _sender.Disconnect();
             }
         }
 
