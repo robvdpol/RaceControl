@@ -781,8 +781,9 @@ namespace RaceControl.ViewModels
 
         private async Task WatchInVlcAsync(IPlayableContent playableContent)
         {
-            // Audio track switching doesn't work with HLS in VLC, so force DASH here
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, StreamTypeKeys.BigScreenDash, playableContent);
+            // DASH works best for live streams, HLS for replays
+            var streamType = playableContent.IsLive ? StreamTypeKeys.BigScreenDash : StreamTypeKeys.BigScreenHls;
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, streamType, playableContent);
 
             if (!ValidateStreamUrl(streamUrl))
             {

@@ -431,8 +431,9 @@ namespace RaceControl.ViewModels
                 }
             }
 
-            // Audio track switching doesn't work with HLS in VLC, so force DASH here
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(_subscriptionToken, StreamTypeKeys.BigScreenDash, PlayableContent);
+            // DASH works best for live streams, HLS for replays
+            var streamType = PlayableContent.IsLive ? StreamTypeKeys.BigScreenDash : StreamTypeKeys.BigScreenHls;
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(_subscriptionToken, streamType, PlayableContent);
             await MediaPlayer.StartPlaybackAsync(streamUrl);
             MediaPlayer.ToggleMute(DialogSettings.IsMuted);
             MediaPlayer.Volume = DialogSettings.Volume;
