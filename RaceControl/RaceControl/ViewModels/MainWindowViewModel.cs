@@ -156,8 +156,9 @@ namespace RaceControl.ViewModels
 
         public IDictionary<string, string> StreamTypes { get; } = new Dictionary<string, string>
         {
-            { StreamTypeKeys.BigScreenHls, "HLS (non-adaptive)" },
-            { StreamTypeKeys.BigScreenDash, "DASH (adaptive)" }
+            { StreamTypeKeys.Auto, "Automatic" },
+            { StreamTypeKeys.BigScreenHls, "HLS" },
+            { StreamTypeKeys.BigScreenDash, "DASH" }
         };
 
         public string SubscriptionToken
@@ -784,7 +785,7 @@ namespace RaceControl.ViewModels
         private async Task WatchInVlcAsync(IPlayableContent playableContent)
         {
             // DASH works best for live streams, HLS for replays
-            var streamType = playableContent.IsLive ? StreamTypeKeys.BigScreenDash : StreamTypeKeys.BigScreenHls;
+            var streamType = Settings.GetStreamType(playableContent.IsLive ? StreamTypeKeys.BigScreenDash : StreamTypeKeys.BigScreenHls);
             var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, streamType, playableContent);
 
             if (!ValidateStreamUrl(streamUrl))
@@ -798,7 +799,8 @@ namespace RaceControl.ViewModels
 
         private async Task WatchInMpvAsync(IPlayableContent playableContent, VideoDialogSettings settings = null)
         {
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, Settings.StreamType, playableContent);
+            var streamType = Settings.GetStreamType(StreamTypeKeys.BigScreenHls);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, streamType, playableContent);
 
             if (!ValidateStreamUrl(streamUrl))
             {
@@ -856,8 +858,8 @@ namespace RaceControl.ViewModels
 
         private async Task CastContentAsync(IReceiver receiver, IPlayableContent playableContent)
         {
-            // Chromecast doesn't support DASH, so force HLS here
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, StreamTypeKeys.BigScreenHls, playableContent);
+            var streamType = Settings.GetStreamType(StreamTypeKeys.BigScreenHls);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, streamType, playableContent);
 
             if (!ValidateStreamUrl(streamUrl))
             {
@@ -883,7 +885,8 @@ namespace RaceControl.ViewModels
 
         private async Task CopyUrlAsync(IPlayableContent playableContent)
         {
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, Settings.StreamType, playableContent);
+            var streamType = Settings.GetStreamType(StreamTypeKeys.BigScreenHls);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, streamType, playableContent);
 
             if (!ValidateStreamUrl(streamUrl))
             {

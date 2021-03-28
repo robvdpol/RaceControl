@@ -4,6 +4,7 @@ using RaceControl.Common.Constants;
 using RaceControl.Common.Enums;
 using RaceControl.Common.Interfaces;
 using RaceControl.Core.Mvvm;
+using RaceControl.Core.Settings;
 using RaceControl.Services.Interfaces.F1TV;
 using System.Threading.Tasks;
 
@@ -11,13 +12,15 @@ namespace RaceControl.ViewModels
 {
     public class DownloadDialogViewModel : DialogViewModelBase
     {
+        private readonly ISettings _settings;
         private readonly IApiService _apiService;
 
         private IPlayableContent _playableContent;
         private string _filename;
 
-        public DownloadDialogViewModel(ILogger logger, IApiService apiService, IMediaDownloader mediaDownloader) : base(logger)
+        public DownloadDialogViewModel(ILogger logger, ISettings settings, IApiService apiService, IMediaDownloader mediaDownloader) : base(logger)
         {
+            _settings = settings;
             _apiService = apiService;
             MediaDownloader = mediaDownloader;
         }
@@ -62,8 +65,8 @@ namespace RaceControl.ViewModels
 
         private async Task GetTokenisedUrlAndStartDownloadAsync(string subscriptionToken)
         {
-            // Downloading doesn't work with DASH, so force HLS here
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(subscriptionToken, StreamTypeKeys.BigScreenHls, PlayableContent);
+            var streamType = _settings.GetStreamType(StreamTypeKeys.BigScreenHls);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(subscriptionToken, streamType, PlayableContent);
             await MediaDownloader.StartDownloadAsync(streamUrl, Filename);
         }
     }
