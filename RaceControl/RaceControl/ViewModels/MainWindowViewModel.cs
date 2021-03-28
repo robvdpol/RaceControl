@@ -95,7 +95,6 @@ namespace RaceControl.ViewModels
         private Session _selectedSession;
         private string _selectedVodGenre;
         private IReceiver _selectedReceiver;
-        private bool _isScanning;
         private Timer _refreshTimer;
 
         public MainWindowViewModel(
@@ -144,7 +143,7 @@ namespace RaceControl.ViewModels
         public ICommand DownloadContentCommand => _downloadContentCommand ??= new DelegateCommand<IPlayableContent>(DownloadContentExecute, CanDownloadContentExecute);
         public ICommand SaveVideoDialogLayoutCommand => _saveVideoDialogLayoutCommand ??= new DelegateCommand(SaveVideoDialogLayoutExecute);
         public ICommand OpenVideoDialogLayoutCommand => _openVideoDialogLayoutCommand ??= new DelegateCommand<PlayerType?>(OpenVideoDialogLayoutExecute, CanOpenVideoDialogLayoutExecute).ObservesProperty(() => VideoDialogLayout.Instances.Count).ObservesProperty(() => Channels.Count);
-        public ICommand ScanReceiversCommand => _scanReceiversCommand ??= new DelegateCommand(ScanReceiversExecute, CanScanReceiversExecute).ObservesProperty(() => IsScanning);
+        public ICommand ScanReceiversCommand => _scanReceiversCommand ??= new DelegateCommand(ScanReceiversExecute);
         public ICommand ReceiverSelectionChangedCommand => _receiverSelectionChangedCommand ??= new DelegateCommand(ReceiverSelectionChangedExecute);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<Track>(AudioTrackSelectionChangedExecute);
         public ICommand DeleteCredentialCommand => _deleteCredentialCommand ??= new DelegateCommand(DeleteCredentialExecute);
@@ -251,12 +250,6 @@ namespace RaceControl.ViewModels
         {
             get => _selectedReceiver;
             set => SetProperty(ref _selectedReceiver, value);
-        }
-
-        public bool IsScanning
-        {
-            get => _isScanning;
-            set => SetProperty(ref _isScanning, value);
         }
 
         private void LoadedExecute(RoutedEventArgs args)
@@ -448,20 +441,29 @@ namespace RaceControl.ViewModels
             OpenVideoDialogLayoutAsync(playerType).Await(HandleCriticalError);
         }
 
-        private bool CanScanReceiversExecute()
-        {
-            return !IsScanning;
-        }
-
         private void ScanReceiversExecute()
         {
-            IsScanning = true;
-            FindReceiversAsync().Await(() => { IsScanning = false; }, HandleCriticalError);
+            IsBusy = true;
+            FindReceiversAsync().Await(() =>
+            {
+                SetNotBusy();
+
+                if (Receivers.Any())
+                {
+                    SelectedReceiver = Receivers.First();
+                }
+            }, HandleCriticalError);
         }
 
         private void ReceiverSelectionChangedExecute()
         {
-            AudioTracks.Clear();
+            if (SelectedReceiver == null)
+            {
+                return;
+            }
+
+            IsBusy = true;
+            FindAudioTracksAsync(SelectedReceiver).Await(SetNotBusy, HandleCriticalError);
         }
 
         private void AudioTrackSelectionChangedExecute(Track audioTrack)
@@ -941,7 +943,28 @@ namespace RaceControl.ViewModels
             AudioTracks.Clear();
             var receivers = await _deviceLocator.FindReceiversAsync();
             Receivers.AddRange(receivers);
-            SelectedReceiver = Receivers.FirstOrDefault();
+        }
+
+        private async Task FindAudioTracksAsync(IReceiver receiver)
+        {
+            AudioTracks.Clear();
+
+            try
+            {
+                await _sender.ConnectAsync(receiver);
+                var mediaChannel = _sender.GetChannel<IMediaChannel>();
+                var status = await mediaChannel.GetStatusAsync();
+                var audioTracks = status.Media.Tracks.Where(t => t.Type == TrackType.Audio);
+                AudioTracks.AddRange(audioTracks);
+            }
+            catch (InvalidOperationException ex)
+            {
+                HandleNonCriticalError(ex);
+            }
+            finally
+            {
+                _sender.Disconnect();
+            }
         }
 
         private async Task ChangeAudioTrackAsync(IReceiver receiver, Track audioTrack)
