@@ -266,7 +266,7 @@ namespace RaceControl.ViewModels
 
         private bool CanSyncSessionExecute()
         {
-            return CanClose && !PlayableContent.IsLive;
+            return CanClose;
         }
 
         private void SyncSessionExecute()
@@ -278,7 +278,7 @@ namespace RaceControl.ViewModels
 
         private void OnSyncStreams(SyncStreamsEventPayload payload)
         {
-            if (CanClose && PlayableContent.SyncUID == payload.SyncUID && !PlayableContent.IsLive)
+            if (CanClose && PlayableContent.SyncUID == payload.SyncUID)
             {
                 MediaPlayer.Time = payload.Time;
             }
