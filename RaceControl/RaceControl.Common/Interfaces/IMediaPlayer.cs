@@ -18,9 +18,13 @@ namespace RaceControl.Common.Interfaces
 
         ObservableCollection<IAudioDevice> AudioDevices { get; }
 
+        ObservableCollection<IMediaTrack> VideoTracks { get; }
+
         ObservableCollection<IMediaTrack> AudioTracks { get; }
 
         IAudioDevice AudioDevice { get; set; }
+
+        IMediaTrack VideoTrack { get; set; }
 
         IMediaTrack AudioTrack { get; set; }
 

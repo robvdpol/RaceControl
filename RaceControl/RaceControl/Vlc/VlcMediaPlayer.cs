@@ -19,8 +19,10 @@ namespace RaceControl.Vlc
         private bool _isPaused;
         private bool _isMuted;
         private ObservableCollection<IAudioDevice> _audioDevices;
+        private ObservableCollection<IMediaTrack> _videoTracks;
         private ObservableCollection<IMediaTrack> _audioTracks;
         private IAudioDevice _audioDevice;
+        private IMediaTrack _videoTrack;
         private IMediaTrack _audioTrack;
         private bool _disposed;
 
@@ -75,6 +77,8 @@ namespace RaceControl.Vlc
 
         public ObservableCollection<IAudioDevice> AudioDevices => _audioDevices ??= new ObservableCollection<IAudioDevice>();
 
+        public ObservableCollection<IMediaTrack> VideoTracks => _videoTracks ??= new ObservableCollection<IMediaTrack>();
+
         public ObservableCollection<IMediaTrack> AudioTracks => _audioTracks ??= new ObservableCollection<IMediaTrack>();
 
         public IAudioDevice AudioDevice
@@ -85,6 +89,18 @@ namespace RaceControl.Vlc
                 if (value != null)
                 {
                     MediaPlayer.SetOutputDevice(value.Identifier);
+                }
+            }
+        }
+
+        public IMediaTrack VideoTrack
+        {
+            get => _videoTrack;
+            set
+            {
+                if (value != null)
+                {
+                    MediaPlayer.SetVideoTrack(value.Id);
                 }
             }
         }
@@ -112,6 +128,7 @@ namespace RaceControl.Vlc
         public void StopPlayback()
         {
             MediaPlayer.Stop();
+            VideoTracks.Clear();
             AudioTracks.Clear();
         }
 
@@ -191,12 +208,21 @@ namespace RaceControl.Vlc
 
             switch (e.Type)
             {
-                case TrackType.Audio:
-                    var trackDescription = MediaPlayer.AudioTrackDescription.First(td => td.Id == e.Id);
+                case TrackType.Video:
+                    var videoTrack = MediaPlayer.VideoTrackDescription.First(track => track.Id == e.Id);
 
                     Application.Current.Dispatcher.Invoke(() =>
                     {
-                        AudioTracks.Add(new VlcMediaTrack(trackDescription));
+                        VideoTracks.Add(new VlcMediaTrack(videoTrack));
+                    });
+                    break;
+
+                case TrackType.Audio:
+                    var audioTrack = MediaPlayer.AudioTrackDescription.First(track => track.Id == e.Id);
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        AudioTracks.Add(new VlcMediaTrack(audioTrack));
                     });
                     break;
             }
@@ -211,8 +237,21 @@ namespace RaceControl.Vlc
 
             switch (e.Type)
             {
+                case TrackType.Video:
+                    var videoTrack = VideoTracks.FirstOrDefault(track => track.Id == e.Id);
+
+                    if (videoTrack != null)
+                    {
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            VideoTracks.Remove(videoTrack);
+                        });
+                    }
+
+                    break;
+
                 case TrackType.Audio:
-                    var audioTrack = AudioTracks.FirstOrDefault(at => at.Id == e.Id);
+                    var audioTrack = AudioTracks.FirstOrDefault(track => track.Id == e.Id);
 
                     if (audioTrack != null)
                     {
@@ -235,8 +274,18 @@ namespace RaceControl.Vlc
 
             switch (e.Type)
             {
+                case TrackType.Video:
+                    var videoTrack = VideoTracks.FirstOrDefault(track => track.Id == e.Id);
+
+                    if (videoTrack != null)
+                    {
+                        SetProperty(ref _videoTrack, videoTrack, nameof(VideoTrack));
+                    }
+
+                    break;
+
                 case TrackType.Audio:
-                    var audioTrack = AudioTracks.FirstOrDefault(at => at.Id == e.Id);
+                    var audioTrack = AudioTracks.FirstOrDefault(track => track.Id == e.Id);
 
                     if (audioTrack != null)
                     {
