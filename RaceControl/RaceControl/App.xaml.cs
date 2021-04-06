@@ -127,7 +127,7 @@ namespace RaceControl
 
         private static LibVLC CreateLibVLC()
         {
-            var libVLC = new LibVLC();
+            var libVLC = new LibVLC("--no-ts-trust-pcr");
             var logger = LogManager.GetLogger(libVLC.GetType().FullName);
 
             libVLC.Log += (_, args) =>

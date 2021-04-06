@@ -793,7 +793,7 @@ namespace RaceControl.ViewModels
                 return;
             }
 
-            using var process = ProcessUtils.CreateProcess(VlcExeLocation, $"\"{streamUrl}\" --meta-title=\"{playableContent.Title}\"");
+            using var process = ProcessUtils.CreateProcess(VlcExeLocation, $"\"{streamUrl}\" --no-ts-trust-pcr --meta-title=\"{playableContent.Title}\"");
             process.Start();
         }
 
