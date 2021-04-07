@@ -192,12 +192,13 @@ namespace RaceControl.Vlc
             switch (e.Type)
             {
                 case TrackType.Audio:
-                    var trackDescription = MediaPlayer.AudioTrackDescription.First(td => td.Id == e.Id);
+                    var audioTrack = MediaPlayer.AudioTrackDescription.First(track => track.Id == e.Id);
 
                     Application.Current.Dispatcher.Invoke(() =>
                     {
-                        AudioTracks.Add(new VlcMediaTrack(trackDescription));
+                        AudioTracks.Add(new VlcMediaTrack(audioTrack));
                     });
+
                     break;
             }
         }
@@ -212,7 +213,7 @@ namespace RaceControl.Vlc
             switch (e.Type)
             {
                 case TrackType.Audio:
-                    var audioTrack = AudioTracks.FirstOrDefault(at => at.Id == e.Id);
+                    var audioTrack = AudioTracks.FirstOrDefault(track => track.Id == e.Id);
 
                     if (audioTrack != null)
                     {
@@ -236,7 +237,7 @@ namespace RaceControl.Vlc
             switch (e.Type)
             {
                 case TrackType.Audio:
-                    var audioTrack = AudioTracks.FirstOrDefault(at => at.Id == e.Id);
+                    var audioTrack = AudioTracks.FirstOrDefault(track => track.Id == e.Id);
 
                     if (audioTrack != null)
                     {
