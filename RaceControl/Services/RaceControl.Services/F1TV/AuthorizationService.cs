@@ -31,7 +31,17 @@ namespace RaceControl.Services.F1TV
             var restRequest = new RestRequest(Constants.AuthenticateUrl).AddJsonBody(authRequest).AddHeader("apiKey", Constants.ApiKey);
             var restResponse = await restClient.ExecutePostAsync<AuthResponse>(restRequest);
 
-            return restResponse.IsSuccessful ? restResponse.Data : throw new Exception(restResponse.StatusDescription);
+            if (restResponse.IsSuccessful)
+            {
+                return restResponse.Data;
+            }
+
+            if (restResponse.ErrorException != null)
+            {
+                throw restResponse.ErrorException;
+            }
+
+            throw new Exception($"{(int)restResponse.StatusCode} - {restResponse.StatusDescription}");
         }
     }
 }
