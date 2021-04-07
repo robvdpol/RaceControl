@@ -415,7 +415,7 @@
                                         Grid.Column="1"
                                         DisplayMemberPath="Value"
                                         ItemsSource="{Binding StreamTypes}"
-                                        SelectedValue="{Binding Settings.StreamType}"
+                                        SelectedValue="{Binding Settings.PreferredStreamType}"
                                         SelectedValuePath="Key" />
                                 </Grid>
                                 <CheckBox

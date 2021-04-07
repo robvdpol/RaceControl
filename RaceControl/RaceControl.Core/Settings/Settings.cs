@@ -18,7 +18,7 @@ namespace RaceControl.Core.Settings
 
         private bool _disableMpvNoBorder;
         private string _additionalMpvParameters;
-        private string _streamType = StreamTypeKeys.Auto;
+        private string _preferredStreamType = StreamTypeKeys.Auto;
         private string _latestRelease;
         private ObservableCollection<string> _selectedSeries;
 
@@ -40,10 +40,10 @@ namespace RaceControl.Core.Settings
             set => SetProperty(ref _additionalMpvParameters, value);
         }
 
-        public string StreamType
+        public string PreferredStreamType
         {
-            get => _streamType;
-            set => SetProperty(ref _streamType, value);
+            get => _preferredStreamType;
+            set => SetProperty(ref _preferredStreamType, value);
         }
 
         public string LatestRelease
@@ -95,7 +95,7 @@ namespace RaceControl.Core.Settings
 
         public string GetStreamType(string autoStreamType)
         {
-            return StreamType == StreamTypeKeys.Auto ? autoStreamType : StreamType;
+            return PreferredStreamType == StreamTypeKeys.Auto ? autoStreamType : PreferredStreamType;
         }
     }
 }
