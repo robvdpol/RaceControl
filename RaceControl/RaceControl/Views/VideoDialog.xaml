@@ -283,27 +283,8 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <Grid Grid.Row="0" Grid.Column="0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <CheckBox
-                                Grid.Column="0"
-                                Margin="1,0"
-                                VerticalAlignment="Center"
-                                Content="Resizable window"
-                                IsChecked="{Binding DialogSettings.ResizeMode, Converter={StaticResource ResizeModeToBooleanConverter}}"
-                                IsEnabled="{Binding DialogSettings.WindowState, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static WindowState.Normal}}" />
-                            <CheckBox
-                                Grid.Column="1"
-                                Margin="4,0"
-                                VerticalAlignment="Center"
-                                Content="Always on top"
-                                IsChecked="{Binding DialogSettings.Topmost}" />
-                        </Grid>
                         <StackPanel
-                            Grid.Row="1"
+                            Grid.Row="0"
                             Grid.Column="0"
                             Orientation="Horizontal">
                             <Button Command="{Binding TogglePauseCommand}" ToolTip="Toggle pause">
@@ -391,6 +372,23 @@
                                 </Button.Content>
                             </Button>
                         </StackPanel>
+                        <Grid Grid.Row="1" Grid.Column="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Grid.Column="0"
+                                Margin="5,2"
+                                VerticalAlignment="Center"
+                                Text="Audio track:" />
+                            <ComboBox
+                                Grid.Column="1"
+                                Margin="2"
+                                DisplayMemberPath="Name"
+                                ItemsSource="{Binding MediaPlayer.AudioTracks}"
+                                SelectedItem="{Binding MediaPlayer.AudioTrack}" />
+                        </Grid>
                         <Grid
                             Grid.Row="0"
                             Grid.RowSpan="2"
@@ -489,39 +487,22 @@
                         </Grid>
                         <Grid Grid.Row="0" Grid.Column="2">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock
+                            <CheckBox
                                 Grid.Column="0"
-                                Margin="5,2"
+                                Margin="1,0"
                                 VerticalAlignment="Center"
-                                Text="Video:" />
-                            <ComboBox
+                                Content="Resizable window"
+                                IsChecked="{Binding DialogSettings.ResizeMode, Converter={StaticResource ResizeModeToBooleanConverter}}"
+                                IsEnabled="{Binding DialogSettings.WindowState, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static WindowState.Normal}}" />
+                            <CheckBox
                                 Grid.Column="1"
-                                Width="210"
-                                Margin="2"
-                                DisplayMemberPath="Name"
-                                ItemsSource="{Binding MediaPlayer.VideoTracks}"
-                                SelectedItem="{Binding MediaPlayer.VideoTrack}" />
-                        </Grid>
-                        <Grid Grid.Row="1" Grid.Column="2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock
-                                Grid.Column="0"
-                                Margin="5,2"
+                                Margin="4,0"
                                 VerticalAlignment="Center"
-                                Text="Audio:" />
-                            <ComboBox
-                                Grid.Column="1"
-                                Width="210"
-                                Margin="2"
-                                DisplayMemberPath="Name"
-                                ItemsSource="{Binding MediaPlayer.AudioTracks}"
-                                SelectedItem="{Binding MediaPlayer.AudioTrack}" />
+                                Content="Always on top"
+                                IsChecked="{Binding DialogSettings.Topmost}" />
                         </Grid>
                     </Grid>
                 </Grid>
