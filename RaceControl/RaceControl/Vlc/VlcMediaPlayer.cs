@@ -1,5 +1,6 @@
 ﻿using LibVLCSharp.Shared;
 using Prism.Mvvm;
+using RaceControl.Common.Enums;
 using RaceControl.Common.Interfaces;
 using System;
 using System.Collections.ObjectModel;
@@ -101,9 +102,9 @@ namespace RaceControl.Vlc
             }
         }
 
-        public async Task StartPlaybackAsync(string streamUrl)
+        public async Task StartPlaybackAsync(string streamUrl, VideoQuality videoQuality)
         {
-            using var media = new Media(_libVLC, streamUrl, FromType.FromLocation);
+            using var media = CreateMedia(streamUrl, videoQuality);
             media.DurationChanged += (_, e) => Duration = e.Duration;
             await media.Parse(MediaParseOptions.ParseNetwork | MediaParseOptions.FetchNetwork);
             MediaPlayer.Play(media);
@@ -255,6 +256,24 @@ namespace RaceControl.Vlc
             if (audioDevice != null)
             {
                 SetProperty(ref _audioDevice, audioDevice, nameof(AudioDevice));
+            }
+        }
+
+        private Media CreateMedia(string streamUrl, VideoQuality videoQuality)
+        {
+            switch (videoQuality)
+            {
+                case VideoQuality.Lowest:
+                    return new Media(_libVLC, streamUrl, FromType.FromLocation, ":adaptive-maxwidth=640");
+
+                case VideoQuality.Low:
+                    return new Media(_libVLC, streamUrl, FromType.FromLocation, ":adaptive-maxwidth=960");
+
+                case VideoQuality.Medium:
+                    return new Media(_libVLC, streamUrl, FromType.FromLocation, ":adaptive-maxwidth=1280");
+
+                default:
+                    return new Media(_libVLC, streamUrl, FromType.FromLocation);
             }
         }
     }
