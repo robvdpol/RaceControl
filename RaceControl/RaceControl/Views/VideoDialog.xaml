@@ -12,6 +12,7 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <core:AreEqualConverter x:Key="AreEqualConverter" />
+        <core:LogicalOrConverter x:Key="LogicalOrConverter" />
         <core:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <core:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
         <core:ResizeModeToBooleanConverter x:Key="ResizeModeToBooleanConverter" />
@@ -519,6 +520,12 @@
                                         <i:InvokeCommandAction Command="{Binding VideoQualitySelectionChangedCommand}" />
                                     </i:EventTrigger>
                                 </i:Interaction.Triggers>
+                                <ComboBox.IsEnabled>
+                                    <MultiBinding Converter="{StaticResource LogicalOrConverter}">
+                                        <Binding Path="MediaPlayer.IsPlaying" />
+                                        <Binding Path="MediaPlayer.IsPaused" />
+                                    </MultiBinding>
+                                </ComboBox.IsEnabled>
                             </ComboBox>
                             <TextBlock
                                 Grid.Row="1"

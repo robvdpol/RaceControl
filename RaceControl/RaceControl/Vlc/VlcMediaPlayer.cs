@@ -17,6 +17,7 @@ namespace RaceControl.Vlc
         private long _time;
         private long _duration;
         private int _volume;
+        private bool _isPlaying;
         private bool _isPaused;
         private bool _isMuted;
         private ObservableCollection<IAudioDevice> _audioDevices;
@@ -31,6 +32,7 @@ namespace RaceControl.Vlc
             MediaPlayer = mediaPlayer;
             MediaPlayer.Playing += MediaPlayer_Playing;
             MediaPlayer.Paused += MediaPlayer_Paused;
+            MediaPlayer.Stopped += MediaPlayer_Stopped;
             MediaPlayer.Muted += MediaPlayer_Muted;
             MediaPlayer.Unmuted += MediaPlayer_Unmuted;
             MediaPlayer.TimeChanged += MediaPlayer_TimeChanged;
@@ -60,6 +62,12 @@ namespace RaceControl.Vlc
         {
             get => _volume;
             set => MediaPlayer.Volume = value;
+        }
+
+        public bool IsPlaying
+        {
+            get => _isPlaying;
+            private set => SetProperty(ref _isPlaying, value);
         }
 
         public bool IsPaused
@@ -155,12 +163,20 @@ namespace RaceControl.Vlc
 
         private void MediaPlayer_Playing(object sender, EventArgs e)
         {
+            IsPlaying = true;
             IsPaused = false;
         }
 
         private void MediaPlayer_Paused(object sender, EventArgs e)
         {
+            IsPlaying = false;
             IsPaused = true;
+        }
+
+        private void MediaPlayer_Stopped(object? sender, EventArgs e)
+        {
+            IsPlaying = false;
+            IsPaused = false;
         }
 
         private void MediaPlayer_Unmuted(object sender, EventArgs e)
@@ -180,7 +196,9 @@ namespace RaceControl.Vlc
 
         private void MediaPlayer_VolumeChanged(object sender, MediaPlayerVolumeChangedEventArgs e)
         {
-            SetProperty(ref _volume, Convert.ToInt32(e.Volume * 100), nameof(Volume));
+            var volume = Math.Max(Convert.ToInt32(e.Volume * 100), 0);
+
+            SetProperty(ref _volume, volume, nameof(Volume));
         }
 
         private void MediaPlayer_ESAdded(object sender, MediaPlayerESAddedEventArgs e)

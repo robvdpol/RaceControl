@@ -13,6 +13,8 @@ namespace RaceControl.Common.Interfaces
 
         int Volume { get; set; }
 
+        bool IsPlaying { get; }
+
         bool IsPaused { get; }
 
         bool IsMuted { get; }
