@@ -173,7 +173,7 @@ namespace RaceControl.Vlc
             IsPaused = true;
         }
 
-        private void MediaPlayer_Stopped(object? sender, EventArgs e)
+        private void MediaPlayer_Stopped(object sender, EventArgs e)
         {
             IsPlaying = false;
             IsPaused = false;

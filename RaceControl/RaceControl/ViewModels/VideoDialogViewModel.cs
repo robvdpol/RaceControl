@@ -380,7 +380,7 @@ namespace RaceControl.ViewModels
         private void VideoQualitySelectionChangedExecute()
         {
             var time = MediaPlayer.Time;
-            StopPlayback();
+            MediaPlayer.StopPlayback();
             StartPlaybackAsync().Await(() =>
             {
                 if (!PlayableContent.IsLive)
@@ -471,11 +471,6 @@ namespace RaceControl.ViewModels
             var streamType = _settings.GetStreamType(PlayableContent.IsLive ? StreamTypeKeys.BigScreenDash : StreamTypeKeys.BigScreenHls);
             var streamUrl = await _apiService.GetTokenisedUrlAsync(_subscriptionToken, streamType, PlayableContent);
             await MediaPlayer.StartPlaybackAsync(streamUrl, DialogSettings.VideoQuality);
-        }
-
-        private void StopPlayback()
-        {
-            MediaPlayer.StopPlayback();
         }
 
         private void SubscribeEvents()
