@@ -848,6 +848,21 @@ namespace RaceControl.ViewModels
                     arguments.Add("--ontop");
                 }
 
+                switch (settings.VideoQuality)
+                {
+                    case VideoQuality.Lowest:
+                        arguments.Add("--hls-bitrate=2500000");
+                        break;
+
+                    case VideoQuality.Low:
+                        arguments.Add("--hls-bitrate=4000000");
+                        break;
+
+                    case VideoQuality.Medium:
+                        arguments.Add("--hls-bitrate=7000000");
+                        break;
+                }
+
                 arguments.Add($"--volume={settings.Volume}");
                 arguments.Add($"--mute={settings.IsMuted.GetYesNoString()}");
             }
