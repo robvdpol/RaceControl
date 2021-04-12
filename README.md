@@ -62,7 +62,7 @@ The main window supports the following keyboard shortcuts:
 You need an F1TV account to watch F1TV streams. If you want to watch race replays, an F1TV Access subscription is required. If you want to watch live sessions, an F1TV Pro subscription is required. You can create an account and subscribe at http://f1tv.formula1.com.
 
 #### What happens with my credentials when I login?
-Your F1TV login credentials are stored locally in the Windows Credential Manager, so you don't have to login every time you start the application. If you wish to switch to a different F1TV account, press the button 'Delete stored credentials' under the 'Options' section. Your stored credentials will be removed from your system and you will be asked to login again.
+Your F1TV login credentials are stored locally in the Windows Credential Manager, so you don't have to login every time you start the application. If you wish to switch to a different F1TV account, press the button 'Log out' under the 'Options' section. Your stored credentials will be removed from your system and you will be asked to login again.
 
 #### How can I move an internal player window?
 You can move an internal player window by clicking and dragging on the actual video (not the menu bar!).
