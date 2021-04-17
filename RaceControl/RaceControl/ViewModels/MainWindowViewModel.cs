@@ -971,9 +971,13 @@ namespace RaceControl.ViewModels
             {
                 await _sender.ConnectAsync(receiver);
                 var mediaChannel = _sender.GetChannel<IMediaChannel>();
-                var status = await mediaChannel.GetStatusAsync();
-                var audioTracks = status.Media.Tracks.Where(t => t.Type == TrackType.Audio);
-                AudioTracks.AddRange(audioTracks);
+
+                if (mediaChannel != null)
+                {
+                    var status = await mediaChannel.GetStatusAsync();
+                    var audioTracks = status.Media.Tracks.Where(t => t.Type == TrackType.Audio);
+                    AudioTracks.AddRange(audioTracks);
+                }
             }
             catch (InvalidOperationException ex)
             {
