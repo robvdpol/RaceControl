@@ -341,16 +341,18 @@ namespace RaceControl.Services.F1TV
 
         private static Session CreateSession(Container container)
         {
+            var seriesUID = container.Properties.First().Series;
+
             return new()
             {
                 UID = container.Id,
                 ContentID = container.Metadata.ContentId,
                 ContentType = container.Metadata.ContentType,
                 ContentSubtype = container.Metadata.ContentSubtype,
-                ShortName = container.Metadata.TitleBrief,
+                ShortName = GetSessionShortName(container.Metadata.TitleBrief, seriesUID),
                 LongName = container.Metadata.Title,
-                SeriesUID = container.Properties.First().Series,
-                ThumbnailUrl = GetThumbnailUrl(container.Metadata.PictureUrl),
+                SeriesUID = seriesUID,
+                ThumbnailUrl = GetThumbnailUrl(container.Metadata.PictureUrl)
                 StartDate = container.Metadata.EmfAttributes.SessionStartDate.GetDateTimeFromEpoch(),
                 EndDate = container.Metadata.EmfAttributes.SessionEndDate.GetDateTimeFromEpoch(),
                 SessionIndex = container.Metadata.EmfAttributes.SessionIndex
@@ -374,6 +376,16 @@ namespace RaceControl.Services.F1TV
                 EndDate = container.Metadata.EmfAttributes.SessionEndDate.GetDateTimeFromEpoch(),
                 SessionIndex = container.Metadata.EmfAttributes.SessionIndex
             };
+        }
+
+        private static string GetSessionShortName(string titleBrief, string seriesUID)
+        {
+            if (seriesUID == SeriesIds.Formula1 || !SeriesNames.ShortNames.TryGetValue(seriesUID, out var shortNames) || shortNames.Any(shortName => titleBrief.Contains(shortName, StringComparison.OrdinalIgnoreCase)))
+            {
+                return titleBrief;
+            }
+
+            return $"{shortNames.First()} {titleBrief}";
         }
 
         private static string GetPlaybackUrl(long contentId)
