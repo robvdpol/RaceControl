@@ -17,6 +17,7 @@ using RaceControl.Core.Mvvm;
 using RaceControl.Core.Settings;
 using RaceControl.Events;
 using RaceControl.Extensions;
+using RaceControl.GoogleCast;
 using RaceControl.Services.Interfaces.Credential;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Entities;
@@ -28,6 +29,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -47,7 +49,7 @@ namespace RaceControl.ViewModels
         private readonly IGithubService _githubService;
         private readonly ICredentialService _credentialService;
         private readonly INumberGenerator _numberGenerator;
-        private readonly IDeviceLocator _deviceLocator;
+        private readonly ICustomDeviceLocator _deviceLocator;
         private readonly ISender _sender;
         private readonly object _refreshTimerLock = new();
 
@@ -95,6 +97,7 @@ namespace RaceControl.ViewModels
         private Session _selectedSession;
         private string _selectedVodGenre;
         private IReceiver _selectedReceiver;
+        private NetworkInterface _selectedNetworkInterface;
         private Timer _refreshTimer;
 
         public MainWindowViewModel(
@@ -105,7 +108,7 @@ namespace RaceControl.ViewModels
             IGithubService githubService,
             ICredentialService credentialService,
             INumberGenerator numberGenerator,
-            IDeviceLocator deviceLocator,
+            ICustomDeviceLocator deviceLocator,
             ISender sender,
             ISettings settings,
             IVideoDialogLayout videoDialogLayout)
@@ -153,6 +156,8 @@ namespace RaceControl.ViewModels
         public IVideoDialogLayout VideoDialogLayout { get; }
 
         public ICollectionView EpisodesView { get; }
+
+        public ICollection<NetworkInterface> NetworkInterfaces { get; } = NetworkInterface.GetAllNetworkInterfaces().ToList();
 
         public IDictionary<string, string> StreamTypes { get; } = new Dictionary<string, string>
         {
@@ -253,6 +258,12 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _selectedReceiver, value);
         }
 
+        public NetworkInterface SelectedNetworkInterface
+        {
+            get => _selectedNetworkInterface;
+            set => SetProperty(ref _selectedNetworkInterface, value);
+        }
+
         private void LoadedExecute(RoutedEventArgs args)
         {
             IsBusy = true;
@@ -267,6 +278,7 @@ namespace RaceControl.ViewModels
                 {
                     SetNotBusy();
                     SelectedSeason = Seasons.FirstOrDefault();
+                    SelectedNetworkInterface = NetworkInterfaces.FirstOrDefault(n => n.OperationalStatus == OperationalStatus.Up && n.NetworkInterfaceType != NetworkInterfaceType.Loopback);
                 },
                 HandleCriticalError);
                 RefreshLiveSessionsAsync().Await(CreateRefreshTimer, HandleNonCriticalError);
@@ -958,7 +970,9 @@ namespace RaceControl.ViewModels
         {
             Receivers.Clear();
             AudioTracks.Clear();
-            var receivers = await _deviceLocator.FindReceiversAsync();
+            var receivers = SelectedNetworkInterface != null ?
+                await _deviceLocator.FindReceiversAsync(SelectedNetworkInterface) :
+                await _deviceLocator.FindReceiversAsync();
             Receivers.AddRange(receivers);
         }
 
