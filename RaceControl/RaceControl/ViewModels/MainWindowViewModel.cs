@@ -988,8 +988,12 @@ namespace RaceControl.ViewModels
                 if (mediaChannel != null)
                 {
                     var status = await mediaChannel.GetStatusAsync();
-                    var audioTracks = status.Media.Tracks.Where(t => t.Type == TrackType.Audio);
-                    AudioTracks.AddRange(audioTracks);
+
+                    if (status?.Media?.Tracks != null)
+                    {
+                        var audioTracks = status.Media.Tracks.Where(t => t.Type == TrackType.Audio);
+                        AudioTracks.AddRange(audioTracks);
+                    }
                 }
             }
             catch (InvalidOperationException ex)
