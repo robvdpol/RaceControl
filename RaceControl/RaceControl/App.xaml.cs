@@ -14,6 +14,7 @@ using RaceControl.Common.Utils;
 using RaceControl.Core.Helpers;
 using RaceControl.Core.Settings;
 using RaceControl.Extensions;
+using RaceControl.GoogleCast;
 using RaceControl.Services.Credential;
 using RaceControl.Services.F1TV;
 using RaceControl.Services.Github;
@@ -83,7 +84,7 @@ namespace RaceControl
                 .Register<IGithubService, GithubService>()
                 .Register<ICredentialService, CredentialService>()
                 .Register<INumberGenerator, NumberGenerator>()
-                .Register<IDeviceLocator, DeviceLocator>()
+                .Register<ICustomDeviceLocator, CustomDeviceLocator>()
                 .Register<ISender>(() => new Sender())
                 .Register<IMediaPlayer, VlcMediaPlayer>()
                 .Register<IMediaDownloader, VlcMediaDownloader>();
@@ -127,7 +128,7 @@ namespace RaceControl
 
         private static LibVLC CreateLibVLC()
         {
-            var libVLC = new LibVLC();
+            var libVLC = new LibVLC("--no-ts-trust-pcr", "--adaptive-livedelay=5000", "--adaptive-maxbuffer=15000");
             var logger = LogManager.GetLogger(libVLC.GetType().FullName);
 
             libVLC.Log += (_, args) =>

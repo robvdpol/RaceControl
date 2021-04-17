@@ -2,6 +2,7 @@
 using Prism.Commands;
 using Prism.Events;
 using Prism.Services.Dialogs;
+using RaceControl.Common.Constants;
 using RaceControl.Common.Enums;
 using RaceControl.Common.Interfaces;
 using RaceControl.Core.Helpers;
@@ -11,6 +12,7 @@ using RaceControl.Events;
 using RaceControl.Extensions;
 using RaceControl.Services.Interfaces.F1TV;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
@@ -46,6 +48,7 @@ namespace RaceControl.ViewModels
         private ICommand _toggleFullScreenCommand;
         private ICommand _moveToCornerCommand;
         private ICommand _selectAudioDeviceCommand;
+        private ICommand _videoQualitySelectionChangedCommand;
 
         private string _subscriptionToken;
         private long _identifier;
@@ -89,8 +92,17 @@ namespace RaceControl.ViewModels
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand<long?>(ToggleFullScreenExecute);
         public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => DialogSettings.WindowState);
         public ICommand SelectAudioDeviceCommand => _selectAudioDeviceCommand ??= new DelegateCommand<IAudioDevice>(SelectAudioDeviceExecute, CanSelectAudioDeviceExecute).ObservesProperty(() => MediaPlayer.AudioDevice);
+        public ICommand VideoQualitySelectionChangedCommand => _videoQualitySelectionChangedCommand ??= new DelegateCommand(VideoQualitySelectionChangedExecute);
 
         public IMediaPlayer MediaPlayer { get; }
+
+        public IDictionary<VideoQuality, string> VideoQualities { get; } = new Dictionary<VideoQuality, string>
+        {
+            { VideoQuality.High, "High" },
+            { VideoQuality.Medium, "Medium" },
+            { VideoQuality.Low, "Low" },
+            { VideoQuality.Lowest, "Potato" }
+        };
 
         public IPlayableContent PlayableContent
         {
@@ -134,7 +146,7 @@ namespace RaceControl.ViewModels
                 StartupLocation = WindowStartupLocation.CenterScreen;
             }
 
-            InitializeAsync().Await(InitializeCompleted, InitializeError);
+            InitializeAsync().Await(InitializeCompleted, InitializeError, true);
         }
 
         public override void OnDialogClosed()
@@ -265,7 +277,7 @@ namespace RaceControl.ViewModels
 
         private bool CanSyncSessionExecute()
         {
-            return CanClose && !PlayableContent.IsLive;
+            return CanClose;
         }
 
         private void SyncSessionExecute()
@@ -277,7 +289,7 @@ namespace RaceControl.ViewModels
 
         private void OnSyncStreams(SyncStreamsEventPayload payload)
         {
-            if (CanClose && PlayableContent.SyncUID == payload.SyncUID && !PlayableContent.IsLive)
+            if (CanClose && PlayableContent.SyncUID == payload.SyncUID)
             {
                 MediaPlayer.Time = payload.Time;
             }
@@ -365,6 +377,19 @@ namespace RaceControl.ViewModels
             MediaPlayer.AudioDevice = audioDevice;
         }
 
+        private void VideoQualitySelectionChangedExecute()
+        {
+            var time = MediaPlayer.Time;
+            MediaPlayer.StopPlayback();
+            StartPlaybackAsync().Await(() =>
+            {
+                if (!PlayableContent.IsLive)
+                {
+                    MediaPlayer.Time = time;
+                }
+            }, HandleCriticalError);
+        }
+
         private void LoadDialogSettings(VideoDialogSettings settings)
         {
             // Properties need to be set in this order
@@ -383,6 +408,7 @@ namespace RaceControl.ViewModels
             DialogSettings.IsMuted = settings.IsMuted;
             DialogSettings.Volume = settings.Volume;
             DialogSettings.AudioDevice = settings.AudioDevice;
+            DialogSettings.VideoQuality = settings.VideoQuality;
         }
 
         private VideoDialogSettings GetDialogSettings()
@@ -395,6 +421,7 @@ namespace RaceControl.ViewModels
                 Height = DialogSettings.Height,
                 ResizeMode = DialogSettings.ResizeMode,
                 WindowState = DialogSettings.WindowState,
+                VideoQuality = DialogSettings.VideoQuality,
                 Topmost = DialogSettings.Topmost,
                 IsMuted = MediaPlayer.IsMuted,
                 Volume = MediaPlayer.Volume,
@@ -418,6 +445,7 @@ namespace RaceControl.ViewModels
         private void InitializeError(Exception ex)
         {
             base.OnDialogOpened(null);
+            RaiseRequestClose();
             HandleCriticalError(ex);
         }
 
@@ -433,10 +461,22 @@ namespace RaceControl.ViewModels
                 }
             }
 
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(_subscriptionToken, _settings.StreamType, PlayableContent);
-            await MediaPlayer.StartPlaybackAsync(streamUrl);
+            await StartPlaybackAsync();
             MediaPlayer.ToggleMute(DialogSettings.IsMuted);
             MediaPlayer.Volume = DialogSettings.Volume;
+        }
+
+        private async Task StartPlaybackAsync()
+        {
+            var streamType = _settings.GetStreamType(StreamTypeKeys.BigScreenHls);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(_subscriptionToken, streamType, PlayableContent);
+
+            if (string.IsNullOrWhiteSpace(streamUrl))
+            {
+                throw new Exception("An error occurred while retrieving the stream URL.");
+            }
+
+            await MediaPlayer.StartPlaybackAsync(streamUrl, DialogSettings.VideoQuality);
         }
 
         private void SubscribeEvents()

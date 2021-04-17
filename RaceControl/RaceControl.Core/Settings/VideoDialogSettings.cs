@@ -1,4 +1,5 @@
 ﻿using Prism.Mvvm;
+using RaceControl.Common.Enums;
 using System.Windows;
 
 namespace RaceControl.Core.Settings
@@ -11,6 +12,7 @@ namespace RaceControl.Core.Settings
         private double _height;
         private ResizeMode _resizeMode;
         private WindowState _windowState;
+        private VideoQuality _videoQuality;
         private bool _topmost;
         private bool _isMuted;
         private int _volume;
@@ -53,6 +55,12 @@ namespace RaceControl.Core.Settings
             set => SetProperty(ref _windowState, value);
         }
 
+        public VideoQuality VideoQuality
+        {
+            get => _videoQuality;
+            set => SetProperty(ref _videoQuality, value);
+        }
+
         public bool Topmost
         {
             get => _topmost;
@@ -89,6 +97,7 @@ namespace RaceControl.Core.Settings
             {
                 ResizeMode = ResizeMode.CanResize,
                 WindowState = WindowState.Normal,
+                VideoQuality = VideoQuality.High,
                 Width = 960,
                 Height = 550,
                 Volume = 100

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RaceControl.Common.Enums;
+using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
@@ -12,6 +13,8 @@ namespace RaceControl.Common.Interfaces
 
         int Volume { get; set; }
 
+        bool IsPlaying { get; }
+
         bool IsPaused { get; }
 
         bool IsMuted { get; }
@@ -24,7 +27,7 @@ namespace RaceControl.Common.Interfaces
 
         IMediaTrack AudioTrack { get; set; }
 
-        Task StartPlaybackAsync(string streamUrl);
+        Task StartPlaybackAsync(string streamUrl, VideoQuality videoQuality);
 
         void StopPlayback();
 

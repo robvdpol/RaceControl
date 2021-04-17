@@ -8,7 +8,7 @@ namespace RaceControl.Core.Settings
 
         string AdditionalMpvParameters { get; set; }
 
-        string StreamType { get; set; }
+        string PreferredStreamType { get; set; }
 
         string LatestRelease { get; set; }
 
@@ -17,5 +17,7 @@ namespace RaceControl.Core.Settings
         void Load();
 
         void Save();
+
+        string GetStreamType(string autoStreamType);
     }
 }

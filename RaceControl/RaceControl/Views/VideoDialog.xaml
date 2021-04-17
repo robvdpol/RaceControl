@@ -12,6 +12,7 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <core:AreEqualConverter x:Key="AreEqualConverter" />
+        <core:LogicalOrConverter x:Key="LogicalOrConverter" />
         <core:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <core:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
         <core:ResizeModeToBooleanConverter x:Key="ResizeModeToBooleanConverter" />
@@ -283,8 +284,27 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
+                        <Grid Grid.Row="0" Grid.Column="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox
+                                Grid.Column="0"
+                                Margin="1,0"
+                                VerticalAlignment="Center"
+                                Content="Resizable window"
+                                IsChecked="{Binding DialogSettings.ResizeMode, Converter={StaticResource ResizeModeToBooleanConverter}}"
+                                IsEnabled="{Binding DialogSettings.WindowState, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static WindowState.Normal}}" />
+                            <CheckBox
+                                Grid.Column="1"
+                                Margin="4,0"
+                                VerticalAlignment="Center"
+                                Content="Always on top"
+                                IsChecked="{Binding DialogSettings.Topmost}" />
+                        </Grid>
                         <StackPanel
-                            Grid.Row="0"
+                            Grid.Row="1"
                             Grid.Column="0"
                             Orientation="Horizontal">
                             <Button Command="{Binding TogglePauseCommand}" ToolTip="Toggle pause">
@@ -372,23 +392,6 @@
                                 </Button.Content>
                             </Button>
                         </StackPanel>
-                        <Grid Grid.Row="1" Grid.Column="0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock
-                                Grid.Column="0"
-                                Margin="5,2"
-                                VerticalAlignment="Center"
-                                Text="Audio track:" />
-                            <ComboBox
-                                Grid.Column="1"
-                                Margin="2"
-                                DisplayMemberPath="Name"
-                                ItemsSource="{Binding MediaPlayer.AudioTracks}"
-                                SelectedItem="{Binding MediaPlayer.AudioTrack}" />
-                        </Grid>
                         <Grid
                             Grid.Row="0"
                             Grid.RowSpan="2"
@@ -485,24 +488,59 @@
                                 </Button.Content>
                             </Button>
                         </Grid>
-                        <Grid Grid.Row="0" Grid.Column="2">
+                        <Grid
+                            Grid.Row="0"
+                            Grid.RowSpan="2"
+                            Grid.Column="2">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <CheckBox
+                            <TextBlock
+                                Grid.Row="0"
                                 Grid.Column="0"
-                                Margin="1,0"
+                                Margin="5,2"
                                 VerticalAlignment="Center"
-                                Content="Resizable window"
-                                IsChecked="{Binding DialogSettings.ResizeMode, Converter={StaticResource ResizeModeToBooleanConverter}}"
-                                IsEnabled="{Binding DialogSettings.WindowState, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static WindowState.Normal}}" />
-                            <CheckBox
+                                Text="Video quality:" />
+                            <ComboBox
+                                Grid.Row="0"
                                 Grid.Column="1"
-                                Margin="4,0"
+                                MinWidth="200"
+                                Margin="2"
+                                DisplayMemberPath="Value"
+                                ItemsSource="{Binding VideoQualities}"
+                                SelectedValue="{Binding DialogSettings.VideoQuality}"
+                                SelectedValuePath="Key">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="SelectionChanged">
+                                        <i:InvokeCommandAction Command="{Binding VideoQualitySelectionChangedCommand}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                                <ComboBox.IsEnabled>
+                                    <MultiBinding Converter="{StaticResource LogicalOrConverter}">
+                                        <Binding Path="MediaPlayer.IsPlaying" />
+                                        <Binding Path="MediaPlayer.IsPaused" />
+                                    </MultiBinding>
+                                </ComboBox.IsEnabled>
+                            </ComboBox>
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Margin="5,2"
                                 VerticalAlignment="Center"
-                                Content="Always on top"
-                                IsChecked="{Binding DialogSettings.Topmost}" />
+                                Text="Audio track:" />
+                            <ComboBox
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                MinWidth="200"
+                                Margin="2"
+                                DisplayMemberPath="Name"
+                                ItemsSource="{Binding MediaPlayer.AudioTracks}"
+                                SelectedItem="{Binding MediaPlayer.AudioTrack}" />
                         </Grid>
                     </Grid>
                 </Grid>

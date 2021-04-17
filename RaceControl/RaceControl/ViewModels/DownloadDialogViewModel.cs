@@ -1,5 +1,6 @@
 ﻿using NLog;
 using Prism.Services.Dialogs;
+using RaceControl.Common.Constants;
 using RaceControl.Common.Enums;
 using RaceControl.Common.Interfaces;
 using RaceControl.Core.Mvvm;
@@ -64,7 +65,8 @@ namespace RaceControl.ViewModels
 
         private async Task GetTokenisedUrlAndStartDownloadAsync(string subscriptionToken)
         {
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(subscriptionToken, _settings.StreamType, PlayableContent);
+            var streamType = _settings.GetStreamType(StreamTypeKeys.BigScreenHls);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(subscriptionToken, streamType, PlayableContent);
             await MediaDownloader.StartDownloadAsync(streamUrl, Filename);
         }
     }

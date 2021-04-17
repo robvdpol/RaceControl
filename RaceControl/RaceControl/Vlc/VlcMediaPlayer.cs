@@ -1,5 +1,6 @@
 ﻿using LibVLCSharp.Shared;
 using Prism.Mvvm;
+using RaceControl.Common.Enums;
 using RaceControl.Common.Interfaces;
 using System;
 using System.Collections.ObjectModel;
@@ -16,6 +17,7 @@ namespace RaceControl.Vlc
         private long _time;
         private long _duration;
         private int _volume;
+        private bool _isPlaying;
         private bool _isPaused;
         private bool _isMuted;
         private ObservableCollection<IAudioDevice> _audioDevices;
@@ -30,6 +32,7 @@ namespace RaceControl.Vlc
             MediaPlayer = mediaPlayer;
             MediaPlayer.Playing += MediaPlayer_Playing;
             MediaPlayer.Paused += MediaPlayer_Paused;
+            MediaPlayer.Stopped += MediaPlayer_Stopped;
             MediaPlayer.Muted += MediaPlayer_Muted;
             MediaPlayer.Unmuted += MediaPlayer_Unmuted;
             MediaPlayer.TimeChanged += MediaPlayer_TimeChanged;
@@ -59,6 +62,12 @@ namespace RaceControl.Vlc
         {
             get => _volume;
             set => MediaPlayer.Volume = value;
+        }
+
+        public bool IsPlaying
+        {
+            get => _isPlaying;
+            private set => SetProperty(ref _isPlaying, value);
         }
 
         public bool IsPaused
@@ -101,9 +110,9 @@ namespace RaceControl.Vlc
             }
         }
 
-        public async Task StartPlaybackAsync(string streamUrl)
+        public async Task StartPlaybackAsync(string streamUrl, VideoQuality videoQuality)
         {
-            using var media = new Media(_libVLC, streamUrl, FromType.FromLocation);
+            using var media = CreateMedia(streamUrl, videoQuality);
             media.DurationChanged += (_, e) => Duration = e.Duration;
             await media.Parse(MediaParseOptions.ParseNetwork | MediaParseOptions.FetchNetwork);
             MediaPlayer.Play(media);
@@ -154,12 +163,20 @@ namespace RaceControl.Vlc
 
         private void MediaPlayer_Playing(object sender, EventArgs e)
         {
+            IsPlaying = true;
             IsPaused = false;
         }
 
         private void MediaPlayer_Paused(object sender, EventArgs e)
         {
+            IsPlaying = false;
             IsPaused = true;
+        }
+
+        private void MediaPlayer_Stopped(object sender, EventArgs e)
+        {
+            IsPlaying = false;
+            IsPaused = false;
         }
 
         private void MediaPlayer_Unmuted(object sender, EventArgs e)
@@ -179,7 +196,9 @@ namespace RaceControl.Vlc
 
         private void MediaPlayer_VolumeChanged(object sender, MediaPlayerVolumeChangedEventArgs e)
         {
-            SetProperty(ref _volume, Convert.ToInt32(e.Volume * 100), nameof(Volume));
+            var volume = Math.Max(Convert.ToInt32(e.Volume * 100), 0);
+
+            SetProperty(ref _volume, volume, nameof(Volume));
         }
 
         private void MediaPlayer_ESAdded(object sender, MediaPlayerESAddedEventArgs e)
@@ -192,12 +211,13 @@ namespace RaceControl.Vlc
             switch (e.Type)
             {
                 case TrackType.Audio:
-                    var trackDescription = MediaPlayer.AudioTrackDescription.First(td => td.Id == e.Id);
+                    var audioTrack = MediaPlayer.AudioTrackDescription.First(track => track.Id == e.Id);
 
                     Application.Current.Dispatcher.Invoke(() =>
                     {
-                        AudioTracks.Add(new VlcMediaTrack(trackDescription));
+                        AudioTracks.Add(new VlcMediaTrack(audioTrack));
                     });
+
                     break;
             }
         }
@@ -212,7 +232,7 @@ namespace RaceControl.Vlc
             switch (e.Type)
             {
                 case TrackType.Audio:
-                    var audioTrack = AudioTracks.FirstOrDefault(at => at.Id == e.Id);
+                    var audioTrack = AudioTracks.FirstOrDefault(track => track.Id == e.Id);
 
                     if (audioTrack != null)
                     {
@@ -236,7 +256,7 @@ namespace RaceControl.Vlc
             switch (e.Type)
             {
                 case TrackType.Audio:
-                    var audioTrack = AudioTracks.FirstOrDefault(at => at.Id == e.Id);
+                    var audioTrack = AudioTracks.FirstOrDefault(track => track.Id == e.Id);
 
                     if (audioTrack != null)
                     {
@@ -254,6 +274,24 @@ namespace RaceControl.Vlc
             if (audioDevice != null)
             {
                 SetProperty(ref _audioDevice, audioDevice, nameof(AudioDevice));
+            }
+        }
+
+        private Media CreateMedia(string streamUrl, VideoQuality videoQuality)
+        {
+            switch (videoQuality)
+            {
+                case VideoQuality.Lowest:
+                    return new Media(_libVLC, streamUrl, FromType.FromLocation, ":adaptive-maxwidth=640");
+
+                case VideoQuality.Low:
+                    return new Media(_libVLC, streamUrl, FromType.FromLocation, ":adaptive-maxwidth=960");
+
+                case VideoQuality.Medium:
+                    return new Media(_libVLC, streamUrl, FromType.FromLocation, ":adaptive-maxwidth=1280");
+
+                default:
+                    return new Media(_libVLC, streamUrl, FromType.FromLocation);
             }
         }
     }

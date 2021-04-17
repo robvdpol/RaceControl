@@ -415,7 +415,7 @@
                                         Grid.Column="1"
                                         DisplayMemberPath="Value"
                                         ItemsSource="{Binding StreamTypes}"
-                                        SelectedValue="{Binding Settings.StreamType}"
+                                        SelectedValue="{Binding Settings.PreferredStreamType}"
                                         SelectedValuePath="Key" />
                                 </Grid>
                                 <CheckBox
@@ -479,19 +479,65 @@
                                     <ColumnDefinition Width="50" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <TextBlock
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Text="Interface:" />
+                                <ComboBox
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    Margin="3"
+                                    DisplayMemberPath="Description"
+                                    IsEnabled="{Binding HasItems, RelativeSource={RelativeSource Self}}"
+                                    ItemsSource="{Binding NetworkInterfaces}"
+                                    SelectedItem="{Binding SelectedNetworkInterface}" />
                                 <Button
+                                    Grid.Row="1"
                                     Grid.Column="0"
                                     Command="{Binding ScanReceiversCommand}"
                                     Content="Scan"
                                     Style="{StaticResource OptionButtonStyle}"
                                     ToolTip="Scan for Chromecast devices in local network" />
                                 <ComboBox
+                                    Grid.Row="1"
                                     Grid.Column="1"
                                     Margin="3"
                                     DisplayMemberPath="FriendlyName"
                                     IsEnabled="{Binding HasItems, RelativeSource={RelativeSource Self}}"
                                     ItemsSource="{Binding Receivers}"
-                                    SelectedItem="{Binding SelectedReceiver}" />
+                                    SelectedItem="{Binding SelectedReceiver}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="SelectionChanged">
+                                            <i:InvokeCommandAction Command="{Binding ReceiverSelectionChangedCommand}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </ComboBox>
+                                <TextBlock
+                                    Grid.Row="2"
+                                    Grid.Column="0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Text="Audio:" />
+                                <ComboBox
+                                    Grid.Row="2"
+                                    Grid.Column="1"
+                                    Margin="3"
+                                    DisplayMemberPath="Name"
+                                    IsEnabled="{Binding HasItems, RelativeSource={RelativeSource Self}}"
+                                    ItemsSource="{Binding AudioTracks}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="SelectionChanged">
+                                            <i:InvokeCommandAction Command="{Binding AudioTrackSelectionChangedCommand}" CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ComboBox}}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </ComboBox>
                             </Grid>
                         </GroupBox>
                         <GroupBox
@@ -510,7 +556,7 @@
                                 <Button
                                     Grid.Row="1"
                                     Command="{Binding DeleteCredentialCommand}"
-                                    Content="Delete stored credentials"
+                                    Content="Log out"
                                     Style="{StaticResource OptionButtonStyle}"
                                     ToolTip="Removes your credentials from the system, useful if you want to login with different credentials" />
                             </Grid>
