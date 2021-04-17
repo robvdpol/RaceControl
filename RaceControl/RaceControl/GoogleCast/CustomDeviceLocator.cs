@@ -1,24 +1,23 @@
-﻿using System;
+﻿using GoogleCast;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
-using System.Text;
 using System.Threading.Tasks;
-using GoogleCast;
 using Zeroconf;
 
 namespace RaceControl.GoogleCast
 {
-    public class CustomDeviceLocator : IDeviceLocator
+    public class CustomDeviceLocator : DeviceLocator, ICustomDeviceLocator
     {
-        private const string PROTOCOL = "_googlecast._tcp.local.";
+        private const string Protocol = "_googlecast._tcp.local.";
 
-        private Receiver CreateReceiver(IZeroconfHost host)
+        private static Receiver CreateReceiver(IZeroconfHost host)
         {
-            var service = host.Services[PROTOCOL];
+            var service = host.Services[Protocol];
             var properties = service.Properties.First();
-            return new Receiver()
+
+            return new Receiver
             {
                 Id = properties["id"],
                 FriendlyName = properties["fn"],
@@ -26,19 +25,9 @@ namespace RaceControl.GoogleCast
             };
         }
 
-        public Task<IEnumerable<IReceiver>> FindReceiversAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IObservable<IReceiver> FindReceiversContinuous()
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<IEnumerable<IReceiver>> FindReceiversAsync(NetworkInterface networkInterface)
         {
-            return (await ZeroconfResolver.ResolveAsync(PROTOCOL, netInterfacesToSendRequestOn: new NetworkInterface[] {networkInterface} )).Select(CreateReceiver);
+            return (await ZeroconfResolver.ResolveAsync(Protocol, netInterfacesToSendRequestOn: new[] { networkInterface })).Select(CreateReceiver);
         }
     }
 }

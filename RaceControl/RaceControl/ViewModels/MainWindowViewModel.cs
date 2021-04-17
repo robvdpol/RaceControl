@@ -17,6 +17,7 @@ using RaceControl.Core.Mvvm;
 using RaceControl.Core.Settings;
 using RaceControl.Events;
 using RaceControl.Extensions;
+using RaceControl.GoogleCast;
 using RaceControl.Services.Interfaces.Credential;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Entities;
@@ -34,7 +35,6 @@ using System.Timers;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
-using RaceControl.GoogleCast;
 using Channel = RaceControl.Services.Interfaces.F1TV.Entities.Channel;
 
 namespace RaceControl.ViewModels
@@ -49,7 +49,7 @@ namespace RaceControl.ViewModels
         private readonly IGithubService _githubService;
         private readonly ICredentialService _credentialService;
         private readonly INumberGenerator _numberGenerator;
-        private readonly CustomDeviceLocator _deviceLocator;
+        private readonly ICustomDeviceLocator _deviceLocator;
         private readonly ISender _sender;
         private readonly object _refreshTimerLock = new();
 
@@ -91,16 +91,14 @@ namespace RaceControl.ViewModels
         private ObservableCollection<IPlayableContent> _episodes;
         private ObservableCollection<IReceiver> _receivers;
         private ObservableCollection<Track> _audioTracks;
-        private ObservableCollection<NetworkInterface> _networkInterfaces;
         private Season _selectedSeason;
         private Event _selectedEvent;
         private Session _selectedLiveSession;
         private Session _selectedSession;
         private string _selectedVodGenre;
         private IReceiver _selectedReceiver;
-        private Timer _refreshTimer;
         private NetworkInterface _selectedNetworkInterface;
-        
+        private Timer _refreshTimer;
 
         public MainWindowViewModel(
             ILogger logger,
@@ -110,7 +108,7 @@ namespace RaceControl.ViewModels
             IGithubService githubService,
             ICredentialService credentialService,
             INumberGenerator numberGenerator,
-            CustomDeviceLocator deviceLocator,
+            ICustomDeviceLocator deviceLocator,
             ISender sender,
             ISettings settings,
             IVideoDialogLayout videoDialogLayout)
@@ -128,12 +126,6 @@ namespace RaceControl.ViewModels
             VideoDialogLayout = videoDialogLayout;
             EpisodesView = CollectionViewSource.GetDefaultView(Episodes);
             EpisodesView.Filter = EpisodesViewFilter;
-
-            _networkInterfaces = new ObservableCollection<NetworkInterface>(NetworkInterface.GetAllNetworkInterfaces());
-            if (_networkInterfaces.Count > 0)
-            {
-                SelectedNetworkInterface = _networkInterfaces[0];
-            }
         }
 
         public ICommand LoadedCommand => _loadedCommand ??= new DelegateCommand<RoutedEventArgs>(LoadedExecute);
@@ -164,6 +156,8 @@ namespace RaceControl.ViewModels
         public IVideoDialogLayout VideoDialogLayout { get; }
 
         public ICollectionView EpisodesView { get; }
+
+        public ICollection<NetworkInterface> NetworkInterfaces { get; } = NetworkInterface.GetAllNetworkInterfaces().ToList();
 
         public IDictionary<string, string> StreamTypes { get; } = new Dictionary<string, string>
         {
@@ -228,7 +222,6 @@ namespace RaceControl.ViewModels
 
         public ObservableCollection<Track> AudioTracks => _audioTracks ??= new ObservableCollection<Track>();
 
-        public ObservableCollection<NetworkInterface> NetworkInterfaces => _networkInterfaces;
         public Season SelectedSeason
         {
             get => _selectedSeason;
@@ -285,6 +278,7 @@ namespace RaceControl.ViewModels
                 {
                     SetNotBusy();
                     SelectedSeason = Seasons.FirstOrDefault();
+                    SelectedNetworkInterface = NetworkInterfaces.FirstOrDefault(n => n.OperationalStatus == OperationalStatus.Up && n.NetworkInterfaceType != NetworkInterfaceType.Loopback);
                 },
                 HandleCriticalError);
                 RefreshLiveSessionsAsync().Await(CreateRefreshTimer, HandleNonCriticalError);
@@ -977,7 +971,9 @@ namespace RaceControl.ViewModels
         {
             Receivers.Clear();
             AudioTracks.Clear();
-            var receivers = await _deviceLocator.FindReceiversAsync(_selectedNetworkInterface);
+            var receivers = SelectedNetworkInterface != null ?
+                await _deviceLocator.FindReceiversAsync(SelectedNetworkInterface) :
+                await _deviceLocator.FindReceiversAsync();
             Receivers.AddRange(receivers);
         }
 
