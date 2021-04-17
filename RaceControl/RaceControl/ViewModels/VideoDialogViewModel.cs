@@ -146,7 +146,7 @@ namespace RaceControl.ViewModels
                 StartupLocation = WindowStartupLocation.CenterScreen;
             }
 
-            InitializeAsync().Await(InitializeCompleted, InitializeError);
+            InitializeAsync().Await(InitializeCompleted, InitializeError, true);
         }
 
         public override void OnDialogClosed()
@@ -445,6 +445,7 @@ namespace RaceControl.ViewModels
         private void InitializeError(Exception ex)
         {
             base.OnDialogOpened(null);
+            RaiseRequestClose();
             HandleCriticalError(ex);
         }
 
@@ -467,9 +468,14 @@ namespace RaceControl.ViewModels
 
         private async Task StartPlaybackAsync()
         {
-            // DASH works best for live streams, HLS for replays
-            var streamType = _settings.GetStreamType(PlayableContent.IsLive ? StreamTypeKeys.BigScreenDash : StreamTypeKeys.BigScreenHls);
+            var streamType = _settings.GetStreamType(StreamTypeKeys.BigScreenHls);
             var streamUrl = await _apiService.GetTokenisedUrlAsync(_subscriptionToken, streamType, PlayableContent);
+
+            if (string.IsNullOrWhiteSpace(streamUrl))
+            {
+                throw new Exception("An error occurred while retrieving the stream URL.");
+            }
+
             await MediaPlayer.StartPlaybackAsync(streamUrl, DialogSettings.VideoQuality);
         }
 

@@ -796,8 +796,7 @@ namespace RaceControl.ViewModels
 
         private async Task WatchInVlcAsync(IPlayableContent playableContent)
         {
-            // DASH works best for live streams, HLS for replays
-            var streamType = Settings.GetStreamType(playableContent.IsLive ? StreamTypeKeys.BigScreenDash : StreamTypeKeys.BigScreenHls);
+            var streamType = Settings.GetStreamType(StreamTypeKeys.BigScreenHls);
             var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, streamType, playableContent);
 
             if (!ValidateStreamUrl(streamUrl))
@@ -985,11 +984,23 @@ namespace RaceControl.ViewModels
             {
                 await _sender.ConnectAsync(receiver);
                 var mediaChannel = _sender.GetChannel<IMediaChannel>();
-                var status = await mediaChannel.GetStatusAsync();
-                var audioTracks = status.Media.Tracks.Where(t => t.Type == TrackType.Audio);
-                AudioTracks.AddRange(audioTracks);
+
+                if (mediaChannel != null)
+                {
+                    var status = await mediaChannel.GetStatusAsync();
+
+                    if (status?.Media?.Tracks != null)
+                    {
+                        var audioTracks = status.Media.Tracks.Where(t => t.Type == TrackType.Audio);
+                        AudioTracks.AddRange(audioTracks);
+                    }
+                }
             }
             catch (InvalidOperationException ex)
+            {
+                HandleNonCriticalError(ex);
+            }
+            catch (ArgumentNullException ex)
             {
                 HandleNonCriticalError(ex);
             }
