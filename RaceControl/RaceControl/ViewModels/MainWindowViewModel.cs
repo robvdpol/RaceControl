@@ -1000,6 +1000,10 @@ namespace RaceControl.ViewModels
             {
                 HandleNonCriticalError(ex);
             }
+            catch (ArgumentNullException ex)
+            {
+                HandleNonCriticalError(ex);
+            }
             finally
             {
                 _sender.Disconnect();
