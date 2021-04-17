@@ -94,6 +94,7 @@ To open and build the solution you need:
 * [RestSharp](https://restsharp.dev)
 * [NLog](https://nlog-project.org)
 * [CredentialManagement.Standard NuGet package](https://www.nuget.org/packages/CredentialManagement.Standard)
+* [GoogleCast](https://github.com/kakone/GoogleCast)
 
 ## Screenshots
 ![preview image](https://imgur.com/Ngos9JZ.png)
