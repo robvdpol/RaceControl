@@ -352,7 +352,7 @@ namespace RaceControl.Services.F1TV
                 ShortName = GetSessionShortName(container.Metadata.TitleBrief, seriesUID),
                 LongName = container.Metadata.Title,
                 SeriesUID = seriesUID,
-                ThumbnailUrl = GetThumbnailUrl(container.Metadata.PictureUrl)
+                ThumbnailUrl = GetThumbnailUrl(container.Metadata.PictureUrl),
                 StartDate = container.Metadata.EmfAttributes.SessionStartDate.GetDateTimeFromEpoch(),
                 EndDate = container.Metadata.EmfAttributes.SessionEndDate.GetDateTimeFromEpoch(),
                 SessionIndex = container.Metadata.EmfAttributes.SessionIndex
