@@ -784,8 +784,7 @@ namespace RaceControl.ViewModels
 
         private async Task WatchInVlcAsync(IPlayableContent playableContent)
         {
-            // DASH works best for live streams, HLS for replays
-            var streamType = Settings.GetStreamType(playableContent.IsLive ? StreamTypeKeys.BigScreenDash : StreamTypeKeys.BigScreenHls);
+            var streamType = Settings.GetStreamType(StreamTypeKeys.BigScreenHls);
             var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, streamType, playableContent);
 
             if (!ValidateStreamUrl(streamUrl))

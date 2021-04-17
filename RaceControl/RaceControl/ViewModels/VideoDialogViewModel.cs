@@ -468,8 +468,7 @@ namespace RaceControl.ViewModels
 
         private async Task StartPlaybackAsync()
         {
-            // DASH works best for live streams, HLS for replays
-            var streamType = _settings.GetStreamType(PlayableContent.IsLive ? StreamTypeKeys.BigScreenDash : StreamTypeKeys.BigScreenHls);
+            var streamType = _settings.GetStreamType(StreamTypeKeys.BigScreenHls);
             var streamUrl = await _apiService.GetTokenisedUrlAsync(_subscriptionToken, streamType, PlayableContent);
 
             if (string.IsNullOrWhiteSpace(streamUrl))
