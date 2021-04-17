@@ -30,6 +30,7 @@ using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Threading;
+using RaceControl.GoogleCast;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 using LibVLCSharpCore = LibVLCSharp.Shared.Core;
 using LogLevelNLog = NLog.LogLevel;
@@ -83,7 +84,7 @@ namespace RaceControl
                 .Register<IGithubService, GithubService>()
                 .Register<ICredentialService, CredentialService>()
                 .Register<INumberGenerator, NumberGenerator>()
-                .Register<IDeviceLocator, DeviceLocator>()
+                .Register<CustomDeviceLocator>()
                 .Register<ISender>(() => new Sender())
                 .Register<IMediaPlayer, VlcMediaPlayer>()
                 .Register<IMediaDownloader, VlcMediaDownloader>();
