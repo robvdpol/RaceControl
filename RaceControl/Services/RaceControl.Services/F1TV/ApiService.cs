@@ -334,32 +334,18 @@ namespace RaceControl.Services.F1TV
         private static Session CreateSession(Container container)
         {
             var seriesUID = container.Properties.First().Series;
+
             return new()
             {
                 UID = container.Id,
                 ContentID = container.Metadata.ContentId,
                 ContentType = container.Metadata.ContentType,
                 ContentSubtype = container.Metadata.ContentSubtype,
-                ShortName = GetShortName(container, seriesUID),
+                ShortName = GetSessionShortName(container.Metadata.TitleBrief, seriesUID),
                 LongName = container.Metadata.Title,
                 SeriesUID = seriesUID,
                 ThumbnailUrl = GetThumbnailUrl(container.Metadata.PictureUrl)
             };
-        }
-
-        private static string GetShortName(Container container, string seriesUID)
-        {
-            var shortName = container.Metadata.TitleBrief;
-
-            // Sometimes F2 races (and perhaps others as well) don't have the "F2" prefix in their brief title, then prefix it.
-            if (seriesUID != SeriesIds.Formula1
-                && SeriesNames.SeriesShortNames.TryGetValue(seriesUID, out var definedShortName)
-                && !definedShortName.Any(d => shortName.ToUpperInvariant().Contains(d.ToUpperInvariant())))
-            {
-                shortName = definedShortName.First() + " " + shortName;
-            }
-
-            return shortName;
         }
 
         private static Episode CreateEpisode(Container container)
@@ -376,6 +362,16 @@ namespace RaceControl.Services.F1TV
                 PlaybackUrl = GetPlaybackUrl(container.Metadata.ContentId),
                 ThumbnailUrl = GetThumbnailUrl(container.Metadata.PictureUrl)
             };
+        }
+
+        private static string GetSessionShortName(string titleBrief, string seriesUID)
+        {
+            if (seriesUID == SeriesIds.Formula1 || !SeriesNames.ShortNames.TryGetValue(seriesUID, out var shortNames) || shortNames.Any(shortName => titleBrief.Contains(shortName, StringComparison.OrdinalIgnoreCase)))
+            {
+                return titleBrief;
+            }
+
+            return $"{shortNames.First()} {titleBrief}";
         }
 
         private static string GetPlaybackUrl(long contentId)

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace RaceControl.Common.Constants
 {
@@ -10,13 +9,12 @@ namespace RaceControl.Common.Constants
         public const string Formula3 = "Formula 3";
         public const string PorscheSupercup = "Porsche Supercup";
 
-        private static readonly Dictionary<string, string[]> shortNames = new()
+        public static readonly Dictionary<string, string[]> ShortNames = new()
         {
             { SeriesIds.Formula1, new[] { "F1" } },
             { SeriesIds.Formula2, new[] { "F2" } },
             { SeriesIds.Formula3, new[] { "F3" } },
-            { SeriesIds.PorscheSupercup, new[] { "Supercup", "PSC" } },
+            { SeriesIds.PorscheSupercup, new[] { "Supercup", "PSC" } }
         };
-        public static ReadOnlyDictionary<string, string[]> SeriesShortNames { get; } = new(shortNames);
-    }    
+    }
 }
