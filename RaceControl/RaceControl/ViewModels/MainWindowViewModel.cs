@@ -74,7 +74,7 @@ namespace RaceControl.ViewModels
         private ICommand _scanReceiversCommand;
         private ICommand _receiverSelectionChangedCommand;
         private ICommand _audioTrackSelectionChangedCommand;
-        private ICommand _deleteCredentialCommand;
+        private ICommand _logOutCommand;
 
         private string _subscriptionToken;
         private string _subscriptionStatus;
@@ -149,7 +149,7 @@ namespace RaceControl.ViewModels
         public ICommand ScanReceiversCommand => _scanReceiversCommand ??= new DelegateCommand(ScanReceiversExecute);
         public ICommand ReceiverSelectionChangedCommand => _receiverSelectionChangedCommand ??= new DelegateCommand(ReceiverSelectionChangedExecute);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<Track>(AudioTrackSelectionChangedExecute);
-        public ICommand DeleteCredentialCommand => _deleteCredentialCommand ??= new DelegateCommand(DeleteCredentialExecute);
+        public ICommand LogOutCommand => _logOutCommand ??= new DelegateCommand(LogOutExecute);
 
         public ISettings Settings { get; }
 
@@ -490,11 +490,11 @@ namespace RaceControl.ViewModels
             ChangeAudioTrackAsync(SelectedReceiver, audioTrack).Await(SetNotBusy, HandleCriticalError);
         }
 
-        private void DeleteCredentialExecute()
+        private void LogOutExecute()
         {
             IsBusy = true;
 
-            if (MessageBoxHelper.AskQuestion("Are you sure you want to delete your credentials from this system?", "Account"))
+            if (MessageBoxHelper.AskQuestion("Are you sure you want to log out?", "Account"))
             {
                 _credentialService.DeleteCredential();
                 Login();
