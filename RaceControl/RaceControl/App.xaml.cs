@@ -14,7 +14,6 @@ using RaceControl.Common.Utils;
 using RaceControl.Core.Helpers;
 using RaceControl.Core.Settings;
 using RaceControl.Extensions;
-using RaceControl.GoogleCast;
 using RaceControl.Services.Credential;
 using RaceControl.Services.F1TV;
 using RaceControl.Services.Github;
@@ -84,7 +83,7 @@ namespace RaceControl
                 .Register<IGithubService, GithubService>()
                 .Register<ICredentialService, CredentialService>()
                 .Register<INumberGenerator, NumberGenerator>()
-                .Register<ICustomDeviceLocator, CustomDeviceLocator>()
+                .Register<IDeviceLocator, DeviceLocator>()
                 .Register<ISender>(() => new Sender())
                 .Register<IMediaPlayer, VlcMediaPlayer>()
                 .Register<IMediaDownloader, VlcMediaDownloader>();

@@ -17,7 +17,6 @@ using RaceControl.Core.Mvvm;
 using RaceControl.Core.Settings;
 using RaceControl.Events;
 using RaceControl.Extensions;
-using RaceControl.GoogleCast;
 using RaceControl.Services.Interfaces.Credential;
 using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.F1TV.Entities;
@@ -49,7 +48,7 @@ namespace RaceControl.ViewModels
         private readonly IGithubService _githubService;
         private readonly ICredentialService _credentialService;
         private readonly INumberGenerator _numberGenerator;
-        private readonly ICustomDeviceLocator _deviceLocator;
+        private readonly IDeviceLocator _deviceLocator;
         private readonly ISender _sender;
         private readonly object _refreshTimerLock = new();
 
@@ -108,7 +107,7 @@ namespace RaceControl.ViewModels
             IGithubService githubService,
             ICredentialService credentialService,
             INumberGenerator numberGenerator,
-            ICustomDeviceLocator deviceLocator,
+            IDeviceLocator deviceLocator,
             ISender sender,
             ISettings settings,
             IVideoDialogLayout videoDialogLayout)
@@ -898,10 +897,18 @@ namespace RaceControl.ViewModels
             {
                 await _sender.ConnectAsync(receiver);
                 var mediaChannel = _sender.GetChannel<IMediaChannel>();
-                await _sender.LaunchAsync(mediaChannel);
-                var status = await mediaChannel.LoadAsync(new MediaInformation { ContentId = streamUrl });
-                var audioTracks = status.Media.Tracks.Where(t => t.Type == TrackType.Audio);
-                AudioTracks.AddRange(audioTracks);
+
+                if (mediaChannel != null)
+                {
+                    await _sender.LaunchAsync(mediaChannel);
+                    var status = await mediaChannel.LoadAsync(new MediaInformation { ContentId = streamUrl });
+
+                    if (status?.Media?.Tracks != null)
+                    {
+                        var audioTracks = status.Media.Tracks.Where(t => t.Type == TrackType.Audio);
+                        AudioTracks.AddRange(audioTracks);
+                    }
+                }
             }
             finally
             {
@@ -970,9 +977,7 @@ namespace RaceControl.ViewModels
         {
             Receivers.Clear();
             AudioTracks.Clear();
-            var receivers = SelectedNetworkInterface != null ?
-                await _deviceLocator.FindReceiversAsync(SelectedNetworkInterface) :
-                await _deviceLocator.FindReceiversAsync();
+            var receivers = await _deviceLocator.FindReceiversAsync(SelectedNetworkInterface);
             Receivers.AddRange(receivers);
         }
 
