@@ -476,7 +476,7 @@ namespace RaceControl.ViewModels
                 throw new Exception("An error occurred while retrieving the stream URL.");
             }
 
-            await MediaPlayer.StartPlaybackAsync(streamUrl, DialogSettings.VideoQuality);
+            MediaPlayer.StartPlayback(streamUrl, DialogSettings.VideoQuality);
         }
 
         private void SubscribeEvents()

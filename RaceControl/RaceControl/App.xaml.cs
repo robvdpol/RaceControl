@@ -82,7 +82,7 @@ namespace RaceControl
                 .RegisterSingleton<ISettings, Settings>()
                 .RegisterSingleton<IVideoDialogLayout, VideoDialogLayout>()
                 .RegisterInstance(CreateLibVLC())
-                .Register<MediaPlayer>(CreateMediaPlayer)
+                .Register<MediaPlayer>(CreateVlcPlayer)
                 .Register<Player>(CreateFlyleafPlayer)
                 .Register<JsonSerializer>(() => new JsonSerializer { Formatting = Formatting.Indented })
                 .Register<IAuthorizationService, AuthorizationService>()
@@ -162,7 +162,7 @@ namespace RaceControl
             return libVLC;
         }
 
-        private static MediaPlayer CreateMediaPlayer(IContainerProvider container)
+        private static MediaPlayer CreateVlcPlayer(IContainerProvider container)
         {
             return new(container.Resolve<LibVLC>())
             {

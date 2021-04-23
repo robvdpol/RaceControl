@@ -1,17 +1,16 @@
 ﻿using RaceControl.Common.Enums;
 using System;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 
 namespace RaceControl.Common.Interfaces
 {
     public interface IMediaPlayer : IDisposable
     {
+        int Volume { get; set; }
+
         long Time { get; set; }
 
         long Duration { get; }
-
-        int Volume { get; set; }
 
         bool IsPlaying { get; }
 
@@ -27,7 +26,7 @@ namespace RaceControl.Common.Interfaces
 
         IMediaTrack AudioTrack { get; set; }
 
-        Task StartPlaybackAsync(string streamUrl, VideoQuality videoQuality);
+        void StartPlayback(string streamUrl, VideoQuality videoQuality);
 
         void StopPlayback();
 

@@ -7,7 +7,6 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace RaceControl.Flyleaf
@@ -16,7 +15,7 @@ namespace RaceControl.Flyleaf
     {
         private long _time;
         private long _duration;
-        private int _volume = 100;
+        private int _volume;
         private bool _isPlaying;
         private bool _isPaused;
         private bool _isMuted;
@@ -34,34 +33,22 @@ namespace RaceControl.Flyleaf
 
         public Player Player { get; }
 
+        public int Volume
+        {
+            get => _volume;
+            set => Player.audioPlayer.Volume = value;
+        }
+
         public long Time
         {
             get => _time;
-            set
-            {
-                if (SetProperty(ref _time, value))
-                {
-                    Player.Session.CurTime = _time;
-                }
-            }
+            set => Player.Session.CurTime = value;
         }
 
         public long Duration
         {
             get => _duration;
             private set => SetProperty(ref _duration, value);
-        }
-
-        public int Volume
-        {
-            get => _volume;
-            set
-            {
-                if (SetProperty(ref _volume, value))
-                {
-                    Player.audioPlayer.Volume = _volume;
-                }
-            }
         }
 
         public bool IsPlaying
@@ -99,7 +86,7 @@ namespace RaceControl.Flyleaf
             }
         }
 
-        public async Task StartPlaybackAsync(string streamUrl, VideoQuality videoQuality)
+        public void StartPlayback(string streamUrl, VideoQuality videoQuality)
         {
             Player.Open(streamUrl);
         }
@@ -161,6 +148,7 @@ namespace RaceControl.Flyleaf
             if (e.type == MediaType.Video)
             {
                 Player.Play();
+                Player.audioPlayer.PropertyChanged += AudioPlayerOnPropertyChanged;
                 Player.Session.PropertyChanged += SessionOnPropertyChanged;
                 Duration = Player.Session.Movie.Duration;
             }
@@ -180,6 +168,14 @@ namespace RaceControl.Flyleaf
             if (e.PropertyName == nameof(Player.Status))
             {
                 UpdatePlayerStatus();
+            }
+        }
+
+        private void AudioPlayerOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Player.audioPlayer.Volume))
+            {
+                SetProperty(ref _volume, Player.audioPlayer.Volume, nameof(Volume));
             }
         }
 
