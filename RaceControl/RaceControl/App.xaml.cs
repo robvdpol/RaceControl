@@ -1,4 +1,6 @@
 ﻿using DryIoc;
+using FlyleafLib;
+using FlyleafLib.MediaPlayer;
 using GoogleCast;
 using LibVLCSharp.Shared;
 using Newtonsoft.Json;
@@ -14,6 +16,7 @@ using RaceControl.Common.Utils;
 using RaceControl.Core.Helpers;
 using RaceControl.Core.Settings;
 using RaceControl.Extensions;
+using RaceControl.Flyleaf;
 using RaceControl.Services.Credential;
 using RaceControl.Services.F1TV;
 using RaceControl.Services.Github;
@@ -52,6 +55,9 @@ namespace RaceControl
                 Environment.CurrentDirectory = currentDirectory;
             }
 
+            Master.RegisterFFmpeg(":2");
+            Master.PreventAborts = true;
+
             base.OnStartup(e);
         }
 
@@ -77,6 +83,7 @@ namespace RaceControl
                 .RegisterSingleton<IVideoDialogLayout, VideoDialogLayout>()
                 .RegisterInstance(CreateLibVLC())
                 .Register<MediaPlayer>(CreateMediaPlayer)
+                .Register<Player>(CreateFlyleafPlayer)
                 .Register<JsonSerializer>(() => new JsonSerializer { Formatting = Formatting.Indented })
                 .Register<IAuthorizationService, AuthorizationService>()
                 .Register<IApiService, ApiService>()
@@ -85,7 +92,7 @@ namespace RaceControl
                 .Register<INumberGenerator, NumberGenerator>()
                 .Register<IDeviceLocator, DeviceLocator>()
                 .Register<ISender>(() => new Sender())
-                .Register<IMediaPlayer, VlcMediaPlayer>()
+                .Register<IMediaPlayer, FlyleafMediaPlayer>()
                 .Register<IMediaDownloader, VlcMediaDownloader>();
 
             var container = registry.GetContainer();
@@ -165,6 +172,11 @@ namespace RaceControl
                 FileCaching = 5000,
                 NetworkCaching = 10000
             };
+        }
+
+        private static Player CreateFlyleafPlayer()
+        {
+            return new();
         }
 
         private static IRestClient CreateRestClient()

@@ -4,10 +4,10 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:core="clr-namespace:RaceControl.Core.Converters;assembly=RaceControl.Core"
     xmlns:enums="clr-namespace:RaceControl.Common.Enums;assembly=RaceControl.Common"
+    xmlns:fl="clr-namespace:FlyleafLib.Controls.WPF;assembly=FlyleafLib"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:prism="http://prismlibrary.com/"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
-    xmlns:vlc="clr-namespace:LibVLCSharp.WPF;assembly=LibVLCSharp.WPF"
     prism:ViewModelLocator.AutoWireViewModel="True">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
@@ -17,7 +17,7 @@
         <core:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
         <core:ResizeModeToBooleanConverter x:Key="ResizeModeToBooleanConverter" />
         <core:DivideDoubleConverter x:Key="DivideDoubleConverter" />
-        <core:MillisecondsToTimeSpanConverter x:Key="MillisecondsToTimeSpanConverter" />
+        <core:TicksToTimeSpanConverter x:Key="TicksToTimeSpanConverter" />
         <Style x:Key="ControlBarButtonStyle" TargetType="Button">
             <Setter Property="Margin" Value="2" />
             <Setter Property="Width" Value="36" />
@@ -61,7 +61,7 @@
             <Setter Property="ShowInTaskbar" Value="True" />
         </Style>
     </prism:Dialog.WindowStyle>
-    <vlc:VideoView Background="Black" MediaPlayer="{Binding MediaPlayer.MediaPlayer}">
+    <fl:VideoView Player="{Binding MediaPlayer.Player}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="24" />
@@ -233,7 +233,7 @@
                             Grid.Column="0"
                             Margin="5,2"
                             VerticalAlignment="Center"
-                            Text="{Binding MediaPlayer.Time, StringFormat=hh\\:mm\\:ss, Converter={StaticResource MillisecondsToTimeSpanConverter}}" />
+                            Text="{Binding MediaPlayer.Time, StringFormat=hh\\:mm\\:ss, Converter={StaticResource TicksToTimeSpanConverter}}" />
                         <Slider
                             Grid.Column="1"
                             Margin="2"
@@ -546,5 +546,5 @@
                 </Grid>
             </Border>
         </Grid>
-    </vlc:VideoView>
+    </fl:VideoView>
 </UserControl>

@@ -271,7 +271,7 @@ namespace RaceControl.ViewModels
             if (seconds.HasValue)
             {
                 Logger.Info($"Fast forwarding stream {seconds.Value} seconds...");
-                MediaPlayer.Time += seconds.Value * 1000;
+                MediaPlayer.Time += TimeSpan.FromSeconds(seconds.Value).Ticks;
             }
         }
 
