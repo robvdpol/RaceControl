@@ -13,7 +13,6 @@ using RaceControl.Extensions;
 using RaceControl.Services.Interfaces.F1TV;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -205,7 +204,7 @@ namespace RaceControl.ViewModels
 
         private void MouseWheelVideoExecute(MouseWheelEventArgs e)
         {
-            MediaPlayer.Volume += e.Delta / MouseWheelDelta;
+            SetVolume(e.Delta / MouseWheelDelta);
             ShowControlsAndResetTimer();
         }
 
@@ -235,7 +234,7 @@ namespace RaceControl.ViewModels
 
         private void MouseWheelControlBarExecute(MouseWheelEventArgs e)
         {
-            MediaPlayer.Volume += e.Delta / MouseWheelDelta;
+            SetVolume(e.Delta / MouseWheelDelta);
         }
 
         private void CloseAllWindowsExecute()
@@ -379,15 +378,7 @@ namespace RaceControl.ViewModels
 
         private void VideoQualitySelectionChangedExecute()
         {
-            var time = MediaPlayer.Time;
-            MediaPlayer.StopPlayback();
-            StartPlaybackAsync().Await(() =>
-            {
-                if (!PlayableContent.IsLive)
-                {
-                    MediaPlayer.Time = time;
-                }
-            }, HandleCriticalError);
+            MediaPlayer.SetVideoQuality(DialogSettings.VideoQuality);
         }
 
         private void LoadDialogSettings(VideoDialogSettings settings)
@@ -451,19 +442,17 @@ namespace RaceControl.ViewModels
 
         private async Task StartStreamAsync()
         {
-            if (!string.IsNullOrWhiteSpace(DialogSettings.AudioDevice))
-            {
-                var audioDevice = MediaPlayer.AudioDevices.FirstOrDefault(ad => ad.Description == DialogSettings.AudioDevice);
+            //if (!string.IsNullOrWhiteSpace(DialogSettings.AudioDevice))
+            //{
+            //    var audioDevice = MediaPlayer.AudioDevices.FirstOrDefault(ad => ad.Description == DialogSettings.AudioDevice);
 
-                if (audioDevice != null)
-                {
-                    MediaPlayer.AudioDevice = audioDevice;
-                }
-            }
+            //    if (audioDevice != null)
+            //    {
+            //        MediaPlayer.AudioDevice = audioDevice;
+            //    }
+            //}
 
             await StartPlaybackAsync();
-            MediaPlayer.ToggleMute(DialogSettings.IsMuted);
-            MediaPlayer.Volume = DialogSettings.Volume;
         }
 
         private async Task StartPlaybackAsync()
@@ -476,7 +465,7 @@ namespace RaceControl.ViewModels
                 throw new Exception("An error occurred while retrieving the stream URL.");
             }
 
-            MediaPlayer.StartPlayback(streamUrl, DialogSettings.VideoQuality);
+            MediaPlayer.StartPlayback(streamUrl, DialogSettings.AudioDevice, DialogSettings.IsMuted, DialogSettings.Volume, DialogSettings.VideoQuality);
         }
 
         private void SubscribeEvents()
@@ -549,6 +538,11 @@ namespace RaceControl.ViewModels
         {
             Logger.Info("Changing to windowed mode...");
             DialogSettings.WindowState = WindowState.Normal;
+        }
+
+        private void SetVolume(int delta)
+        {
+            MediaPlayer.Volume += delta;
         }
     }
 }
