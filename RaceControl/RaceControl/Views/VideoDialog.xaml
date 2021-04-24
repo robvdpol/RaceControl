@@ -509,7 +509,7 @@
                             <ComboBox
                                 Grid.Row="0"
                                 Grid.Column="1"
-                                MinWidth="200"
+                                MinWidth="150"
                                 Margin="2"
                                 DisplayMemberPath="Value"
                                 ItemsSource="{Binding VideoQualities}"
@@ -536,7 +536,7 @@
                             <ComboBox
                                 Grid.Row="1"
                                 Grid.Column="1"
-                                MinWidth="200"
+                                MinWidth="150"
                                 Margin="2"
                                 DisplayMemberPath="Name"
                                 ItemsSource="{Binding MediaPlayer.AudioTracks}"
