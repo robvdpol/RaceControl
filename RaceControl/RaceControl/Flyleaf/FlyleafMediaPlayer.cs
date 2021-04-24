@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
+using MediaType = FlyleafLib.MediaType;
 
 namespace RaceControl.Flyleaf
 {
@@ -80,10 +81,18 @@ namespace RaceControl.Flyleaf
             get => _audioTrack;
             set
             {
-                if (SetProperty(ref _audioTrack, value) && _audioTrack != null)
+                if (value != null)
                 {
-                    var audioStream = Player.curAudioPlugin.AudioStreams[_audioTrack.Id];
-                    Player.Open(audioStream);
+                    var audioStream = Player.curAudioPlugin.AudioStreams.FirstOrDefault(stream => new FlyleafAudioTrack(stream).Id == value.Id);
+
+                    if (audioStream != null)
+                    {
+                        Player.Open(audioStream);
+                    }
+                }
+                else
+                {
+                    SetProperty(ref _audioTrack, null);
                 }
             }
         }
@@ -105,7 +114,7 @@ namespace RaceControl.Flyleaf
 
         public void SetVideoQuality(VideoQuality videoQuality)
         {
-            var maxHeight = Player.curVideoPlugin.VideoStreams.Max(s => s.Height);
+            var maxHeight = Player.curVideoPlugin.VideoStreams.Max(stream => stream.Height);
             var minHeight = maxHeight;
 
             switch (videoQuality)
@@ -123,7 +132,7 @@ namespace RaceControl.Flyleaf
                     break;
             }
 
-            var videoStream = Player.curVideoPlugin.VideoStreams.OrderBy(s => s.Height).FirstOrDefault(s => s.Height >= minHeight);
+            var videoStream = Player.curVideoPlugin.VideoStreams.OrderBy(stream => stream.Height).FirstOrDefault(stream => stream.Height >= minHeight);
 
             if (videoStream != null && Player.Session.CurVideoStream != videoStream)
             {
@@ -203,8 +212,17 @@ namespace RaceControl.Flyleaf
                         Application.Current.Dispatcher.Invoke(() =>
                         {
                             AudioTracks.Clear();
-                            AudioTracks.AddRange(Player.curAudioPlugin.AudioStreams.Select((stream, index) => new FlyleafAudioTrack(index, stream)));
+                            AudioTracks.AddRange(Player.curAudioPlugin.AudioStreams.Select(stream => new FlyleafAudioTrack(stream)));
                         });
+                    }
+
+                    var audioStream = Player.Session.CurAudioStream;
+
+                    if (audioStream != null)
+                    {
+                        var audioTrackId = new FlyleafAudioTrack(audioStream).Id;
+                        var audioTrack = AudioTracks.FirstOrDefault(track => track.Id == audioTrackId);
+                        SetProperty(ref _audioTrack, audioTrack, nameof(AudioTrack));
                     }
 
                     break;
