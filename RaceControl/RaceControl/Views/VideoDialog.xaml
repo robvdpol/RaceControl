@@ -540,7 +540,14 @@
                                 Margin="2"
                                 DisplayMemberPath="Name"
                                 ItemsSource="{Binding MediaPlayer.AudioTracks}"
-                                SelectedItem="{Binding MediaPlayer.AudioTrack}" />
+                                SelectedItem="{Binding MediaPlayer.AudioTrack}">
+                                <ComboBox.IsEnabled>
+                                    <MultiBinding Converter="{StaticResource LogicalOrConverter}">
+                                        <Binding Path="MediaPlayer.IsPlaying" />
+                                        <Binding Path="MediaPlayer.IsPaused" />
+                                    </MultiBinding>
+                                </ComboBox.IsEnabled>
+                            </ComboBox>
                         </Grid>
                     </Grid>
                 </Grid>
