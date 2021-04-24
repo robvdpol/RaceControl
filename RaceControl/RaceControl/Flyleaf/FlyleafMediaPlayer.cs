@@ -33,10 +33,12 @@ namespace RaceControl.Flyleaf
 
         public Player Player { get; }
 
+        public int MaxVolume => 150;
+
         public int Volume
         {
             get => _volume;
-            set => Player.audioPlayer.Volume = Math.Min(Math.Max(value, 0), 100);
+            set => Player.audioPlayer.Volume = Math.Min(Math.Max(value, 0), MaxVolume);
         }
 
         public long Time

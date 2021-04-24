@@ -6,6 +6,8 @@ namespace RaceControl.Common.Interfaces
 {
     public interface IMediaPlayer : IDisposable
     {
+        int MaxVolume { get; }
+
         int Volume { get; set; }
 
         long Time { get; set; }

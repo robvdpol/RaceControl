@@ -263,7 +263,7 @@
                             VerticalAlignment="Center"
                             IsMoveToPointEnabled="True"
                             IsSnapToTickEnabled="False"
-                            Maximum="100"
+                            Maximum="{Binding MediaPlayer.MaxVolume}"
                             TickFrequency="10"
                             TickPlacement="BottomRight"
                             Value="{Binding MediaPlayer.Volume}" />
