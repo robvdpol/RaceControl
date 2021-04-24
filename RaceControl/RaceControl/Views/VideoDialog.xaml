@@ -6,6 +6,7 @@
     xmlns:enums="clr-namespace:RaceControl.Common.Enums;assembly=RaceControl.Common"
     xmlns:fl="clr-namespace:FlyleafLib.Controls.WPF;assembly=FlyleafLib"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:mvvm="clr-namespace:RaceControl.Core.Mvvm;assembly=RaceControl.Core"
     xmlns:prism="http://prismlibrary.com/"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     prism:ViewModelLocator.AutoWireViewModel="True">
@@ -64,113 +65,11 @@
     <fl:VideoView Player="{Binding MediaPlayer.Player}">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="24" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Menu
-                Grid.Row="0"
-                Padding="0,1"
-                Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <MenuItem Height="22" Header="File">
-                    <MenuItem Command="{Binding CloseWindowCommand}" Header="Close Player" />
-                    <MenuItem Command="{Binding CloseAllWindowsCommand}" Header="Close All Players" />
-                </MenuItem>
-                <MenuItem Height="22" Header="Settings">
-                    <MenuItem Header="Audio Device" ItemsSource="{Binding MediaPlayer.AudioDevices}">
-                        <MenuItem.ItemContainerStyle>
-                            <Style TargetType="MenuItem">
-                                <Setter Property="IsCheckable" Value="True" />
-                                <Setter Property="Header" Value="{Binding Description}" />
-                                <Setter Property="Command" Value="{Binding DataContext.SelectAudioDeviceCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Menu}}" />
-                                <Setter Property="CommandParameter" Value="{Binding}" />
-                                <Setter Property="IsChecked" Value="False" />
-                                <Style.Triggers>
-                                    <DataTrigger Value="True">
-                                        <DataTrigger.Binding>
-                                            <MultiBinding Converter="{StaticResource AreEqualConverter}">
-                                                <Binding />
-                                                <Binding Path="DataContext.MediaPlayer.AudioDevice" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Menu}" />
-                                            </MultiBinding>
-                                        </DataTrigger.Binding>
-                                        <Setter Property="IsChecked" Value="True" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </MenuItem.ItemContainerStyle>
-                    </MenuItem>
-                    <Separator />
-                    <MenuItem Header="2x2 Layout">
-                        <MenuItem
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.TopLeft}"
-                            Header="Top Left" />
-                        <MenuItem
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.TopRight}"
-                            Header="Top Right" />
-                        <MenuItem
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.BottomLeft}"
-                            Header="Bottom Left" />
-                        <MenuItem
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.BottomRight}"
-                            Header="Bottom Right" />
-                    </MenuItem>
-                    <MenuItem Header="3x3 Layout">
-                        <MenuItem
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.TopLeftSmall}"
-                            Header="Top Left" />
-                        <MenuItem
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.TopSmall}"
-                            Header="Top" />
-                        <MenuItem
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.TopRightSmall}"
-                            Header="Top Right" />
-                        <MenuItem
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.LeftSmall}"
-                            Header="Left" />
-                        <MenuItem
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.CenterSmall}"
-                            Header="Center" />
-                        <MenuItem
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.RightSmall}"
-                            Header="Right" />
-                        <MenuItem
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.BottomLeftSmall}"
-                            Header="Bottom Left" />
-                        <MenuItem
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.BottomSmall}"
-                            Header="Bottom" />
-                        <MenuItem
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.BottomRightSmall}"
-                            Header="Bottom Right" />
-                    </MenuItem>
-                </MenuItem>
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="MouseMove">
-                        <i:InvokeCommandAction Command="{Binding MouseMoveControlBarCommand}" />
-                    </i:EventTrigger>
-                    <i:EventTrigger EventName="MouseEnter">
-                        <i:InvokeCommandAction Command="{Binding MouseEnterControlBarCommand}" />
-                    </i:EventTrigger>
-                    <i:EventTrigger EventName="MouseLeave">
-                        <i:InvokeCommandAction Command="{Binding MouseLeaveControlBarCommand}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </Menu>
             <!--  Non-transparent background is required to capture mouse events  -->
-            <Grid Grid.Row="1" Background="#01000000">
+            <Grid Grid.Row="0" Background="#01000000">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseDown">
                         <i:InvokeCommandAction Command="{Binding MouseDownVideoCommand}" PassEventArgsToCommand="True" />
@@ -188,6 +87,96 @@
                         <i:InvokeCommandAction Command="{Binding MouseWheelVideoCommand}" PassEventArgsToCommand="True" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
+                <Grid.Resources>
+                    <!--  Needed for ContextMenu DataContext  -->
+                    <mvvm:BindingProxy x:Key="Proxy" Data="{Binding}" />
+                </Grid.Resources>
+                <Grid.ContextMenu>
+                    <ContextMenu DataContext="{Binding Data, Source={StaticResource Proxy}}" IsOpen="{Binding ContextMenuIsOpen}">
+                        <MenuItem Header="Audio Device" ItemsSource="{Binding MediaPlayer.AudioDevices}">
+                            <MenuItem.ItemContainerStyle>
+                                <Style TargetType="MenuItem">
+                                    <Setter Property="IsCheckable" Value="True" />
+                                    <Setter Property="Header" Value="{Binding Description}" />
+                                    <Setter Property="Command" Value="{Binding DataContext.SelectAudioDeviceCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
+                                    <Setter Property="CommandParameter" Value="{Binding}" />
+                                    <Setter Property="IsChecked" Value="False" />
+                                    <Style.Triggers>
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <MultiBinding Converter="{StaticResource AreEqualConverter}">
+                                                    <Binding />
+                                                    <Binding Path="DataContext.MediaPlayer.AudioDevice" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}" />
+                                                </MultiBinding>
+                                            </DataTrigger.Binding>
+                                            <Setter Property="IsChecked" Value="True" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </MenuItem.ItemContainerStyle>
+                        </MenuItem>
+                        <Separator />
+                        <MenuItem Header="2x2 Layout">
+                            <MenuItem
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.TopLeft}"
+                                Header="Top Left" />
+                            <MenuItem
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.TopRight}"
+                                Header="Top Right" />
+                            <MenuItem
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.BottomLeft}"
+                                Header="Bottom Left" />
+                            <MenuItem
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.BottomRight}"
+                                Header="Bottom Right" />
+                        </MenuItem>
+                        <MenuItem Header="3x3 Layout">
+                            <MenuItem
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.TopLeftSmall}"
+                                Header="Top Left" />
+                            <MenuItem
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.TopSmall}"
+                                Header="Top" />
+                            <MenuItem
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.TopRightSmall}"
+                                Header="Top Right" />
+                            <MenuItem
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.LeftSmall}"
+                                Header="Left" />
+                            <MenuItem
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.CenterSmall}"
+                                Header="Center" />
+                            <MenuItem
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.RightSmall}"
+                                Header="Right" />
+                            <MenuItem
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.BottomLeftSmall}"
+                                Header="Bottom Left" />
+                            <MenuItem
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.BottomSmall}"
+                                Header="Bottom" />
+                            <MenuItem
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.BottomRightSmall}"
+                                Header="Bottom Right" />
+                        </MenuItem>
+                        <Separator />
+                        <MenuItem Command="{Binding CloseWindowCommand}" Header="Close Player" />
+                        <MenuItem Command="{Binding CloseAllWindowsCommand}" Header="Close All Players" />
+                    </ContextMenu>
+                </Grid.ContextMenu>
                 <Label
                     HorizontalAlignment="Center"
                     VerticalAlignment="Top"
@@ -197,7 +186,7 @@
                     Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}" />
             </Grid>
             <Border
-                Grid.Row="2"
+                Grid.Row="1"
                 Height="Auto"
                 BorderBrush="#ABADB3"
                 BorderThickness="1"

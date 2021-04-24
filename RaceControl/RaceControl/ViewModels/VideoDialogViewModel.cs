@@ -53,6 +53,7 @@ namespace RaceControl.ViewModels
         private VideoDialogSettings _dialogSettings;
         private WindowStartupLocation _startupLocation = WindowStartupLocation.CenterOwner;
         private bool _showControls = true;
+        private bool _contextMenuIsOpen;
         private Timer _showControlsTimer;
 
         public VideoDialogViewModel(
@@ -123,6 +124,12 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _showControls, value);
         }
 
+        public bool ContextMenuIsOpen
+        {
+            get => _contextMenuIsOpen;
+            set => SetProperty(ref _contextMenuIsOpen, value);
+        }
+
         public override void OnDialogOpened(IDialogParameters parameters)
         {
             _subscriptionToken = parameters.GetValue<string>(ParameterNames.SubscriptionToken);
@@ -156,12 +163,15 @@ namespace RaceControl.ViewModels
 
         private void ShowControlsTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            ShowControls = false;
-
-            Application.Current.Dispatcher.Invoke(() =>
+            if (!ContextMenuIsOpen)
             {
-                Mouse.OverrideCursor = Cursors.None;
-            });
+                ShowControls = false;
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    Mouse.OverrideCursor = Cursors.None;
+                });
+            }
         }
 
         private void MouseDownVideoExecute(MouseButtonEventArgs e)
