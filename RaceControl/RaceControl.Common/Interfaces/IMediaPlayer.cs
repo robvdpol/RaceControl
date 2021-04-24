@@ -28,7 +28,7 @@ namespace RaceControl.Common.Interfaces
 
         IMediaTrack AudioTrack { get; set; }
 
-        void StartPlayback(string streamUrl, VideoQuality videoQuality, string audioDevice, bool isMuted, int volume);
+        void StartPlayback(string streamUrl, VideoQuality videoQuality, string audioDevice, string audioTrack, bool isMuted, int volume);
 
         void StopPlayback();
 

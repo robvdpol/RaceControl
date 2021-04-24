@@ -17,6 +17,7 @@ namespace RaceControl.Core.Settings
         private bool _isMuted;
         private int _volume;
         private string _audioDevice;
+        private string _audioTrack;
         private string _channelName;
 
         public double Top
@@ -83,6 +84,12 @@ namespace RaceControl.Core.Settings
         {
             get => _audioDevice;
             set => SetProperty(ref _audioDevice, value);
+        }
+
+        public string AudioTrack
+        {
+            get => _audioTrack;
+            set => SetProperty(ref _audioTrack, value);
         }
 
         public string ChannelName

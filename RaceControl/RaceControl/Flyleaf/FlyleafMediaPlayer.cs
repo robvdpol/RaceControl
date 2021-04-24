@@ -110,14 +110,14 @@ namespace RaceControl.Flyleaf
             }
         }
 
-        public void StartPlayback(string streamUrl, VideoQuality videoQuality, string audioDevice, bool isMuted, int volume)
+        public void StartPlayback(string streamUrl, VideoQuality videoQuality, string audioDevice, string audioTrack, bool isMuted, int volume)
         {
             Player.PropertyChanged += PlayerOnPropertyChanged;
             Player.OpenCompleted += (_, args) =>
             {
                 if (args.success)
                 {
-                    PlayerOnOpenCompleted(args.type, videoQuality, audioDevice, isMuted, volume);
+                    PlayerOnOpenCompleted(args.type, videoQuality, audioDevice, audioTrack, isMuted, volume);
                 }
             };
             Player.Open(streamUrl);
@@ -206,7 +206,7 @@ namespace RaceControl.Flyleaf
             }
         }
 
-        private void PlayerOnOpenCompleted(MediaType mediaType, VideoQuality videoQuality, string audioDevice, bool isMuted, int volume)
+        private void PlayerOnOpenCompleted(MediaType mediaType, VideoQuality videoQuality, string audioDevice, string audioTrack, bool isMuted, int volume)
         {
             switch (mediaType)
             {
@@ -224,7 +224,7 @@ namespace RaceControl.Flyleaf
                     if (!_audioInitialized)
                     {
                         _audioInitialized = true;
-                        InitializeAudio(audioDevice, isMuted, volume);
+                        InitializeAudio(audioDevice, audioTrack, isMuted, volume);
                     }
 
                     var audioStream = Player.Session.CurAudioStream;
@@ -232,8 +232,7 @@ namespace RaceControl.Flyleaf
                     if (audioStream != null)
                     {
                         var audioTrackId = new FlyleafAudioTrack(audioStream).Id;
-                        var audioTrack = AudioTracks.FirstOrDefault(track => track.Id == audioTrackId);
-                        SetProperty(ref _audioTrack, audioTrack, nameof(AudioTrack));
+                        SetProperty(ref _audioTrack, AudioTracks.FirstOrDefault(track => track.Id == audioTrackId), nameof(AudioTrack));
                     }
 
                     break;
@@ -272,7 +271,7 @@ namespace RaceControl.Flyleaf
             }
         }
 
-        private void InitializeAudio(string audioDevice, bool isMuted, int volume)
+        private void InitializeAudio(string audioDevice, string audioTrack, bool isMuted, int volume)
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
@@ -302,6 +301,16 @@ namespace RaceControl.Flyleaf
                 if (device != null)
                 {
                     SetProperty(ref _audioDevice, device, nameof(AudioDevice));
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(audioTrack))
+            {
+                var track = AudioTracks.FirstOrDefault(t => t.Id == audioTrack);
+
+                if (track != null)
+                {
+                    AudioTrack = track;
                 }
             }
         }

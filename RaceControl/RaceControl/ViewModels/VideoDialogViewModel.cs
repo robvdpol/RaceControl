@@ -395,6 +395,7 @@ namespace RaceControl.ViewModels
             DialogSettings.IsMuted = settings.IsMuted;
             DialogSettings.Volume = settings.Volume;
             DialogSettings.AudioDevice = settings.AudioDevice;
+            DialogSettings.AudioTrack = settings.AudioTrack;
             DialogSettings.VideoQuality = settings.VideoQuality;
         }
 
@@ -413,6 +414,7 @@ namespace RaceControl.ViewModels
                 IsMuted = MediaPlayer.IsMuted,
                 Volume = MediaPlayer.Volume,
                 AudioDevice = MediaPlayer.AudioDevice?.Identifier,
+                AudioTrack = MediaPlayer.AudioTrack?.Id,
                 ChannelName = PlayableContent.Name
             };
         }
@@ -445,7 +447,7 @@ namespace RaceControl.ViewModels
                 throw new Exception("An error occurred while retrieving the stream URL.");
             }
 
-            MediaPlayer.StartPlayback(streamUrl, DialogSettings.VideoQuality, DialogSettings.AudioDevice, DialogSettings.IsMuted, DialogSettings.Volume);
+            MediaPlayer.StartPlayback(streamUrl, DialogSettings.VideoQuality, DialogSettings.AudioDevice, DialogSettings.AudioTrack, DialogSettings.IsMuted, DialogSettings.Volume);
         }
 
         private void SubscribeEvents()
