@@ -2,7 +2,6 @@
 using Prism.Commands;
 using Prism.Events;
 using Prism.Services.Dialogs;
-using RaceControl.Common.Constants;
 using RaceControl.Common.Enums;
 using RaceControl.Common.Interfaces;
 using RaceControl.Core.Helpers;
@@ -26,7 +25,6 @@ namespace RaceControl.ViewModels
         private const int MouseWheelDelta = 12;
 
         private readonly IEventAggregator _eventAggregator;
-        private readonly ISettings _settings;
         private readonly IApiService _apiService;
         private readonly IVideoDialogLayout _videoDialogLayout;
         private readonly object _showControlsTimerLock = new();
@@ -60,14 +58,12 @@ namespace RaceControl.ViewModels
         public VideoDialogViewModel(
             ILogger logger,
             IEventAggregator eventAggregator,
-            ISettings settings,
             IApiService apiService,
             IVideoDialogLayout videoDialogLayout,
             IMediaPlayer mediaPlayer)
             : base(logger)
         {
             _eventAggregator = eventAggregator;
-            _settings = settings;
             _apiService = apiService;
             _videoDialogLayout = videoDialogLayout;
             MediaPlayer = mediaPlayer;
@@ -457,8 +453,7 @@ namespace RaceControl.ViewModels
 
         private async Task StartPlaybackAsync()
         {
-            var streamType = _settings.GetStreamType(StreamTypeKeys.BigScreenHls);
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(_subscriptionToken, streamType, PlayableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(_subscriptionToken, PlayableContent);
 
             if (string.IsNullOrWhiteSpace(streamUrl))
             {

@@ -27,6 +27,6 @@ namespace RaceControl.Services.Interfaces.F1TV
 
         Task<List<Episode>> GetEpisodesForGenreAsync(string genre);
 
-        Task<string> GetTokenisedUrlAsync(string subscriptionToken, string streamType, IPlayableContent playableContent);
+        Task<string> GetTokenisedUrlAsync(string subscriptionToken, IPlayableContent playableContent);
     }
 }

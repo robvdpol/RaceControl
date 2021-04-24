@@ -158,13 +158,6 @@ namespace RaceControl.ViewModels
 
         public ICollection<NetworkInterface> NetworkInterfaces { get; } = NetworkInterface.GetAllNetworkInterfaces().ToList();
 
-        public IDictionary<string, string> StreamTypes { get; } = new Dictionary<string, string>
-        {
-            { StreamTypeKeys.Auto, "Automatic" },
-            { StreamTypeKeys.BigScreenHls, "HLS" },
-            { StreamTypeKeys.BigScreenDash, "DASH" }
-        };
-
         public string SubscriptionToken
         {
             get => _subscriptionToken;
@@ -795,8 +788,7 @@ namespace RaceControl.ViewModels
 
         private async Task WatchInVlcAsync(IPlayableContent playableContent)
         {
-            var streamType = Settings.GetStreamType(StreamTypeKeys.BigScreenHls);
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, streamType, playableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, playableContent);
 
             if (!ValidateStreamUrl(streamUrl))
             {
@@ -809,8 +801,7 @@ namespace RaceControl.ViewModels
 
         private async Task WatchInMpvAsync(IPlayableContent playableContent, VideoDialogSettings settings = null)
         {
-            var streamType = Settings.GetStreamType(StreamTypeKeys.BigScreenHls);
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, streamType, playableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, playableContent);
 
             if (!ValidateStreamUrl(streamUrl))
             {
@@ -883,8 +874,7 @@ namespace RaceControl.ViewModels
 
         private async Task CastContentAsync(IReceiver receiver, IPlayableContent playableContent)
         {
-            var streamType = Settings.GetStreamType(StreamTypeKeys.BigScreenHls);
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, streamType, playableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, playableContent);
 
             if (!ValidateStreamUrl(streamUrl))
             {
@@ -918,8 +908,7 @@ namespace RaceControl.ViewModels
 
         private async Task CopyUrlAsync(IPlayableContent playableContent)
         {
-            var streamType = Settings.GetStreamType(StreamTypeKeys.BigScreenHls);
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, streamType, playableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, playableContent);
 
             if (!ValidateStreamUrl(streamUrl))
             {

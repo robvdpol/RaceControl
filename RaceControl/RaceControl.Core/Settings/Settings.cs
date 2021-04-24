@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using NLog;
 using Prism.Mvvm;
-using RaceControl.Common.Constants;
 using RaceControl.Common.Utils;
 using System;
 using System.Collections.ObjectModel;
@@ -18,7 +17,6 @@ namespace RaceControl.Core.Settings
 
         private bool _disableMpvNoBorder;
         private string _additionalMpvParameters;
-        private string _preferredStreamType = StreamTypeKeys.Auto;
         private string _latestRelease;
         private ObservableCollection<string> _selectedSeries;
 
@@ -38,12 +36,6 @@ namespace RaceControl.Core.Settings
         {
             get => _additionalMpvParameters;
             set => SetProperty(ref _additionalMpvParameters, value);
-        }
-
-        public string PreferredStreamType
-        {
-            get => _preferredStreamType;
-            set => SetProperty(ref _preferredStreamType, value);
         }
 
         public string LatestRelease
@@ -91,11 +83,6 @@ namespace RaceControl.Core.Settings
             }
 
             _logger.Info("Settings saved.");
-        }
-
-        public string GetStreamType(string autoStreamType)
-        {
-            return PreferredStreamType == StreamTypeKeys.Auto ? autoStreamType : PreferredStreamType;
         }
     }
 }
