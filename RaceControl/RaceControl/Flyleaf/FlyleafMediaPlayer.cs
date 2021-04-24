@@ -105,24 +105,21 @@ namespace RaceControl.Flyleaf
 
         public void SetVideoQuality(VideoQuality videoQuality)
         {
-            int minHeight;
+            var maxHeight = Player.curVideoPlugin.VideoStreams.Max(s => s.Height);
+            var minHeight = maxHeight;
 
             switch (videoQuality)
             {
                 case VideoQuality.Medium:
-                    minHeight = 720;
+                    minHeight = maxHeight / 3 * 2;
                     break;
 
                 case VideoQuality.Low:
-                    minHeight = 540;
+                    minHeight = maxHeight / 2;
                     break;
 
                 case VideoQuality.Lowest:
-                    minHeight = 360;
-                    break;
-
-                default:
-                    minHeight = 1080;
+                    minHeight = maxHeight / 3;
                     break;
             }
 
