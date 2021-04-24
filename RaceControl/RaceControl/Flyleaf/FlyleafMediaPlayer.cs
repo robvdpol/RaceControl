@@ -22,6 +22,7 @@ namespace RaceControl.Flyleaf
         private bool _isMuted;
         private ObservableCollection<IAudioDevice> _audioDevices;
         private ObservableCollection<IMediaTrack> _audioTracks;
+        private IAudioDevice _audioDevice;
         private IMediaTrack _audioTrack;
         private bool _videoInitialized;
         private bool _audioInitialized;
@@ -73,8 +74,20 @@ namespace RaceControl.Flyleaf
         }
 
         public ObservableCollection<IAudioDevice> AudioDevices => _audioDevices ??= new ObservableCollection<IAudioDevice>();
+
         public ObservableCollection<IMediaTrack> AudioTracks => _audioTracks ??= new ObservableCollection<IMediaTrack>();
-        public IAudioDevice AudioDevice { get; set; }
+
+        public IAudioDevice AudioDevice
+        {
+            get => _audioDevice;
+            set
+            {
+                if (SetProperty(ref _audioDevice, value) && _audioDevice != null)
+                {
+                    Player.audioPlayer.Device = _audioDevice.Identifier;
+                }
+            }
+        }
 
         public IMediaTrack AudioTrack
         {
@@ -97,12 +110,15 @@ namespace RaceControl.Flyleaf
             }
         }
 
-        public void StartPlayback(string streamUrl, string audioDevice, bool isMuted, int volume, VideoQuality videoQuality)
+        public void StartPlayback(string streamUrl, VideoQuality videoQuality, string audioDevice, bool isMuted, int volume)
         {
             Player.PropertyChanged += PlayerOnPropertyChanged;
             Player.OpenCompleted += (_, args) =>
             {
-                PlayerOnOpenCompleted(args, audioDevice, isMuted, volume, videoQuality);
+                if (args.success)
+                {
+                    PlayerOnOpenCompleted(args.type, videoQuality, audioDevice, isMuted, volume);
+                }
             };
             Player.Open(streamUrl);
         }
@@ -181,22 +197,24 @@ namespace RaceControl.Flyleaf
             _disposed = true;
         }
 
-        private void PlayerOnOpenCompleted(Player.OpenCompletedArgs e, string audioDevice, bool isMuted, int volume, VideoQuality videoQuality)
+        private void PlayerOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (!e.success)
+            if (e.PropertyName == nameof(Player.Status))
             {
-                return;
+                IsPlaying = Player.Status == Status.Playing;
+                IsPaused = Player.Status == Status.Paused;
             }
+        }
 
-            switch (e.type)
+        private void PlayerOnOpenCompleted(MediaType mediaType, VideoQuality videoQuality, string audioDevice, bool isMuted, int volume)
+        {
+            switch (mediaType)
             {
                 case MediaType.Video:
                     if (!_videoInitialized)
                     {
                         _videoInitialized = true;
-                        Duration = Player.Session.Movie.Duration;
-                        Player.Session.PropertyChanged += SessionOnPropertyChanged;
-                        SetVideoQuality(videoQuality);
+                        InitializeVideo(videoQuality);
                     }
 
                     Player.Play();
@@ -206,14 +224,7 @@ namespace RaceControl.Flyleaf
                     if (!_audioInitialized)
                     {
                         _audioInitialized = true;
-                        Player.audioPlayer.PropertyChanged += AudioPlayerOnPropertyChanged;
-                        Volume = volume;
-                        ToggleMute(isMuted);
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            AudioTracks.Clear();
-                            AudioTracks.AddRange(Player.curAudioPlugin.AudioStreams.Select(stream => new FlyleafAudioTrack(stream)));
-                        });
+                        InitializeAudio(audioDevice, isMuted, volume);
                     }
 
                     var audioStream = Player.Session.CurAudioStream;
@@ -229,11 +240,11 @@ namespace RaceControl.Flyleaf
             }
         }
 
-        private void PlayerOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void SessionOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(Player.Status))
+            if (e.PropertyName == nameof(Player.Session.CurTime))
             {
-                UpdatePlayerStatus();
+                SetProperty(ref _time, Player.Session.CurTime, nameof(Time));
             }
         }
 
@@ -250,18 +261,49 @@ namespace RaceControl.Flyleaf
             }
         }
 
-        private void SessionOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void InitializeVideo(VideoQuality videoQuality)
         {
-            if (e.PropertyName == nameof(Player.Session.CurTime))
+            Player.Session.PropertyChanged += SessionOnPropertyChanged;
+            Duration = Player.Session.Movie.Duration;
+
+            if (videoQuality != VideoQuality.High)
             {
-                SetProperty(ref _time, Player.Session.CurTime, nameof(Time));
+                SetVideoQuality(videoQuality);
             }
         }
 
-        private void UpdatePlayerStatus()
+        private void InitializeAudio(string audioDevice, bool isMuted, int volume)
         {
-            IsPlaying = Player.Status == Status.Playing;
-            IsPaused = Player.Status == Status.Paused;
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                AudioDevices.Clear();
+                AudioDevices.AddRange(Master.AudioMaster.Devices.Select(device => new FlyleafAudioDevice(device)));
+                AudioTracks.Clear();
+                AudioTracks.AddRange(Player.curAudioPlugin.AudioStreams.Select(stream => new FlyleafAudioTrack(stream)));
+            });
+
+            Player.audioPlayer.PropertyChanged += AudioPlayerOnPropertyChanged;
+            Volume = volume;
+            ToggleMute(isMuted);
+
+            if (!string.IsNullOrWhiteSpace(audioDevice))
+            {
+                var device = AudioDevices.FirstOrDefault(d => d.Identifier == audioDevice);
+
+                if (device != null)
+                {
+                    AudioDevice = device;
+                }
+            }
+            else
+            {
+                var device = AudioDevices.FirstOrDefault(d => d.Identifier == Player.audioPlayer.Device);
+
+                if (device != null)
+                {
+                    SetProperty(ref _audioDevice, device, nameof(AudioDevice));
+                }
+            }
         }
     }
 }

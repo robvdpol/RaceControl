@@ -412,7 +412,7 @@ namespace RaceControl.ViewModels
                 Topmost = DialogSettings.Topmost,
                 IsMuted = MediaPlayer.IsMuted,
                 Volume = MediaPlayer.Volume,
-                AudioDevice = MediaPlayer.AudioDevice?.Description,
+                AudioDevice = MediaPlayer.AudioDevice?.Identifier,
                 ChannelName = PlayableContent.Name
             };
         }
@@ -438,21 +438,6 @@ namespace RaceControl.ViewModels
 
         private async Task StartStreamAsync()
         {
-            //if (!string.IsNullOrWhiteSpace(DialogSettings.AudioDevice))
-            //{
-            //    var audioDevice = MediaPlayer.AudioDevices.FirstOrDefault(ad => ad.Description == DialogSettings.AudioDevice);
-
-            //    if (audioDevice != null)
-            //    {
-            //        MediaPlayer.AudioDevice = audioDevice;
-            //    }
-            //}
-
-            await StartPlaybackAsync();
-        }
-
-        private async Task StartPlaybackAsync()
-        {
             var streamUrl = await _apiService.GetTokenisedUrlAsync(_subscriptionToken, PlayableContent);
 
             if (string.IsNullOrWhiteSpace(streamUrl))
@@ -460,7 +445,7 @@ namespace RaceControl.ViewModels
                 throw new Exception("An error occurred while retrieving the stream URL.");
             }
 
-            MediaPlayer.StartPlayback(streamUrl, DialogSettings.AudioDevice, DialogSettings.IsMuted, DialogSettings.Volume, DialogSettings.VideoQuality);
+            MediaPlayer.StartPlayback(streamUrl, DialogSettings.VideoQuality, DialogSettings.AudioDevice, DialogSettings.IsMuted, DialogSettings.Volume);
         }
 
         private void SubscribeEvents()
