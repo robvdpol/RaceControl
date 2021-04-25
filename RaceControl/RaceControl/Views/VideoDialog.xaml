@@ -217,6 +217,7 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <TextBlock
                             Grid.Column="0"
@@ -242,11 +243,27 @@
                         </Slider>
                         <TextBlock
                             Grid.Column="2"
+                            Margin="3,2"
+                            VerticalAlignment="Center"
+                            Text="{Binding MediaPlayer.Duration, StringFormat=hh\\:mm\\:ss, Converter={StaticResource TicksToTimeSpanConverter}}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding PlayableContent.IsLive}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <TextBlock
+                            Grid.Column="3"
                             Margin="5,2"
                             VerticalAlignment="Center"
                             Text="Volume" />
                         <Slider
-                            Grid.Column="3"
+                            Grid.Column="4"
                             Width="100"
                             Margin="2"
                             VerticalAlignment="Center"
@@ -257,7 +274,7 @@
                             TickPlacement="BottomRight"
                             Value="{Binding MediaPlayer.Volume}" />
                         <TextBlock
-                            Grid.Column="4"
+                            Grid.Column="5"
                             Width="30"
                             Margin="5,2"
                             VerticalAlignment="Center"
