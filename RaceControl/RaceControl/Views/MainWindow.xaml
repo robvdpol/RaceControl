@@ -431,11 +431,17 @@
                                 <Button
                                     Grid.Row="0"
                                     Grid.Column="0"
-                                    Grid.ColumnSpan="2"
                                     Command="{Binding SaveVideoDialogLayoutCommand}"
-                                    Content="Save current layout"
+                                    Content="Save layout"
                                     Style="{StaticResource OptionButtonStyle}"
                                     ToolTip="Saves the position and size of all currently open video players (Ctrl+S)" />
+                                <Button
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    Command="{Binding ImportVideoDialogLayoutCommand}"
+                                    Content="Import layout"
+                                    Style="{StaticResource OptionButtonStyle}"
+                                    ToolTip="Import a saved layout from file" />
                                 <Button
                                     Grid.Row="1"
                                     Grid.Column="0"

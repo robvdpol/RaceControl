@@ -6,8 +6,10 @@ namespace RaceControl.Core.Settings
     {
         ObservableCollection<VideoDialogSettings> Instances { get; }
 
-        void Load();
+        bool Load(string filename = null);
 
         bool Save();
+
+        bool Import(string filename);
     }
 }
