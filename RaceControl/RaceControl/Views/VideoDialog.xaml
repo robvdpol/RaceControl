@@ -276,7 +276,7 @@
                         <TextBlock
                             Grid.Column="5"
                             Width="30"
-                            Margin="5,2"
+                            Margin="3,2"
                             VerticalAlignment="Center"
                             Text="{Binding MediaPlayer.Volume, StringFormat={}{0}%}" />
                     </Grid>
