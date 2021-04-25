@@ -227,7 +227,7 @@ namespace RaceControl.Flyleaf
                         InitializeAudio(audioDevice, audioTrack, isMuted, volume);
                     }
 
-                    Player.Config.audio.DelayTicks = -TimeSpan.FromMilliseconds(150).Ticks;
+                    Player.Config.audio.DelayTicks = -TimeSpan.FromMilliseconds(200).Ticks;
 
                     var audioStream = Player.Session.CurAudioStream;
 

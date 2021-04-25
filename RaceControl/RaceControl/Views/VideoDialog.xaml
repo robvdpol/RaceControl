@@ -221,7 +221,7 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock
                             Grid.Column="0"
-                            Margin="5,2"
+                            Margin="3,2"
                             VerticalAlignment="Center"
                             Text="{Binding MediaPlayer.Time, StringFormat=hh\\:mm\\:ss, Converter={StaticResource TicksToTimeSpanConverter}}" />
                         <Slider
