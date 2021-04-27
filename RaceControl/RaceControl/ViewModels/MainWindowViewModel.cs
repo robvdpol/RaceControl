@@ -69,6 +69,7 @@ namespace RaceControl.ViewModels
         private ICommand _copyContentUrlCommand;
         private ICommand _downloadContentCommand;
         private ICommand _saveVideoDialogLayoutCommand;
+        private ICommand _importVideoDialogLayoutCommand;
         private ICommand _openVideoDialogLayoutCommand;
         private ICommand _scanReceiversCommand;
         private ICommand _receiverSelectionChangedCommand;
@@ -144,6 +145,7 @@ namespace RaceControl.ViewModels
         public ICommand CopyContentUrlCommand => _copyContentUrlCommand ??= new DelegateCommand<IPlayableContent>(CopyContentUrlExecute);
         public ICommand DownloadContentCommand => _downloadContentCommand ??= new DelegateCommand<IPlayableContent>(DownloadContentExecute, CanDownloadContentExecute);
         public ICommand SaveVideoDialogLayoutCommand => _saveVideoDialogLayoutCommand ??= new DelegateCommand(SaveVideoDialogLayoutExecute);
+        public ICommand ImportVideoDialogLayoutCommand => _importVideoDialogLayoutCommand ??= new DelegateCommand(ImportVideoDialogLayoutExecute);
         public ICommand OpenVideoDialogLayoutCommand => _openVideoDialogLayoutCommand ??= new DelegateCommand<PlayerType?>(OpenVideoDialogLayoutExecute, CanOpenVideoDialogLayoutExecute).ObservesProperty(() => VideoDialogLayout.Instances.Count).ObservesProperty(() => Channels.Count);
         public ICommand ScanReceiversCommand => _scanReceiversCommand ??= new DelegateCommand(ScanReceiversExecute);
         public ICommand ReceiverSelectionChangedCommand => _receiverSelectionChangedCommand ??= new DelegateCommand(ReceiverSelectionChangedExecute);
@@ -157,13 +159,6 @@ namespace RaceControl.ViewModels
         public ICollectionView EpisodesView { get; }
 
         public ICollection<NetworkInterface> NetworkInterfaces { get; } = NetworkInterface.GetAllNetworkInterfaces().ToList();
-
-        public IDictionary<string, string> StreamTypes { get; } = new Dictionary<string, string>
-        {
-            { StreamTypeKeys.Auto, "Automatic" },
-            { StreamTypeKeys.BigScreenHls, "HLS" },
-            { StreamTypeKeys.BigScreenDash, "DASH" }
-        };
 
         public string SubscriptionToken
         {
@@ -425,6 +420,8 @@ namespace RaceControl.ViewModels
 
         private void SaveVideoDialogLayoutExecute()
         {
+            const string caption = "Save layout";
+
             VideoDialogLayout.Instances.Clear();
             _eventAggregator.GetEvent<SaveLayoutEvent>().Publish(ContentType.Channel);
 
@@ -432,13 +429,32 @@ namespace RaceControl.ViewModels
             {
                 if (VideoDialogLayout.Save())
                 {
-                    MessageBoxHelper.ShowInfo("The current window layout has been successfully saved.", "Video player layout");
+                    MessageBoxHelper.ShowInfo("The current window layout has been successfully saved.", caption);
                 }
             }
             else
             {
                 VideoDialogLayout.Load();
-                MessageBoxHelper.ShowError("Could not find any internal player windows to save.", "Video player layout");
+                MessageBoxHelper.ShowError("Could not find any internal player windows to save.", caption);
+            }
+        }
+
+        private void ImportVideoDialogLayoutExecute()
+        {
+            const string caption = "Import layout";
+
+            var initialDirectory = FolderUtils.GetLocalApplicationDataFolder();
+
+            if (_dialogService.OpenFile("Select layout file", initialDirectory, ".json", out var filename))
+            {
+                if (VideoDialogLayout.Import(filename))
+                {
+                    MessageBoxHelper.ShowInfo("Layout file has been successfully imported.", caption);
+                }
+                else
+                {
+                    MessageBoxHelper.ShowError("Layout file could not be imported.", caption);
+                }
             }
         }
 
@@ -795,8 +811,7 @@ namespace RaceControl.ViewModels
 
         private async Task WatchInVlcAsync(IPlayableContent playableContent)
         {
-            var streamType = Settings.GetStreamType(StreamTypeKeys.BigScreenHls);
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, streamType, playableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, playableContent);
 
             if (!ValidateStreamUrl(streamUrl))
             {
@@ -809,8 +824,7 @@ namespace RaceControl.ViewModels
 
         private async Task WatchInMpvAsync(IPlayableContent playableContent, VideoDialogSettings settings = null)
         {
-            var streamType = Settings.GetStreamType(StreamTypeKeys.BigScreenHls);
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, streamType, playableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, playableContent);
 
             if (!ValidateStreamUrl(streamUrl))
             {
@@ -883,8 +897,7 @@ namespace RaceControl.ViewModels
 
         private async Task CastContentAsync(IReceiver receiver, IPlayableContent playableContent)
         {
-            var streamType = Settings.GetStreamType(StreamTypeKeys.BigScreenHls);
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, streamType, playableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, playableContent);
 
             if (!ValidateStreamUrl(streamUrl))
             {
@@ -918,8 +931,7 @@ namespace RaceControl.ViewModels
 
         private async Task CopyUrlAsync(IPlayableContent playableContent)
         {
-            var streamType = Settings.GetStreamType(StreamTypeKeys.BigScreenHls);
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, streamType, playableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, playableContent);
 
             if (!ValidateStreamUrl(streamUrl))
             {
@@ -932,8 +944,9 @@ namespace RaceControl.ViewModels
         private void StartDownload(IPlayableContent playableContent)
         {
             var defaultFilename = $"{playableContent.Title}.ts".RemoveInvalidFileNameChars();
+            var initialDirectory = FolderUtils.GetSpecialFolderPath(Environment.SpecialFolder.Desktop);
 
-            if (_dialogService.SelectFile("Select a filename", Environment.CurrentDirectory, defaultFilename, ".ts", out var filename))
+            if (_dialogService.SaveFile("Select a filename", initialDirectory, defaultFilename, ".ts", out var filename))
             {
                 var parameters = new DialogParameters
                 {
