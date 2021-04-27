@@ -86,6 +86,7 @@ To open and build the solution you need:
 * The extension [Microsoft Visual Studio Installer Projects](https://marketplace.visualstudio.com/items?itemName=VisualStudioClient.MicrosoftVisualStudio2017InstallerProjects) to open the RaceControl.Installer project
 
 ## Acknowledgements
+* [Flyleaf](https://github.com/SuRGeoNix/Flyleaf) for providing an excellent video player and .NET library
 * [VLC](https://www.videolan.org/vlc) for providing an excellent video player and .NET library
 * [MPV](https://mpv.io) for providing an excellent video player
 * [Flaticon](https://www.flaticon.com) for providing the application icon
