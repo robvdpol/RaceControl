@@ -1,4 +1,5 @@
 ﻿using RaceControl.Common.Enums;
+using RaceControl.Core.Settings;
 using System;
 using System.Collections.ObjectModel;
 
@@ -32,7 +33,7 @@ namespace RaceControl.Interfaces
 
         IMediaTrack AudioTrack { get; set; }
 
-        void StartPlayback(string streamUrl, VideoQuality videoQuality, string aspectRatio, string audioDevice, string audioTrack, bool isMuted, int volume);
+        void StartPlayback(string streamUrl, VideoDialogSettings settings);
 
         void StopPlayback();
 

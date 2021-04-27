@@ -472,7 +472,7 @@ namespace RaceControl.ViewModels
                 throw new Exception("An error occurred while retrieving the stream URL.");
             }
 
-            MediaPlayer.StartPlayback(streamUrl, DialogSettings.VideoQuality, DialogSettings.AspectRatio, DialogSettings.AudioDevice, DialogSettings.AudioTrack, DialogSettings.IsMuted, DialogSettings.Volume);
+            MediaPlayer.StartPlayback(streamUrl, DialogSettings);
         }
 
         private void SubscribeEvents()

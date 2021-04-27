@@ -2,6 +2,7 @@
 using FlyleafLib.MediaPlayer;
 using Prism.Mvvm;
 using RaceControl.Common.Enums;
+using RaceControl.Core.Settings;
 using RaceControl.Interfaces;
 using System;
 using System.Collections.ObjectModel;
@@ -122,14 +123,14 @@ namespace RaceControl.Flyleaf
             }
         }
 
-        public void StartPlayback(string streamUrl, VideoQuality videoQuality, string aspectRatio, string audioDevice, string audioTrack, bool isMuted, int volume)
+        public void StartPlayback(string streamUrl, VideoDialogSettings settings)
         {
             Player.PropertyChanged += PlayerOnPropertyChanged;
             Player.OpenCompleted += (_, args) =>
             {
                 if (args.success)
                 {
-                    PlayerOnOpenCompleted(args.type, videoQuality, aspectRatio, audioDevice, audioTrack, isMuted, volume);
+                    PlayerOnOpenCompleted(args.type, settings);
                 }
             };
             Player.Open(streamUrl);
@@ -218,7 +219,7 @@ namespace RaceControl.Flyleaf
             }
         }
 
-        private void PlayerOnOpenCompleted(MediaType mediaType, VideoQuality videoQuality, string aspectRatio, string audioDevice, string audioTrack, bool isMuted, int volume)
+        private void PlayerOnOpenCompleted(MediaType mediaType, VideoDialogSettings settings)
         {
             switch (mediaType)
             {
@@ -229,7 +230,7 @@ namespace RaceControl.Flyleaf
 
                         Application.Current.Dispatcher.Invoke(() =>
                         {
-                            InitializeVideo(videoQuality, aspectRatio);
+                            InitializeVideo(settings.VideoQuality, settings.AspectRatio);
                         });
                     }
 
@@ -243,7 +244,7 @@ namespace RaceControl.Flyleaf
 
                         Application.Current.Dispatcher.Invoke(() =>
                         {
-                            InitializeAudio(audioDevice, audioTrack, isMuted, volume);
+                            InitializeAudio(settings.AudioDevice, settings.AudioTrack, settings.IsMuted, settings.Volume);
                         });
                     }
 
