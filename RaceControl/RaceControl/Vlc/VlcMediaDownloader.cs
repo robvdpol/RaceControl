@@ -1,7 +1,7 @@
 ﻿using LibVLCSharp.Shared;
 using Prism.Mvvm;
 using RaceControl.Common.Enums;
-using RaceControl.Common.Interfaces;
+using RaceControl.Interfaces;
 using System;
 using System.Threading;
 using System.Threading.Tasks;

@@ -2,7 +2,7 @@
 using System;
 using System.Collections.ObjectModel;
 
-namespace RaceControl.Common.Interfaces
+namespace RaceControl.Interfaces
 {
     public interface IMediaPlayer : IDisposable
     {

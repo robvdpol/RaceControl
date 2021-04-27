@@ -1,6 +1,6 @@
 ﻿using FlyleafLib;
 using FlyleafLib.Plugins.MediaStream;
-using RaceControl.Common.Interfaces;
+using RaceControl.Interfaces;
 
 namespace RaceControl.Flyleaf
 {

@@ -1,4 +1,4 @@
-﻿namespace RaceControl.Common.Interfaces
+﻿namespace RaceControl.Interfaces
 {
     public interface IAudioDevice
     {

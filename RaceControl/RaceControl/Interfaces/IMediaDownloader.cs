@@ -2,7 +2,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace RaceControl.Common.Interfaces
+namespace RaceControl.Interfaces
 {
     public interface IMediaDownloader : IDisposable
     {

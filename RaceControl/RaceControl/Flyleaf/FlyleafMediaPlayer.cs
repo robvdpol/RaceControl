@@ -2,7 +2,7 @@
 using FlyleafLib.MediaPlayer;
 using Prism.Mvvm;
 using RaceControl.Common.Enums;
-using RaceControl.Common.Interfaces;
+using RaceControl.Interfaces;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
