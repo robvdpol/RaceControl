@@ -35,6 +35,8 @@ namespace RaceControl.Flyleaf
 
         public Player Player { get; }
 
+        public bool IsMuted => _isMuted;
+
         public int MaxVolume => 150;
 
         public int Volume
@@ -65,12 +67,6 @@ namespace RaceControl.Flyleaf
         {
             get => _isPaused;
             private set => SetProperty(ref _isPaused, value);
-        }
-
-        public bool IsMuted
-        {
-            get => _isMuted;
-            private set => SetProperty(ref _isMuted, value);
         }
 
         public ObservableCollection<IAudioDevice> AudioDevices => _audioDevices ??= new ObservableCollection<IAudioDevice>();
@@ -214,7 +210,11 @@ namespace RaceControl.Flyleaf
                     if (!_videoInitialized)
                     {
                         _videoInitialized = true;
-                        InitializeVideo(videoQuality);
+
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            InitializeVideo(videoQuality);
+                        });
                     }
 
                     Player.Play();
@@ -224,7 +224,11 @@ namespace RaceControl.Flyleaf
                     if (!_audioInitialized)
                     {
                         _audioInitialized = true;
-                        InitializeAudio(audioDevice, audioTrack, isMuted, volume);
+
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            InitializeAudio(audioDevice, audioTrack, isMuted, volume);
+                        });
                     }
 
                     Player.Config.audio.DelayTicks = -TimeSpan.FromMilliseconds(200).Ticks;
@@ -234,7 +238,11 @@ namespace RaceControl.Flyleaf
                     if (audioStream != null)
                     {
                         var audioTrackId = new FlyleafAudioTrack(audioStream).Id;
-                        SetProperty(ref _audioTrack, AudioTracks.FirstOrDefault(track => track.Id == audioTrackId), nameof(AudioTrack));
+
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            SetProperty(ref _audioTrack, AudioTracks.FirstOrDefault(track => track.Id == audioTrackId), nameof(AudioTrack));
+                        });
                     }
 
                     break;
@@ -245,7 +253,10 @@ namespace RaceControl.Flyleaf
         {
             if (e.PropertyName == nameof(Player.Session.CurTime))
             {
-                SetProperty(ref _time, Player.Session.CurTime, nameof(Time));
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    SetProperty(ref _time, Player.Session.CurTime, nameof(Time));
+                });
             }
         }
 
@@ -253,12 +264,18 @@ namespace RaceControl.Flyleaf
         {
             if (e.PropertyName == nameof(Player.audioPlayer.Volume))
             {
-                SetProperty(ref _volume, Player.audioPlayer.Volume, nameof(Volume));
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    SetProperty(ref _volume, Player.audioPlayer.Volume, nameof(Volume));
+                });
             }
 
             if (e.PropertyName == nameof(Player.audioPlayer.Mute))
             {
-                IsMuted = Player.audioPlayer.Mute;
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    SetProperty(ref _isMuted, Player.audioPlayer.Mute, nameof(IsMuted));
+                });
             }
         }
 
@@ -275,13 +292,10 @@ namespace RaceControl.Flyleaf
 
         private void InitializeAudio(string audioDevice, string audioTrack, bool isMuted, int volume)
         {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                AudioDevices.Clear();
-                AudioDevices.AddRange(Master.AudioMaster.Devices.Select(device => new FlyleafAudioDevice(device)));
-                AudioTracks.Clear();
-                AudioTracks.AddRange(Player.curAudioPlugin.AudioStreams.Select(stream => new FlyleafAudioTrack(stream)));
-            });
+            AudioDevices.Clear();
+            AudioDevices.AddRange(Master.AudioMaster.Devices.Select(device => new FlyleafAudioDevice(device)));
+            AudioTracks.Clear();
+            AudioTracks.AddRange(Player.curAudioPlugin.AudioStreams.Select(stream => new FlyleafAudioTrack(stream)));
 
             Player.audioPlayer.PropertyChanged += AudioPlayerOnPropertyChanged;
             Volume = volume;

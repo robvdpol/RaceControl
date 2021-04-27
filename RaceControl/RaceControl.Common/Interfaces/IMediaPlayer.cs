@@ -6,6 +6,8 @@ namespace RaceControl.Common.Interfaces
 {
     public interface IMediaPlayer : IDisposable
     {
+        bool IsMuted { get; }
+
         int MaxVolume { get; }
 
         int Volume { get; set; }
@@ -17,8 +19,6 @@ namespace RaceControl.Common.Interfaces
         bool IsPlaying { get; }
 
         bool IsPaused { get; }
-
-        bool IsMuted { get; }
 
         ObservableCollection<IAudioDevice> AudioDevices { get; }
 
