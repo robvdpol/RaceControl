@@ -20,15 +20,19 @@ namespace RaceControl.Common.Interfaces
 
         bool IsPaused { get; }
 
+        ObservableCollection<IAspectRatio> AspectRatios { get; }
+
         ObservableCollection<IAudioDevice> AudioDevices { get; }
 
         ObservableCollection<IMediaTrack> AudioTracks { get; }
+
+        IAspectRatio AspectRatio { get; set; }
 
         IAudioDevice AudioDevice { get; set; }
 
         IMediaTrack AudioTrack { get; set; }
 
-        void StartPlayback(string streamUrl, VideoQuality videoQuality, string audioDevice, string audioTrack, bool isMuted, int volume);
+        void StartPlayback(string streamUrl, VideoQuality videoQuality, string aspectRatio, string audioDevice, string audioTrack, bool isMuted, int volume);
 
         void StopPlayback();
 

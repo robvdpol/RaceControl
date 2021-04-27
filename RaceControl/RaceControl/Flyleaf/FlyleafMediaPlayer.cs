@@ -20,8 +20,10 @@ namespace RaceControl.Flyleaf
         private bool _isPlaying;
         private bool _isPaused;
         private bool _isMuted;
+        private ObservableCollection<IAspectRatio> _aspectRatios;
         private ObservableCollection<IAudioDevice> _audioDevices;
         private ObservableCollection<IMediaTrack> _audioTracks;
+        private IAspectRatio _aspectRatio;
         private IAudioDevice _audioDevice;
         private IMediaTrack _audioTrack;
         private bool _videoInitialized;
@@ -69,9 +71,23 @@ namespace RaceControl.Flyleaf
             private set => SetProperty(ref _isPaused, value);
         }
 
+        public ObservableCollection<IAspectRatio> AspectRatios => _aspectRatios ??= new ObservableCollection<IAspectRatio>();
+
         public ObservableCollection<IAudioDevice> AudioDevices => _audioDevices ??= new ObservableCollection<IAudioDevice>();
 
         public ObservableCollection<IMediaTrack> AudioTracks => _audioTracks ??= new ObservableCollection<IMediaTrack>();
+
+        public IAspectRatio AspectRatio
+        {
+            get => _aspectRatio;
+            set
+            {
+                if (SetProperty(ref _aspectRatio, value) && _aspectRatio != null)
+                {
+                    Player.Config.video.AspectRatio = new AspectRatio(_aspectRatio.Value);
+                }
+            }
+        }
 
         public IAudioDevice AudioDevice
         {
@@ -106,14 +122,14 @@ namespace RaceControl.Flyleaf
             }
         }
 
-        public void StartPlayback(string streamUrl, VideoQuality videoQuality, string audioDevice, string audioTrack, bool isMuted, int volume)
+        public void StartPlayback(string streamUrl, VideoQuality videoQuality, string aspectRatio, string audioDevice, string audioTrack, bool isMuted, int volume)
         {
             Player.PropertyChanged += PlayerOnPropertyChanged;
             Player.OpenCompleted += (_, args) =>
             {
                 if (args.success)
                 {
-                    PlayerOnOpenCompleted(args.type, videoQuality, audioDevice, audioTrack, isMuted, volume);
+                    PlayerOnOpenCompleted(args.type, videoQuality, aspectRatio, audioDevice, audioTrack, isMuted, volume);
                 }
             };
             Player.Open(streamUrl);
@@ -202,7 +218,7 @@ namespace RaceControl.Flyleaf
             }
         }
 
-        private void PlayerOnOpenCompleted(MediaType mediaType, VideoQuality videoQuality, string audioDevice, string audioTrack, bool isMuted, int volume)
+        private void PlayerOnOpenCompleted(MediaType mediaType, VideoQuality videoQuality, string aspectRatio, string audioDevice, string audioTrack, bool isMuted, int volume)
         {
             switch (mediaType)
             {
@@ -213,7 +229,7 @@ namespace RaceControl.Flyleaf
 
                         Application.Current.Dispatcher.Invoke(() =>
                         {
-                            InitializeVideo(videoQuality);
+                            InitializeVideo(videoQuality, aspectRatio);
                         });
                     }
 
@@ -279,8 +295,9 @@ namespace RaceControl.Flyleaf
             }
         }
 
-        private void InitializeVideo(VideoQuality videoQuality)
+        private void InitializeVideo(VideoQuality videoQuality, string aspectRatio)
         {
+            AspectRatios.AddRange(FlyleafLib.AspectRatio.AspectRatios.Where(ar => ar != FlyleafLib.AspectRatio.Custom).Select(ar => new FlyleafAspectRatio(ar)));
             Player.Session.PropertyChanged += SessionOnPropertyChanged;
             Duration = Player.Session.Movie.Duration;
 
@@ -288,15 +305,24 @@ namespace RaceControl.Flyleaf
             {
                 SetVideoQuality(videoQuality);
             }
+
+            if (string.IsNullOrWhiteSpace(aspectRatio))
+            {
+                aspectRatio = FlyleafLib.AspectRatio.Keep.ValueStr;
+            }
+
+            var ratio = AspectRatios.FirstOrDefault(ar => ar.Value == aspectRatio);
+
+            if (ratio != null)
+            {
+                AspectRatio = ratio;
+            }
         }
 
         private void InitializeAudio(string audioDevice, string audioTrack, bool isMuted, int volume)
         {
-            AudioDevices.Clear();
             AudioDevices.AddRange(Master.AudioMaster.Devices.Select(device => new FlyleafAudioDevice(device)));
-            AudioTracks.Clear();
             AudioTracks.AddRange(Player.curAudioPlugin.AudioStreams.Select(stream => new FlyleafAudioTrack(stream)));
-
             Player.audioPlayer.PropertyChanged += AudioPlayerOnPropertyChanged;
             Volume = volume;
             ToggleMute(isMuted);

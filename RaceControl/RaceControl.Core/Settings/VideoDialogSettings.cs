@@ -16,6 +16,7 @@ namespace RaceControl.Core.Settings
         private bool _topmost;
         private bool _isMuted;
         private int _volume;
+        private string _aspectRatio;
         private string _audioDevice;
         private string _audioTrack;
         private string _channelName;
@@ -78,6 +79,12 @@ namespace RaceControl.Core.Settings
         {
             get => _volume;
             set => SetProperty(ref _volume, value);
+        }
+
+        public string AspectRatio
+        {
+            get => _aspectRatio;
+            set => SetProperty(ref _aspectRatio, value);
         }
 
         public string AudioDevice

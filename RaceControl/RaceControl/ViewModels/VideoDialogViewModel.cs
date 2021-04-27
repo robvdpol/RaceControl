@@ -44,6 +44,7 @@ namespace RaceControl.ViewModels
         private ICommand _syncSessionCommand;
         private ICommand _toggleFullScreenCommand;
         private ICommand _moveToCornerCommand;
+        private ICommand _selectAspectRatioCommand;
         private ICommand _selectAudioDeviceCommand;
         private ICommand _videoQualitySelectionChangedCommand;
 
@@ -87,6 +88,7 @@ namespace RaceControl.ViewModels
         public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand<long?>(ToggleFullScreenExecute);
         public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => DialogSettings.WindowState);
+        public ICommand SelectAspectRatioCommand => _selectAspectRatioCommand ??= new DelegateCommand<IAspectRatio>(SelectAspectRatioExecute, CanSelectAspectRatioExecute).ObservesProperty(() => MediaPlayer.AspectRatio);
         public ICommand SelectAudioDeviceCommand => _selectAudioDeviceCommand ??= new DelegateCommand<IAudioDevice>(SelectAudioDeviceExecute, CanSelectAudioDeviceExecute).ObservesProperty(() => MediaPlayer.AudioDevice);
         public ICommand VideoQualitySelectionChangedCommand => _videoQualitySelectionChangedCommand ??= new DelegateCommand(VideoQualitySelectionChangedExecute);
 
@@ -372,6 +374,16 @@ namespace RaceControl.ViewModels
             DialogSettings.Left = windowLeft;
         }
 
+        private bool CanSelectAspectRatioExecute(IAspectRatio aspectRatio)
+        {
+            return MediaPlayer.AspectRatio != aspectRatio;
+        }
+
+        private void SelectAspectRatioExecute(IAspectRatio aspectRatio)
+        {
+            MediaPlayer.AspectRatio = aspectRatio;
+        }
+
         private bool CanSelectAudioDeviceExecute(IAudioDevice audioDevice)
         {
             return MediaPlayer.AudioDevice != audioDevice;
@@ -402,11 +414,12 @@ namespace RaceControl.ViewModels
                 DialogSettings.Height = settings.Height;
             }
 
+            DialogSettings.VideoQuality = settings.VideoQuality;
             DialogSettings.IsMuted = settings.IsMuted;
             DialogSettings.Volume = settings.Volume;
+            DialogSettings.AspectRatio = settings.AspectRatio;
             DialogSettings.AudioDevice = settings.AudioDevice;
             DialogSettings.AudioTrack = settings.AudioTrack;
-            DialogSettings.VideoQuality = settings.VideoQuality;
         }
 
         private VideoDialogSettings GetDialogSettings()
@@ -423,6 +436,7 @@ namespace RaceControl.ViewModels
                 Topmost = DialogSettings.Topmost,
                 IsMuted = MediaPlayer.IsMuted,
                 Volume = MediaPlayer.Volume,
+                AspectRatio = MediaPlayer.AspectRatio?.Value,
                 AudioDevice = MediaPlayer.AudioDevice?.Identifier,
                 AudioTrack = MediaPlayer.AudioTrack?.Id,
                 ChannelName = PlayableContent.Name
@@ -457,7 +471,7 @@ namespace RaceControl.ViewModels
                 throw new Exception("An error occurred while retrieving the stream URL.");
             }
 
-            MediaPlayer.StartPlayback(streamUrl, DialogSettings.VideoQuality, DialogSettings.AudioDevice, DialogSettings.AudioTrack, DialogSettings.IsMuted, DialogSettings.Volume);
+            MediaPlayer.StartPlayback(streamUrl, DialogSettings.VideoQuality, DialogSettings.AspectRatio, DialogSettings.AudioDevice, DialogSettings.AudioTrack, DialogSettings.IsMuted, DialogSettings.Volume);
         }
 
         private void SubscribeEvents()

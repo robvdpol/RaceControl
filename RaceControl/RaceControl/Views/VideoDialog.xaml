@@ -93,6 +93,28 @@
                 </Grid.Resources>
                 <Grid.ContextMenu>
                     <ContextMenu DataContext="{Binding Data, Source={StaticResource Proxy}}" IsOpen="{Binding ContextMenuIsOpen}">
+                        <MenuItem Header="Aspect ratio" ItemsSource="{Binding MediaPlayer.AspectRatios}">
+                            <MenuItem.ItemContainerStyle>
+                                <Style TargetType="MenuItem">
+                                    <Setter Property="IsCheckable" Value="True" />
+                                    <Setter Property="Header" Value="{Binding Description}" />
+                                    <Setter Property="Command" Value="{Binding DataContext.SelectAspectRatioCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
+                                    <Setter Property="CommandParameter" Value="{Binding}" />
+                                    <Setter Property="IsChecked" Value="False" />
+                                    <Style.Triggers>
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <MultiBinding Converter="{StaticResource AreEqualConverter}">
+                                                    <Binding />
+                                                    <Binding Path="DataContext.MediaPlayer.AspectRatio" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}" />
+                                                </MultiBinding>
+                                            </DataTrigger.Binding>
+                                            <Setter Property="IsChecked" Value="True" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </MenuItem.ItemContainerStyle>
+                        </MenuItem>
                         <MenuItem Header="Audio Device" ItemsSource="{Binding MediaPlayer.AudioDevices}">
                             <MenuItem.ItemContainerStyle>
                                 <Style TargetType="MenuItem">
