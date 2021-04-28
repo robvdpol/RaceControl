@@ -31,11 +31,13 @@ namespace RaceControl.ViewModels
         private readonly object _showControlsTimerLock = new();
 
         private ICommand _mouseDownVideoCommand;
-        private ICommand _mouseEnterOrLeaveOrMoveVideoCommand;
+        private ICommand _mouseEnterVideoCommand;
+        private ICommand _mouseLeaveVideoCommand;
+        private ICommand _mouseMoveVideoCommand;
         private ICommand _mouseWheelVideoCommand;
-        private ICommand _mouseMoveControlBarCommand;
         private ICommand _mouseEnterControlBarCommand;
         private ICommand _mouseLeaveControlBarCommand;
+        private ICommand _mouseMoveControlBarCommand;
         private ICommand _mouseWheelControlBarCommand;
         private ICommand _closeAllWindowsCommand;
         private ICommand _togglePauseCommand;
@@ -54,6 +56,7 @@ namespace RaceControl.ViewModels
         private IPlayableContent _playableContent;
         private VideoDialogSettings _dialogSettings;
         private WindowStartupLocation _startupLocation = WindowStartupLocation.CenterOwner;
+        private bool _isMouseOver;
         private bool _showControls = true;
         private bool _contextMenuIsOpen;
         private Timer _showControlsTimer;
@@ -75,11 +78,13 @@ namespace RaceControl.ViewModels
         public override string Title => $"{_identifier}. {PlayableContent?.Title}";
 
         public ICommand MouseDownVideoCommand => _mouseDownVideoCommand ??= new DelegateCommand<MouseButtonEventArgs>(MouseDownVideoExecute);
-        public ICommand MouseEnterOrLeaveOrMoveVideoCommand => _mouseEnterOrLeaveOrMoveVideoCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveVideoExecute);
+        public ICommand MouseEnterVideoCommand => _mouseEnterVideoCommand ??= new DelegateCommand(MouseEnterVideoExecute);
+        public ICommand MouseLeaveVideoCommand => _mouseLeaveVideoCommand ??= new DelegateCommand(MouseLeaveVideoExecute);
+        public ICommand MouseMoveVideoCommand => _mouseMoveVideoCommand ??= new DelegateCommand(MouseMoveVideoExecute);
         public ICommand MouseWheelVideoCommand => _mouseWheelVideoCommand ??= new DelegateCommand<MouseWheelEventArgs>(MouseWheelVideoExecute);
-        public ICommand MouseMoveControlBarCommand => _mouseMoveControlBarCommand ??= new DelegateCommand(MouseMoveControlBarExecute);
         public ICommand MouseEnterControlBarCommand => _mouseEnterControlBarCommand ??= new DelegateCommand(MouseEnterControlBarExecute);
         public ICommand MouseLeaveControlBarCommand => _mouseLeaveControlBarCommand ??= new DelegateCommand(MouseLeaveControlBarExecute);
+        public ICommand MouseMoveControlBarCommand => _mouseMoveControlBarCommand ??= new DelegateCommand(MouseMoveControlBarExecute);
         public ICommand MouseWheelControlBarCommand => _mouseWheelControlBarCommand ??= new DelegateCommand<MouseWheelEventArgs>(MouseWheelControlBarExecute);
         public ICommand CloseAllWindowsCommand => _closeAllWindowsCommand ??= new DelegateCommand(CloseAllWindowsExecute);
         public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute).ObservesCanExecute(() => CanClose);
@@ -119,6 +124,12 @@ namespace RaceControl.ViewModels
         {
             get => _startupLocation;
             set => SetProperty(ref _startupLocation, value);
+        }
+
+        public bool IsMouseOver
+        {
+            get => _isMouseOver;
+            set => SetProperty(ref _isMouseOver, value);
         }
 
         public bool ShowControls
@@ -166,15 +177,15 @@ namespace RaceControl.ViewModels
 
         private void ShowControlsTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (!ContextMenuIsOpen)
+            Application.Current.Dispatcher.Invoke(() =>
             {
                 ShowControls = false;
 
-                Application.Current.Dispatcher.Invoke(() =>
+                if (IsMouseOver && !ContextMenuIsOpen)
                 {
                     Mouse.OverrideCursor = Cursors.None;
-                });
-            }
+                }
+            });
         }
 
         private void MouseDownVideoExecute(MouseButtonEventArgs e)
@@ -206,7 +217,19 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void MouseEnterOrLeaveOrMoveVideoExecute()
+        private void MouseEnterVideoExecute()
+        {
+            IsMouseOver = true;
+            ShowControlsAndResetTimer();
+        }
+
+        private void MouseLeaveVideoExecute()
+        {
+            IsMouseOver = false;
+            ShowControlsAndResetTimer();
+        }
+
+        private void MouseMoveVideoExecute()
         {
             ShowControlsAndResetTimer();
         }
@@ -215,14 +238,6 @@ namespace RaceControl.ViewModels
         {
             SetVolume(e.Delta / MouseWheelDelta);
             ShowControlsAndResetTimer();
-        }
-
-        private static void MouseMoveControlBarExecute()
-        {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                Mouse.OverrideCursor = null;
-            });
         }
 
         private void MouseEnterControlBarExecute()
@@ -238,6 +253,17 @@ namespace RaceControl.ViewModels
             lock (_showControlsTimerLock)
             {
                 _showControlsTimer?.Start();
+            }
+        }
+
+        private static void MouseMoveControlBarExecute()
+        {
+            if (Mouse.OverrideCursor != null)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    Mouse.OverrideCursor = null;
+                });
             }
         }
 
@@ -527,7 +553,11 @@ namespace RaceControl.ViewModels
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     ShowControls = true;
-                    Mouse.OverrideCursor = null;
+
+                    if (Mouse.OverrideCursor != null)
+                    {
+                        Mouse.OverrideCursor = null;
+                    }
                 });
 
                 _showControlsTimer?.Start();

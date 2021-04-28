@@ -74,14 +74,14 @@
                     <i:EventTrigger EventName="MouseDown">
                         <i:InvokeCommandAction Command="{Binding MouseDownVideoCommand}" PassEventArgsToCommand="True" />
                     </i:EventTrigger>
-                    <i:EventTrigger EventName="MouseMove">
-                        <i:InvokeCommandAction Command="{Binding MouseEnterOrLeaveOrMoveVideoCommand}" />
-                    </i:EventTrigger>
                     <i:EventTrigger EventName="MouseEnter">
-                        <i:InvokeCommandAction Command="{Binding MouseEnterOrLeaveOrMoveVideoCommand}" />
+                        <i:InvokeCommandAction Command="{Binding MouseEnterVideoCommand}" />
                     </i:EventTrigger>
                     <i:EventTrigger EventName="MouseLeave">
-                        <i:InvokeCommandAction Command="{Binding MouseEnterOrLeaveOrMoveVideoCommand}" />
+                        <i:InvokeCommandAction Command="{Binding MouseLeaveVideoCommand}" />
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="MouseMove">
+                        <i:InvokeCommandAction Command="{Binding MouseMoveVideoCommand}" />
                     </i:EventTrigger>
                     <i:EventTrigger EventName="MouseWheel">
                         <i:InvokeCommandAction Command="{Binding MouseWheelVideoCommand}" PassEventArgsToCommand="True" />
@@ -215,14 +215,14 @@
                 Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Grid Background="White">
                     <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="MouseMove">
-                            <i:InvokeCommandAction Command="{Binding MouseMoveControlBarCommand}" />
-                        </i:EventTrigger>
                         <i:EventTrigger EventName="MouseEnter">
                             <i:InvokeCommandAction Command="{Binding MouseEnterControlBarCommand}" />
                         </i:EventTrigger>
                         <i:EventTrigger EventName="MouseLeave">
                             <i:InvokeCommandAction Command="{Binding MouseLeaveControlBarCommand}" />
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="MouseMove">
+                            <i:InvokeCommandAction Command="{Binding MouseMoveControlBarCommand}" />
                         </i:EventTrigger>
                         <i:EventTrigger EventName="MouseWheel">
                             <i:InvokeCommandAction Command="{Binding MouseWheelControlBarCommand}" PassEventArgsToCommand="True" />
