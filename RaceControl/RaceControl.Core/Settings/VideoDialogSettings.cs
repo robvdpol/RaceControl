@@ -15,6 +15,7 @@ namespace RaceControl.Core.Settings
         private VideoQuality _videoQuality;
         private bool _topmost;
         private bool _isMuted;
+        private int _zoom;
         private int _volume;
         private string _aspectRatio;
         private string _audioDevice;
@@ -79,6 +80,12 @@ namespace RaceControl.Core.Settings
         {
             get => _volume;
             set => SetProperty(ref _volume, value);
+        }
+
+        public int Zoom
+        {
+            get => _zoom;
+            set => SetProperty(ref _zoom, value);
         }
 
         public string AspectRatio

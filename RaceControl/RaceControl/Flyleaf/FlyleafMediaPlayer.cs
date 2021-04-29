@@ -18,6 +18,7 @@ namespace RaceControl.Flyleaf
         private long _time;
         private long _duration;
         private int _volume;
+        private int _zoom;
         private bool _isPlaying;
         private bool _isPaused;
         private bool _isMuted;
@@ -46,6 +47,18 @@ namespace RaceControl.Flyleaf
         {
             get => _volume;
             set => Player.audioPlayer.Volume = Math.Min(Math.Max(value, 0), MaxVolume);
+        }
+
+        public int Zoom
+        {
+            get => _zoom;
+            set
+            {
+                if (SetProperty(ref _zoom, value))
+                {
+                    Player.renderer.Zoom(_zoom);
+                }
+            }
         }
 
         public long Time
@@ -216,6 +229,11 @@ namespace RaceControl.Flyleaf
             {
                 IsPlaying = Player.Status == Status.Playing;
                 IsPaused = Player.Status == Status.Paused;
+
+                if (IsPlaying && Zoom != 0)
+                {
+                    Player.renderer.Zoom(Zoom);
+                }
             }
         }
 
@@ -230,7 +248,7 @@ namespace RaceControl.Flyleaf
 
                         Application.Current.Dispatcher.Invoke(() =>
                         {
-                            InitializeVideo(settings.VideoQuality, settings.AspectRatio);
+                            InitializeVideo(settings.VideoQuality, settings.Zoom, settings.AspectRatio);
                         });
                     }
 
@@ -296,7 +314,7 @@ namespace RaceControl.Flyleaf
             }
         }
 
-        private void InitializeVideo(VideoQuality videoQuality, string aspectRatio)
+        private void InitializeVideo(VideoQuality videoQuality, int zoom, string aspectRatio)
         {
             AspectRatios.AddRange(FlyleafLib.AspectRatio.AspectRatios.Where(ar => ar != FlyleafLib.AspectRatio.Custom).Select(ar => new FlyleafAspectRatio(ar)));
             Player.Session.PropertyChanged += SessionOnPropertyChanged;
@@ -306,6 +324,9 @@ namespace RaceControl.Flyleaf
             {
                 SetVideoQuality(videoQuality);
             }
+
+            // Actual zooming will be performed when player starts playing
+            SetProperty(ref _zoom, zoom, nameof(Zoom));
 
             if (string.IsNullOrWhiteSpace(aspectRatio))
             {

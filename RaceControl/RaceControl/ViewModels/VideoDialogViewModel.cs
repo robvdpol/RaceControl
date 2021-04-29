@@ -48,6 +48,7 @@ namespace RaceControl.ViewModels
         private ICommand _selectAspectRatioCommand;
         private ICommand _selectAudioDeviceCommand;
         private ICommand _videoQualitySelectionChangedCommand;
+        private ICommand _zoomCommand;
 
         private string _subscriptionToken;
         private long _identifier;
@@ -93,6 +94,7 @@ namespace RaceControl.ViewModels
         public ICommand SelectAspectRatioCommand => _selectAspectRatioCommand ??= new DelegateCommand<IAspectRatio>(SelectAspectRatioExecute, CanSelectAspectRatioExecute).ObservesProperty(() => MediaPlayer.AspectRatio);
         public ICommand SelectAudioDeviceCommand => _selectAudioDeviceCommand ??= new DelegateCommand<IAudioDevice>(SelectAudioDeviceExecute, CanSelectAudioDeviceExecute).ObservesProperty(() => MediaPlayer.AudioDevice);
         public ICommand VideoQualitySelectionChangedCommand => _videoQualitySelectionChangedCommand ??= new DelegateCommand(VideoQualitySelectionChangedExecute);
+        public ICommand ZoomCommand => _zoomCommand ??= new DelegateCommand<int?>(ZoomExecute);
 
         public IMediaPlayer MediaPlayer { get; }
 
@@ -415,6 +417,18 @@ namespace RaceControl.ViewModels
             MediaPlayer.SetVideoQuality(DialogSettings.VideoQuality);
         }
 
+        private void ZoomExecute(int? zoom)
+        {
+            if (zoom.HasValue)
+            {
+                MediaPlayer.Zoom += zoom.Value;
+            }
+            else
+            {
+                MediaPlayer.Zoom = 0;
+            }
+        }
+
         private void LoadDialogSettings(VideoDialogSettings settings)
         {
             // Properties need to be set in this order
@@ -433,6 +447,7 @@ namespace RaceControl.ViewModels
             DialogSettings.VideoQuality = settings.VideoQuality;
             DialogSettings.IsMuted = settings.IsMuted;
             DialogSettings.Volume = settings.Volume;
+            DialogSettings.Zoom = settings.Zoom;
             DialogSettings.AspectRatio = settings.AspectRatio;
             DialogSettings.AudioDevice = settings.AudioDevice;
             DialogSettings.AudioTrack = settings.AudioTrack;
@@ -452,6 +467,7 @@ namespace RaceControl.ViewModels
                 Topmost = DialogSettings.Topmost,
                 IsMuted = MediaPlayer.IsMuted,
                 Volume = MediaPlayer.Volume,
+                Zoom = MediaPlayer.Zoom,
                 AspectRatio = MediaPlayer.AspectRatio?.Value,
                 AudioDevice = MediaPlayer.AudioDevice?.Identifier,
                 AudioTrack = MediaPlayer.AudioTrack?.Id,

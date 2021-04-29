@@ -13,6 +13,8 @@ namespace RaceControl.Interfaces
 
         int Volume { get; set; }
 
+        int Zoom { get; set; }
+
         long Time { get; set; }
 
         long Duration { get; }

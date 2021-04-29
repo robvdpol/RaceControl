@@ -95,6 +95,22 @@
                 </Grid.Resources>
                 <Grid.ContextMenu>
                     <ContextMenu DataContext="{Binding Data, Source={StaticResource Proxy}}" IsOpen="{Binding ContextMenuIsOpen}">
+                        <MenuItem Header="Zoom">
+                            <MenuItem Command="{Binding ZoomCommand}" Header="Zoom in">
+                                <MenuItem.CommandParameter>
+                                    <sys:Int32>50</sys:Int32>
+                                </MenuItem.CommandParameter>
+                            </MenuItem>
+                            <MenuItem Command="{Binding ZoomCommand}" Header="Zoom out">
+                                <MenuItem.CommandParameter>
+                                    <sys:Int32>-50</sys:Int32>
+                                </MenuItem.CommandParameter>
+                            </MenuItem>
+                            <MenuItem
+                                Command="{Binding ZoomCommand}"
+                                CommandParameter="{x:Null}"
+                                Header="Reset" />
+                        </MenuItem>
                         <MenuItem Header="Aspect ratio" ItemsSource="{Binding MediaPlayer.AspectRatios}">
                             <MenuItem.ItemContainerStyle>
                                 <Style TargetType="MenuItem">
