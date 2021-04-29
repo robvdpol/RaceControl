@@ -65,7 +65,7 @@ You need an F1TV account to watch F1TV streams. If you want to watch race replay
 Your F1TV login credentials are stored locally in the Windows Credential Manager, so you don't have to login every time you start the application. If you wish to switch to a different F1TV account, press the button 'Log out' under the 'Options' section. Your stored credentials will be removed from your system and you will be asked to login again.
 
 #### How can I move an internal player window?
-You can move an internal player window by clicking and dragging on the actual video (not the menu bar!).
+You can move an internal player window by clicking and dragging on the actual video.
 
 #### Where does Race Control store my settings and video layout? Will they be retained when I upgrade Race Control?
 Your settings and video layout are stored in JSON-files, which are saved to *%LOCALAPPDATA%\RaceControl* (usually located at *C:\Users\USERNAME\AppData\Local\RaceControl*). When you upgrade Race Control your settings and video layout will be retained.
