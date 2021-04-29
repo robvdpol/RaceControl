@@ -11,6 +11,8 @@
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     prism:ViewModelLocator.AutoWireViewModel="True">
     <UserControl.Resources>
+        <sys:Boolean x:Key="True">True</sys:Boolean>
+        <sys:Boolean x:Key="False">False</sys:Boolean>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <core:AreEqualConverter x:Key="AreEqualConverter" />
         <core:LogicalOrConverter x:Key="LogicalOrConverter" />
@@ -75,13 +77,13 @@
                         <i:InvokeCommandAction Command="{Binding MouseDownVideoCommand}" PassEventArgsToCommand="True" />
                     </i:EventTrigger>
                     <i:EventTrigger EventName="MouseEnter">
-                        <i:InvokeCommandAction Command="{Binding MouseEnterVideoCommand}" />
+                        <i:InvokeCommandAction Command="{Binding MouseEnterOrLeaveOrMoveVideoCommand}" CommandParameter="{StaticResource True}" />
                     </i:EventTrigger>
                     <i:EventTrigger EventName="MouseLeave">
-                        <i:InvokeCommandAction Command="{Binding MouseLeaveVideoCommand}" />
+                        <i:InvokeCommandAction Command="{Binding MouseEnterOrLeaveOrMoveVideoCommand}" CommandParameter="{StaticResource False}" />
                     </i:EventTrigger>
                     <i:EventTrigger EventName="MouseMove">
-                        <i:InvokeCommandAction Command="{Binding MouseMoveVideoCommand}" />
+                        <i:InvokeCommandAction Command="{Binding MouseEnterOrLeaveOrMoveVideoCommand}" CommandParameter="{x:Null}" />
                     </i:EventTrigger>
                     <i:EventTrigger EventName="MouseWheel">
                         <i:InvokeCommandAction Command="{Binding MouseWheelVideoCommand}" PassEventArgsToCommand="True" />

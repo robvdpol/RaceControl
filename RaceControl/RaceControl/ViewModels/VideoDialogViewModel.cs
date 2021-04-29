@@ -31,9 +31,7 @@ namespace RaceControl.ViewModels
         private readonly object _showControlsTimerLock = new();
 
         private ICommand _mouseDownVideoCommand;
-        private ICommand _mouseEnterVideoCommand;
-        private ICommand _mouseLeaveVideoCommand;
-        private ICommand _mouseMoveVideoCommand;
+        private ICommand _mouseEnterOrLeaveOrMoveVideoCommand;
         private ICommand _mouseWheelVideoCommand;
         private ICommand _mouseEnterControlBarCommand;
         private ICommand _mouseLeaveControlBarCommand;
@@ -78,9 +76,7 @@ namespace RaceControl.ViewModels
         public override string Title => $"{_identifier}. {PlayableContent?.Title}";
 
         public ICommand MouseDownVideoCommand => _mouseDownVideoCommand ??= new DelegateCommand<MouseButtonEventArgs>(MouseDownVideoExecute);
-        public ICommand MouseEnterVideoCommand => _mouseEnterVideoCommand ??= new DelegateCommand(MouseEnterVideoExecute);
-        public ICommand MouseLeaveVideoCommand => _mouseLeaveVideoCommand ??= new DelegateCommand(MouseLeaveVideoExecute);
-        public ICommand MouseMoveVideoCommand => _mouseMoveVideoCommand ??= new DelegateCommand(MouseMoveVideoExecute);
+        public ICommand MouseEnterOrLeaveOrMoveVideoCommand => _mouseEnterOrLeaveOrMoveVideoCommand ??= new DelegateCommand<bool?>(MouseEnterOrLeaveOrMoveVideoExecute);
         public ICommand MouseWheelVideoCommand => _mouseWheelVideoCommand ??= new DelegateCommand<MouseWheelEventArgs>(MouseWheelVideoExecute);
         public ICommand MouseEnterControlBarCommand => _mouseEnterControlBarCommand ??= new DelegateCommand(MouseEnterControlBarExecute);
         public ICommand MouseLeaveControlBarCommand => _mouseLeaveControlBarCommand ??= new DelegateCommand(MouseLeaveControlBarExecute);
@@ -217,20 +213,13 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void MouseEnterVideoExecute()
+        private void MouseEnterOrLeaveOrMoveVideoExecute(bool? isMouseOver)
         {
-            IsMouseOver = true;
-            ShowControlsAndResetTimer();
-        }
+            if (isMouseOver.HasValue)
+            {
+                IsMouseOver = isMouseOver.Value;
+            }
 
-        private void MouseLeaveVideoExecute()
-        {
-            IsMouseOver = false;
-            ShowControlsAndResetTimer();
-        }
-
-        private void MouseMoveVideoExecute()
-        {
             ShowControlsAndResetTimer();
         }
 
