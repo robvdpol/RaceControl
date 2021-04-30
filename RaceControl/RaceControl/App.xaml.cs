@@ -55,7 +55,7 @@ namespace RaceControl
                 Environment.CurrentDirectory = currentDirectory;
             }
 
-            Master.RegisterFFmpeg();
+            Master.RegisterFFmpeg(":2");
             Master.PreventAborts = true;
 
             base.OnStartup(e);
