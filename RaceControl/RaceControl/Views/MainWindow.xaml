@@ -9,9 +9,10 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:prism="http://prismlibrary.com/"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
-    Width="1260"
-    Height="829"
+    Width="1200"
+    Height="900"
     prism:ViewModelLocator.AutoWireViewModel="True"
+    Loaded="MainWindowLoaded"
     WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />

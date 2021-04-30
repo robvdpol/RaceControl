@@ -10,7 +10,10 @@ namespace RaceControl.Core.Helpers
     {
         public static Screen GetScreen(VideoDialogSettings settings)
         {
-            return Screen.FromRectangle(new Rectangle((int)settings.Left, (int)settings.Top, (int)settings.Width, (int)settings.Height));
+            var screenScale = GetScreenScale();
+            var windowRectangle = new Rectangle((int)(settings.Left * screenScale), (int)(settings.Top * screenScale), (int)(settings.Width * screenScale), (int)(settings.Height * screenScale));
+
+            return Screen.FromRectangle(windowRectangle);
         }
 
         public static int GetScreenIndex(VideoDialogSettings settings)
