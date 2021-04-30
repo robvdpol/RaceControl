@@ -37,8 +37,6 @@ namespace RaceControl.Interfaces
 
         void StartPlayback(string streamUrl, VideoDialogSettings settings);
 
-        void StopPlayback();
-
         void SetVideoQuality(VideoQuality videoQuality);
 
         void TogglePause();

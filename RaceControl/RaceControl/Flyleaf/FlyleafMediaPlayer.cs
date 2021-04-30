@@ -1,5 +1,6 @@
 ﻿using FlyleafLib;
 using FlyleafLib.MediaPlayer;
+using NLog;
 using Prism.Mvvm;
 using RaceControl.Common.Enums;
 using RaceControl.Core.Settings;
@@ -15,6 +16,8 @@ namespace RaceControl.Flyleaf
 {
     public class FlyleafMediaPlayer : BindableBase, IMediaPlayer
     {
+        private readonly ILogger _logger;
+
         private long _time;
         private long _duration;
         private int _volume;
@@ -32,8 +35,9 @@ namespace RaceControl.Flyleaf
         private bool _audioInitialized;
         private bool _disposed;
 
-        public FlyleafMediaPlayer(Player player)
+        public FlyleafMediaPlayer(ILogger logger, Player player)
         {
+            _logger = logger;
             Player = player;
         }
 
@@ -149,11 +153,6 @@ namespace RaceControl.Flyleaf
             Player.Open(streamUrl);
         }
 
-        public void StopPlayback()
-        {
-            Player.Stop();
-        }
-
         public void SetVideoQuality(VideoQuality videoQuality)
         {
             var maxHeight = Player.curVideoPlugin.VideoStreams.Max(stream => stream.Height);
@@ -217,7 +216,14 @@ namespace RaceControl.Flyleaf
 
             if (disposing)
             {
-                Player.Dispose();
+                try
+                {
+                    Player.Dispose();
+                }
+                catch (PlatformNotSupportedException ex)
+                {
+                    _logger.Warn(ex, "A non-critical error occurred.");
+                }
             }
 
             _disposed = true;

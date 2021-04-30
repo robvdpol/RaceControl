@@ -165,7 +165,6 @@ namespace RaceControl.ViewModels
 
         public override void OnDialogClosed()
         {
-            MediaPlayer.StopPlayback();
             MediaPlayer.Dispose();
             RemoveShowControlsTimer();
             UnsubscribeEvents();
