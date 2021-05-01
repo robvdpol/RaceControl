@@ -1,5 +1,5 @@
 ﻿using FlyleafLib;
-using FlyleafLib.Plugins.MediaStream;
+using FlyleafLib.MediaStream;
 using RaceControl.Interfaces;
 
 namespace RaceControl.Flyleaf

@@ -60,7 +60,7 @@ namespace RaceControl.Flyleaf
             {
                 if (SetProperty(ref _zoom, value))
                 {
-                    Player.renderer.Zoom(_zoom);
+                    Player.renderer.Zoom = _zoom;
                 }
             }
         }
@@ -238,7 +238,7 @@ namespace RaceControl.Flyleaf
 
                 if (IsPlaying && Zoom != 0)
                 {
-                    Player.renderer.Zoom(Zoom);
+                    Player.renderer.Zoom = Zoom;
                 }
             }
         }
