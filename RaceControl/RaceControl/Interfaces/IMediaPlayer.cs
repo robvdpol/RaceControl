@@ -19,6 +19,8 @@ namespace RaceControl.Interfaces
 
         long Duration { get; }
 
+        bool IsFullScreen { get; }
+
         bool IsPlaying { get; }
 
         bool IsPaused { get; }
@@ -38,6 +40,10 @@ namespace RaceControl.Interfaces
         void StartPlayback(string streamUrl, VideoDialogSettings settings);
 
         void SetVideoQuality(VideoQuality videoQuality);
+
+        void SetFullScreen();
+
+        void SetNormalScreen();
 
         void TogglePause();
 

@@ -22,6 +22,7 @@ namespace RaceControl.Flyleaf
         private long _duration;
         private int _volume;
         private int _zoom;
+        private bool _isFullScreen;
         private bool _isPlaying;
         private bool _isPaused;
         private bool _isMuted;
@@ -75,6 +76,12 @@ namespace RaceControl.Flyleaf
         {
             get => _duration;
             private set => SetProperty(ref _duration, value);
+        }
+
+        public bool IsFullScreen
+        {
+            get => _isFullScreen;
+            private set => SetProperty(ref _isFullScreen, value);
         }
 
         public bool IsPlaying
@@ -150,11 +157,22 @@ namespace RaceControl.Flyleaf
                     PlayerOnOpenCompleted(args.type, settings);
                 }
             };
+
+            if (settings.FullScreen)
+            {
+                SetFullScreen();
+            }
+
             Player.Open(streamUrl);
         }
 
         public void SetVideoQuality(VideoQuality videoQuality)
         {
+            if (Player.curVideoPlugin == null || !Player.curVideoPlugin.VideoStreams.Any())
+            {
+                return;
+            }
+
             var maxHeight = Player.curVideoPlugin.VideoStreams.Max(stream => stream.Height);
             var minHeight = maxHeight;
 
@@ -178,6 +196,22 @@ namespace RaceControl.Flyleaf
             if (videoStream != null && Player.Session.CurVideoStream != videoStream)
             {
                 Player.Open(videoStream);
+            }
+        }
+
+        public void SetFullScreen()
+        {
+            if (!IsFullScreen)
+            {
+                IsFullScreen = Player.VideoView.FullScreen();
+            }
+        }
+
+        public void SetNormalScreen()
+        {
+            if (IsFullScreen)
+            {
+                IsFullScreen = !Player.VideoView.NormalScreen();
             }
         }
 
@@ -271,8 +305,6 @@ namespace RaceControl.Flyleaf
                             InitializeAudio(settings.AudioDevice, settings.AudioTrack, settings.IsMuted, settings.Volume);
                         });
                     }
-
-                    Player.Config.audio.DelayTicks = -TimeSpan.FromMilliseconds(200).Ticks;
 
                     var audioStream = Player.Session.CurAudioStream;
 

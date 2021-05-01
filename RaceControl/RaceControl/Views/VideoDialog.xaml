@@ -55,7 +55,6 @@
             <Setter Property="prism:Dialog.WindowStartupLocation" Value="{Binding StartupLocation}" />
             <Setter Property="WindowStyle" Value="None" />
             <Setter Property="ResizeMode" Value="{Binding DialogSettings.ResizeMode}" />
-            <Setter Property="WindowState" Value="{Binding DialogSettings.WindowState}" />
             <Setter Property="Topmost" Value="{Binding DialogSettings.Topmost}" />
             <Setter Property="Top" Value="{Binding DialogSettings.Top, Mode=TwoWay}" />
             <Setter Property="Left" Value="{Binding DialogSettings.Left, Mode=TwoWay}" />
@@ -341,7 +340,7 @@
                                 VerticalAlignment="Center"
                                 Content="Resizable window"
                                 IsChecked="{Binding DialogSettings.ResizeMode, Converter={StaticResource ResizeModeToBooleanConverter}}"
-                                IsEnabled="{Binding DialogSettings.WindowState, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static WindowState.Normal}}" />
+                                IsEnabled="{Binding MediaPlayer.IsFullScreen, Converter={StaticResource InverseBooleanConverter}}" />
                             <CheckBox
                                 Grid.Column="1"
                                 Margin="4,0"
@@ -467,7 +466,7 @@
                                     <Style BasedOn="{StaticResource ControlBarButtonStyleLarge}" TargetType="Button">
                                         <Setter Property="Content" Value="{StaticResource FullscreenImage}" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding DialogSettings.WindowState, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static WindowState.Maximized}}" Value="True">
+                                            <DataTrigger Binding="{Binding MediaPlayer.IsFullScreen}" Value="True">
                                                 <Setter Property="Content" Value="{StaticResource WindowedImage}" />
                                             </DataTrigger>
                                         </Style.Triggers>

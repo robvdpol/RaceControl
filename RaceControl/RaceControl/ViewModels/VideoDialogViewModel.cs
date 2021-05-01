@@ -90,7 +90,7 @@ namespace RaceControl.ViewModels
         public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<int?>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent);
         public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand<long?>(ToggleFullScreenExecute);
-        public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => DialogSettings.WindowState);
+        public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => MediaPlayer.IsFullScreen);
         public ICommand SelectAspectRatioCommand => _selectAspectRatioCommand ??= new DelegateCommand<IAspectRatio>(SelectAspectRatioExecute, CanSelectAspectRatioExecute).ObservesProperty(() => MediaPlayer.AspectRatio);
         public ICommand SelectAudioDeviceCommand => _selectAudioDeviceCommand ??= new DelegateCommand<IAudioDevice>(SelectAudioDeviceExecute, CanSelectAudioDeviceExecute).ObservesProperty(() => MediaPlayer.AudioDevice);
         public ICommand VideoQualitySelectionChangedCommand => _videoQualitySelectionChangedCommand ??= new DelegateCommand(VideoQualitySelectionChangedExecute);
@@ -343,7 +343,7 @@ namespace RaceControl.ViewModels
 
         private void OnToggleFullScreen(long identifier)
         {
-            if (ToggleFullScreenCommand.TryExecute() && DialogSettings.WindowState == WindowState.Maximized)
+            if (ToggleFullScreenCommand.TryExecute() && MediaPlayer.IsFullScreen)
             {
                 _eventAggregator.GetEvent<MuteAllEvent>().Publish(identifier);
             }
@@ -353,13 +353,13 @@ namespace RaceControl.ViewModels
         {
             if (identifier == null)
             {
-                if (DialogSettings.WindowState != WindowState.Maximized)
+                if (MediaPlayer.IsFullScreen)
                 {
-                    SetFullScreen();
+                    MediaPlayer.SetNormalScreen();
                 }
                 else
                 {
-                    SetWindowed();
+                    MediaPlayer.SetFullScreen();
                 }
             }
             else
@@ -370,7 +370,7 @@ namespace RaceControl.ViewModels
 
         private bool CanMoveToCornerExecute(WindowLocation? location)
         {
-            return DialogSettings.WindowState != WindowState.Maximized && location != null;
+            return !MediaPlayer.IsFullScreen && location != null;
         }
 
         private void MoveToCornerExecute(WindowLocation? location)
@@ -413,6 +413,7 @@ namespace RaceControl.ViewModels
 
         private void VideoQualitySelectionChangedExecute()
         {
+            // todo: prevent this trigger when switching to fullscreen (store current videoquality in mediaplayer)
             MediaPlayer.SetVideoQuality(DialogSettings.VideoQuality);
         }
 
@@ -431,18 +432,18 @@ namespace RaceControl.ViewModels
         private void LoadDialogSettings(VideoDialogSettings settings)
         {
             // Properties need to be set in this order
+            DialogSettings.FullScreen = settings.FullScreen;
             DialogSettings.ResizeMode = settings.ResizeMode;
-            DialogSettings.WindowState = settings.WindowState;
             DialogSettings.Topmost = settings.Topmost;
             DialogSettings.Top = settings.Top;
             DialogSettings.Left = settings.Left;
 
-            if (settings.WindowState != WindowState.Maximized)
+            if (!settings.FullScreen)
             {
                 DialogSettings.Width = settings.Width;
                 DialogSettings.Height = settings.Height;
             }
-
+            
             DialogSettings.VideoQuality = settings.VideoQuality;
             DialogSettings.IsMuted = settings.IsMuted;
             DialogSettings.Volume = settings.Volume;
@@ -460,8 +461,8 @@ namespace RaceControl.ViewModels
                 Left = DialogSettings.Left,
                 Width = DialogSettings.Width,
                 Height = DialogSettings.Height,
+                FullScreen = MediaPlayer.IsFullScreen,
                 ResizeMode = DialogSettings.ResizeMode,
-                WindowState = DialogSettings.WindowState,
                 VideoQuality = DialogSettings.VideoQuality,
                 Topmost = DialogSettings.Topmost,
                 IsMuted = MediaPlayer.IsMuted,
@@ -566,19 +567,6 @@ namespace RaceControl.ViewModels
 
                 _showControlsTimer?.Start();
             }
-        }
-
-        private void SetFullScreen()
-        {
-            Logger.Info("Changing to fullscreen mode...");
-            DialogSettings.ResizeMode = ResizeMode.NoResize;
-            DialogSettings.WindowState = WindowState.Maximized;
-        }
-
-        private void SetWindowed()
-        {
-            Logger.Info("Changing to windowed mode...");
-            DialogSettings.WindowState = WindowState.Normal;
         }
 
         private void SetVolume(int delta)

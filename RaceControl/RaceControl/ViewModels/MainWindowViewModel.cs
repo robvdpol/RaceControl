@@ -851,7 +851,7 @@ namespace RaceControl.ViewModels
             {
                 var screenIndex = ScreenHelper.GetScreenIndex(settings);
 
-                if (settings.WindowState == WindowState.Maximized)
+                if (settings.FullScreen)
                 {
                     arguments.Add("--fs");
                     arguments.Add($"--screen={screenIndex}");
