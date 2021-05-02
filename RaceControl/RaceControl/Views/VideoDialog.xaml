@@ -52,7 +52,7 @@
         <Style x:Key="ChannelMenuItemContainerStyle" TargetType="MenuItem">
             <Setter Property="IsCheckable" Value="True" />
             <Setter Property="Header" Value="{Binding DisplayName}" />
-            <Setter Property="Command" Value="{Binding DataContext.SelectChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Menu}}" />
+            <Setter Property="Command" Value="{Binding DataContext.SelectChannelCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
             <Setter Property="CommandParameter" Value="{Binding}" />
             <Setter Property="IsChecked" Value="False" />
             <Style.Triggers>
@@ -60,7 +60,7 @@
                     <DataTrigger.Binding>
                         <MultiBinding Converter="{StaticResource AreEqualConverter}">
                             <Binding />
-                            <Binding Path="DataContext.Channels.CurrentChannel" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Menu}" />
+                            <Binding Path="DataContext.Channels.CurrentChannel" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}" />
                         </MultiBinding>
                     </DataTrigger.Binding>
                     <Setter Property="IsChecked" Value="True" />
