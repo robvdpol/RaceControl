@@ -116,7 +116,7 @@ namespace RaceControl.ViewModels
             set 
             {
                 SetProperty(ref _playableContent, value);
-                OnPropertyChanged(new PropertyChangedEventArgs(nameof(Title)));
+                RaisePropertyChanged(nameof(Title));
             }
         }
 
