@@ -386,6 +386,7 @@ namespace RaceControl.Flyleaf
             if (startTime > 0)
             {
                 Player.Session.CurTime = startTime;
+                Player.Seek((int)startTime);
             }
         }
 
