@@ -38,6 +38,8 @@ namespace RaceControl.Interfaces
         IMediaTrack AudioTrack { get; set; }
 
         void StartPlayback(string streamUrl, VideoDialogSettings settings);
+        
+        void StopPlayback();
 
         void SetVideoQuality(VideoQuality videoQuality);
 

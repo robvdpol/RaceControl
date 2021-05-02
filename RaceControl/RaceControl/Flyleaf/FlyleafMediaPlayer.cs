@@ -166,6 +166,11 @@ namespace RaceControl.Flyleaf
             Player.Open(streamUrl);
         }
 
+        public void StopPlayback()
+        {
+            Player.Stop();
+        }
+
         public void SetVideoQuality(VideoQuality videoQuality)
         {
             if (Player.curVideoPlugin == null || !Player.curVideoPlugin.VideoStreams.Any())
