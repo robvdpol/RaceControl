@@ -23,10 +23,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		Directory.Build.props = Directory.Build.props
 		LICENSE.md = LICENSE.md
+		PRIVACY_POLICY.md = PRIVACY_POLICY.md
 		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{C7167F0D-BC9F-4E6E-AFE1-012C56B48DB5}") = "RaceControl.Package", "RaceControl\RaceControl.Package\RaceControl.Package.wapproj", "{EA81E946-E298-4589-BB5E-86C6D9213FB7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RaceControl.FFmpeg", "RaceControl\RaceControl.FFmpeg\RaceControl.FFmpeg.csproj", "{805D758E-5713-4050-9765-FEDB5C80C5EC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,6 +68,10 @@ Global
 		{EA81E946-E298-4589-BB5E-86C6D9213FB7}.Release|x64.ActiveCfg = Release|x64
 		{EA81E946-E298-4589-BB5E-86C6D9213FB7}.Release|x64.Build.0 = Release|x64
 		{EA81E946-E298-4589-BB5E-86C6D9213FB7}.Release|x64.Deploy.0 = Release|x64
+		{805D758E-5713-4050-9765-FEDB5C80C5EC}.Debug|x64.ActiveCfg = Debug|x64
+		{805D758E-5713-4050-9765-FEDB5C80C5EC}.Debug|x64.Build.0 = Debug|x64
+		{805D758E-5713-4050-9765-FEDB5C80C5EC}.Release|x64.ActiveCfg = Release|x64
+		{805D758E-5713-4050-9765-FEDB5C80C5EC}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

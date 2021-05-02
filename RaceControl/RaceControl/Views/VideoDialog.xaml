@@ -4,19 +4,23 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:core="clr-namespace:RaceControl.Core.Converters;assembly=RaceControl.Core"
     xmlns:enums="clr-namespace:RaceControl.Common.Enums;assembly=RaceControl.Common"
+    xmlns:fl="clr-namespace:FlyleafLib.Controls.WPF;assembly=FlyleafLib"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:mvvm="clr-namespace:RaceControl.Core.Mvvm;assembly=RaceControl.Core"
     xmlns:prism="http://prismlibrary.com/"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
-    xmlns:vlc="clr-namespace:LibVLCSharp.WPF;assembly=LibVLCSharp.WPF"
     prism:ViewModelLocator.AutoWireViewModel="True">
     <UserControl.Resources>
+        <sys:Boolean x:Key="True">True</sys:Boolean>
+        <sys:Boolean x:Key="False">False</sys:Boolean>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <core:AreEqualConverter x:Key="AreEqualConverter" />
+        <core:LogicalOrConverter x:Key="LogicalOrConverter" />
         <core:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <core:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
         <core:ResizeModeToBooleanConverter x:Key="ResizeModeToBooleanConverter" />
         <core:DivideDoubleConverter x:Key="DivideDoubleConverter" />
-        <core:MillisecondsToTimeSpanConverter x:Key="MillisecondsToTimeSpanConverter" />
+        <core:TicksToTimeSpanConverter x:Key="TicksToTimeSpanConverter" />
         <Style x:Key="ControlBarButtonStyle" TargetType="Button">
             <Setter Property="Margin" Value="2" />
             <Setter Property="Width" Value="36" />
@@ -69,7 +73,6 @@
             <Setter Property="prism:Dialog.WindowStartupLocation" Value="{Binding StartupLocation}" />
             <Setter Property="WindowStyle" Value="None" />
             <Setter Property="ResizeMode" Value="{Binding DialogSettings.ResizeMode}" />
-            <Setter Property="WindowState" Value="{Binding DialogSettings.WindowState}" />
             <Setter Property="Topmost" Value="{Binding DialogSettings.Topmost}" />
             <Setter Property="Top" Value="{Binding DialogSettings.Top, Mode=TwoWay}" />
             <Setter Property="Left" Value="{Binding DialogSettings.Left, Mode=TwoWay}" />
@@ -78,138 +81,164 @@
             <Setter Property="ShowInTaskbar" Value="True" />
         </Style>
     </prism:Dialog.WindowStyle>
-    <vlc:VideoView Background="Black" MediaPlayer="{Binding MediaPlayer.MediaPlayer}">
+    <fl:VideoView Player="{Binding MediaPlayer.Player}">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="24" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Menu
-                Grid.Row="0"
-                Padding="0,1"
-                Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <MenuItem Height="22" Header="File">
-                    <MenuItem Command="{Binding CloseWindowCommand}" Header="Close Player" />
-                    <MenuItem Command="{Binding CloseAllWindowsCommand}" Header="Close All Players" />
-                </MenuItem>
-                <MenuItem Height="22" Header="Settings">
-                    <MenuItem Header="Audio Device" ItemsSource="{Binding MediaPlayer.AudioDevices}">
-                        <MenuItem.ItemContainerStyle>
-                            <Style TargetType="MenuItem">
-                                <Setter Property="IsCheckable" Value="True" />
-                                <Setter Property="Header" Value="{Binding Description}" />
-                                <Setter Property="Command" Value="{Binding DataContext.SelectAudioDeviceCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Menu}}" />
-                                <Setter Property="CommandParameter" Value="{Binding}" />
-                                <Setter Property="IsChecked" Value="False" />
-                                <Style.Triggers>
-                                    <DataTrigger Value="True">
-                                        <DataTrigger.Binding>
-                                            <MultiBinding Converter="{StaticResource AreEqualConverter}">
-                                                <Binding />
-                                                <Binding Path="DataContext.MediaPlayer.AudioDevice" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Menu}" />
-                                            </MultiBinding>
-                                        </DataTrigger.Binding>
-                                        <Setter Property="IsChecked" Value="True" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </MenuItem.ItemContainerStyle>
-                    </MenuItem>
-                    <Separator />
-                    <MenuItem Header="2x2 Layout">
-                        <MenuItem
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.TopLeft}"
-                            Header="Top Left" />
-                        <MenuItem
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.TopRight}"
-                            Header="Top Right" />
-                        <MenuItem
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.BottomLeft}"
-                            Header="Bottom Left" />
-                        <MenuItem
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.BottomRight}"
-                            Header="Bottom Right" />
-                    </MenuItem>
-                    <MenuItem Header="3x3 Layout">
-                        <MenuItem
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.TopLeftSmall}"
-                            Header="Top Left" />
-                        <MenuItem
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.TopSmall}"
-                            Header="Top" />
-                        <MenuItem
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.TopRightSmall}"
-                            Header="Top Right" />
-                        <MenuItem
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.LeftSmall}"
-                            Header="Left" />
-                        <MenuItem
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.CenterSmall}"
-                            Header="Center" />
-                        <MenuItem
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.RightSmall}"
-                            Header="Right" />
-                        <MenuItem
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.BottomLeftSmall}"
-                            Header="Bottom Left" />
-                        <MenuItem
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.BottomSmall}"
-                            Header="Bottom" />
-                        <MenuItem
-                            Command="{Binding MoveToCornerCommand}"
-                            CommandParameter="{x:Static enums:WindowLocation.BottomRightSmall}"
-                            Header="Bottom Right" />
-                    </MenuItem>
-                </MenuItem>
-                <MenuItem Height="22" Header="Channel">
-                    <MenuItem Header="Globals" ItemsSource="{Binding Channels.Globals}" ItemContainerStyle="{StaticResource ChannelMenuItemContainerStyle}" />
-                    <MenuItem Header="Graphs" ItemsSource="{Binding Channels.Graphs}" ItemContainerStyle="{StaticResource ChannelMenuItemContainerStyle}" />
-                    <MenuItem Header="Onboards" ItemsSource="{Binding Channels.Onboards}" ItemContainerStyle="{StaticResource ChannelMenuItemContainerStyle}" />
-                </MenuItem>
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="MouseMove">
-                        <i:InvokeCommandAction Command="{Binding MouseMoveControlBarCommand}" />
-                    </i:EventTrigger>
-                    <i:EventTrigger EventName="MouseEnter">
-                        <i:InvokeCommandAction Command="{Binding MouseEnterControlBarCommand}" />
-                    </i:EventTrigger>
-                    <i:EventTrigger EventName="MouseLeave">
-                        <i:InvokeCommandAction Command="{Binding MouseLeaveControlBarCommand}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </Menu>
             <!--  Non-transparent background is required to capture mouse events  -->
-            <Grid Grid.Row="1" Background="#01000000">
+            <Grid Grid.Row="0" Background="#01000000">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseDown">
                         <i:InvokeCommandAction Command="{Binding MouseDownVideoCommand}" PassEventArgsToCommand="True" />
                     </i:EventTrigger>
-                    <i:EventTrigger EventName="MouseMove">
-                        <i:InvokeCommandAction Command="{Binding MouseEnterOrLeaveOrMoveVideoCommand}" />
-                    </i:EventTrigger>
                     <i:EventTrigger EventName="MouseEnter">
-                        <i:InvokeCommandAction Command="{Binding MouseEnterOrLeaveOrMoveVideoCommand}" />
+                        <i:InvokeCommandAction Command="{Binding MouseEnterOrLeaveOrMoveVideoCommand}" CommandParameter="{StaticResource True}" />
                     </i:EventTrigger>
                     <i:EventTrigger EventName="MouseLeave">
-                        <i:InvokeCommandAction Command="{Binding MouseEnterOrLeaveOrMoveVideoCommand}" />
+                        <i:InvokeCommandAction Command="{Binding MouseEnterOrLeaveOrMoveVideoCommand}" CommandParameter="{StaticResource False}" />
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="MouseMove">
+                        <i:InvokeCommandAction Command="{Binding MouseEnterOrLeaveOrMoveVideoCommand}" CommandParameter="{x:Null}" />
                     </i:EventTrigger>
                     <i:EventTrigger EventName="MouseWheel">
                         <i:InvokeCommandAction Command="{Binding MouseWheelVideoCommand}" PassEventArgsToCommand="True" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
+                <Grid.Resources>
+                    <!--  Needed for ContextMenu DataContext  -->
+                    <mvvm:BindingProxy x:Key="Proxy" Data="{Binding}" />
+                </Grid.Resources>
+                <Grid.ContextMenu>
+                    <ContextMenu DataContext="{Binding Data, Source={StaticResource Proxy}}" IsOpen="{Binding ContextMenuIsOpen}">
+                        <MenuItem Header="Zoom">
+                            <MenuItem Command="{Binding ZoomCommand}" Header="Zoom in">
+                                <MenuItem.CommandParameter>
+                                    <sys:Int32>50</sys:Int32>
+                                </MenuItem.CommandParameter>
+                            </MenuItem>
+                            <MenuItem Command="{Binding ZoomCommand}" Header="Zoom out">
+                                <MenuItem.CommandParameter>
+                                    <sys:Int32>-50</sys:Int32>
+                                </MenuItem.CommandParameter>
+                            </MenuItem>
+                            <MenuItem
+                                Command="{Binding ZoomCommand}"
+                                CommandParameter="{x:Null}"
+                                Header="Reset" />
+                        </MenuItem>
+                        <MenuItem Header="Aspect ratio" ItemsSource="{Binding MediaPlayer.AspectRatios}">
+                            <MenuItem.ItemContainerStyle>
+                                <Style TargetType="MenuItem">
+                                    <Setter Property="IsCheckable" Value="True" />
+                                    <Setter Property="Header" Value="{Binding Description}" />
+                                    <Setter Property="Command" Value="{Binding DataContext.SelectAspectRatioCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
+                                    <Setter Property="CommandParameter" Value="{Binding}" />
+                                    <Setter Property="IsChecked" Value="False" />
+                                    <Style.Triggers>
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <MultiBinding Converter="{StaticResource AreEqualConverter}">
+                                                    <Binding />
+                                                    <Binding Path="DataContext.MediaPlayer.AspectRatio" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}" />
+                                                </MultiBinding>
+                                            </DataTrigger.Binding>
+                                            <Setter Property="IsChecked" Value="True" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </MenuItem.ItemContainerStyle>
+                        </MenuItem>
+                        <MenuItem Header="Audio Device" ItemsSource="{Binding MediaPlayer.AudioDevices}">
+                            <MenuItem.ItemContainerStyle>
+                                <Style TargetType="MenuItem">
+                                    <Setter Property="IsCheckable" Value="True" />
+                                    <Setter Property="Header" Value="{Binding Description}" />
+                                    <Setter Property="Command" Value="{Binding DataContext.SelectAudioDeviceCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ContextMenu}}" />
+                                    <Setter Property="CommandParameter" Value="{Binding}" />
+                                    <Setter Property="IsChecked" Value="False" />
+                                    <Style.Triggers>
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <MultiBinding Converter="{StaticResource AreEqualConverter}">
+                                                    <Binding />
+                                                    <Binding Path="DataContext.MediaPlayer.AudioDevice" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}" />
+                                                </MultiBinding>
+                                            </DataTrigger.Binding>
+                                            <Setter Property="IsChecked" Value="True" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </MenuItem.ItemContainerStyle>
+                        </MenuItem>
+                        <Separator />
+                        <MenuItem Header="2x2 Layout">
+                            <MenuItem
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.TopLeft}"
+                                Header="Top Left" />
+                            <MenuItem
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.TopRight}"
+                                Header="Top Right" />
+                            <MenuItem
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.BottomLeft}"
+                                Header="Bottom Left" />
+                            <MenuItem
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.BottomRight}"
+                                Header="Bottom Right" />
+                        </MenuItem>
+                        <MenuItem Header="3x3 Layout">
+                            <MenuItem
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.TopLeftSmall}"
+                                Header="Top Left" />
+                            <MenuItem
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.TopSmall}"
+                                Header="Top" />
+                            <MenuItem
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.TopRightSmall}"
+                                Header="Top Right" />
+                            <MenuItem
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.LeftSmall}"
+                                Header="Left" />
+                            <MenuItem
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.CenterSmall}"
+                                Header="Center" />
+                            <MenuItem
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.RightSmall}"
+                                Header="Right" />
+                            <MenuItem
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.BottomLeftSmall}"
+                                Header="Bottom Left" />
+                            <MenuItem
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.BottomSmall}"
+                                Header="Bottom" />
+                            <MenuItem
+                                Command="{Binding MoveToCornerCommand}"
+                                CommandParameter="{x:Static enums:WindowLocation.BottomRightSmall}"
+                                Header="Bottom Right" />
+                        </MenuItem>
+                        <Separator />
+	                <MenuItem Height="22" Header="Channel">
+	                    <MenuItem Header="Globals" ItemsSource="{Binding Channels.Globals}" ItemContainerStyle="{StaticResource ChannelMenuItemContainerStyle}" />
+	                    <MenuItem Header="Graphs" ItemsSource="{Binding Channels.Graphs}" ItemContainerStyle="{StaticResource ChannelMenuItemContainerStyle}" />
+	                    <MenuItem Header="Onboards" ItemsSource="{Binding Channels.Onboards}" ItemContainerStyle="{StaticResource ChannelMenuItemContainerStyle}" />
+	                </MenuItem>
+                        <MenuItem Command="{Binding CloseWindowCommand}" Header="Close Player" />
+                        <MenuItem Command="{Binding CloseAllWindowsCommand}" Header="Close All Players" />
+                    </ContextMenu>
+                </Grid.ContextMenu>
                 <Label
                     HorizontalAlignment="Center"
                     VerticalAlignment="Top"
@@ -219,21 +248,21 @@
                     Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}" />
             </Grid>
             <Border
-                Grid.Row="2"
+                Grid.Row="1"
                 Height="Auto"
                 BorderBrush="#ABADB3"
                 BorderThickness="1"
                 Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Grid Background="White">
                     <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="MouseMove">
-                            <i:InvokeCommandAction Command="{Binding MouseMoveControlBarCommand}" />
-                        </i:EventTrigger>
                         <i:EventTrigger EventName="MouseEnter">
                             <i:InvokeCommandAction Command="{Binding MouseEnterControlBarCommand}" />
                         </i:EventTrigger>
                         <i:EventTrigger EventName="MouseLeave">
                             <i:InvokeCommandAction Command="{Binding MouseLeaveControlBarCommand}" />
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="MouseMove">
+                            <i:InvokeCommandAction Command="{Binding MouseMoveControlBarCommand}" />
                         </i:EventTrigger>
                         <i:EventTrigger EventName="MouseWheel">
                             <i:InvokeCommandAction Command="{Binding MouseWheelControlBarCommand}" PassEventArgsToCommand="True" />
@@ -250,12 +279,13 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <TextBlock
                             Grid.Column="0"
-                            Margin="5,2"
+                            Margin="3,2"
                             VerticalAlignment="Center"
-                            Text="{Binding MediaPlayer.Time, StringFormat=hh\\:mm\\:ss, Converter={StaticResource MillisecondsToTimeSpanConverter}}" />
+                            Text="{Binding MediaPlayer.Time, StringFormat=hh\\:mm\\:ss, Converter={StaticResource TicksToTimeSpanConverter}}" />
                         <Slider
                             Grid.Column="1"
                             Margin="2"
@@ -275,24 +305,40 @@
                         </Slider>
                         <TextBlock
                             Grid.Column="2"
+                            Margin="3,2"
+                            VerticalAlignment="Center"
+                            Text="{Binding MediaPlayer.Duration, StringFormat=hh\\:mm\\:ss, Converter={StaticResource TicksToTimeSpanConverter}}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding PlayableContent.IsLive}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <TextBlock
+                            Grid.Column="3"
                             Margin="5,2"
                             VerticalAlignment="Center"
                             Text="Volume" />
                         <Slider
-                            Grid.Column="3"
+                            Grid.Column="4"
                             Width="100"
                             Margin="2"
                             VerticalAlignment="Center"
                             IsMoveToPointEnabled="True"
                             IsSnapToTickEnabled="False"
-                            Maximum="100"
+                            Maximum="{Binding MediaPlayer.MaxVolume}"
                             TickFrequency="10"
                             TickPlacement="BottomRight"
                             Value="{Binding MediaPlayer.Volume}" />
                         <TextBlock
-                            Grid.Column="4"
+                            Grid.Column="5"
                             Width="30"
-                            Margin="5,2"
+                            Margin="3,2"
                             VerticalAlignment="Center"
                             Text="{Binding MediaPlayer.Volume, StringFormat={}{0}%}" />
                     </Grid>
@@ -306,8 +352,27 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
+                        <Grid Grid.Row="0" Grid.Column="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox
+                                Grid.Column="0"
+                                Margin="1,0"
+                                VerticalAlignment="Center"
+                                Content="Resizable window"
+                                IsChecked="{Binding DialogSettings.ResizeMode, Converter={StaticResource ResizeModeToBooleanConverter}}"
+                                IsEnabled="{Binding MediaPlayer.IsFullScreen, Converter={StaticResource InverseBooleanConverter}}" />
+                            <CheckBox
+                                Grid.Column="1"
+                                Margin="4,0"
+                                VerticalAlignment="Center"
+                                Content="Always on top"
+                                IsChecked="{Binding DialogSettings.Topmost}" />
+                        </Grid>
                         <StackPanel
-                            Grid.Row="0"
+                            Grid.Row="1"
                             Grid.Column="0"
                             Orientation="Horizontal">
                             <Button Command="{Binding TogglePauseCommand}" ToolTip="Toggle pause">
@@ -395,23 +460,6 @@
                                 </Button.Content>
                             </Button>
                         </StackPanel>
-                        <Grid Grid.Row="1" Grid.Column="0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock
-                                Grid.Column="0"
-                                Margin="5,2"
-                                VerticalAlignment="Center"
-                                Text="Audio track:" />
-                            <ComboBox
-                                Grid.Column="1"
-                                Margin="2"
-                                DisplayMemberPath="Name"
-                                ItemsSource="{Binding MediaPlayer.AudioTracks}"
-                                SelectedItem="{Binding MediaPlayer.AudioTrack}" />
-                        </Grid>
                         <Grid
                             Grid.Row="0"
                             Grid.RowSpan="2"
@@ -441,7 +489,7 @@
                                     <Style BasedOn="{StaticResource ControlBarButtonStyleLarge}" TargetType="Button">
                                         <Setter Property="Content" Value="{StaticResource FullscreenImage}" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding DialogSettings.WindowState, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static WindowState.Maximized}}" Value="True">
+                                            <DataTrigger Binding="{Binding MediaPlayer.IsFullScreen}" Value="True">
                                                 <Setter Property="Content" Value="{StaticResource WindowedImage}" />
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -508,28 +556,70 @@
                                 </Button.Content>
                             </Button>
                         </Grid>
-                        <Grid Grid.Row="0" Grid.Column="2">
+                        <Grid
+                            Grid.Row="0"
+                            Grid.RowSpan="2"
+                            Grid.Column="2">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <CheckBox
+                            <TextBlock
+                                Grid.Row="0"
                                 Grid.Column="0"
-                                Margin="1,0"
+                                Margin="5,2"
                                 VerticalAlignment="Center"
-                                Content="Resizable window"
-                                IsChecked="{Binding DialogSettings.ResizeMode, Converter={StaticResource ResizeModeToBooleanConverter}}"
-                                IsEnabled="{Binding DialogSettings.WindowState, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static WindowState.Normal}}" />
-                            <CheckBox
+                                Text="Video quality:" />
+                            <ComboBox
+                                Grid.Row="0"
                                 Grid.Column="1"
-                                Margin="4,0"
+                                MinWidth="150"
+                                Margin="2"
+                                DisplayMemberPath="Value"
+                                ItemsSource="{Binding VideoQualities}"
+                                SelectedValue="{Binding DialogSettings.VideoQuality}"
+                                SelectedValuePath="Key">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="SelectionChanged">
+                                        <i:InvokeCommandAction Command="{Binding VideoQualitySelectionChangedCommand}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                                <ComboBox.IsEnabled>
+                                    <MultiBinding Converter="{StaticResource LogicalOrConverter}">
+                                        <Binding Path="MediaPlayer.IsPlaying" />
+                                        <Binding Path="MediaPlayer.IsPaused" />
+                                    </MultiBinding>
+                                </ComboBox.IsEnabled>
+                            </ComboBox>
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Margin="5,2"
                                 VerticalAlignment="Center"
-                                Content="Always on top"
-                                IsChecked="{Binding DialogSettings.Topmost}" />
+                                Text="Audio track:" />
+                            <ComboBox
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                MinWidth="150"
+                                Margin="2"
+                                DisplayMemberPath="Name"
+                                ItemsSource="{Binding MediaPlayer.AudioTracks}"
+                                SelectedItem="{Binding MediaPlayer.AudioTrack}">
+                                <ComboBox.IsEnabled>
+                                    <MultiBinding Converter="{StaticResource LogicalOrConverter}">
+                                        <Binding Path="MediaPlayer.IsPlaying" />
+                                        <Binding Path="MediaPlayer.IsPaused" />
+                                    </MultiBinding>
+                                </ComboBox.IsEnabled>
+                            </ComboBox>
                         </Grid>
                     </Grid>
                 </Grid>
             </Border>
         </Grid>
-    </vlc:VideoView>
+    </fl:VideoView>
 </UserControl>

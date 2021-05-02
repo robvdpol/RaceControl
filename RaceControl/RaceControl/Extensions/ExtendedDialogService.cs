@@ -12,7 +12,7 @@ namespace RaceControl.Extensions
         {
         }
 
-        public bool SelectFile(string title, string initialDirectory, string initialFilename, string defaultExtension, out string filename)
+        public bool SaveFile(string title, string initialDirectory, string initialFilename, string defaultExtension, out string filename)
         {
             filename = null;
 
@@ -26,6 +26,32 @@ namespace RaceControl.Extensions
                 AlwaysAppendDefaultExtension = true,
                 OverwritePrompt = true,
                 IsExpandedMode = true
+            };
+
+            dialog.Filters.Add(new CommonFileDialogFilter($"{defaultExtension}-files", $"*{defaultExtension}"));
+
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                filename = dialog.FileName;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool OpenFile(string title, string initialDirectory, string defaultExtension, out string filename)
+        {
+            filename = null;
+
+            var dialog = new CommonOpenFileDialog
+            {
+                Title = title,
+                DefaultDirectory = initialDirectory,
+                InitialDirectory = initialDirectory,
+                DefaultExtension = defaultExtension,
+                EnsureFileExists = true,
+                EnsurePathExists = true
             };
 
             dialog.Filters.Add(new CommonFileDialogFilter($"{defaultExtension}-files", $"*{defaultExtension}"));

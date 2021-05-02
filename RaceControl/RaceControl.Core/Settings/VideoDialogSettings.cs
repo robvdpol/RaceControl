@@ -1,4 +1,5 @@
 ﻿using Prism.Mvvm;
+using RaceControl.Common.Enums;
 using System.Windows;
 
 namespace RaceControl.Core.Settings
@@ -9,12 +10,16 @@ namespace RaceControl.Core.Settings
         private double _left;
         private double _width;
         private double _height;
+        private bool _fullScreen;
         private ResizeMode _resizeMode;
-        private WindowState _windowState;
+        private VideoQuality _videoQuality;
         private bool _topmost;
         private bool _isMuted;
+        private int _zoom;
         private int _volume;
+        private string _aspectRatio;
         private string _audioDevice;
+        private string _audioTrack;
         private string _channelName;
 
         public double Top
@@ -41,16 +46,22 @@ namespace RaceControl.Core.Settings
             set => SetProperty(ref _height, value);
         }
 
+        public bool FullScreen
+        {
+            get => _fullScreen;
+            set => SetProperty(ref _fullScreen, value);
+        }
+
         public ResizeMode ResizeMode
         {
             get => _resizeMode;
             set => SetProperty(ref _resizeMode, value);
         }
 
-        public WindowState WindowState
+        public VideoQuality VideoQuality
         {
-            get => _windowState;
-            set => SetProperty(ref _windowState, value);
+            get => _videoQuality;
+            set => SetProperty(ref _videoQuality, value);
         }
 
         public bool Topmost
@@ -71,10 +82,28 @@ namespace RaceControl.Core.Settings
             set => SetProperty(ref _volume, value);
         }
 
+        public int Zoom
+        {
+            get => _zoom;
+            set => SetProperty(ref _zoom, value);
+        }
+
+        public string AspectRatio
+        {
+            get => _aspectRatio;
+            set => SetProperty(ref _aspectRatio, value);
+        }
+
         public string AudioDevice
         {
             get => _audioDevice;
             set => SetProperty(ref _audioDevice, value);
+        }
+
+        public string AudioTrack
+        {
+            get => _audioTrack;
+            set => SetProperty(ref _audioTrack, value);
         }
 
         public string ChannelName
@@ -87,8 +116,9 @@ namespace RaceControl.Core.Settings
         {
             return new()
             {
+                FullScreen = false,
                 ResizeMode = ResizeMode.CanResize,
-                WindowState = WindowState.Normal,
+                VideoQuality = VideoQuality.High,
                 Width = 960,
                 Height = 550,
                 Volume = 100

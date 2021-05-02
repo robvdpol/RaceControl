@@ -15,7 +15,7 @@ Race Control is an open source [F1TV](https://f1tv.formula1.com) desktop client 
 * Open as many streams as you like, using the layout that you like
 * Save your custom video player layout, so you don't have to position windows manually every time you watch a session
 * Cast to your Chromecast with a single click of a button
-* Experimental synchronization of streams (replays only at the moment)
+* Experimental synchronization of streams
 
 ## Installation
 #### Microsoft Store
@@ -23,8 +23,8 @@ Race Control is an open source [F1TV](https://f1tv.formula1.com) desktop client 
 * Install and launch the app.
 
 #### Manual installation
+* Make sure the [.NET 5.0 Desktop Runtime (x64)](https://dotnet.microsoft.com/download/dotnet-core/5.0/runtime) is installed on your system.
 * Download the [latest release](https://github.com/robvdpol/RaceControl/releases/latest) and start the installer. If a SmartScreen warning pops up, select 'More info' and click 'Run anyway'.
-* If the [.NET 5.0 Desktop Runtime (x64)](https://dotnet.microsoft.com/download/dotnet-core/5.0/runtime) needs to be installed on your system you will be notified about it.
 * Follow the steps in the setup wizard to complete the installation.
 * Start Race Control using either the desktop shortcut or the start menu entry.
 
@@ -62,10 +62,10 @@ The main window supports the following keyboard shortcuts:
 You need an F1TV account to watch F1TV streams. If you want to watch race replays, an F1TV Access subscription is required. If you want to watch live sessions, an F1TV Pro subscription is required. You can create an account and subscribe at http://f1tv.formula1.com.
 
 #### What happens with my credentials when I login?
-Your F1TV login credentials are stored locally in the Windows Credential Manager, so you don't have to login every time you start the application. If you wish to switch to a different F1TV account, press the button 'Delete stored credentials' under the 'Options' section. Your stored credentials will be removed from your system and you will be asked to login again.
+Your F1TV login credentials are stored locally in the Windows Credential Manager, so you don't have to login every time you start the application. If you wish to switch to a different F1TV account, press the button 'Log out' under the 'Options' section. Your stored credentials will be removed from your system and you will be asked to login again.
 
 #### How can I move an internal player window?
-You can move an internal player window by clicking and dragging on the actual video (not the menu bar!).
+You can move an internal player window by clicking and dragging on the actual video.
 
 #### Where does Race Control store my settings and video layout? Will they be retained when I upgrade Race Control?
 Your settings and video layout are stored in JSON-files, which are saved to *%LOCALAPPDATA%\RaceControl* (usually located at *C:\Users\USERNAME\AppData\Local\RaceControl*). When you upgrade Race Control your settings and video layout will be retained.
@@ -86,6 +86,7 @@ To open and build the solution you need:
 * The extension [Microsoft Visual Studio Installer Projects](https://marketplace.visualstudio.com/items?itemName=VisualStudioClient.MicrosoftVisualStudio2017InstallerProjects) to open the RaceControl.Installer project
 
 ## Acknowledgements
+* [Flyleaf](https://github.com/SuRGeoNix/Flyleaf) for providing an excellent video player and .NET library
 * [VLC](https://www.videolan.org/vlc) for providing an excellent video player and .NET library
 * [MPV](https://mpv.io) for providing an excellent video player
 * [Flaticon](https://www.flaticon.com) for providing the application icon
@@ -94,6 +95,7 @@ To open and build the solution you need:
 * [RestSharp](https://restsharp.dev)
 * [NLog](https://nlog-project.org)
 * [CredentialManagement.Standard NuGet package](https://www.nuget.org/packages/CredentialManagement.Standard)
+* [GoogleCast](https://github.com/kakone/GoogleCast)
 
 ## Screenshots
 ![preview image](https://imgur.com/Ngos9JZ.png)

@@ -53,17 +53,20 @@
     <Resource Include="splashscreen.png" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="GoogleCast" Version="1.6.7" />
-    <PackageReference Include="LibVLCSharp" Version="3.4.9" />
-    <PackageReference Include="LibVLCSharp.WPF" Version="3.4.9" />
+    <PackageReference Include="FlyleafLib" Version="3.1.0-alpha" />
+    <PackageReference Include="GoogleCast" Version="1.7.0" />
+    <PackageReference Include="LibVLCSharp" Version="3.5.0" />
+    <PackageReference Include="LibVLCSharp.WPF" Version="3.5.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.31" />
     <PackageReference Include="NLog" Version="4.7.9" />
     <PackageReference Include="Prism.DryIoc" Version="8.0.0.1909" />
     <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="106.11.7" />
     <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.12" />
+    <PackageReference Include="Zeroconf" Version="3.4.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RaceControl.Core\RaceControl.Core.csproj" />
+    <ProjectReference Include="..\RaceControl.FFmpeg\RaceControl.FFmpeg.csproj" />
     <ProjectReference Include="..\RaceControl.Mpv\RaceControl.Mpv.csproj" />
     <ProjectReference Include="..\Services\RaceControl.Services.Interfaces\RaceControl.Services.Interfaces.csproj" />
     <ProjectReference Include="..\Services\RaceControl.Services\RaceControl.Services.csproj" />

@@ -29,26 +29,32 @@ namespace RaceControl.Core.Settings
             set => SetProperty(ref _instances, value);
         }
 
-        public void Load()
+        public bool Load(string filename = null)
         {
-            if (!File.Exists(Filename))
+            filename ??= Filename;
+
+            if (!File.Exists(filename))
             {
-                return;
+                return false;
             }
+
+            Instances.Clear();
 
             try
             {
-                using var file = File.OpenText(Filename);
+                using var file = File.OpenText(filename);
                 _serializer.Populate(file, this);
             }
             catch (Exception ex)
             {
                 _logger.Error(ex, "An error occurred while loading video dialog layout.");
 
-                return;
+                return false;
             }
 
             _logger.Info("Video dialog layout loaded.");
+
+            return true;
         }
 
         public bool Save()
@@ -68,6 +74,11 @@ namespace RaceControl.Core.Settings
             _logger.Info("Video dialog layout saved.");
 
             return true;
+        }
+
+        public bool Import(string filename)
+        {
+            return Load(filename) && Save();
         }
     }
 }

@@ -221,15 +221,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Race Control"
-        "ProductCode" = "8:{6D0A7096-F4E5-4549-9423-FF8F5879B8DB}"
-        "PackageCode" = "8:{A7A3B0D6-CD28-4229-B65A-42A871D5C8F5}"
+        "ProductCode" = "8:{02655A3C-208D-464B-B052-E9409F71AF38}"
+        "PackageCode" = "8:{4BB21F0E-C94F-474C-A53E-88D4E79404C2}"
         "UpgradeCode" = "8:{AED9C889-7712-4594-8E9C-2BD1BA1CEE3A}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:2.0.3"
+        "ProductVersion" = "8:2.1.0"
         "Manufacturer" = "8:Rob van der Pol"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -781,7 +781,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_F867FD2856644403AF46E4B92E0A8B4E"
             {
-            "SourcePath" = "8:..\\RaceControl\\obj\\x64\\Release\\netcoreapp3.1\\win-x64\\RaceControl.exe"
+            "SourcePath" = "8:..\\RaceControl\\obj\\x64\\Release\\net5.0-windows\\win-x64\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8C370B7B2E2A4A1C8F1DE261C79191C2"

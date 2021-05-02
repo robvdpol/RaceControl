@@ -205,11 +205,11 @@ namespace RaceControl.Services.F1TV
                 .ToList();
         }
 
-        public async Task<string> GetTokenisedUrlAsync(string subscriptionToken, string streamType, IPlayableContent playableContent)
+        public async Task<string> GetTokenisedUrlAsync(string subscriptionToken, IPlayableContent playableContent)
         {
             _logger.Info($"Getting tokenised URL for content-type '{playableContent.ContentType}' and content-URL '{playableContent.ContentUrl}'...");
 
-            return playableContent.ContentType == ContentType.Backup ? (await GetBackupStream()).StreamManifest : (await QueryTokenisedUrlAsync(subscriptionToken, streamType, playableContent.ContentUrl)).ResultObj.Url;
+            return playableContent.ContentType == ContentType.Backup ? (await GetBackupStream()).StreamManifest : (await QueryTokenisedUrlAsync(subscriptionToken, StreamTypeKeys.BigScreenHls, playableContent.ContentUrl)).ResultObj.Url;
         }
 
         private async Task<ApiResponse> QueryLiveSessionsAsync()
@@ -341,15 +341,17 @@ namespace RaceControl.Services.F1TV
 
         private static Session CreateSession(Container container)
         {
+            var seriesUID = container.Properties.First().Series;
+
             return new()
             {
                 UID = container.Id,
                 ContentID = container.Metadata.ContentId,
                 ContentType = container.Metadata.ContentType,
                 ContentSubtype = container.Metadata.ContentSubtype,
-                ShortName = container.Metadata.TitleBrief,
+                ShortName = GetSessionShortName(container.Metadata.TitleBrief, seriesUID),
                 LongName = container.Metadata.Title,
-                SeriesUID = container.Properties.First().Series,
+                SeriesUID = seriesUID,
                 ThumbnailUrl = GetThumbnailUrl(container.Metadata.PictureUrl),
                 StartDate = container.Metadata.EmfAttributes.SessionStartDate.GetDateTimeFromEpoch(),
                 EndDate = container.Metadata.EmfAttributes.SessionEndDate.GetDateTimeFromEpoch(),
@@ -374,6 +376,16 @@ namespace RaceControl.Services.F1TV
                 EndDate = container.Metadata.EmfAttributes.SessionEndDate.GetDateTimeFromEpoch(),
                 SessionIndex = container.Metadata.EmfAttributes.SessionIndex
             };
+        }
+
+        private static string GetSessionShortName(string titleBrief, string seriesUID)
+        {
+            if (seriesUID == SeriesIds.Formula1 || !SeriesNames.ShortNames.TryGetValue(seriesUID, out var shortNames) || shortNames.Any(shortName => titleBrief.Contains(shortName, StringComparison.OrdinalIgnoreCase)))
+            {
+                return titleBrief;
+            }
+
+            return $"{shortNames.First()} {titleBrief}";
         }
 
         private static string GetPlaybackUrl(long contentId)
