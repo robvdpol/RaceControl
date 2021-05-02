@@ -123,7 +123,7 @@ namespace RaceControl.Core.Settings
         {
             return new()
             {
-                // Default to the "undefined" track, which (at least for now) seems to be the default track for the selected channel
+                // Default to the "und(etermined)" track, which (at least for now) seems to be the default track for the selected channel
                 AudioTrack = "und", 
                 FullScreen = false,
                 ResizeMode = ResizeMode.CanResize,
