@@ -25,6 +25,8 @@ namespace RaceControl.Interfaces
 
         bool IsPaused { get; }
 
+        VideoQuality VideoQuality { get; set; }
+
         ObservableCollection<IAspectRatio> AspectRatios { get; }
 
         ObservableCollection<IAudioDevice> AudioDevices { get; }
@@ -38,8 +40,6 @@ namespace RaceControl.Interfaces
         IMediaTrack AudioTrack { get; set; }
 
         void StartPlayback(string streamUrl, VideoDialogSettings settings);
-
-        void SetVideoQuality(VideoQuality videoQuality);
 
         void SetFullScreen();
 

@@ -17,7 +17,6 @@
         <core:AreEqualConverter x:Key="AreEqualConverter" />
         <core:LogicalOrConverter x:Key="LogicalOrConverter" />
         <core:InverseBooleanConverter x:Key="InverseBooleanConverter" />
-        <core:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
         <core:ResizeModeToBooleanConverter x:Key="ResizeModeToBooleanConverter" />
         <core:DivideDoubleConverter x:Key="DivideDoubleConverter" />
         <core:TicksToTimeSpanConverter x:Key="TicksToTimeSpanConverter" />
@@ -558,7 +557,7 @@
                                 Margin="2"
                                 DisplayMemberPath="Value"
                                 ItemsSource="{Binding VideoQualities}"
-                                SelectedValue="{Binding DialogSettings.VideoQuality}"
+                                SelectedValue="{Binding MediaPlayer.VideoQuality}"
                                 SelectedValuePath="Key">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="SelectionChanged">

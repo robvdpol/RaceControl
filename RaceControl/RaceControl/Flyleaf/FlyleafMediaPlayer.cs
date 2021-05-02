@@ -10,7 +10,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
-using MediaType = FlyleafLib.MediaType;
 
 namespace RaceControl.Flyleaf
 {
@@ -26,6 +25,7 @@ namespace RaceControl.Flyleaf
         private bool _isPlaying;
         private bool _isPaused;
         private bool _isMuted;
+        private VideoQuality _videoQuality;
         private ObservableCollection<IAspectRatio> _aspectRatios;
         private ObservableCollection<IAudioDevice> _audioDevices;
         private ObservableCollection<IMediaTrack> _audioTracks;
@@ -96,6 +96,18 @@ namespace RaceControl.Flyleaf
             private set => SetProperty(ref _isPaused, value);
         }
 
+        public VideoQuality VideoQuality
+        {
+            get => _videoQuality;
+            set
+            {
+                if (SetProperty(ref _videoQuality, value))
+                {
+                    SetVideoQuality(_videoQuality);
+                }
+            }
+        }
+
         public ObservableCollection<IAspectRatio> AspectRatios => _aspectRatios ??= new ObservableCollection<IAspectRatio>();
 
         public ObservableCollection<IAudioDevice> AudioDevices => _audioDevices ??= new ObservableCollection<IAudioDevice>();
@@ -164,39 +176,6 @@ namespace RaceControl.Flyleaf
             }
 
             Player.Open(streamUrl);
-        }
-
-        public void SetVideoQuality(VideoQuality videoQuality)
-        {
-            if (Player.curVideoPlugin == null || !Player.curVideoPlugin.VideoStreams.Any())
-            {
-                return;
-            }
-
-            var maxHeight = Player.curVideoPlugin.VideoStreams.Max(stream => stream.Height);
-            var minHeight = maxHeight;
-
-            switch (videoQuality)
-            {
-                case VideoQuality.Medium:
-                    minHeight = maxHeight / 3 * 2;
-                    break;
-
-                case VideoQuality.Low:
-                    minHeight = maxHeight / 2;
-                    break;
-
-                case VideoQuality.Lowest:
-                    minHeight = maxHeight / 3;
-                    break;
-            }
-
-            var videoStream = Player.curVideoPlugin.VideoStreams.OrderBy(stream => stream.Height).FirstOrDefault(stream => stream.Height >= minHeight);
-
-            if (videoStream != null && Player.Session.CurVideoStream != videoStream)
-            {
-                Player.Open(videoStream);
-            }
         }
 
         public void SetFullScreen()
@@ -357,11 +336,7 @@ namespace RaceControl.Flyleaf
             AspectRatios.AddRange(FlyleafLib.AspectRatio.AspectRatios.Where(ar => ar != FlyleafLib.AspectRatio.Custom).Select(ar => new FlyleafAspectRatio(ar)));
             Player.Session.PropertyChanged += SessionOnPropertyChanged;
             Duration = Player.Session.Movie.Duration;
-
-            if (videoQuality != VideoQuality.High)
-            {
-                SetVideoQuality(videoQuality);
-            }
+            VideoQuality = videoQuality;
 
             // Actual zooming will be performed when player starts playing
             SetProperty(ref _zoom, zoom, nameof(Zoom));
@@ -414,6 +389,39 @@ namespace RaceControl.Flyleaf
                 {
                     AudioTrack = track;
                 }
+            }
+        }
+
+        private void SetVideoQuality(VideoQuality videoQuality)
+        {
+            if (Player.curVideoPlugin == null || !Player.curVideoPlugin.VideoStreams.Any())
+            {
+                return;
+            }
+
+            var maxHeight = Player.curVideoPlugin.VideoStreams.Max(stream => stream.Height);
+            var minHeight = maxHeight;
+
+            switch (videoQuality)
+            {
+                case VideoQuality.Medium:
+                    minHeight = maxHeight / 3 * 2;
+                    break;
+
+                case VideoQuality.Low:
+                    minHeight = maxHeight / 2;
+                    break;
+
+                case VideoQuality.Lowest:
+                    minHeight = maxHeight / 3;
+                    break;
+            }
+
+            var videoStream = Player.curVideoPlugin.VideoStreams.OrderBy(stream => stream.Height).FirstOrDefault(stream => stream.Height >= minHeight);
+
+            if (videoStream != null)
+            {
+                Player.Open(videoStream);
             }
         }
     }

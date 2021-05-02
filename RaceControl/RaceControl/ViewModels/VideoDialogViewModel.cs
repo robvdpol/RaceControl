@@ -47,7 +47,6 @@ namespace RaceControl.ViewModels
         private ICommand _moveToCornerCommand;
         private ICommand _selectAspectRatioCommand;
         private ICommand _selectAudioDeviceCommand;
-        private ICommand _videoQualitySelectionChangedCommand;
         private ICommand _zoomCommand;
 
         private string _subscriptionToken;
@@ -93,7 +92,6 @@ namespace RaceControl.ViewModels
         public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => MediaPlayer.IsFullScreen);
         public ICommand SelectAspectRatioCommand => _selectAspectRatioCommand ??= new DelegateCommand<IAspectRatio>(SelectAspectRatioExecute, CanSelectAspectRatioExecute).ObservesProperty(() => MediaPlayer.AspectRatio);
         public ICommand SelectAudioDeviceCommand => _selectAudioDeviceCommand ??= new DelegateCommand<IAudioDevice>(SelectAudioDeviceExecute, CanSelectAudioDeviceExecute).ObservesProperty(() => MediaPlayer.AudioDevice);
-        public ICommand VideoQualitySelectionChangedCommand => _videoQualitySelectionChangedCommand ??= new DelegateCommand(VideoQualitySelectionChangedExecute);
         public ICommand ZoomCommand => _zoomCommand ??= new DelegateCommand<int?>(ZoomExecute);
 
         public IMediaPlayer MediaPlayer { get; }
@@ -411,12 +409,6 @@ namespace RaceControl.ViewModels
             MediaPlayer.AudioDevice = audioDevice;
         }
 
-        private void VideoQualitySelectionChangedExecute()
-        {
-            // todo: prevent this trigger when switching to fullscreen (store current videoquality in mediaplayer)
-            MediaPlayer.SetVideoQuality(DialogSettings.VideoQuality);
-        }
-
         private void ZoomExecute(int? zoom)
         {
             if (zoom.HasValue)
@@ -443,7 +435,7 @@ namespace RaceControl.ViewModels
                 DialogSettings.Width = settings.Width;
                 DialogSettings.Height = settings.Height;
             }
-            
+
             DialogSettings.VideoQuality = settings.VideoQuality;
             DialogSettings.IsMuted = settings.IsMuted;
             DialogSettings.Volume = settings.Volume;
@@ -463,7 +455,7 @@ namespace RaceControl.ViewModels
                 Height = DialogSettings.Height,
                 FullScreen = MediaPlayer.IsFullScreen,
                 ResizeMode = DialogSettings.ResizeMode,
-                VideoQuality = DialogSettings.VideoQuality,
+                VideoQuality = MediaPlayer.VideoQuality,
                 Topmost = DialogSettings.Topmost,
                 IsMuted = MediaPlayer.IsMuted,
                 Volume = MediaPlayer.Volume,
