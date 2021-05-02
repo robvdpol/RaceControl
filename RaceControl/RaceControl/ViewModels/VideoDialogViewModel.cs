@@ -14,6 +14,7 @@ using RaceControl.Services.Interfaces.F1TV;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -112,7 +113,11 @@ namespace RaceControl.ViewModels
         public IPlayableContent PlayableContent
         {
             get => _playableContent;
-            set => SetProperty(ref _playableContent, value);
+            set 
+            {
+                SetProperty(ref _playableContent, value);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(Title)));
+            }
         }
 
         public VideoDialogSettings DialogSettings
@@ -433,9 +438,9 @@ namespace RaceControl.ViewModels
                 DialogSettings.StartTime = currentTime;
             }
 
-            await StartStreamAsync();            
+            await StartStreamAsync();
         }
-		
+
         private void ZoomExecute(int? zoom)
         {
             if (zoom.HasValue)
@@ -521,6 +526,8 @@ namespace RaceControl.ViewModels
             {
                 throw new Exception("An error occurred while retrieving the stream URL.");
             }
+
+            DialogSettings.IsMuted = Channels.Graphs.Contains(PlayableContent as IPlayableChannel);
 
             MediaPlayer.StartPlayback(streamUrl, DialogSettings);
         }
