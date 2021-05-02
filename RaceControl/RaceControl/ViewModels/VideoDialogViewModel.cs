@@ -428,11 +428,12 @@ namespace RaceControl.ViewModels
             Channels.CurrentChannel = channel;
             PlayableContent = channel;
             
-            await StartStreamAsync();
             if (!PlayableContent.IsLive)
             {
-                MediaPlayer.Time = currentTime;
+                DialogSettings.StartTime = currentTime;
             }
+
+            await StartStreamAsync();            
         }
 		
         private void ZoomExecute(int? zoom)

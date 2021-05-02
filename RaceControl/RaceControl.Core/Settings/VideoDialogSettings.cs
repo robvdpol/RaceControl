@@ -113,6 +113,11 @@ namespace RaceControl.Core.Settings
             set => SetProperty(ref _channelName, value);
         }
 
+        public long StartTime
+        {
+            get => _startTime;
+            set => SetProperty(ref _startTime, value);
+        }
 
         public static VideoDialogSettings GetDefaultSettings()
         {
