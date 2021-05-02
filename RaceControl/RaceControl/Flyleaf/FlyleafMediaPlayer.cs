@@ -9,6 +9,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace RaceControl.Flyleaf
@@ -229,14 +230,18 @@ namespace RaceControl.Flyleaf
 
             if (disposing)
             {
-                try
+                // Prevent main application from hanging after closing an internal player
+                Task.Run(() =>
                 {
-                    Player.Dispose();
-                }
-                catch (PlatformNotSupportedException ex)
-                {
-                    _logger.Warn(ex, "A non-critical error occurred.");
-                }
+                    try
+                    {
+                        Player.Dispose();
+                    }
+                    catch (PlatformNotSupportedException ex)
+                    {
+                        _logger.Warn(ex, "A non-critical error occurred.");
+                    }
+                });
             }
 
             _disposed = true;
