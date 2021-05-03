@@ -48,6 +48,8 @@ namespace RaceControl.Flyleaf
                     return;
                 }
 
+                Status = DownloadStatus.Downloading;
+
                 // Only download the highest quality video stream
                 if (_downloader.VideoStreams.Any())
                 {
