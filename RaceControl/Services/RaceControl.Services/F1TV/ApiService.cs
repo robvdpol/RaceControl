@@ -201,7 +201,7 @@ namespace RaceControl.Services.F1TV
                 .Where(c => c.Metadata.ContentType == "VIDEO")
                 .Where(c => c.Metadata.ContentSubtype != "LIVE")
                 .Select(CreateEpisode)
-                .OrderByDescending(e => e.SessionIndex)
+                .OrderByDescending(e => e.ContractStartDate)
                 .ToList();
         }
 
@@ -374,6 +374,8 @@ namespace RaceControl.Services.F1TV
                 ThumbnailUrl = GetThumbnailUrl(container.Metadata.PictureUrl),
                 StartDate = container.Metadata.EmfAttributes.SessionStartDate.GetDateTimeFromEpoch(),
                 EndDate = container.Metadata.EmfAttributes.SessionEndDate.GetDateTimeFromEpoch(),
+                ContractStartDate = container.Metadata.ContractStartDate.GetDateTimeFromEpoch(),
+                ContractEndDate = container.Metadata.ContractEndDate.GetDateTimeFromEpoch(),
                 SessionIndex = container.Metadata.EmfAttributes.SessionIndex
             };
         }

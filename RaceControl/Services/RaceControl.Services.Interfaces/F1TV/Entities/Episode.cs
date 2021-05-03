@@ -15,6 +15,8 @@ namespace RaceControl.Services.Interfaces.F1TV.Entities
         public string ThumbnailUrl { get; init; }
         public DateTime? StartDate { get; init; }
         public DateTime? EndDate { get; init; }
+        public DateTime? ContractStartDate { get; init; }
+        public DateTime? ContractEndDate { get; init; }
         public long SessionIndex { get; init; }
 
         public override string ToString()
