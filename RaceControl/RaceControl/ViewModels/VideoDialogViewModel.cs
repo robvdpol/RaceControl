@@ -45,9 +45,9 @@ namespace RaceControl.ViewModels
         private ICommand _syncSessionCommand;
         private ICommand _toggleFullScreenCommand;
         private ICommand _moveToCornerCommand;
+        private ICommand _zoomCommand;
         private ICommand _selectAspectRatioCommand;
         private ICommand _selectAudioDeviceCommand;
-        private ICommand _zoomCommand;
 
         private string _subscriptionToken;
         private long _identifier;
@@ -90,9 +90,9 @@ namespace RaceControl.ViewModels
         public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand<long?>(ToggleFullScreenExecute);
         public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => MediaPlayer.IsFullScreen);
+        public ICommand ZoomCommand => _zoomCommand ??= new DelegateCommand<int?>(ZoomExecute);
         public ICommand SelectAspectRatioCommand => _selectAspectRatioCommand ??= new DelegateCommand<IAspectRatio>(SelectAspectRatioExecute, CanSelectAspectRatioExecute).ObservesProperty(() => MediaPlayer.AspectRatio);
         public ICommand SelectAudioDeviceCommand => _selectAudioDeviceCommand ??= new DelegateCommand<IAudioDevice>(SelectAudioDeviceExecute, CanSelectAudioDeviceExecute).ObservesProperty(() => MediaPlayer.AudioDevice);
-        public ICommand ZoomCommand => _zoomCommand ??= new DelegateCommand<int?>(ZoomExecute);
 
         public IMediaPlayer MediaPlayer { get; }
 
@@ -351,14 +351,7 @@ namespace RaceControl.ViewModels
         {
             if (identifier == null)
             {
-                if (MediaPlayer.IsFullScreen)
-                {
-                    MediaPlayer.SetNormalScreen();
-                }
-                else
-                {
-                    MediaPlayer.SetFullScreen();
-                }
+                MediaPlayer.ToggleFullScreen();
             }
             else
             {
@@ -389,6 +382,18 @@ namespace RaceControl.ViewModels
             DialogSettings.Left = windowLeft;
         }
 
+        private void ZoomExecute(int? zoom)
+        {
+            if (zoom.HasValue)
+            {
+                MediaPlayer.Zoom += zoom.Value;
+            }
+            else
+            {
+                MediaPlayer.Zoom = 0;
+            }
+        }
+
         private bool CanSelectAspectRatioExecute(IAspectRatio aspectRatio)
         {
             return MediaPlayer.AspectRatio != aspectRatio;
@@ -407,18 +412,6 @@ namespace RaceControl.ViewModels
         private void SelectAudioDeviceExecute(IAudioDevice audioDevice)
         {
             MediaPlayer.AudioDevice = audioDevice;
-        }
-
-        private void ZoomExecute(int? zoom)
-        {
-            if (zoom.HasValue)
-            {
-                MediaPlayer.Zoom += zoom.Value;
-            }
-            else
-            {
-                MediaPlayer.Zoom = 0;
-            }
         }
 
         private void LoadDialogSettings(VideoDialogSettings settings)

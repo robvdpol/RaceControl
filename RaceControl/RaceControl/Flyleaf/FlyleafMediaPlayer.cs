@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using FlyleafLibAspectRatio = FlyleafLib.AspectRatio;
 
 namespace RaceControl.Flyleaf
 {
@@ -18,14 +19,14 @@ namespace RaceControl.Flyleaf
     {
         private readonly ILogger _logger;
 
+        private bool _isPlaying;
+        private bool _isPaused;
         private long _time;
         private long _duration;
         private int _volume;
-        private int _zoom;
-        private bool _isFullScreen;
-        private bool _isPlaying;
-        private bool _isPaused;
         private bool _isMuted;
+        private bool _isFullScreen;
+        private int _zoom;
         private VideoQuality _videoQuality;
         private ObservableCollection<IAspectRatio> _aspectRatios;
         private ObservableCollection<IAudioDevice> _audioDevices;
@@ -45,14 +46,66 @@ namespace RaceControl.Flyleaf
 
         public Player Player { get; }
 
-        public bool IsMuted => _isMuted;
+        public bool IsPlaying
+        {
+            get => _isPlaying;
+            private set => SetProperty(ref _isPlaying, value);
+        }
+
+        public bool IsPaused
+        {
+            get => _isPaused;
+            private set => SetProperty(ref _isPaused, value);
+        }
+
+        public long Time
+        {
+            get => _time;
+            set
+            {
+                var time = TimeSpan.FromTicks(Math.Max(value, 0));
+                Player.Seek((int)time.TotalMilliseconds);
+            }
+        }
+
+        public long Duration
+        {
+            get => _duration;
+            private set => SetProperty(ref _duration, value);
+        }
 
         public int MaxVolume => 150;
 
         public int Volume
         {
             get => _volume;
-            set => Player.audioPlayer.Volume = Math.Min(Math.Max(value, 0), MaxVolume);
+            set
+            {
+                var volume = Math.Min(Math.Max(value, 0), MaxVolume);
+
+                if (SetProperty(ref _volume, volume))
+                {
+                    Player.audioPlayer.Volume = _volume;
+                }
+            }
+        }
+
+        public bool IsMuted
+        {
+            get => _isMuted;
+            private set
+            {
+                if (SetProperty(ref _isMuted, value))
+                {
+                    Player.audioPlayer.Mute = _isMuted;
+                }
+            }
+        }
+
+        public bool IsFullScreen
+        {
+            get => _isFullScreen;
+            private set => SetProperty(ref _isFullScreen, value);
         }
 
         public int Zoom
@@ -65,36 +118,6 @@ namespace RaceControl.Flyleaf
                     Player.renderer.Zoom = _zoom;
                 }
             }
-        }
-
-        public long Time
-        {
-            get => _time;
-            set => Player.Session.CurTime = Math.Max(value, 0);
-        }
-
-        public long Duration
-        {
-            get => _duration;
-            private set => SetProperty(ref _duration, value);
-        }
-
-        public bool IsFullScreen
-        {
-            get => _isFullScreen;
-            private set => SetProperty(ref _isFullScreen, value);
-        }
-
-        public bool IsPlaying
-        {
-            get => _isPlaying;
-            private set => SetProperty(ref _isPlaying, value);
-        }
-
-        public bool IsPaused
-        {
-            get => _isPaused;
-            private set => SetProperty(ref _isPaused, value);
         }
 
         public VideoQuality VideoQuality
@@ -122,7 +145,7 @@ namespace RaceControl.Flyleaf
             {
                 if (SetProperty(ref _aspectRatio, value) && _aspectRatio != null)
                 {
-                    Player.Config.video.AspectRatio = new AspectRatio(_aspectRatio.Value);
+                    Player.Config.video.AspectRatio = new FlyleafLibAspectRatio(_aspectRatio.Value);
                 }
             }
         }
@@ -144,25 +167,20 @@ namespace RaceControl.Flyleaf
             get => _audioTrack;
             set
             {
-                if (value != null)
+                if (SetProperty(ref _audioTrack, value) && _audioTrack != null)
                 {
-                    var audioStream = Player.curAudioPlugin.AudioStreams.FirstOrDefault(stream => new FlyleafAudioTrack(stream).Id == value.Id);
+                    var audioStream = Player.curAudioPlugin.AudioStreams.FirstOrDefault(stream => new FlyleafAudioTrack(stream).Id == _audioTrack.Id);
 
                     if (audioStream != null)
                     {
                         Player.Open(audioStream);
                     }
                 }
-                else
-                {
-                    SetProperty(ref _audioTrack, null);
-                }
             }
         }
 
         public void StartPlayback(string streamUrl, VideoDialogSettings settings)
         {
-            Player.PropertyChanged += PlayerOnPropertyChanged;
             Player.OpenCompleted += (_, args) =>
             {
                 if (args.success)
@@ -171,33 +189,24 @@ namespace RaceControl.Flyleaf
                 }
             };
 
+            Player.PropertyChanged += PlayerOnPropertyChanged;
+
             if (settings.FullScreen)
             {
-                SetFullScreen();
+                ToggleFullScreen();
             }
 
             Player.Open(streamUrl);
         }
 
-        public void SetFullScreen()
+        public void ToggleFullScreen()
         {
-            if (!IsFullScreen)
-            {
-                IsFullScreen = Player.VideoView.FullScreen();
-            }
-        }
-
-        public void SetNormalScreen()
-        {
-            if (IsFullScreen)
-            {
-                IsFullScreen = !Player.VideoView.NormalScreen();
-            }
+            IsFullScreen = IsFullScreen ? !Player.VideoView.NormalScreen() : Player.VideoView.FullScreen();
         }
 
         public void TogglePause()
         {
-            if (Player.IsPlaying)
+            if (IsPlaying)
             {
                 Player.Pause();
             }
@@ -209,10 +218,7 @@ namespace RaceControl.Flyleaf
 
         public void ToggleMute(bool? mute)
         {
-            if (mute == null || mute.Value != Player.audioPlayer.Mute)
-            {
-                Player.audioPlayer.Mute = !Player.audioPlayer.Mute;
-            }
+            IsMuted = mute.GetValueOrDefault(!IsMuted);
         }
 
         public void Dispose()
@@ -237,7 +243,7 @@ namespace RaceControl.Flyleaf
                     {
                         Player.Dispose();
                     }
-                    catch (PlatformNotSupportedException ex)
+                    catch (Exception ex)
                     {
                         _logger.Warn(ex, "A non-critical error occurred.");
                     }
@@ -247,20 +253,6 @@ namespace RaceControl.Flyleaf
             _disposed = true;
         }
 
-        private void PlayerOnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(Player.Status))
-            {
-                IsPlaying = Player.Status == Status.Playing;
-                IsPaused = Player.Status == Status.Paused;
-
-                if (IsPlaying && Zoom != 0)
-                {
-                    Player.renderer.Zoom = Zoom;
-                }
-            }
-        }
-
         private void PlayerOnOpenCompleted(MediaType mediaType, VideoDialogSettings settings)
         {
             switch (mediaType)
@@ -268,12 +260,12 @@ namespace RaceControl.Flyleaf
                 case MediaType.Video:
                     if (!_videoInitialized)
                     {
-                        _videoInitialized = true;
-
                         Application.Current.Dispatcher.Invoke(() =>
                         {
                             InitializeVideo(settings.VideoQuality, settings.Zoom, settings.AspectRatio);
                         });
+
+                        _videoInitialized = true;
                     }
 
                     Player.Play();
@@ -282,27 +274,27 @@ namespace RaceControl.Flyleaf
                 case MediaType.Audio:
                     if (!_audioInitialized)
                     {
-                        _audioInitialized = true;
-
                         Application.Current.Dispatcher.Invoke(() =>
                         {
                             InitializeAudio(settings.AudioDevice, settings.AudioTrack, settings.IsMuted, settings.Volume);
                         });
-                    }
 
-                    var audioStream = Player.Session.CurAudioStream;
-
-                    if (audioStream != null)
-                    {
-                        var audioTrackId = new FlyleafAudioTrack(audioStream).Id;
-
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            SetProperty(ref _audioTrack, AudioTracks.FirstOrDefault(track => track.Id == audioTrackId), nameof(AudioTrack));
-                        });
+                        _audioInitialized = true;
                     }
 
                     break;
+            }
+        }
+
+        private void PlayerOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Player.Status))
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    IsPlaying = Player.Status == Status.Playing;
+                    IsPaused = Player.Status == Status.Paused;
+                });
             }
         }
 
@@ -317,45 +309,22 @@ namespace RaceControl.Flyleaf
             }
         }
 
-        private void AudioPlayerOnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(Player.audioPlayer.Volume))
-            {
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    SetProperty(ref _volume, Player.audioPlayer.Volume, nameof(Volume));
-                });
-            }
-
-            if (e.PropertyName == nameof(Player.audioPlayer.Mute))
-            {
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    SetProperty(ref _isMuted, Player.audioPlayer.Mute, nameof(IsMuted));
-                });
-            }
-        }
-
         private void InitializeVideo(VideoQuality videoQuality, int zoom, string aspectRatio)
         {
-            AspectRatios.AddRange(FlyleafLib.AspectRatio.AspectRatios.Where(ar => ar != FlyleafLib.AspectRatio.Custom).Select(ar => new FlyleafAspectRatio(ar)));
             Player.Session.PropertyChanged += SessionOnPropertyChanged;
+            AspectRatios.AddRange(FlyleafLibAspectRatio.AspectRatios.Where(ar => ar != FlyleafLibAspectRatio.Custom).Select(ar => new FlyleafAspectRatio(ar)));
             Duration = Player.Session.Movie.Duration;
             VideoQuality = videoQuality;
+            Zoom = zoom;
 
-            // Actual zooming will be performed when player starts playing
-            SetProperty(ref _zoom, zoom, nameof(Zoom));
-
-            if (string.IsNullOrWhiteSpace(aspectRatio))
+            if (!string.IsNullOrWhiteSpace(aspectRatio))
             {
-                aspectRatio = FlyleafLib.AspectRatio.Keep.ValueStr;
+                AspectRatio = AspectRatios.FirstOrDefault(ar => ar.Value == aspectRatio);
             }
-
-            var ratio = AspectRatios.FirstOrDefault(ar => ar.Value == aspectRatio);
-
-            if (ratio != null)
+            else
             {
-                AspectRatio = ratio;
+                var ratio = AspectRatios.FirstOrDefault(ar => ar.Value == FlyleafLibAspectRatio.Keep.ValueStr);
+                SetProperty(ref _aspectRatio, ratio, nameof(AspectRatio));
             }
         }
 
@@ -363,37 +332,22 @@ namespace RaceControl.Flyleaf
         {
             AudioDevices.AddRange(Master.AudioMaster.Devices.Select(device => new FlyleafAudioDevice(device)));
             AudioTracks.AddRange(Player.curAudioPlugin.AudioStreams.Select(stream => new FlyleafAudioTrack(stream)));
-            Player.audioPlayer.PropertyChanged += AudioPlayerOnPropertyChanged;
             Volume = volume;
             ToggleMute(isMuted);
 
             if (!string.IsNullOrWhiteSpace(audioDevice))
             {
-                var device = AudioDevices.FirstOrDefault(d => d.Identifier == audioDevice);
-
-                if (device != null)
-                {
-                    AudioDevice = device;
-                }
+                AudioDevice = AudioDevices.FirstOrDefault(d => d.Identifier == audioDevice);
             }
             else
             {
                 var device = AudioDevices.FirstOrDefault(d => d.Identifier == Player.audioPlayer.Device);
-
-                if (device != null)
-                {
-                    SetProperty(ref _audioDevice, device, nameof(AudioDevice));
-                }
+                SetProperty(ref _audioDevice, device, nameof(AudioDevice));
             }
 
             if (!string.IsNullOrWhiteSpace(audioTrack))
             {
-                var track = AudioTracks.FirstOrDefault(t => t.Id == audioTrack);
-
-                if (track != null)
-                {
-                    AudioTrack = track;
-                }
+                AudioTrack = AudioTracks.FirstOrDefault(t => t.Id == audioTrack);
             }
         }
 

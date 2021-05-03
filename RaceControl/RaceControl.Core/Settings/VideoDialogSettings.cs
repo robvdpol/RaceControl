@@ -121,7 +121,8 @@ namespace RaceControl.Core.Settings
                 VideoQuality = VideoQuality.High,
                 Width = 960,
                 Height = 550,
-                Volume = 100
+                Volume = 100,
+                AudioTrack = "eng"
             };
         }
     }

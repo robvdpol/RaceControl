@@ -559,11 +559,6 @@
                                 ItemsSource="{Binding VideoQualities}"
                                 SelectedValue="{Binding MediaPlayer.VideoQuality}"
                                 SelectedValuePath="Key">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="SelectionChanged">
-                                        <i:InvokeCommandAction Command="{Binding VideoQualitySelectionChangedCommand}" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
                                 <ComboBox.IsEnabled>
                                     <MultiBinding Converter="{StaticResource LogicalOrConverter}">
                                         <Binding Path="MediaPlayer.IsPlaying" />

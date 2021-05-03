@@ -7,24 +7,24 @@ namespace RaceControl.Interfaces
 {
     public interface IMediaPlayer : IDisposable
     {
-        bool IsMuted { get; }
+        bool IsPlaying { get; }
 
-        int MaxVolume { get; }
-
-        int Volume { get; set; }
-
-        int Zoom { get; set; }
+        bool IsPaused { get; }
 
         long Time { get; set; }
 
         long Duration { get; }
 
+        int MaxVolume { get; }
+
+        int Volume { get; set; }
+
+        bool IsMuted { get; }
+
         bool IsFullScreen { get; }
 
-        bool IsPlaying { get; }
-
-        bool IsPaused { get; }
-
+        int Zoom { get; set; }
+        
         VideoQuality VideoQuality { get; set; }
 
         ObservableCollection<IAspectRatio> AspectRatios { get; }
@@ -41,9 +41,7 @@ namespace RaceControl.Interfaces
 
         void StartPlayback(string streamUrl, VideoDialogSettings settings);
 
-        void SetFullScreen();
-
-        void SetNormalScreen();
+        void ToggleFullScreen();
 
         void TogglePause();
 
