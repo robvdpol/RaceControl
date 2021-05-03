@@ -306,7 +306,7 @@ namespace RaceControl.ViewModels
 
         private void OnSyncStreams(SyncStreamsEventPayload payload)
         {
-            if (CanClose && PlayableContent.SyncUID == payload.SyncUID)
+            if (MediaPlayer.IsStarted && PlayableContent.SyncUID == payload.SyncUID)
             {
                 MediaPlayer.Time = payload.Time;
             }
