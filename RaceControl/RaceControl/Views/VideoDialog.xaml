@@ -15,8 +15,8 @@
         <sys:Boolean x:Key="False">False</sys:Boolean>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <core:AreEqualConverter x:Key="AreEqualConverter" />
-        <core:LogicalOrConverter x:Key="LogicalOrConverter" />
         <core:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <core:LogicalAndConverter x:Key="LogicalAndConverter" />
         <core:ResizeModeToBooleanConverter x:Key="ResizeModeToBooleanConverter" />
         <core:DivideDoubleConverter x:Key="DivideDoubleConverter" />
         <core:TicksToTimeSpanConverter x:Key="TicksToTimeSpanConverter" />
@@ -265,7 +265,6 @@
                         <Slider
                             Grid.Column="1"
                             Margin="2"
-                            IsEnabled="{Binding PlayableContent.IsLive, Converter={StaticResource InverseBooleanConverter}}"
                             IsMoveToPointEnabled="True"
                             IsSnapToTickEnabled="False"
                             Maximum="{Binding MediaPlayer.Duration}"
@@ -278,6 +277,12 @@
                                     </Binding.ConverterParameter>
                                 </Binding>
                             </Slider.TickFrequency>
+                            <Slider.IsEnabled>
+                                <MultiBinding Converter="{StaticResource LogicalAndConverter}">
+                                    <Binding Converter="{StaticResource InverseBooleanConverter}" Path="PlayableContent.IsLive" />
+                                    <Binding Path="MediaPlayer.IsStarted" />
+                                </MultiBinding>
+                            </Slider.IsEnabled>
                         </Slider>
                         <TextBlock
                             Grid.Column="2"
@@ -305,6 +310,7 @@
                             Width="100"
                             Margin="2"
                             VerticalAlignment="Center"
+                            IsEnabled="{Binding MediaPlayer.IsStarted}"
                             IsMoveToPointEnabled="True"
                             IsSnapToTickEnabled="False"
                             Maximum="{Binding MediaPlayer.MaxVolume}"
@@ -556,16 +562,10 @@
                                 MinWidth="150"
                                 Margin="2"
                                 DisplayMemberPath="Value"
+                                IsEnabled="{Binding MediaPlayer.IsStarted}"
                                 ItemsSource="{Binding VideoQualities}"
                                 SelectedValue="{Binding MediaPlayer.VideoQuality}"
-                                SelectedValuePath="Key">
-                                <ComboBox.IsEnabled>
-                                    <MultiBinding Converter="{StaticResource LogicalOrConverter}">
-                                        <Binding Path="MediaPlayer.IsPlaying" />
-                                        <Binding Path="MediaPlayer.IsPaused" />
-                                    </MultiBinding>
-                                </ComboBox.IsEnabled>
-                            </ComboBox>
+                                SelectedValuePath="Key" />
                             <TextBlock
                                 Grid.Row="1"
                                 Grid.Column="0"
@@ -578,15 +578,9 @@
                                 MinWidth="150"
                                 Margin="2"
                                 DisplayMemberPath="Name"
+                                IsEnabled="{Binding MediaPlayer.IsStarted}"
                                 ItemsSource="{Binding MediaPlayer.AudioTracks}"
-                                SelectedItem="{Binding MediaPlayer.AudioTrack}">
-                                <ComboBox.IsEnabled>
-                                    <MultiBinding Converter="{StaticResource LogicalOrConverter}">
-                                        <Binding Path="MediaPlayer.IsPlaying" />
-                                        <Binding Path="MediaPlayer.IsPaused" />
-                                    </MultiBinding>
-                                </ComboBox.IsEnabled>
-                            </ComboBox>
+                                SelectedItem="{Binding MediaPlayer.AudioTrack}" />
                         </Grid>
                     </Grid>
                 </Grid>

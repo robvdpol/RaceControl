@@ -83,16 +83,16 @@ namespace RaceControl.ViewModels
         public ICommand MouseMoveControlBarCommand => _mouseMoveControlBarCommand ??= new DelegateCommand(MouseMoveControlBarExecute);
         public ICommand MouseWheelControlBarCommand => _mouseWheelControlBarCommand ??= new DelegateCommand<MouseWheelEventArgs>(MouseWheelControlBarExecute);
         public ICommand CloseAllWindowsCommand => _closeAllWindowsCommand ??= new DelegateCommand(CloseAllWindowsExecute);
-        public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute).ObservesCanExecute(() => CanClose);
-        public ICommand TogglePauseAllCommand => _togglePauseAllCommand ??= new DelegateCommand(TogglePauseAllExecute).ObservesCanExecute(() => CanClose);
-        public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand<bool?>(ToggleMuteExecute).ObservesCanExecute(() => CanClose);
-        public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<int?>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent);
-        public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent);
-        public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand<long?>(ToggleFullScreenExecute);
+        public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
+        public ICommand TogglePauseAllCommand => _togglePauseAllCommand ??= new DelegateCommand(TogglePauseAllExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
+        public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand<bool?>(ToggleMuteExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
+        public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<int?>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => PlayableContent);
+        public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
+        public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand<long?>(ToggleFullScreenExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
         public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => MediaPlayer.IsFullScreen);
-        public ICommand ZoomCommand => _zoomCommand ??= new DelegateCommand<int?>(ZoomExecute);
-        public ICommand SelectAspectRatioCommand => _selectAspectRatioCommand ??= new DelegateCommand<IAspectRatio>(SelectAspectRatioExecute, CanSelectAspectRatioExecute).ObservesProperty(() => MediaPlayer.AspectRatio);
-        public ICommand SelectAudioDeviceCommand => _selectAudioDeviceCommand ??= new DelegateCommand<IAudioDevice>(SelectAudioDeviceExecute, CanSelectAudioDeviceExecute).ObservesProperty(() => MediaPlayer.AudioDevice);
+        public ICommand ZoomCommand => _zoomCommand ??= new DelegateCommand<int?>(ZoomExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
+        public ICommand SelectAspectRatioCommand => _selectAspectRatioCommand ??= new DelegateCommand<IAspectRatio>(SelectAspectRatioExecute, CanSelectAspectRatioExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => MediaPlayer.AspectRatio);
+        public ICommand SelectAudioDeviceCommand => _selectAudioDeviceCommand ??= new DelegateCommand<IAudioDevice>(SelectAudioDeviceExecute, CanSelectAudioDeviceExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => MediaPlayer.AudioDevice);
 
         public IMediaPlayer MediaPlayer { get; }
 
@@ -285,7 +285,7 @@ namespace RaceControl.ViewModels
 
         private bool CanFastForwardExecute(int? seconds)
         {
-            return CanClose && !PlayableContent.IsLive;
+            return MediaPlayer.IsStarted && !PlayableContent.IsLive;
         }
 
         private void FastForwardExecute(int? seconds)
@@ -295,11 +295,6 @@ namespace RaceControl.ViewModels
                 Logger.Info($"Fast forwarding stream {seconds.Value} seconds...");
                 MediaPlayer.Time += TimeSpan.FromSeconds(seconds.Value).Ticks;
             }
-        }
-
-        private bool CanSyncSessionExecute()
-        {
-            return CanClose;
         }
 
         private void SyncSessionExecute()
@@ -396,7 +391,7 @@ namespace RaceControl.ViewModels
 
         private bool CanSelectAspectRatioExecute(IAspectRatio aspectRatio)
         {
-            return MediaPlayer.AspectRatio != aspectRatio;
+            return MediaPlayer.IsStarted && MediaPlayer.AspectRatio != aspectRatio;
         }
 
         private void SelectAspectRatioExecute(IAspectRatio aspectRatio)
@@ -406,7 +401,7 @@ namespace RaceControl.ViewModels
 
         private bool CanSelectAudioDeviceExecute(IAudioDevice audioDevice)
         {
-            return MediaPlayer.AudioDevice != audioDevice;
+            return MediaPlayer.IsStarted && MediaPlayer.AudioDevice != audioDevice;
         }
 
         private void SelectAudioDeviceExecute(IAudioDevice audioDevice)

@@ -19,6 +19,7 @@ namespace RaceControl.Flyleaf
     {
         private readonly ILogger _logger;
 
+        private bool _isStarted;
         private bool _isPlaying;
         private bool _isPaused;
         private long _time;
@@ -45,6 +46,12 @@ namespace RaceControl.Flyleaf
         }
 
         public Player Player { get; }
+
+        public bool IsStarted
+        {
+            get => _isStarted;
+            private set => SetProperty(ref _isStarted, value);
+        }
 
         public bool IsPlaying
         {
@@ -294,6 +301,11 @@ namespace RaceControl.Flyleaf
                 {
                     IsPlaying = Player.Status == Status.Playing;
                     IsPaused = Player.Status == Status.Paused;
+
+                    if (IsPlaying)
+                    {
+                        IsStarted = true;
+                    }
                 });
             }
         }

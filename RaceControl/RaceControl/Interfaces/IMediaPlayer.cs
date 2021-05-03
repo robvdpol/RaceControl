@@ -7,6 +7,8 @@ namespace RaceControl.Interfaces
 {
     public interface IMediaPlayer : IDisposable
     {
+        bool IsStarted { get; }
+
         bool IsPlaying { get; }
 
         bool IsPaused { get; }
@@ -24,7 +26,7 @@ namespace RaceControl.Interfaces
         bool IsFullScreen { get; }
 
         int Zoom { get; set; }
-        
+
         VideoQuality VideoQuality { get; set; }
 
         ObservableCollection<IAspectRatio> AspectRatios { get; }
