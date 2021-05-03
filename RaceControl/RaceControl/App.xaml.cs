@@ -3,7 +3,6 @@ using FlyleafLib;
 using FlyleafLib.MediaFramework.MediaDemuxer;
 using FlyleafLib.MediaPlayer;
 using GoogleCast;
-using LibVLCSharp.Shared;
 using Newtonsoft.Json;
 using NLog;
 using NLog.Config;
@@ -34,9 +33,6 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Threading;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
-using LibVLCSharpCore = LibVLCSharp.Shared.Core;
-using LogLevelNLog = NLog.LogLevel;
-using LogLevelVLC = LibVLCSharp.Shared.LogLevel;
 
 namespace RaceControl
 {
@@ -66,7 +62,6 @@ namespace RaceControl
         protected override void Initialize()
         {
             InitializeLogging();
-            LibVLCSharpCore.Initialize();
             base.Initialize();
         }
 
@@ -83,8 +78,6 @@ namespace RaceControl
                 .RegisterSingleton<IExtendedDialogService, ExtendedDialogService>()
                 .RegisterSingleton<ISettings, Settings>()
                 .RegisterSingleton<IVideoDialogLayout, VideoDialogLayout>()
-                .RegisterInstance(CreateLibVLC())
-                .Register<MediaPlayer>(CreateVlcPlayer)
                 .Register<Player>(CreateFlyleafPlayer)
                 .Register<VideoDemuxer>(CreateFlyleafDownloader)
                 .Register<JsonSerializer>(() => new JsonSerializer { Formatting = Formatting.Indented })
@@ -114,12 +107,6 @@ namespace RaceControl
             _splashScreen.Close(TimeSpan.Zero);
         }
 
-        protected override void OnExit(ExitEventArgs e)
-        {
-            base.OnExit(e);
-            Container.Resolve<LibVLC>()?.Dispose();
-        }
-
         private static void InitializeLogging()
         {
             var config = new LoggingConfiguration();
@@ -131,50 +118,8 @@ namespace RaceControl
                 ArchiveNumbering = ArchiveNumberingMode.Rolling,
                 MaxArchiveFiles = 2
             };
-            config.AddRule(LogLevelNLog.Info, LogLevelNLog.Fatal, logfile);
+            config.AddRule(LogLevel.Info, LogLevel.Fatal, logfile);
             LogManager.Configuration = config;
-        }
-
-        private static LibVLC CreateLibVLC()
-        {
-            var libVLC = new LibVLC("--no-ts-trust-pcr", "--adaptive-livedelay=5000", "--adaptive-maxbuffer=15000");
-            var logger = LogManager.GetLogger(libVLC.GetType().FullName);
-
-            libVLC.Log += (_, args) =>
-            {
-                switch (args.Level)
-                {
-                    case LogLevelVLC.Debug:
-                        logger.Debug($"[VLC] {args.Message}");
-                        break;
-
-                    case LogLevelVLC.Notice:
-                        logger.Info($"[VLC] {args.Message}");
-                        break;
-
-                    case LogLevelVLC.Warning:
-                        logger.Warn($"[VLC] {args.Message}");
-                        break;
-
-                    case LogLevelVLC.Error:
-                        logger.Error($"[VLC] {args.Message}");
-                        break;
-                }
-            };
-
-            return libVLC;
-        }
-
-        private static MediaPlayer CreateVlcPlayer(IContainerProvider container)
-        {
-            return new(container.Resolve<LibVLC>())
-            {
-                EnableHardwareDecoding = true,
-                EnableMouseInput = false,
-                EnableKeyInput = false,
-                FileCaching = 5000,
-                NetworkCaching = 10000
-            };
         }
 
         private static Player CreateFlyleafPlayer()
