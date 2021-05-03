@@ -1,5 +1,6 @@
 ﻿using DryIoc;
 using FlyleafLib;
+using FlyleafLib.MediaFramework.MediaDemuxer;
 using FlyleafLib.MediaPlayer;
 using GoogleCast;
 using LibVLCSharp.Shared;
@@ -25,7 +26,6 @@ using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.Github;
 using RaceControl.ViewModels;
 using RaceControl.Views;
-using RaceControl.Vlc;
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
 using System;
@@ -43,6 +43,8 @@ namespace RaceControl
     public partial class App
     {
         private readonly SplashScreen _splashScreen = new("splashscreen.png");
+
+        private static int _flyleafUniqueId;
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -84,6 +86,7 @@ namespace RaceControl
                 .RegisterInstance(CreateLibVLC())
                 .Register<MediaPlayer>(CreateVlcPlayer)
                 .Register<Player>(CreateFlyleafPlayer)
+                .Register<VideoDemuxer>(CreateFlyleafDownloader)
                 .Register<JsonSerializer>(() => new JsonSerializer { Formatting = Formatting.Indented })
                 .Register<IAuthorizationService, AuthorizationService>()
                 .Register<IApiService, ApiService>()
@@ -93,7 +96,7 @@ namespace RaceControl
                 .Register<IDeviceLocator, DeviceLocator>()
                 .Register<ISender>(() => new Sender())
                 .Register<IMediaPlayer, FlyleafMediaPlayer>()
-                .Register<IMediaDownloader, VlcMediaDownloader>();
+                .Register<IMediaDownloader, FlyleafMediaDownloader>();
 
             var container = registry.GetContainer();
             container.Register(Made.Of(() => CreateRestClient()), setup: Setup.With(asResolutionCall: true));
@@ -177,6 +180,13 @@ namespace RaceControl
         private static Player CreateFlyleafPlayer()
         {
             return new();
+        }
+
+        private static VideoDemuxer CreateFlyleafDownloader()
+        {
+            _flyleafUniqueId++;
+
+            return new VideoDemuxer(new Config(), _flyleafUniqueId);
         }
 
         private static IRestClient CreateRestClient()
