@@ -745,6 +745,7 @@ namespace RaceControl.ViewModels
             Sessions.Clear();
             SelectedLiveSession = null;
             SelectedSession = null;
+            SelectedEvent = null;
 
             await LoadEpisodesForGenreAsync(genre);
         }
