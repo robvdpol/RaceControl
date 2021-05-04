@@ -44,7 +44,7 @@ namespace RaceControl
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            _splashScreen.Show(false);
+            _splashScreen.Show(false, true);
 
             var currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
@@ -99,13 +99,9 @@ namespace RaceControl
 
         protected override Window CreateShell()
         {
-            return Container.Resolve<MainWindow>();
-        }
-
-        protected override void OnInitialized()
-        {
-            base.OnInitialized();
             _splashScreen.Close(TimeSpan.Zero);
+
+            return Container.Resolve<MainWindow>();
         }
 
         private static void InitializeLogging()
