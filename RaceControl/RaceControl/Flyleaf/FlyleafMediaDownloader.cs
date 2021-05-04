@@ -104,11 +104,26 @@ namespace RaceControl.Flyleaf
             {
                 Progress = (float)_downloader.DownloadPercentage;
             }
+
+            if (e.PropertyName == nameof(_downloader.Duration))
+            {
+                CalculateProgress();
+            }
+
+            if (e.PropertyName == nameof(_downloader.CurTime))
+            {
+                CalculateProgress();
+            }
         }
 
         private void DownloaderOnDownloadCompleted(object sender, bool success)
         {
             Status = success ? DownloadStatus.Finished : DownloadStatus.Failed;
+        }
+
+        private void CalculateProgress()
+        {
+            Progress = (_downloader.CurTime - _downloader.StartTime) / (float)_downloader.Duration * 100;
         }
     }
 }
