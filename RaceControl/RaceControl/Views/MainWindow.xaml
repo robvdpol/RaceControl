@@ -399,6 +399,7 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <GroupBox
                             Grid.Row="0"
@@ -560,6 +561,35 @@
                                     Style="{StaticResource OptionButtonStyle}" />
                             </Grid>
                         </GroupBox>
+                        <StackPanel
+                            Grid.Row="4"
+                            Margin="8,3"
+                            Orientation="Vertical">
+                            <TextBlock>
+                                <Run>Found a bug?</Run>
+                                <Hyperlink NavigateUri="https://github.com/robvdpol/RaceControl/issues">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="RequestNavigate">
+                                            <i:InvokeCommandAction Command="{Binding RequestNavigateCommand}" PassEventArgsToCommand="True" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                    Click here
+                                </Hyperlink>
+                                <Run>to report it.</Run>
+                            </TextBlock>
+                            <TextBlock>
+                                <Run>Like this app?</Run>
+                                <Hyperlink NavigateUri="https://github.com/sponsors/robvdpol">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="RequestNavigate">
+                                            <i:InvokeCommandAction Command="{Binding RequestNavigateCommand}" PassEventArgsToCommand="True" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                    Click here
+                                </Hyperlink>
+                                <Run>to support me.</Run>
+                            </TextBlock>
+                        </StackPanel>
                     </Grid>
                 </ScrollViewer>
             </Border>

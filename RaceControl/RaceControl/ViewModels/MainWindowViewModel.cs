@@ -34,6 +34,7 @@ using System.Timers;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Navigation;
 using Channel = RaceControl.Services.Interfaces.F1TV.Entities.Channel;
 
 namespace RaceControl.ViewModels
@@ -75,6 +76,7 @@ namespace RaceControl.ViewModels
         private ICommand _receiverSelectionChangedCommand;
         private ICommand _audioTrackSelectionChangedCommand;
         private ICommand _logOutCommand;
+        private ICommand _requestNavigateCommand;
 
         private string _subscriptionToken;
         private string _subscriptionStatus;
@@ -151,6 +153,7 @@ namespace RaceControl.ViewModels
         public ICommand ReceiverSelectionChangedCommand => _receiverSelectionChangedCommand ??= new DelegateCommand(ReceiverSelectionChangedExecute);
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<Track>(AudioTrackSelectionChangedExecute);
         public ICommand LogOutCommand => _logOutCommand ??= new DelegateCommand(LogOutExecute);
+        public ICommand RequestNavigateCommand => _requestNavigateCommand ??= new DelegateCommand<RequestNavigateEventArgs>(RequestNavigateExecute);
 
         public ISettings Settings { get; }
 
@@ -526,6 +529,11 @@ namespace RaceControl.ViewModels
             }
 
             IsBusy = false;
+        }
+
+        private static void RequestNavigateExecute(RequestNavigateEventArgs e)
+        {
+            ProcessUtils.BrowseToUrl(e.Uri.AbsoluteUri);
         }
 
         private void RefreshTimer_Elapsed(object sender, ElapsedEventArgs e)
