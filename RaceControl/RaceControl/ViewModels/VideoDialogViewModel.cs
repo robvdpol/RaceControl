@@ -343,6 +343,11 @@ namespace RaceControl.ViewModels
         {
             if (identifier == null)
             {
+                if (!MediaPlayer.IsFullScreen)
+                {
+                    DialogSettings.ResizeMode = ResizeMode.CanResize;
+                }
+
                 MediaPlayer.ToggleFullScreen();
             }
             else
