@@ -121,7 +121,9 @@ namespace RaceControl.Flyleaf
             get => _zoom;
             set
             {
-                if (SetProperty(ref _zoom, value))
+                var zoom = Math.Min(Math.Max(value, -250), 250);
+
+                if (SetProperty(ref _zoom, zoom))
                 {
                     Player.renderer.Zoom = _zoom;
                 }
