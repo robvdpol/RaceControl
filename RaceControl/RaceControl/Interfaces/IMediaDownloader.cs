@@ -12,8 +12,6 @@ namespace RaceControl.Interfaces
 
         Task StartDownloadAsync(string streamUrl, string filename);
 
-        void StopDownload();
-
         void SetDownloadStatus(DownloadStatus status);
     }
 }

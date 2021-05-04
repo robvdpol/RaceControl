@@ -5,6 +5,7 @@ using RaceControl.Common.Interfaces;
 using RaceControl.Core.Mvvm;
 using RaceControl.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
+using System;
 using System.Threading.Tasks;
 
 namespace RaceControl.ViewModels
@@ -22,7 +23,7 @@ namespace RaceControl.ViewModels
             MediaDownloader = mediaDownloader;
         }
 
-        public override string Title { get; } = "Download";
+        public override string Title => "Download";
 
         public IMediaDownloader MediaDownloader { get; }
 
@@ -43,27 +44,32 @@ namespace RaceControl.ViewModels
             var subscriptionToken = parameters.GetValue<string>(ParameterNames.SubscriptionToken);
             PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.Content);
             Filename = parameters.GetValue<string>(ParameterNames.Filename);
-            GetTokenisedUrlAndStartDownloadAsync(subscriptionToken).Await(ex =>
-            {
-                HandleNonCriticalError(ex);
-                MediaDownloader.SetDownloadStatus(DownloadStatus.Failed);
-            });
-
-            base.OnDialogOpened(parameters);
+            StartDownloadAsync(subscriptionToken).Await(DownloadStarted, DownloadFailed);
         }
 
         public override void OnDialogClosed()
         {
-            MediaDownloader.StopDownload();
             MediaDownloader.Dispose();
-
             base.OnDialogClosed();
         }
 
-        private async Task GetTokenisedUrlAndStartDownloadAsync(string subscriptionToken)
+        private async Task StartDownloadAsync(string subscriptionToken)
         {
             var streamUrl = await _apiService.GetTokenisedUrlAsync(subscriptionToken, PlayableContent);
             await MediaDownloader.StartDownloadAsync(streamUrl, Filename);
+        }
+
+        private void DownloadStarted()
+        {
+            base.OnDialogOpened(null);
+            MediaDownloader.SetDownloadStatus(DownloadStatus.Downloading);
+        }
+
+        private void DownloadFailed(Exception ex)
+        {
+            base.OnDialogOpened(null);
+            MediaDownloader.SetDownloadStatus(DownloadStatus.Failed);
+            HandleCriticalError(ex);
         }
     }
 }

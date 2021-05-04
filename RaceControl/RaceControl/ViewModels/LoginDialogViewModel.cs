@@ -29,7 +29,7 @@ namespace RaceControl.ViewModels
             _credentialService = credentialService;
         }
 
-        public override string Title { get; } = "Login";
+        public override string Title => "Login";
 
         public ICommand LoginCommand => _loginCommand ??= new DelegateCommand(LoginExecute, CanLoginExecute).ObservesProperty(() => IsBusy).ObservesProperty(() => Email).ObservesProperty(() => Password);
 
