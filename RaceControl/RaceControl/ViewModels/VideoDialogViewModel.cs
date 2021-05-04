@@ -30,7 +30,7 @@ namespace RaceControl.ViewModels
         private readonly IVideoDialogLayout _videoDialogLayout;
         private readonly object _showControlsTimerLock = new();
 
-        private ICommand _mouseDownVideoCommand;
+        private ICommand _mouseDownCommand;
         private ICommand _mouseEnterOrLeaveOrMoveVideoCommand;
         private ICommand _mouseWheelVideoCommand;
         private ICommand _mouseEnterControlBarCommand;
@@ -76,7 +76,7 @@ namespace RaceControl.ViewModels
 
         public override string Title => $"{_identifier}. {PlayableContent?.Title}";
 
-        public ICommand MouseDownVideoCommand => _mouseDownVideoCommand ??= new DelegateCommand<MouseButtonEventArgs>(MouseDownVideoExecute);
+        public ICommand MouseDownCommand => _mouseDownCommand ??= new DelegateCommand<MouseButtonEventArgs>(MouseDownExecute);
         public ICommand MouseEnterOrLeaveOrMoveVideoCommand => _mouseEnterOrLeaveOrMoveVideoCommand ??= new DelegateCommand<bool?>(MouseEnterOrLeaveOrMoveVideoExecute);
         public ICommand MouseWheelVideoCommand => _mouseWheelVideoCommand ??= new DelegateCommand<MouseWheelEventArgs>(MouseWheelVideoExecute);
         public ICommand MouseEnterControlBarCommand => _mouseEnterControlBarCommand ??= new DelegateCommand(MouseEnterControlBarExecute);
@@ -185,7 +185,7 @@ namespace RaceControl.ViewModels
             });
         }
 
-        private void MouseDownVideoExecute(MouseButtonEventArgs e)
+        private void MouseDownExecute(MouseButtonEventArgs e)
         {
             if (e.ChangedButton != MouseButton.Left || e.LeftButton != MouseButtonState.Pressed)
             {
