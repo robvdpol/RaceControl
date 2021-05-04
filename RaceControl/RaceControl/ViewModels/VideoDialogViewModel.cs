@@ -37,7 +37,6 @@ namespace RaceControl.ViewModels
         private ICommand _mouseLeaveControlBarCommand;
         private ICommand _mouseMoveControlBarCommand;
         private ICommand _mouseWheelControlBarCommand;
-        private ICommand _closeAllWindowsCommand;
         private ICommand _togglePauseCommand;
         private ICommand _togglePauseAllCommand;
         private ICommand _toggleMuteCommand;
@@ -48,6 +47,8 @@ namespace RaceControl.ViewModels
         private ICommand _zoomCommand;
         private ICommand _selectAspectRatioCommand;
         private ICommand _selectAudioDeviceCommand;
+        private ICommand _closeVideoWindowCommand;
+        private ICommand _closeAllWindowsCommand;
 
         private string _subscriptionToken;
         private long _identifier;
@@ -82,7 +83,6 @@ namespace RaceControl.ViewModels
         public ICommand MouseLeaveControlBarCommand => _mouseLeaveControlBarCommand ??= new DelegateCommand(MouseLeaveControlBarExecute);
         public ICommand MouseMoveControlBarCommand => _mouseMoveControlBarCommand ??= new DelegateCommand(MouseMoveControlBarExecute);
         public ICommand MouseWheelControlBarCommand => _mouseWheelControlBarCommand ??= new DelegateCommand<MouseWheelEventArgs>(MouseWheelControlBarExecute);
-        public ICommand CloseAllWindowsCommand => _closeAllWindowsCommand ??= new DelegateCommand(CloseAllWindowsExecute);
         public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
         public ICommand TogglePauseAllCommand => _togglePauseAllCommand ??= new DelegateCommand(TogglePauseAllExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
         public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand<bool?>(ToggleMuteExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
@@ -93,6 +93,8 @@ namespace RaceControl.ViewModels
         public ICommand ZoomCommand => _zoomCommand ??= new DelegateCommand<int?>(ZoomExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
         public ICommand SelectAspectRatioCommand => _selectAspectRatioCommand ??= new DelegateCommand<IAspectRatio>(SelectAspectRatioExecute, CanSelectAspectRatioExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => MediaPlayer.AspectRatio);
         public ICommand SelectAudioDeviceCommand => _selectAudioDeviceCommand ??= new DelegateCommand<IAudioDevice>(SelectAudioDeviceExecute, CanSelectAudioDeviceExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => MediaPlayer.AudioDevice);
+        public ICommand CloseVideoWindowCommand => _closeVideoWindowCommand ??= new DelegateCommand(RaiseRequestClose).ObservesCanExecute(() => MediaPlayer.IsStarted);
+        public ICommand CloseAllWindowsCommand => _closeAllWindowsCommand ??= new DelegateCommand(CloseAllWindowsExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
 
         public IMediaPlayer MediaPlayer { get; }
 
@@ -260,11 +262,6 @@ namespace RaceControl.ViewModels
             SetVolume(e.Delta / MouseWheelDelta);
         }
 
-        private void CloseAllWindowsExecute()
-        {
-            _eventAggregator.GetEvent<CloseAllEvent>().Publish(null);
-        }
-
         private void TogglePauseExecute()
         {
             Logger.Info("Toggling pause...");
@@ -325,7 +322,7 @@ namespace RaceControl.ViewModels
 
         private void OnCloseAll(ContentType? contentType)
         {
-            CloseWindowCommand.TryExecute();
+            CloseVideoWindowCommand.TryExecute();
         }
 
         private void OnSaveLayout(ContentType contentType)
@@ -407,6 +404,11 @@ namespace RaceControl.ViewModels
         private void SelectAudioDeviceExecute(IAudioDevice audioDevice)
         {
             MediaPlayer.AudioDevice = audioDevice;
+        }
+
+        private void CloseAllWindowsExecute()
+        {
+            _eventAggregator.GetEvent<CloseAllEvent>().Publish(null);
         }
 
         private void LoadDialogSettings(VideoDialogSettings settings)

@@ -12,7 +12,7 @@
         </Style>
     </Window.Style>
     <Window.InputBindings>
-        <KeyBinding Key="Escape" Command="{Binding CloseWindowCommand}" />
+        <KeyBinding Key="Escape" Command="{Binding CloseVideoWindowCommand}" />
         <KeyBinding
             Key="Escape"
             Command="{Binding CloseAllWindowsCommand}"
