@@ -49,8 +49,8 @@ namespace RaceControl.ViewModels
 
         public override void OnDialogClosed()
         {
-            MediaDownloader.Dispose();
             base.OnDialogClosed();
+            MediaDownloader.Dispose();
         }
 
         private async Task StartDownloadAsync(string subscriptionToken)
