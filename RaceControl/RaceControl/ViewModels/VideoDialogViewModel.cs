@@ -158,7 +158,7 @@ namespace RaceControl.ViewModels
                 StartupLocation = WindowStartupLocation.CenterScreen;
             }
 
-            InitializeAsync().Await(InitializeCompleted, InitializeError, true);
+            StartStreamAsync().Await(InitializeCompleted, InitializeError, true);
         }
 
         public override void OnDialogClosed()
@@ -455,16 +455,11 @@ namespace RaceControl.ViewModels
             };
         }
 
-        private async Task InitializeAsync()
-        {
-            await StartStreamAsync();
-            SubscribeEvents();
-            CreateShowControlsTimer();
-        }
-
         private void InitializeCompleted()
         {
             base.OnDialogOpened(null);
+            SubscribeEvents();
+            CreateShowControlsTimer();
         }
 
         private void InitializeError(Exception ex)

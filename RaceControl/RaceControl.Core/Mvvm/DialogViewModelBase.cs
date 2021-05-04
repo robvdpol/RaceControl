@@ -43,9 +43,9 @@ namespace RaceControl.Core.Mvvm
             return CanClose;
         }
 
-        protected void RaiseRequestClose(ButtonResult buttonResult, IDialogParameters dialogParameters = null)
+        protected void RaiseRequestClose(ButtonResult result, IDialogParameters parameters = null)
         {
-            RaiseRequestClose(new DialogResult(buttonResult, dialogParameters));
+            RaiseRequestClose(new DialogResult(result, parameters));
         }
 
         protected void RaiseRequestClose()
