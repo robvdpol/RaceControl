@@ -160,7 +160,7 @@ namespace RaceControl.ViewModels
                 StartupLocation = WindowStartupLocation.CenterScreen;
             }
 
-            StartStreamAsync().Await(InitializeCompleted, InitializeError, true);
+            StartStreamAsync().Await(StreamStarted, StreamFailed, true);
         }
 
         public override void OnDialogClosed()
@@ -457,20 +457,6 @@ namespace RaceControl.ViewModels
             };
         }
 
-        private void InitializeCompleted()
-        {
-            base.OnDialogOpened(null);
-            SubscribeEvents();
-            CreateShowControlsTimer();
-        }
-
-        private void InitializeError(Exception ex)
-        {
-            base.OnDialogOpened(null);
-            RaiseRequestClose();
-            HandleCriticalError(ex);
-        }
-
         private async Task StartStreamAsync()
         {
             var streamUrl = await _apiService.GetTokenisedUrlAsync(_subscriptionToken, PlayableContent);
@@ -481,6 +467,20 @@ namespace RaceControl.ViewModels
             }
 
             MediaPlayer.StartPlayback(streamUrl, DialogSettings);
+        }
+
+        private void StreamStarted()
+        {
+            base.OnDialogOpened(null);
+            SubscribeEvents();
+            CreateShowControlsTimer();
+        }
+
+        private void StreamFailed(Exception ex)
+        {
+            base.OnDialogOpened(null);
+            RaiseRequestClose();
+            HandleCriticalError(ex);
         }
 
         private void SubscribeEvents()
