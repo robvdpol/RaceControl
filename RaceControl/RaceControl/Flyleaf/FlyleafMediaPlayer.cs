@@ -328,7 +328,6 @@ namespace RaceControl.Flyleaf
             AspectRatios.AddRange(FlyleafLibAspectRatio.AspectRatios.Where(ar => ar != FlyleafLibAspectRatio.Custom).Select(ar => new FlyleafAspectRatio(ar)));
             Duration = Player.Session.Movie.Duration;
             VideoQuality = videoQuality;
-            Zoom = zoom;
 
             if (!string.IsNullOrWhiteSpace(aspectRatio))
             {
@@ -339,6 +338,8 @@ namespace RaceControl.Flyleaf
                 var ratio = AspectRatios.FirstOrDefault(ar => ar.Value == FlyleafLibAspectRatio.Keep.ValueStr);
                 SetProperty(ref _aspectRatio, ratio, nameof(AspectRatio));
             }
+
+            Zoom = zoom;
         }
 
         private void InitializeAudio(string audioDevice, string audioTrack, bool isMuted, int volume)
