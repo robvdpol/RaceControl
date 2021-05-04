@@ -49,6 +49,8 @@ The internal player supports the following keyboard shortcuts:
 | Jump backward 5 sec                    | Shift + Left arrow  |
 | Jump forward 10 min                    | Shift + Up arrow    |
 | Jump backward 10 min                   | Shift + Down arrow  |
+| Zoom in                                | Numpad +            |
+| Zoom out                               | Numpad -            |
 
 The main window supports the following keyboard shortcuts:
 | Function                       | Key                 |
