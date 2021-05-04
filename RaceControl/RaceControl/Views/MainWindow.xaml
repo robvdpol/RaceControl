@@ -403,6 +403,13 @@
                             Margin="5,3"
                             Header="Settings">
                             <StackPanel Orientation="Vertical">
+                                <TextBlock Margin="3" Text="Default audio language:" />
+                                <ComboBox
+                                    Margin="3,1"
+                                    DisplayMemberPath="Value"
+                                    ItemsSource="{Binding AudioLanguages}"
+                                    SelectedValue="{Binding Settings.DefaultAudioLanguage}"
+                                    SelectedValuePath="Key" />
                                 <CheckBox
                                     Margin="3"
                                     Content="Disable MPV borderless mode"

@@ -2,6 +2,7 @@
 using FlyleafLib.MediaPlayer;
 using NLog;
 using Prism.Mvvm;
+using RaceControl.Common.Constants;
 using RaceControl.Common.Enums;
 using RaceControl.Core.Settings;
 using RaceControl.Interfaces;
@@ -361,6 +362,10 @@ namespace RaceControl.Flyleaf
             {
                 AudioTrack = AudioTracks.FirstOrDefault(t => t.Id == audioTrack);
             }
+
+            AudioTrack ??= AudioTracks.FirstOrDefault(t => t.Id == LanguageCodes.English) ??
+                           AudioTracks.FirstOrDefault(t => t.Id == LanguageCodes.Undetermined) ??
+                           AudioTracks.FirstOrDefault();
         }
 
         private void SetVideoQuality(VideoQuality videoQuality)

@@ -158,6 +158,16 @@ namespace RaceControl.ViewModels
 
         public ICollectionView EpisodesView { get; }
 
+        public IDictionary<string, string> AudioLanguages { get; } = new Dictionary<string, string>
+        {
+            { LanguageCodes.English, "English" },
+            { LanguageCodes.German, "German" },
+            { LanguageCodes.French, "French" },
+            { LanguageCodes.Spanish, "Spanish" },
+            { LanguageCodes.Dutch, "Dutch" },
+            { LanguageCodes.Portuguese, "Portuguese" }
+        };
+
         public ICollection<NetworkInterface> NetworkInterfaces { get; } = NetworkInterface.GetAllNetworkInterfaces().ToList();
 
         public string SubscriptionToken
