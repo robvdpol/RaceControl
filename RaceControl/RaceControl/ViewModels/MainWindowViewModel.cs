@@ -813,12 +813,7 @@ namespace RaceControl.ViewModels
         private async Task WatchInVlcAsync(IPlayableContent playableContent)
         {
             var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, playableContent);
-
-            if (!ValidateStreamUrl(streamUrl))
-            {
-                return;
-            }
-
+            ValidateStreamUrl(streamUrl);
             using var process = ProcessUtils.CreateProcess(VlcExeLocation, $"\"{streamUrl}\" --meta-title=\"{playableContent.Title}\"");
             process.Start();
         }
@@ -826,11 +821,7 @@ namespace RaceControl.ViewModels
         private async Task WatchInMpvAsync(IPlayableContent playableContent, VideoDialogSettings settings = null)
         {
             var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, playableContent);
-
-            if (!ValidateStreamUrl(streamUrl))
-            {
-                return;
-            }
+            ValidateStreamUrl(streamUrl);
 
             var arguments = new List<string>
             {
@@ -899,12 +890,7 @@ namespace RaceControl.ViewModels
         private async Task CastContentAsync(IReceiver receiver, IPlayableContent playableContent)
         {
             var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, playableContent);
-
-            if (!ValidateStreamUrl(streamUrl))
-            {
-                return;
-            }
-
+            ValidateStreamUrl(streamUrl);
             AudioTracks.Clear();
 
             try
@@ -933,12 +919,7 @@ namespace RaceControl.ViewModels
         private async Task CopyUrlAsync(IPlayableContent playableContent)
         {
             var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, playableContent);
-
-            if (!ValidateStreamUrl(streamUrl))
-            {
-                return;
-            }
-
+            ValidateStreamUrl(streamUrl);
             Clipboard.SetText(streamUrl);
         }
 
@@ -1069,16 +1050,12 @@ namespace RaceControl.ViewModels
             SelectedVodGenre = null;
         }
 
-        private static bool ValidateStreamUrl(string streamUrl)
+        private static void ValidateStreamUrl(string streamUrl)
         {
             if (string.IsNullOrWhiteSpace(streamUrl))
             {
-                MessageBoxHelper.ShowError("An error occurred while retrieving the stream URL.");
-
-                return false;
+                throw new Exception("An error occurred while retrieving the stream URL.");
             }
-
-            return true;
         }
     }
 }
