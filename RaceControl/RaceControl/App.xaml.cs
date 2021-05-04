@@ -53,15 +53,16 @@ namespace RaceControl
                 Environment.CurrentDirectory = currentDirectory;
             }
 
-            Master.RegisterFFmpeg(":2");
-            Master.PreventAborts = true;
-
             base.OnStartup(e);
         }
 
         protected override void Initialize()
         {
             InitializeLogging();
+
+            Master.RegisterFFmpeg(":2");
+            Master.PreventAborts = true;
+
             base.Initialize();
         }
 
