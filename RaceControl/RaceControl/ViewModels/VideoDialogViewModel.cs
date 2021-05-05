@@ -2,7 +2,6 @@
 using Prism.Commands;
 using Prism.Events;
 using Prism.Services.Dialogs;
-using RaceControl.Common.Constants;
 using RaceControl.Common.Enums;
 using RaceControl.Common.Interfaces;
 using RaceControl.Core.Helpers;
@@ -162,7 +161,7 @@ namespace RaceControl.ViewModels
             else
             {
                 StartupLocation = WindowStartupLocation.CenterScreen;
-                DialogSettings.AudioTrack = DetermineAudioTrack();
+                DialogSettings.AudioTrack = PlayableContent.DetermineAudioLanguage(_settings.DefaultAudioLanguage);
             }
 
             StartStreamAsync().Await(StreamStarted, StreamFailed, true);
@@ -464,21 +463,6 @@ namespace RaceControl.ViewModels
                 AudioTrack = MediaPlayer.AudioTrack?.Id,
                 ChannelName = PlayableContent.Name
             };
-        }
-
-        private string DetermineAudioTrack()
-        {
-            if (PlayableContent.ContentType != ContentType.Channel || PlayableContent.Name == ChannelNames.PitLane)
-            {
-                return LanguageCodes.English;
-            }
-
-            if (PlayableContent.Name is ChannelNames.Wif or ChannelNames.Tracker or ChannelNames.Data)
-            {
-                return !string.IsNullOrWhiteSpace(_settings.DefaultAudioLanguage) ? _settings.DefaultAudioLanguage : LanguageCodes.English;
-            }
-
-            return LanguageCodes.Undetermined;
         }
 
         private async Task StartStreamAsync()

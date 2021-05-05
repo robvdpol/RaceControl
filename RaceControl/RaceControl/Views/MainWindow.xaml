@@ -532,10 +532,11 @@
                                     Margin="3"
                                     DisplayMemberPath="Name"
                                     IsEnabled="{Binding HasItems, RelativeSource={RelativeSource Self}}"
-                                    ItemsSource="{Binding AudioTracks}">
+                                    ItemsSource="{Binding AudioTracks}"
+                                    SelectedItem="{Binding SelectedAudioTrack}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="SelectionChanged">
-                                            <i:InvokeCommandAction Command="{Binding AudioTrackSelectionChangedCommand}" CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ComboBox}}" />
+                                            <i:InvokeCommandAction Command="{Binding AudioTrackSelectionChangedCommand}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </ComboBox>

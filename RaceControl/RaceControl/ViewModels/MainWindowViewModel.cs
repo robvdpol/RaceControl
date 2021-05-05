@@ -91,6 +91,7 @@ namespace RaceControl.ViewModels
         private ObservableCollection<string> _vodGenres;
         private ObservableCollection<IPlayableContent> _channels;
         private ObservableCollection<IPlayableContent> _episodes;
+        private ObservableCollection<NetworkInterface> _networkInterfaces;
         private ObservableCollection<IReceiver> _receivers;
         private ObservableCollection<Track> _audioTracks;
         private Season _selectedSeason;
@@ -98,8 +99,9 @@ namespace RaceControl.ViewModels
         private Session _selectedLiveSession;
         private Session _selectedSession;
         private string _selectedVodGenre;
-        private IReceiver _selectedReceiver;
         private NetworkInterface _selectedNetworkInterface;
+        private IReceiver _selectedReceiver;
+        private Track _selectedAudioTrack;
         private Timer _refreshTimer;
 
         public MainWindowViewModel(
@@ -151,7 +153,7 @@ namespace RaceControl.ViewModels
         public ICommand OpenVideoDialogLayoutCommand => _openVideoDialogLayoutCommand ??= new DelegateCommand<PlayerType?>(OpenVideoDialogLayoutExecute, CanOpenVideoDialogLayoutExecute).ObservesProperty(() => VideoDialogLayout.Instances.Count).ObservesProperty(() => Channels.Count);
         public ICommand ScanReceiversCommand => _scanReceiversCommand ??= new DelegateCommand(ScanReceiversExecute);
         public ICommand ReceiverSelectionChangedCommand => _receiverSelectionChangedCommand ??= new DelegateCommand(ReceiverSelectionChangedExecute);
-        public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<Track>(AudioTrackSelectionChangedExecute);
+        public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand(AudioTrackSelectionChangedExecute);
         public ICommand LogOutCommand => _logOutCommand ??= new DelegateCommand(LogOutExecute);
         public ICommand RequestNavigateCommand => _requestNavigateCommand ??= new DelegateCommand<RequestNavigateEventArgs>(RequestNavigateExecute);
 
@@ -170,8 +172,6 @@ namespace RaceControl.ViewModels
             { LanguageCodes.Dutch, "Dutch" },
             { LanguageCodes.Portuguese, "Portuguese" }
         };
-
-        public ICollection<NetworkInterface> NetworkInterfaces { get; } = NetworkInterface.GetAllNetworkInterfaces().ToList();
 
         public string SubscriptionToken
         {
@@ -225,6 +225,8 @@ namespace RaceControl.ViewModels
 
         public ObservableCollection<IPlayableContent> Episodes => _episodes ??= new ObservableCollection<IPlayableContent>();
 
+        public ObservableCollection<NetworkInterface> NetworkInterfaces => _networkInterfaces ??= new ObservableCollection<NetworkInterface>(NetworkInterface.GetAllNetworkInterfaces());
+
         public ObservableCollection<IReceiver> Receivers => _receivers ??= new ObservableCollection<IReceiver>();
 
         public ObservableCollection<Track> AudioTracks => _audioTracks ??= new ObservableCollection<Track>();
@@ -259,16 +261,22 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _selectedVodGenre, value);
         }
 
+        public NetworkInterface SelectedNetworkInterface
+        {
+            get => _selectedNetworkInterface;
+            set => SetProperty(ref _selectedNetworkInterface, value);
+        }
+
         public IReceiver SelectedReceiver
         {
             get => _selectedReceiver;
             set => SetProperty(ref _selectedReceiver, value);
         }
 
-        public NetworkInterface SelectedNetworkInterface
+        public Track SelectedAudioTrack
         {
-            get => _selectedNetworkInterface;
-            set => SetProperty(ref _selectedNetworkInterface, value);
+            get => _selectedAudioTrack;
+            set => SetProperty(ref _selectedAudioTrack, value);
         }
 
         private void LoadedExecute(RoutedEventArgs args)
@@ -412,7 +420,12 @@ namespace RaceControl.ViewModels
         private void CastContentExecute(IPlayableContent playableContent)
         {
             IsBusy = true;
-            CastContentAsync(SelectedReceiver, playableContent).Await(SetNotBusy, HandleCriticalError);
+            CastContentAsync(SelectedReceiver, playableContent).Await(() =>
+            {
+                SetNotBusy();
+                var language = playableContent.DetermineAudioLanguage(Settings.DefaultAudioLanguage);
+                SelectedAudioTrack = AudioTracks.Where(track => track.Language != null).FirstOrDefault(track => track.Language == language || LanguageCodes.AlternativeCodes.TryGetValue(track.Language, out var alternative) && alternative == language);
+            }, HandleCriticalError);
         }
 
         private void CopyContentUrlExecute(IPlayableContent playableContent)
@@ -507,15 +520,15 @@ namespace RaceControl.ViewModels
             FindAudioTracksAsync(SelectedReceiver).Await(SetNotBusy, HandleCriticalError);
         }
 
-        private void AudioTrackSelectionChangedExecute(Track audioTrack)
+        private void AudioTrackSelectionChangedExecute()
         {
-            if (audioTrack == null)
+            if (SelectedAudioTrack == null)
             {
                 return;
             }
 
             IsBusy = true;
-            ChangeAudioTrackAsync(SelectedReceiver, audioTrack).Await(SetNotBusy, HandleCriticalError);
+            ChangeAudioTrackAsync(SelectedReceiver, SelectedAudioTrack).Await(SetNotBusy, HandleCriticalError);
         }
 
         private void LogOutExecute()
