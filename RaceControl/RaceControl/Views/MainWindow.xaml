@@ -349,6 +349,14 @@
                                         ToolTip="Cast to selected Chromecast device"
                                         Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                     <Button
+                                        Width="60"
+                                        Margin="2,0"
+                                        Command="{Binding DataContext.WatchContentInMpcCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                        CommandParameter="{Binding}"
+                                        Content="MPC-HC"
+                                        ToolTip="Watch with MPC-HC"
+                                        Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                    <Button
                                         Width="50"
                                         Margin="2,0"
                                         Command="{Binding DataContext.WatchContentInMpvCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
@@ -721,6 +729,14 @@
                                     CommandParameter="{Binding}"
                                     Content="Cast"
                                     ToolTip="Cast to selected Chromecast device"
+                                    Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                <Button
+                                    Width="60"
+                                    Margin="2,0"
+                                    Command="{Binding DataContext.WatchContentInMpcCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                    CommandParameter="{Binding}"
+                                    Content="MPC-HC"
+                                    ToolTip="Watch with MPC-HC"
                                     Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                 <Button
                                     Width="50"

@@ -66,6 +66,7 @@ namespace RaceControl.ViewModels
         private ICommand _watchContentCommand;
         private ICommand _watchContentInVlcCommand;
         private ICommand _watchContentInMpvCommand;
+        private ICommand _watchContentInMpcCommand;
         private ICommand _castContentCommand;
         private ICommand _copyContentUrlCommand;
         private ICommand _downloadContentCommand;
@@ -83,6 +84,7 @@ namespace RaceControl.ViewModels
         private string _episodeFilterText;
         private string _vlcExeLocation;
         private string _mpvExeLocation;
+        private string _mpcExeLocation;
         private ObservableCollection<Season> _seasons;
         private ObservableCollection<Series> _series;
         private ObservableCollection<Event> _events;
@@ -145,6 +147,7 @@ namespace RaceControl.ViewModels
         public ICommand WatchContentCommand => _watchContentCommand ??= new DelegateCommand<IPlayableContent>(WatchContentExecute);
         public ICommand WatchContentInVlcCommand => _watchContentInVlcCommand ??= new DelegateCommand<IPlayableContent>(WatchContentInVlcExecute, CanWatchContentInVlcExecute).ObservesProperty(() => VlcExeLocation);
         public ICommand WatchContentInMpvCommand => _watchContentInMpvCommand ??= new DelegateCommand<IPlayableContent>(WatchContentInMpvExecute, CanWatchContentInMpvExecute).ObservesProperty(() => MpvExeLocation);
+        public ICommand WatchContentInMpcCommand => _watchContentInMpcCommand ??= new DelegateCommand<IPlayableContent>(WatchContentInMpcExecute, CanWatchContentInMpcExecute).ObservesProperty(() => MpcExeLocation);
         public ICommand CastContentCommand => _castContentCommand ??= new DelegateCommand<IPlayableContent>(CastContentExecute, CanCastContentExecute).ObservesProperty(() => SelectedReceiver);
         public ICommand CopyContentUrlCommand => _copyContentUrlCommand ??= new DelegateCommand<IPlayableContent>(CopyContentUrlExecute);
         public ICommand DownloadContentCommand => _downloadContentCommand ??= new DelegateCommand<IPlayableContent>(DownloadContentExecute, CanDownloadContentExecute);
@@ -207,6 +210,12 @@ namespace RaceControl.ViewModels
         {
             get => _mpvExeLocation;
             set => SetProperty(ref _mpvExeLocation, value);
+        }
+
+        public string MpcExeLocation
+        {
+            get => _mpcExeLocation;
+            set => SetProperty(ref _mpcExeLocation, value);
         }
 
         public ObservableCollection<Season> Seasons => _seasons ??= new ObservableCollection<Season>();
@@ -286,6 +295,7 @@ namespace RaceControl.ViewModels
             VideoDialogLayout.Load();
             SetVlcExeLocation();
             SetMpvExeLocation();
+            SetMpcExeLocation();
 
             if (Login())
             {
@@ -392,7 +402,7 @@ namespace RaceControl.ViewModels
 
         private bool CanWatchContentInVlcExecute(IPlayableContent playableContent)
         {
-            return !string.IsNullOrWhiteSpace(VlcExeLocation) && File.Exists(VlcExeLocation);
+            return !string.IsNullOrWhiteSpace(VlcExeLocation);
         }
 
         private void WatchContentInVlcExecute(IPlayableContent playableContent)
@@ -403,13 +413,24 @@ namespace RaceControl.ViewModels
 
         private bool CanWatchContentInMpvExecute(IPlayableContent playableContent)
         {
-            return !string.IsNullOrWhiteSpace(MpvExeLocation) && File.Exists(MpvExeLocation);
+            return !string.IsNullOrWhiteSpace(MpvExeLocation);
         }
 
         private void WatchContentInMpvExecute(IPlayableContent playableContent)
         {
             IsBusy = true;
             WatchInMpvAsync(playableContent).Await(SetNotBusy, HandleCriticalError);
+        }
+
+        private bool CanWatchContentInMpcExecute(IPlayableContent playableContent)
+        {
+            return !string.IsNullOrWhiteSpace(MpcExeLocation);
+        }
+
+        private void WatchContentInMpcExecute(IPlayableContent playableContent)
+        {
+            IsBusy = true;
+            WatchInMpcAsync(playableContent).Await(SetNotBusy, HandleCriticalError);
         }
 
         private bool CanCastContentExecute(IPlayableContent playableContent)
@@ -592,6 +613,21 @@ namespace RaceControl.ViewModels
             else
             {
                 Logger.Warn("Could not find MPV installation.");
+            }
+        }
+
+        private void SetMpcExeLocation()
+        {
+            var registryKey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\MPC-HC\MPC-HC") ?? Registry.CurrentUser.OpenSubKey(@"SOFTWARE\WOW6432Node\MPC-HC\MPC-HC");
+
+            if (registryKey?.GetValue("ExePath") is string mpcExeLocation && File.Exists(mpcExeLocation))
+            {
+                MpcExeLocation = mpcExeLocation;
+                Logger.Info($"Found MPC-HC installation at '{mpcExeLocation}'.");
+            }
+            else
+            {
+                Logger.Warn("Could not find MPC-HC installation.");
             }
         }
 
@@ -915,6 +951,14 @@ namespace RaceControl.ViewModels
             }
 
             using var process = ProcessUtils.CreateProcess(MpvExeLocation, string.Join(" ", arguments));
+            process.Start();
+        }
+
+        private async Task WatchInMpcAsync(IPlayableContent playableContent)
+        {
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, playableContent);
+            ValidateStreamUrl(streamUrl);
+            using var process = ProcessUtils.CreateProcess(MpcExeLocation, $"\"{streamUrl}\"");
             process.Start();
         }
 
