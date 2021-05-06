@@ -133,7 +133,13 @@ namespace RaceControl
 
         private static IRestClient CreateRestClient()
         {
-            var restClient = new RestClient { UserAgent = nameof(RaceControl), ThrowOnAnyError = true };
+            var restClient = new RestClient
+            {
+                UserAgent = nameof(RaceControl), 
+                Timeout = 15000,
+                ReadWriteTimeout = 30000,
+                ThrowOnAnyError = true
+            };
             restClient.UseNewtonsoftJson();
 
             return restClient;
