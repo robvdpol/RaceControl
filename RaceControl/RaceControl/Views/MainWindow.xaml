@@ -408,7 +408,7 @@
                             <StackPanel Orientation="Vertical">
                                 <TextBlock Margin="3" Text="Default audio language:" />
                                 <ComboBox
-                                    Margin="3,1"
+                                    Margin="3"
                                     DisplayMemberPath="Value"
                                     ItemsSource="{Binding AudioLanguages}"
                                     SelectedValue="{Binding Settings.DefaultAudioLanguage}"
