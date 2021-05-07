@@ -5,21 +5,22 @@
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/robvdpol/RaceControl)](https://github.com/robvdpol/RaceControl/releases/latest)
 [![GitHub](https://img.shields.io/github/license/robvdpol/RaceControl)](https://github.com/robvdpol/RaceControl/blob/master/LICENSE.md)
 
-Race Control is an open source [F1TV](https://f1tv.formula1.com) desktop client for Windows. It can be used to watch F1TV content (both live streams and video on demand) in the highest quality available, using one of three supported video players. The goal of this project is to improve the overall F1TV experience by implementing features not found in the official F1TV website and apps, while still being easy to set up and use.
+Race Control is an open source [F1TV](https://f1tv.formula1.com) desktop client for Windows. It can be used to watch F1TV content (both live broadcasts and replays) in the highest quality available, using either the built-in player or an external media player of your choice. The goal of this project is to improve the overall F1TV experience by implementing features not found in the official F1TV website and apps, while still being easy to set up and use.
 
 ## Features
 * Easy to set up and use, no editing of config files needed
 * Fast and user-friendly user interface
 * Watch F1TV live streams in the highest quality available
-* Supports three different video players (internal player, VLC and MPV)
+* Supports four different media players (internal player, VLC, MPV and MPC-HC)
 * Open as many streams as you like, using the layout that you like
-* Save your custom video player layout, so you don't have to position windows manually every time you watch a session
+* Create and save your own custom video player layout
+* Support for multi-monitor setups
 * Cast to your Chromecast with a single click of a button
 * Experimental synchronization of streams
 
 ## Installation
 #### Microsoft Store
-* Go to the Microsoft Store and search for 'F1 Race Control' or use the [direct link](https://www.microsoft.com/en-us/p/f1-race-control/9mwc9pj4jfww).
+* Go to the Microsoft Store and search for 'F1 Race Control' or use the [direct link](https://www.microsoft.com/store/apps/9MWC9PJ4JFWW).
 * Install and launch the app.
 
 #### Manual installation
@@ -49,6 +50,8 @@ The internal player supports the following keyboard shortcuts:
 | Jump backward 5 sec                    | Shift + Left arrow  |
 | Jump forward 10 min                    | Shift + Up arrow    |
 | Jump backward 10 min                   | Shift + Down arrow  |
+| Zoom in                                | Numpad +            |
+| Zoom out                               | Numpad -            |
 
 The main window supports the following keyboard shortcuts:
 | Function                       | Key                 |
@@ -65,16 +68,25 @@ You need an F1TV account to watch F1TV streams. If you want to watch race replay
 Your F1TV login credentials are stored locally in the Windows Credential Manager, so you don't have to login every time you start the application. If you wish to switch to a different F1TV account, press the button 'Log out' under the 'Options' section. Your stored credentials will be removed from your system and you will be asked to login again.
 
 #### How can I move an internal player window?
-You can move an internal player window by clicking and dragging on the actual video.
+You can move an internal player window by clicking and dragging the actual video or the control bar.
+
+#### Do I need to install MPV separately to use it with Race Control?
+No, Race Control comes with a recent version of MPV included in the release.
+
+#### Why is the VLC button not shown?
+You need to have VLC media player installed on your machine. The location of your VLC installation will be read from the Windows registry.
+
+#### Why is the MPC-HC button not shown?
+You need to have MPC-HC media player installed on your machine. The location of your MPC-HC installation will be read from the Windows registry.
+
+#### Why is the Cast button not shown?
+You need to scan for Chromecast devices first.
 
 #### Where does Race Control store my settings and video layout? Will they be retained when I upgrade Race Control?
 Your settings and video layout are stored in JSON-files, which are saved to *%LOCALAPPDATA%\RaceControl* (usually located at *C:\Users\USERNAME\AppData\Local\RaceControl*). When you upgrade Race Control your settings and video layout will be retained.
 
-#### Why is the VLC button disabled?
-You need to have VLC media player installed on your machine. The location of your VLC installation will be read from the Windows registry.
-
-#### Do I need to install MPV separately to use it with Race Control?
-No, Race Control comes with a recent version of MPV included in the release.
+#### Where is the log file located?
+The log file is located at *%LOCALAPPDATA%\RaceControl\RaceControl.log*.
 
 #### Can you add support for my favourite media player?
 Maybe, please create an issue (feature request) and I will consider it. As a workaround, you can use the Copy-button to generate a tokenized link to the stream that is copied to your clipboard. Open the link with a media player of your choice to watch the stream. Note: the media player needs to properly support the HTTP Live Streaming (HLS) protocol.
@@ -87,7 +99,6 @@ To open and build the solution you need:
 
 ## Acknowledgements
 * [Flyleaf](https://github.com/SuRGeoNix/Flyleaf) for providing an excellent video player and .NET library
-* [VLC](https://www.videolan.org/vlc) for providing an excellent video player and .NET library
 * [MPV](https://mpv.io) for providing an excellent video player
 * [Flaticon](https://www.flaticon.com) for providing the application icon
 * [Prism Library](https://prismlibrary.com)
@@ -98,6 +109,7 @@ To open and build the solution you need:
 * [GoogleCast](https://github.com/kakone/GoogleCast)
 
 ## Screenshots
-![preview image](https://imgur.com/Ngos9JZ.png)
-
-![preview image](https://imgur.com/m46BzZj.png)
+#### Main application
+![preview image](https://imgur.com/GIPIPvP.png)
+#### Internal player
+![preview image](https://imgur.com/drUlpAV.png)

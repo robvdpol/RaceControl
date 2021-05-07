@@ -4,6 +4,8 @@ namespace RaceControl.Core.Settings
 {
     public interface ISettings
     {
+        string DefaultAudioLanguage { get; set; }
+
         bool DisableMpvNoBorder { get; set; }
 
         string AdditionalMpvParameters { get; set; }

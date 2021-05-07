@@ -15,6 +15,7 @@ namespace RaceControl.Core.Settings
         private readonly ILogger _logger;
         private readonly JsonSerializer _serializer;
 
+        private string _defaultAudioLanguage;
         private bool _disableMpvNoBorder;
         private string _additionalMpvParameters;
         private string _latestRelease;
@@ -24,6 +25,12 @@ namespace RaceControl.Core.Settings
         {
             _logger = logger;
             _serializer = serializer;
+        }
+
+        public string DefaultAudioLanguage
+        {
+            get => _defaultAudioLanguage;
+            set => SetProperty(ref _defaultAudioLanguage, value);
         }
 
         public bool DisableMpvNoBorder

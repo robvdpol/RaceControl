@@ -34,6 +34,7 @@ using System.Timers;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Navigation;
 using Channel = RaceControl.Services.Interfaces.F1TV.Entities.Channel;
 
 namespace RaceControl.ViewModels
@@ -65,6 +66,7 @@ namespace RaceControl.ViewModels
         private ICommand _watchContentCommand;
         private ICommand _watchContentInVlcCommand;
         private ICommand _watchContentInMpvCommand;
+        private ICommand _watchContentInMpcCommand;
         private ICommand _castContentCommand;
         private ICommand _copyContentUrlCommand;
         private ICommand _downloadContentCommand;
@@ -75,12 +77,14 @@ namespace RaceControl.ViewModels
         private ICommand _receiverSelectionChangedCommand;
         private ICommand _audioTrackSelectionChangedCommand;
         private ICommand _logOutCommand;
+        private ICommand _requestNavigateCommand;
 
         private string _subscriptionToken;
         private string _subscriptionStatus;
         private string _episodeFilterText;
         private string _vlcExeLocation;
         private string _mpvExeLocation;
+        private string _mpcExeLocation;
         private ObservableCollection<Season> _seasons;
         private ObservableCollection<Series> _series;
         private ObservableCollection<Event> _events;
@@ -89,6 +93,7 @@ namespace RaceControl.ViewModels
         private ObservableCollection<string> _vodGenres;
         private ObservableCollection<IPlayableChannel> _channels;
         private ObservableCollection<IPlayableContent> _episodes;
+        private ObservableCollection<NetworkInterface> _networkInterfaces;
         private ObservableCollection<IReceiver> _receivers;
         private ObservableCollection<Track> _audioTracks;
         private Season _selectedSeason;
@@ -96,8 +101,9 @@ namespace RaceControl.ViewModels
         private Session _selectedLiveSession;
         private Session _selectedSession;
         private string _selectedVodGenre;
-        private IReceiver _selectedReceiver;
         private NetworkInterface _selectedNetworkInterface;
+        private IReceiver _selectedReceiver;
+        private Track _selectedAudioTrack;
         private Timer _refreshTimer;
 
         public MainWindowViewModel(
@@ -141,6 +147,7 @@ namespace RaceControl.ViewModels
         public ICommand WatchContentCommand => _watchContentCommand ??= new DelegateCommand<IPlayableContent>(WatchContentExecute);
         public ICommand WatchContentInVlcCommand => _watchContentInVlcCommand ??= new DelegateCommand<IPlayableContent>(WatchContentInVlcExecute, CanWatchContentInVlcExecute).ObservesProperty(() => VlcExeLocation);
         public ICommand WatchContentInMpvCommand => _watchContentInMpvCommand ??= new DelegateCommand<IPlayableContent>(WatchContentInMpvExecute, CanWatchContentInMpvExecute).ObservesProperty(() => MpvExeLocation);
+        public ICommand WatchContentInMpcCommand => _watchContentInMpcCommand ??= new DelegateCommand<IPlayableContent>(WatchContentInMpcExecute, CanWatchContentInMpcExecute).ObservesProperty(() => MpcExeLocation);
         public ICommand CastContentCommand => _castContentCommand ??= new DelegateCommand<IPlayableContent>(CastContentExecute, CanCastContentExecute).ObservesProperty(() => SelectedReceiver);
         public ICommand CopyContentUrlCommand => _copyContentUrlCommand ??= new DelegateCommand<IPlayableContent>(CopyContentUrlExecute);
         public ICommand DownloadContentCommand => _downloadContentCommand ??= new DelegateCommand<IPlayableContent>(DownloadContentExecute, CanDownloadContentExecute);
@@ -149,8 +156,9 @@ namespace RaceControl.ViewModels
         public ICommand OpenVideoDialogLayoutCommand => _openVideoDialogLayoutCommand ??= new DelegateCommand<PlayerType?>(OpenVideoDialogLayoutExecute, CanOpenVideoDialogLayoutExecute).ObservesProperty(() => VideoDialogLayout.Instances.Count).ObservesProperty(() => Channels.Count);
         public ICommand ScanReceiversCommand => _scanReceiversCommand ??= new DelegateCommand(ScanReceiversExecute);
         public ICommand ReceiverSelectionChangedCommand => _receiverSelectionChangedCommand ??= new DelegateCommand(ReceiverSelectionChangedExecute);
-        public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand<Track>(AudioTrackSelectionChangedExecute);
+        public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand(AudioTrackSelectionChangedExecute);
         public ICommand LogOutCommand => _logOutCommand ??= new DelegateCommand(LogOutExecute);
+        public ICommand RequestNavigateCommand => _requestNavigateCommand ??= new DelegateCommand<RequestNavigateEventArgs>(RequestNavigateExecute);
 
         public ISettings Settings { get; }
 
@@ -158,7 +166,15 @@ namespace RaceControl.ViewModels
 
         public ICollectionView EpisodesView { get; }
 
-        public ICollection<NetworkInterface> NetworkInterfaces { get; } = NetworkInterface.GetAllNetworkInterfaces().ToList();
+        public IDictionary<string, string> AudioLanguages { get; } = new Dictionary<string, string>
+        {
+            { LanguageCodes.English, "English" },
+            { LanguageCodes.German, "German" },
+            { LanguageCodes.French, "French" },
+            { LanguageCodes.Spanish, "Spanish" },
+            { LanguageCodes.Dutch, "Dutch" },
+            { LanguageCodes.Portuguese, "Portuguese" }
+        };
 
         public string SubscriptionToken
         {
@@ -196,6 +212,12 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _mpvExeLocation, value);
         }
 
+        public string MpcExeLocation
+        {
+            get => _mpcExeLocation;
+            set => SetProperty(ref _mpcExeLocation, value);
+        }
+
         public ObservableCollection<Season> Seasons => _seasons ??= new ObservableCollection<Season>();
 
         public ObservableCollection<Series> Series => _series ??= new ObservableCollection<Series>();
@@ -211,6 +233,8 @@ namespace RaceControl.ViewModels
         public ObservableCollection<IPlayableChannel> Channels => _channels ??= new ObservableCollection<IPlayableChannel>();
 
         public ObservableCollection<IPlayableContent> Episodes => _episodes ??= new ObservableCollection<IPlayableContent>();
+
+        public ObservableCollection<NetworkInterface> NetworkInterfaces => _networkInterfaces ??= new ObservableCollection<NetworkInterface>(NetworkInterface.GetAllNetworkInterfaces());
 
         public ObservableCollection<IReceiver> Receivers => _receivers ??= new ObservableCollection<IReceiver>();
 
@@ -246,16 +270,22 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _selectedVodGenre, value);
         }
 
+        public NetworkInterface SelectedNetworkInterface
+        {
+            get => _selectedNetworkInterface;
+            set => SetProperty(ref _selectedNetworkInterface, value);
+        }
+
         public IReceiver SelectedReceiver
         {
             get => _selectedReceiver;
             set => SetProperty(ref _selectedReceiver, value);
         }
 
-        public NetworkInterface SelectedNetworkInterface
+        public Track SelectedAudioTrack
         {
-            get => _selectedNetworkInterface;
-            set => SetProperty(ref _selectedNetworkInterface, value);
+            get => _selectedAudioTrack;
+            set => SetProperty(ref _selectedAudioTrack, value);
         }
 
         private void LoadedExecute(RoutedEventArgs args)
@@ -265,6 +295,7 @@ namespace RaceControl.ViewModels
             VideoDialogLayout.Load();
             SetVlcExeLocation();
             SetMpvExeLocation();
+            SetMpcExeLocation();
 
             if (Login())
             {
@@ -371,7 +402,7 @@ namespace RaceControl.ViewModels
 
         private bool CanWatchContentInVlcExecute(IPlayableContent playableContent)
         {
-            return !string.IsNullOrWhiteSpace(VlcExeLocation) && File.Exists(VlcExeLocation);
+            return !string.IsNullOrWhiteSpace(VlcExeLocation);
         }
 
         private void WatchContentInVlcExecute(IPlayableContent playableContent)
@@ -382,13 +413,24 @@ namespace RaceControl.ViewModels
 
         private bool CanWatchContentInMpvExecute(IPlayableContent playableContent)
         {
-            return !string.IsNullOrWhiteSpace(MpvExeLocation) && File.Exists(MpvExeLocation);
+            return !string.IsNullOrWhiteSpace(MpvExeLocation);
         }
 
         private void WatchContentInMpvExecute(IPlayableContent playableContent)
         {
             IsBusy = true;
             WatchInMpvAsync(playableContent).Await(SetNotBusy, HandleCriticalError);
+        }
+
+        private bool CanWatchContentInMpcExecute(IPlayableContent playableContent)
+        {
+            return !string.IsNullOrWhiteSpace(MpcExeLocation);
+        }
+
+        private void WatchContentInMpcExecute(IPlayableContent playableContent)
+        {
+            IsBusy = true;
+            WatchInMpcAsync(playableContent).Await(SetNotBusy, HandleCriticalError);
         }
 
         private bool CanCastContentExecute(IPlayableContent playableContent)
@@ -399,7 +441,12 @@ namespace RaceControl.ViewModels
         private void CastContentExecute(IPlayableContent playableContent)
         {
             IsBusy = true;
-            CastContentAsync(SelectedReceiver, playableContent).Await(SetNotBusy, HandleCriticalError);
+            CastContentAsync(SelectedReceiver, playableContent).Await(() =>
+            {
+                SetNotBusy();
+                var language = playableContent.DetermineAudioLanguage(Settings.DefaultAudioLanguage);
+                SelectedAudioTrack = AudioTracks.Where(track => track.Language != null).FirstOrDefault(track => track.Language == language || LanguageCodes.AlternativeCodes.TryGetValue(track.Language, out var alternative) && alternative == language);
+            }, HandleCriticalError);
         }
 
         private void CopyContentUrlExecute(IPlayableContent playableContent)
@@ -494,15 +541,15 @@ namespace RaceControl.ViewModels
             FindAudioTracksAsync(SelectedReceiver).Await(SetNotBusy, HandleCriticalError);
         }
 
-        private void AudioTrackSelectionChangedExecute(Track audioTrack)
+        private void AudioTrackSelectionChangedExecute()
         {
-            if (audioTrack == null)
+            if (SelectedAudioTrack == null)
             {
                 return;
             }
 
             IsBusy = true;
-            ChangeAudioTrackAsync(SelectedReceiver, audioTrack).Await(SetNotBusy, HandleCriticalError);
+            ChangeAudioTrackAsync(SelectedReceiver, SelectedAudioTrack).Await(SetNotBusy, HandleCriticalError);
         }
 
         private void LogOutExecute()
@@ -516,6 +563,11 @@ namespace RaceControl.ViewModels
             }
 
             IsBusy = false;
+        }
+
+        private static void RequestNavigateExecute(RequestNavigateEventArgs e)
+        {
+            ProcessUtils.BrowseToUrl(e.Uri.AbsoluteUri);
         }
 
         private void RefreshTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -561,6 +613,21 @@ namespace RaceControl.ViewModels
             else
             {
                 Logger.Warn("Could not find MPV installation.");
+            }
+        }
+
+        private void SetMpcExeLocation()
+        {
+            var registryKey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\MPC-HC\MPC-HC") ?? Registry.CurrentUser.OpenSubKey(@"SOFTWARE\WOW6432Node\MPC-HC\MPC-HC");
+
+            if (registryKey?.GetValue("ExePath") is string mpcExeLocation && File.Exists(mpcExeLocation))
+            {
+                MpcExeLocation = mpcExeLocation;
+                Logger.Info($"Found MPC-HC installation at '{mpcExeLocation}'.");
+            }
+            else
+            {
+                Logger.Warn("Could not find MPC-HC installation.");
             }
         }
 
@@ -745,6 +812,7 @@ namespace RaceControl.ViewModels
             Sessions.Clear();
             SelectedLiveSession = null;
             SelectedSession = null;
+            SelectedEvent = null;
 
             await LoadEpisodesForGenreAsync(genre);
         }
@@ -813,12 +881,7 @@ namespace RaceControl.ViewModels
         private async Task WatchInVlcAsync(IPlayableContent playableContent)
         {
             var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, playableContent);
-
-            if (!ValidateStreamUrl(streamUrl))
-            {
-                return;
-            }
-
+            ValidateStreamUrl(streamUrl);
             using var process = ProcessUtils.CreateProcess(VlcExeLocation, $"\"{streamUrl}\" --meta-title=\"{playableContent.Title}\"");
             process.Start();
         }
@@ -826,11 +889,7 @@ namespace RaceControl.ViewModels
         private async Task WatchInMpvAsync(IPlayableContent playableContent, VideoDialogSettings settings = null)
         {
             var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, playableContent);
-
-            if (!ValidateStreamUrl(streamUrl))
-            {
-                return;
-            }
+            ValidateStreamUrl(streamUrl);
 
             var arguments = new List<string>
             {
@@ -896,15 +955,18 @@ namespace RaceControl.ViewModels
             process.Start();
         }
 
+        private async Task WatchInMpcAsync(IPlayableContent playableContent)
+        {
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, playableContent);
+            ValidateStreamUrl(streamUrl);
+            using var process = ProcessUtils.CreateProcess(MpcExeLocation, $"\"{streamUrl}\"");
+            process.Start();
+        }
+
         private async Task CastContentAsync(IReceiver receiver, IPlayableContent playableContent)
         {
             var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, playableContent);
-
-            if (!ValidateStreamUrl(streamUrl))
-            {
-                return;
-            }
-
+            ValidateStreamUrl(streamUrl);
             AudioTracks.Clear();
 
             try
@@ -933,12 +995,7 @@ namespace RaceControl.ViewModels
         private async Task CopyUrlAsync(IPlayableContent playableContent)
         {
             var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, playableContent);
-
-            if (!ValidateStreamUrl(streamUrl))
-            {
-                return;
-            }
-
+            ValidateStreamUrl(streamUrl);
             Clipboard.SetText(streamUrl);
         }
 
@@ -1069,16 +1126,12 @@ namespace RaceControl.ViewModels
             SelectedVodGenre = null;
         }
 
-        private static bool ValidateStreamUrl(string streamUrl)
+        private static void ValidateStreamUrl(string streamUrl)
         {
             if (string.IsNullOrWhiteSpace(streamUrl))
             {
-                MessageBoxHelper.ShowError("An error occurred while retrieving the stream URL.");
-
-                return false;
+                throw new Exception("An error occurred while retrieving the stream URL.");
             }
-
-            return true;
         }
     }
 }

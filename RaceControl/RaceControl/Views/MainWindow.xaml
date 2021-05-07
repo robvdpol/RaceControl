@@ -32,7 +32,6 @@
         <Style x:Key="OptionButtonStyle" TargetType="Button">
             <Setter Property="Margin" Value="3" />
             <Setter Property="Height" Value="24" />
-            <Setter Property="MaxWidth" Value="250" />
         </Style>
         <Style x:Key="ContentListBoxStyle" TargetType="ListBox">
             <Setter Property="Margin" Value="2" />
@@ -89,7 +88,10 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*" MinWidth="265" />
+                <ColumnDefinition
+                    Width="1*"
+                    MinWidth="250"
+                    MaxWidth="325" />
                 <ColumnDefinition Width="1*" />
                 <ColumnDefinition Width="3*" />
             </Grid.ColumnDefinitions>
@@ -320,62 +322,63 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="{Binding}" />
-                                <Button
-                                    Grid.Column="1"
-                                    Width="70"
-                                    Margin="2,0"
-                                    Command="{Binding DataContext.DownloadContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                                    CommandParameter="{Binding}"
-                                    Content="Download"
-                                    ToolTip="Download copy to file system"
-                                    Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                                <Button
-                                    Grid.Column="2"
-                                    Width="50"
-                                    Margin="2,0"
-                                    Command="{Binding DataContext.CopyContentUrlCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                                    CommandParameter="{Binding}"
-                                    Content="Copy"
-                                    ToolTip="Copy URL to clipboard" />
-                                <Button
-                                    Grid.Column="3"
-                                    Width="50"
-                                    Margin="2,0"
-                                    Command="{Binding DataContext.CastContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                                    CommandParameter="{Binding}"
-                                    Content="Cast"
-                                    ToolTip="Cast to selected Chromecast device" />
-                                <Button
-                                    Grid.Column="4"
-                                    Width="50"
-                                    Margin="2,0"
-                                    Command="{Binding DataContext.WatchContentInMpvCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                                    CommandParameter="{Binding}"
-                                    Content="MPV"
-                                    ToolTip="Watch with MPV" />
-                                <Button
-                                    Grid.Column="5"
-                                    Width="50"
-                                    Margin="2,0"
-                                    Command="{Binding DataContext.WatchContentInVlcCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                                    CommandParameter="{Binding}"
-                                    Content="VLC"
-                                    ToolTip="Watch with VLC media player" />
-                                <Button
-                                    Grid.Column="6"
-                                    Width="50"
-                                    Margin="2,0,0,0"
-                                    Command="{Binding DataContext.WatchContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                                    CommandParameter="{Binding}"
-                                    Content="Watch"
-                                    ToolTip="Watch with internal player" />
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <Button
+                                        Width="70"
+                                        Margin="2,0"
+                                        Command="{Binding DataContext.DownloadContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                        CommandParameter="{Binding}"
+                                        Content="Download"
+                                        ToolTip="Download copy to file system"
+                                        Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                    <Button
+                                        Width="50"
+                                        Margin="2,0"
+                                        Command="{Binding DataContext.CopyContentUrlCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                        CommandParameter="{Binding}"
+                                        Content="Copy"
+                                        ToolTip="Copy URL to clipboard" />
+                                    <Button
+                                        Width="50"
+                                        Margin="2,0"
+                                        Command="{Binding DataContext.CastContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                        CommandParameter="{Binding}"
+                                        Content="Cast"
+                                        ToolTip="Cast to selected Chromecast device"
+                                        Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                    <Button
+                                        Width="60"
+                                        Margin="2,0"
+                                        Command="{Binding DataContext.WatchContentInMpcCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                        CommandParameter="{Binding}"
+                                        Content="MPC-HC"
+                                        ToolTip="Watch with MPC-HC"
+                                        Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                    <Button
+                                        Width="50"
+                                        Margin="2,0"
+                                        Command="{Binding DataContext.WatchContentInMpvCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                        CommandParameter="{Binding}"
+                                        Content="MPV"
+                                        ToolTip="Watch with MPV" />
+                                    <Button
+                                        Width="50"
+                                        Margin="2,0"
+                                        Command="{Binding DataContext.WatchContentInVlcCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                        CommandParameter="{Binding}"
+                                        Content="VLC"
+                                        ToolTip="Watch with VLC media player"
+                                        Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                    <Button
+                                        Width="50"
+                                        Margin="2,0,0,0"
+                                        Command="{Binding DataContext.WatchContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                        CommandParameter="{Binding}"
+                                        Content="Watch"
+                                        ToolTip="Watch with internal player" />
+                                </StackPanel>
                             </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -397,12 +400,20 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <GroupBox
                             Grid.Row="0"
                             Margin="5,3"
                             Header="Settings">
                             <StackPanel Orientation="Vertical">
+                                <TextBlock Margin="3" Text="Default audio language:" />
+                                <ComboBox
+                                    Margin="3"
+                                    DisplayMemberPath="Value"
+                                    ItemsSource="{Binding AudioLanguages}"
+                                    SelectedValue="{Binding Settings.DefaultAudioLanguage}"
+                                    SelectedValuePath="Key" />
                                 <CheckBox
                                     Margin="3"
                                     Content="Disable MPV borderless mode"
@@ -522,10 +533,11 @@
                                     Margin="3"
                                     DisplayMemberPath="Name"
                                     IsEnabled="{Binding HasItems, RelativeSource={RelativeSource Self}}"
-                                    ItemsSource="{Binding AudioTracks}">
+                                    ItemsSource="{Binding AudioTracks}"
+                                    SelectedItem="{Binding SelectedAudioTrack}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="SelectionChanged">
-                                            <i:InvokeCommandAction Command="{Binding AudioTrackSelectionChangedCommand}" CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ComboBox}}" />
+                                            <i:InvokeCommandAction Command="{Binding AudioTrackSelectionChangedCommand}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </ComboBox>
@@ -551,6 +563,35 @@
                                     Style="{StaticResource OptionButtonStyle}" />
                             </Grid>
                         </GroupBox>
+                        <StackPanel
+                            Grid.Row="4"
+                            Margin="8,3"
+                            Orientation="Vertical">
+                            <TextBlock>
+                                <Run>Found a bug?</Run>
+                                <Hyperlink NavigateUri="https://github.com/robvdpol/RaceControl/issues">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="RequestNavigate">
+                                            <i:InvokeCommandAction Command="{Binding RequestNavigateCommand}" PassEventArgsToCommand="True" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                    Click here
+                                </Hyperlink>
+                                <Run>to report it.</Run>
+                            </TextBlock>
+                            <TextBlock>
+                                <Run>Like this app?</Run>
+                                <Hyperlink NavigateUri="https://github.com/sponsors/robvdpol">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="RequestNavigate">
+                                            <i:InvokeCommandAction Command="{Binding RequestNavigateCommand}" PassEventArgsToCommand="True" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                    Click here
+                                </Hyperlink>
+                                <Run>to support me.</Run>
+                            </TextBlock>
+                        </StackPanel>
                     </Grid>
                 </ScrollViewer>
             </Border>
@@ -663,62 +704,63 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="{Binding}" />
-                            <Button
-                                Grid.Column="1"
-                                Width="70"
-                                Margin="2,0"
-                                Command="{Binding DataContext.DownloadContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                                CommandParameter="{Binding}"
-                                Content="Download"
-                                ToolTip="Download copy to file system"
-                                Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                            <Button
-                                Grid.Column="2"
-                                Width="50"
-                                Margin="2,0"
-                                Command="{Binding DataContext.CopyContentUrlCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                                CommandParameter="{Binding}"
-                                Content="Copy"
-                                ToolTip="Copy URL to clipboard" />
-                            <Button
-                                Grid.Column="3"
-                                Width="50"
-                                Margin="2,0"
-                                Command="{Binding DataContext.CastContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                                CommandParameter="{Binding}"
-                                Content="Cast"
-                                ToolTip="Cast to selected Chromecast device" />
-                            <Button
-                                Grid.Column="4"
-                                Width="50"
-                                Margin="2,0"
-                                Command="{Binding DataContext.WatchContentInMpvCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                                CommandParameter="{Binding}"
-                                Content="MPV"
-                                ToolTip="Watch with MPV" />
-                            <Button
-                                Grid.Column="5"
-                                Width="50"
-                                Margin="2,0"
-                                Command="{Binding DataContext.WatchContentInVlcCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                                CommandParameter="{Binding}"
-                                Content="VLC"
-                                ToolTip="Watch with VLC media player" />
-                            <Button
-                                Grid.Column="6"
-                                Width="50"
-                                Margin="2,0,0,0"
-                                Command="{Binding DataContext.WatchContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                                CommandParameter="{Binding}"
-                                Content="Watch"
-                                ToolTip="Watch with internal player" />
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <Button
+                                    Width="70"
+                                    Margin="2,0"
+                                    Command="{Binding DataContext.DownloadContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                    CommandParameter="{Binding}"
+                                    Content="Download"
+                                    ToolTip="Download copy to file system"
+                                    Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                <Button
+                                    Width="50"
+                                    Margin="2,0"
+                                    Command="{Binding DataContext.CopyContentUrlCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                    CommandParameter="{Binding}"
+                                    Content="Copy"
+                                    ToolTip="Copy URL to clipboard" />
+                                <Button
+                                    Width="50"
+                                    Margin="2,0"
+                                    Command="{Binding DataContext.CastContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                    CommandParameter="{Binding}"
+                                    Content="Cast"
+                                    ToolTip="Cast to selected Chromecast device"
+                                    Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                <Button
+                                    Width="60"
+                                    Margin="2,0"
+                                    Command="{Binding DataContext.WatchContentInMpcCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                    CommandParameter="{Binding}"
+                                    Content="MPC-HC"
+                                    ToolTip="Watch with MPC-HC"
+                                    Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                <Button
+                                    Width="50"
+                                    Margin="2,0"
+                                    Command="{Binding DataContext.WatchContentInMpvCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                    CommandParameter="{Binding}"
+                                    Content="MPV"
+                                    ToolTip="Watch with MPV" />
+                                <Button
+                                    Width="50"
+                                    Margin="2,0"
+                                    Command="{Binding DataContext.WatchContentInVlcCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                    CommandParameter="{Binding}"
+                                    Content="VLC"
+                                    ToolTip="Watch with VLC media player"
+                                    Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                <Button
+                                    Width="50"
+                                    Margin="2,0,0,0"
+                                    Command="{Binding DataContext.WatchContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                    CommandParameter="{Binding}"
+                                    Content="Watch"
+                                    ToolTip="Watch with internal player" />
+                            </StackPanel>
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

@@ -6,9 +6,11 @@ namespace RaceControl.Interfaces
 {
     public interface IMediaDownloader : IDisposable
     {
-        Task StartDownloadAsync(string streamUrl, string filename);
+        DownloadStatus Status { get; }
 
-        void StopDownload();
+        float Progress { get; }
+
+        Task StartDownloadAsync(string streamUrl, string filename);
 
         void SetDownloadStatus(DownloadStatus status);
     }

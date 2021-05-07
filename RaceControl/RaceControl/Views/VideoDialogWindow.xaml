@@ -12,7 +12,7 @@
         </Style>
     </Window.Style>
     <Window.InputBindings>
-        <KeyBinding Key="Escape" Command="{Binding CloseWindowCommand}" />
+        <KeyBinding Key="Escape" Command="{Binding CloseVideoWindowCommand}" />
         <KeyBinding
             Key="Escape"
             Command="{Binding CloseAllWindowsCommand}"
@@ -25,6 +25,16 @@
         <KeyBinding Key="M" Command="{Binding ToggleMuteCommand}" />
         <KeyBinding Key="F" Command="{Binding ToggleFullScreenCommand}" />
         <KeyBinding Key="S" Command="{Binding SyncSessionCommand}" />
+        <KeyBinding Key="Add" Command="{Binding ZoomCommand}">
+            <KeyBinding.CommandParameter>
+                <sys:Int32>50</sys:Int32>
+            </KeyBinding.CommandParameter>
+        </KeyBinding>
+        <KeyBinding Key="Subtract" Command="{Binding ZoomCommand}">
+            <KeyBinding.CommandParameter>
+                <sys:Int32>-50</sys:Int32>
+            </KeyBinding.CommandParameter>
+        </KeyBinding>
         <KeyBinding Key="Right" Command="{Binding FastForwardCommand}">
             <KeyBinding.CommandParameter>
                 <sys:Int32>10</sys:Int32>

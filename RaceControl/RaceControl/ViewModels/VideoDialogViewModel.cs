@@ -28,18 +28,18 @@ namespace RaceControl.ViewModels
         private const int MouseWheelDelta = 12;
 
         private readonly IEventAggregator _eventAggregator;
+        private readonly ISettings _settings;
         private readonly IApiService _apiService;
         private readonly IVideoDialogLayout _videoDialogLayout;
         private readonly object _showControlsTimerLock = new();
 
-        private ICommand _mouseDownVideoCommand;
+        private ICommand _mouseDownCommand;
         private ICommand _mouseEnterOrLeaveOrMoveVideoCommand;
         private ICommand _mouseWheelVideoCommand;
         private ICommand _mouseEnterControlBarCommand;
         private ICommand _mouseLeaveControlBarCommand;
         private ICommand _mouseMoveControlBarCommand;
         private ICommand _mouseWheelControlBarCommand;
-        private ICommand _closeAllWindowsCommand;
         private ICommand _togglePauseCommand;
         private ICommand _togglePauseAllCommand;
         private ICommand _toggleMuteCommand;
@@ -47,10 +47,12 @@ namespace RaceControl.ViewModels
         private ICommand _syncSessionCommand;
         private ICommand _toggleFullScreenCommand;
         private ICommand _moveToCornerCommand;
+        private ICommand _zoomCommand;
         private ICommand _selectAspectRatioCommand;
         private ICommand _selectAudioDeviceCommand;
         private ICommand _selectChannelCommand;
-        private ICommand _zoomCommand;
+        private ICommand _closeVideoWindowCommand;
+        private ICommand _closeAllWindowsCommand;
 
         private string _subscriptionToken;
         private long _identifier;
@@ -65,12 +67,14 @@ namespace RaceControl.ViewModels
         public VideoDialogViewModel(
             ILogger logger,
             IEventAggregator eventAggregator,
+            ISettings settings,
             IApiService apiService,
             IVideoDialogLayout videoDialogLayout,
             IMediaPlayer mediaPlayer)
             : base(logger)
         {
             _eventAggregator = eventAggregator;
+            _settings = settings;
             _apiService = apiService;
             _videoDialogLayout = videoDialogLayout;
             MediaPlayer = mediaPlayer;
@@ -78,24 +82,25 @@ namespace RaceControl.ViewModels
 
         public override string Title => $"{_identifier}. {PlayableContent?.Title}";
 
-        public ICommand MouseDownVideoCommand => _mouseDownVideoCommand ??= new DelegateCommand<MouseButtonEventArgs>(MouseDownVideoExecute);
+        public ICommand MouseDownCommand => _mouseDownCommand ??= new DelegateCommand<MouseButtonEventArgs>(MouseDownExecute);
         public ICommand MouseEnterOrLeaveOrMoveVideoCommand => _mouseEnterOrLeaveOrMoveVideoCommand ??= new DelegateCommand<bool?>(MouseEnterOrLeaveOrMoveVideoExecute);
         public ICommand MouseWheelVideoCommand => _mouseWheelVideoCommand ??= new DelegateCommand<MouseWheelEventArgs>(MouseWheelVideoExecute);
         public ICommand MouseEnterControlBarCommand => _mouseEnterControlBarCommand ??= new DelegateCommand(MouseEnterControlBarExecute);
         public ICommand MouseLeaveControlBarCommand => _mouseLeaveControlBarCommand ??= new DelegateCommand(MouseLeaveControlBarExecute);
         public ICommand MouseMoveControlBarCommand => _mouseMoveControlBarCommand ??= new DelegateCommand(MouseMoveControlBarExecute);
         public ICommand MouseWheelControlBarCommand => _mouseWheelControlBarCommand ??= new DelegateCommand<MouseWheelEventArgs>(MouseWheelControlBarExecute);
-        public ICommand CloseAllWindowsCommand => _closeAllWindowsCommand ??= new DelegateCommand(CloseAllWindowsExecute);
-        public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute).ObservesCanExecute(() => CanClose);
-        public ICommand TogglePauseAllCommand => _togglePauseAllCommand ??= new DelegateCommand(TogglePauseAllExecute).ObservesCanExecute(() => CanClose);
-        public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand<bool?>(ToggleMuteExecute).ObservesCanExecute(() => CanClose);
-        public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<int?>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent);
-        public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent);
-        public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand<long?>(ToggleFullScreenExecute);
+        public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
+        public ICommand TogglePauseAllCommand => _togglePauseAllCommand ??= new DelegateCommand(TogglePauseAllExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
+        public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand<bool?>(ToggleMuteExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
+        public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<int?>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => PlayableContent);
+        public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
+        public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand<long?>(ToggleFullScreenExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
         public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => MediaPlayer.IsFullScreen);
-        public ICommand SelectAspectRatioCommand => _selectAspectRatioCommand ??= new DelegateCommand<IAspectRatio>(SelectAspectRatioExecute, CanSelectAspectRatioExecute).ObservesProperty(() => MediaPlayer.AspectRatio);
-        public ICommand SelectAudioDeviceCommand => _selectAudioDeviceCommand ??= new DelegateCommand<IAudioDevice>(SelectAudioDeviceExecute, CanSelectAudioDeviceExecute).ObservesProperty(() => MediaPlayer.AudioDevice);
-        public ICommand ZoomCommand => _zoomCommand ??= new DelegateCommand<int?>(ZoomExecute);
+        public ICommand ZoomCommand => _zoomCommand ??= new DelegateCommand<int?>(ZoomExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
+        public ICommand SelectAspectRatioCommand => _selectAspectRatioCommand ??= new DelegateCommand<IAspectRatio>(SelectAspectRatioExecute, CanSelectAspectRatioExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => MediaPlayer.AspectRatio);
+        public ICommand SelectAudioDeviceCommand => _selectAudioDeviceCommand ??= new DelegateCommand<IAudioDevice>(SelectAudioDeviceExecute, CanSelectAudioDeviceExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => MediaPlayer.AudioDevice);
+        public ICommand CloseVideoWindowCommand => _closeVideoWindowCommand ??= new DelegateCommand(RaiseRequestClose).ObservesCanExecute(() => MediaPlayer.IsStarted);
+        public ICommand CloseAllWindowsCommand => _closeAllWindowsCommand ??= new DelegateCommand(CloseAllWindowsExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
         public ICommand SelectChannelCommand => _selectChannelCommand ??= new DelegateCommand<IPlayableChannel>(SelectChannelExecute, CanSelectChannelExecute).ObservesProperty(() => Channels.CurrentChannel);
         
         public IMediaPlayer MediaPlayer { get; }
@@ -167,18 +172,18 @@ namespace RaceControl.ViewModels
             else
             {
                 StartupLocation = WindowStartupLocation.CenterScreen;
+                DialogSettings.AudioTrack = PlayableContent.DetermineAudioLanguage(_settings.DefaultAudioLanguage);
             }
 
-            InitializeAsync().Await(InitializeCompleted, InitializeError, true);
+            StartStreamAsync().Await(StreamStarted, StreamFailed, true);
         }
 
         public override void OnDialogClosed()
         {
+            base.OnDialogClosed();
             MediaPlayer.Dispose();
             RemoveShowControlsTimer();
             UnsubscribeEvents();
-
-            base.OnDialogClosed();
         }
 
         private void ShowControlsTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -194,7 +199,7 @@ namespace RaceControl.ViewModels
             });
         }
 
-        private void MouseDownVideoExecute(MouseButtonEventArgs e)
+        private void MouseDownExecute(MouseButtonEventArgs e)
         {
             if (e.ChangedButton != MouseButton.Left || e.LeftButton != MouseButtonState.Pressed)
             {
@@ -271,11 +276,6 @@ namespace RaceControl.ViewModels
             SetVolume(e.Delta / MouseWheelDelta);
         }
 
-        private void CloseAllWindowsExecute()
-        {
-            _eventAggregator.GetEvent<CloseAllEvent>().Publish(null);
-        }
-
         private void TogglePauseExecute()
         {
             Logger.Info("Toggling pause...");
@@ -296,7 +296,7 @@ namespace RaceControl.ViewModels
 
         private bool CanFastForwardExecute(int? seconds)
         {
-            return CanClose && !PlayableContent.IsLive;
+            return MediaPlayer.IsStarted && !PlayableContent.IsLive;
         }
 
         private void FastForwardExecute(int? seconds)
@@ -308,11 +308,6 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private bool CanSyncSessionExecute()
-        {
-            return CanClose;
-        }
-
         private void SyncSessionExecute()
         {
             var payload = new SyncStreamsEventPayload(PlayableContent.SyncUID, MediaPlayer.Time);
@@ -322,7 +317,7 @@ namespace RaceControl.ViewModels
 
         private void OnSyncStreams(SyncStreamsEventPayload payload)
         {
-            if (CanClose && PlayableContent.SyncUID == payload.SyncUID)
+            if (MediaPlayer.IsStarted && PlayableContent.SyncUID == payload.SyncUID)
             {
                 MediaPlayer.Time = payload.Time;
             }
@@ -341,7 +336,7 @@ namespace RaceControl.ViewModels
 
         private void OnCloseAll(ContentType? contentType)
         {
-            CloseWindowCommand.TryExecute();
+            CloseVideoWindowCommand.TryExecute();
         }
 
         private void OnSaveLayout(ContentType contentType)
@@ -362,14 +357,12 @@ namespace RaceControl.ViewModels
         {
             if (identifier == null)
             {
-                if (MediaPlayer.IsFullScreen)
+                if (!MediaPlayer.IsFullScreen)
                 {
-                    MediaPlayer.SetNormalScreen();
+                    DialogSettings.ResizeMode = ResizeMode.CanResize;
                 }
-                else
-                {
-                    MediaPlayer.SetFullScreen();
-                }
+
+                MediaPlayer.ToggleFullScreen();
             }
             else
             {
@@ -398,26 +391,6 @@ namespace RaceControl.ViewModels
             DialogSettings.Height = windowHeight;
             DialogSettings.Top = windowTop;
             DialogSettings.Left = windowLeft;
-        }
-
-        private bool CanSelectAspectRatioExecute(IAspectRatio aspectRatio)
-        {
-            return MediaPlayer.AspectRatio != aspectRatio;
-        }
-
-        private void SelectAspectRatioExecute(IAspectRatio aspectRatio)
-        {
-            MediaPlayer.AspectRatio = aspectRatio;
-        }
-
-        private bool CanSelectAudioDeviceExecute(IAudioDevice audioDevice)
-        {
-            return MediaPlayer.AudioDevice != audioDevice;
-        }
-
-        private void SelectAudioDeviceExecute(IAudioDevice audioDevice)
-        {
-            MediaPlayer.AudioDevice = audioDevice;
         }
 
         private bool CanSelectChannelExecute(IPlayableChannel channel)
@@ -451,6 +424,31 @@ namespace RaceControl.ViewModels
             {
                 MediaPlayer.Zoom = 0;
             }
+        }
+
+        private bool CanSelectAspectRatioExecute(IAspectRatio aspectRatio)
+        {
+            return MediaPlayer.IsStarted && MediaPlayer.AspectRatio != aspectRatio;
+        }
+
+        private void SelectAspectRatioExecute(IAspectRatio aspectRatio)
+        {
+            MediaPlayer.AspectRatio = aspectRatio;
+        }
+
+        private bool CanSelectAudioDeviceExecute(IAudioDevice audioDevice)
+        {
+            return MediaPlayer.IsStarted && MediaPlayer.AudioDevice != audioDevice;
+        }
+
+        private void SelectAudioDeviceExecute(IAudioDevice audioDevice)
+        {
+            MediaPlayer.AudioDevice = audioDevice;
+        }
+
+        private void CloseAllWindowsExecute()
+        {
+            _eventAggregator.GetEvent<CloseAllEvent>().Publish(null);
         }
 
         private void LoadDialogSettings(VideoDialogSettings settings)
@@ -499,25 +497,6 @@ namespace RaceControl.ViewModels
             };
         }
 
-        private async Task InitializeAsync()
-        {
-            await StartStreamAsync();
-            SubscribeEvents();
-            CreateShowControlsTimer();
-        }
-
-        private void InitializeCompleted()
-        {
-            base.OnDialogOpened(null);
-        }
-
-        private void InitializeError(Exception ex)
-        {
-            base.OnDialogOpened(null);
-            RaiseRequestClose();
-            HandleCriticalError(ex);
-        }
-
         private async Task StartStreamAsync()
         {
             var streamUrl = await _apiService.GetTokenisedUrlAsync(_subscriptionToken, PlayableContent);
@@ -530,6 +509,20 @@ namespace RaceControl.ViewModels
             DialogSettings.IsMuted = Channels.Graphs.Contains(PlayableContent as IPlayableChannel);
 
             MediaPlayer.StartPlayback(streamUrl, DialogSettings);
+        }
+
+        private void StreamStarted()
+        {
+            base.OnDialogOpened(null);
+            SubscribeEvents();
+            CreateShowControlsTimer();
+        }
+
+        private void StreamFailed(Exception ex)
+        {
+            base.OnDialogOpened(null);
+            RaiseRequestClose();
+            HandleCriticalError(ex);
         }
 
         private void SubscribeEvents()
