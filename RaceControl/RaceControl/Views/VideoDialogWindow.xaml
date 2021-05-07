@@ -5,7 +5,7 @@
     xmlns:enums="clr-namespace:RaceControl.Common.Enums;assembly=RaceControl.Common"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     Title="{Binding Title}"
-    WindowStartupLocation="CenterOwner">
+    WindowStartupLocation="CenterOwner" StateChanged="WindowStateChanged">
     <Window.Style>
         <Style TargetType="{x:Type Window}">
             <Setter Property="SizeToContent" Value="WidthAndHeight" />
