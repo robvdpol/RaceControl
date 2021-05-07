@@ -109,6 +109,7 @@ To open and build the solution you need:
 * [GoogleCast](https://github.com/kakone/GoogleCast)
 
 ## Screenshots
+#### Main application
 ![preview image](https://imgur.com/GIPIPvP.png)
-
+#### Internal player
 ![preview image](https://imgur.com/drUlpAV.png)
