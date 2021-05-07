@@ -109,6 +109,6 @@ To open and build the solution you need:
 * [GoogleCast](https://github.com/kakone/GoogleCast)
 
 ## Screenshots
-![preview image](https://imgur.com/Ngos9JZ.png)
+![preview image](https://imgur.com/GIPIPvP.png)
 
-![preview image](https://imgur.com/m46BzZj.png)
+![preview image](https://imgur.com/drUlpAV.png)
