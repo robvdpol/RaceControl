@@ -8,17 +8,12 @@ namespace RaceControl.Extensions
     {
         public static string DetermineAudioLanguage(this IPlayableContent playableContent, string defaultAudioLanguage)
         {
-            if (playableContent.ContentType != ContentType.Channel || playableContent.Name == ChannelNames.PitLane)
-            {
-                return LanguageCodes.English;
-            }
-
-            if (playableContent.Name is ChannelNames.Wif or ChannelNames.Tracker or ChannelNames.Data)
+            if (playableContent.ContentType != ContentType.Channel || playableContent.Name is ChannelNames.Wif or ChannelNames.Tracker or ChannelNames.Data or ChannelNames.PitLane)
             {
                 return !string.IsNullOrWhiteSpace(defaultAudioLanguage) ? defaultAudioLanguage : LanguageCodes.English;
             }
 
-            return LanguageCodes.Undetermined;
+            return LanguageCodes.Onboard;
         }
     }
 }

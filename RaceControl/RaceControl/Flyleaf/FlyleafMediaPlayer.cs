@@ -361,14 +361,11 @@ namespace RaceControl.Flyleaf
                 SetProperty(ref _audioDevice, device, nameof(AudioDevice));
             }
 
-            if (!string.IsNullOrWhiteSpace(audioTrack))
-            {
-                AudioTrack = AudioTracks.FirstOrDefault(t => t.Id == audioTrack);
-            }
+            var flyleafCode = LanguageCodes.GetFlyleafCode(audioTrack);
 
-            AudioTrack ??= AudioTracks.FirstOrDefault(t => t.Id == LanguageCodes.English) ??
-                           AudioTracks.FirstOrDefault(t => t.Id == LanguageCodes.Undetermined) ??
-                           AudioTracks.FirstOrDefault();
+            AudioTrack = AudioTracks.FirstOrDefault(t => t.Id == flyleafCode) ??
+                         AudioTracks.FirstOrDefault(t => t.Id == LanguageCodes.English) ??
+                         AudioTracks.FirstOrDefault(t => t.Id == LanguageCodes.Undetermined);
         }
 
         private void SetVideoQuality(VideoQuality videoQuality)

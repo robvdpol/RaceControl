@@ -2,6 +2,7 @@
 using Prism.Commands;
 using Prism.Events;
 using Prism.Services.Dialogs;
+using RaceControl.Common.Constants;
 using RaceControl.Common.Enums;
 using RaceControl.Common.Interfaces;
 using RaceControl.Core.Helpers;
@@ -460,7 +461,7 @@ namespace RaceControl.ViewModels
                 Zoom = MediaPlayer.Zoom,
                 AspectRatio = MediaPlayer.AspectRatio?.Value,
                 AudioDevice = MediaPlayer.AudioDevice?.Identifier,
-                AudioTrack = MediaPlayer.AudioTrack?.Id,
+                AudioTrack = LanguageCodes.GetStandardCode(MediaPlayer.AudioTrack?.Id),
                 ChannelName = PlayableContent.Name
             };
         }
