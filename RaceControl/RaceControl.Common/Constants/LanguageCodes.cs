@@ -23,6 +23,16 @@ namespace RaceControl.Common.Constants
             { SoundFx, "und" }
         };
 
+        private static readonly IDictionary<string, string> TwoLetterCodes = new Dictionary<string, string>
+        {
+            { English, "en" },
+            { German, "de" },
+            { French, "fr" },
+            { Spanish, "es" },
+            { Portuguese, "pt" },
+            { Dutch, "nl" }
+        };
+
         public static string GetFlyleafCode(string languageCode)
         {
             return FlyleafCodes.TryGetValue(languageCode, out var flyleafCode) ? flyleafCode : languageCode;
@@ -44,6 +54,11 @@ namespace RaceControl.Common.Constants
             }
 
             return flyleafCode;
+        }
+
+        public static string GetTwoLetterCode(string languageCode)
+        {
+            return TwoLetterCodes.TryGetValue(languageCode, out var twoLetterCode) ? twoLetterCode : null;
         }
     }
 }

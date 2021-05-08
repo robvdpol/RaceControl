@@ -162,7 +162,7 @@ namespace RaceControl.ViewModels
             else
             {
                 StartupLocation = WindowStartupLocation.CenterScreen;
-                DialogSettings.AudioTrack = PlayableContent.DetermineAudioLanguage(_settings.DefaultAudioLanguage);
+                DialogSettings.AudioTrack = PlayableContent.GetPreferredAudioLanguage(_settings.DefaultAudioLanguage);
             }
 
             StartStreamAsync().Await(StreamStarted, StreamFailed, true);

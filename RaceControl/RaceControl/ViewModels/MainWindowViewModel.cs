@@ -444,10 +444,19 @@ namespace RaceControl.ViewModels
             CastContentAsync(SelectedReceiver, playableContent).Await(() =>
             {
                 SetNotBusy();
-                var language = playableContent.DetermineAudioLanguage(Settings.DefaultAudioLanguage);
-                SelectedAudioTrack = AudioTracks.FirstOrDefault(track => track.Language == language) ??
-                                     AudioTracks.FirstOrDefault(track => track.Language == LanguageCodes.Onboard) ??
-                                     AudioTracks.FirstOrDefault(track => track.Language == LanguageCodes.English);
+
+                var languageCodes = playableContent.GetAudioLanguages(Settings.DefaultAudioLanguage);
+
+                foreach (var languageCode in languageCodes)
+                {
+                    var audioTrack = AudioTracks.FirstOrDefault(track => track.Language == languageCode);
+
+                    if (audioTrack != null)
+                    {
+                        SelectedAudioTrack = audioTrack;
+                        break;
+                    }
+                }
             }, HandleCriticalError);
         }
 
@@ -917,8 +926,8 @@ namespace RaceControl.ViewModels
 
             if (!hasAudioLanguage)
             {
-                var language = playableContent.DetermineAudioLanguage(Settings.DefaultAudioLanguage);
-                arguments.Add($"--alang={language},{LanguageCodes.Onboard},{LanguageCodes.English}");
+                var languageCodes = playableContent.GetAudioLanguages(Settings.DefaultAudioLanguage);
+                arguments.Add($"--alang={string.Join(',', languageCodes)}");
             }
 
             if (settings != null)
