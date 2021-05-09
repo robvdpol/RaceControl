@@ -26,6 +26,7 @@ namespace RaceControl.Views
                 && !viewModel.MediaPlayer.IsFullScreen)
             {
                 WindowState = System.Windows.WindowState.Normal;
+                viewModel.MediaPlayer.ToggleFullScreen();
             }
         }
     }
