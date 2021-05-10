@@ -372,7 +372,7 @@ namespace RaceControl.ViewModels
             {
                 IsBusy = true;
                 SelectedSession = null;
-                SelectSessionAsync(SelectedLiveSession, true).Await(SetNotBusy, HandleCriticalError);
+                SelectSessionAsync(SelectedLiveSession).Await(SetNotBusy, HandleCriticalError);
             }
         }
 
@@ -382,7 +382,7 @@ namespace RaceControl.ViewModels
             {
                 IsBusy = true;
                 SelectedLiveSession = null;
-                SelectSessionAsync(SelectedSession, false).Await(SetNotBusy, HandleCriticalError);
+                SelectSessionAsync(SelectedSession).Await(SetNotBusy, HandleCriticalError);
             }
         }
 
@@ -803,13 +803,8 @@ namespace RaceControl.ViewModels
             await Task.WhenAll(LoadSessionsForEventAsync(evt), LoadEpisodesForEventAsync(evt));
         }
 
-        private async Task SelectSessionAsync(Session session, bool clearEpisodes)
+        private async Task SelectSessionAsync(Session session)
         {
-            if (clearEpisodes)
-            {
-                Episodes.Clear();
-            }
-
             Channels.Clear();
             SelectedVodGenre = null;
 
