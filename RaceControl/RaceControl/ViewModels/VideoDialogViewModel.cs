@@ -11,6 +11,7 @@ using RaceControl.Events;
 using RaceControl.Extensions;
 using RaceControl.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
+using RaceControl.Views;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -50,6 +51,7 @@ namespace RaceControl.ViewModels
         private ICommand _selectAudioDeviceCommand;
         private ICommand _closeVideoWindowCommand;
         private ICommand _closeAllWindowsCommand;
+        private ICommand _windowStateChangedCommand;
 
         private string _subscriptionToken;
         private long _identifier;
@@ -98,6 +100,7 @@ namespace RaceControl.ViewModels
         public ICommand SelectAudioDeviceCommand => _selectAudioDeviceCommand ??= new DelegateCommand<IAudioDevice>(SelectAudioDeviceExecute, CanSelectAudioDeviceExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => MediaPlayer.AudioDevice);
         public ICommand CloseVideoWindowCommand => _closeVideoWindowCommand ??= new DelegateCommand(RaiseRequestClose).ObservesCanExecute(() => MediaPlayer.IsStarted);
         public ICommand CloseAllWindowsCommand => _closeAllWindowsCommand ??= new DelegateCommand(CloseAllWindowsExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
+        public ICommand WindowStateChangedCommand => _windowStateChangedCommand ??= new DelegateCommand<Window>(WindowStateChangedExecute);
 
         public IMediaPlayer MediaPlayer { get; }
 
@@ -417,6 +420,26 @@ namespace RaceControl.ViewModels
         private void CloseAllWindowsExecute()
         {
             _eventAggregator.GetEvent<CloseAllEvent>().Publish(null);
+        }
+
+        private void WindowStateChangedExecute(Window window)
+        {
+            // Prevent maximizing the video window by snapping it to the top of the screen; it doesn't have a toolbar nor
+            // is it visible on the task bar, so users can't restore it by dragging it down or clicking the "restore" icon(#119).
+
+            // This event is raised by the FlyLeaf player as well when maximizing, on this window but with different content
+            // (namely a WindowsFormsHost with the FlyLeaf player itself), then skip the overruling of the change in state.
+            switch (window.WindowState)
+            {
+                case WindowState.Maximized when !MediaPlayer.IsFullScreen && window.Content is VideoDialog:
+                    window.WindowState = WindowState.Normal;
+                    MediaPlayer.ToggleFullScreen();
+                    break;
+
+                case WindowState.Normal when MediaPlayer.IsFullScreen:
+                    MediaPlayer.ToggleFullScreen();
+                    break;
+            }
         }
 
         private void LoadDialogSettings(VideoDialogSettings settings)
