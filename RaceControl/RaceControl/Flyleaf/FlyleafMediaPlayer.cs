@@ -211,7 +211,9 @@ namespace RaceControl.Flyleaf
 
         public void ToggleFullScreen()
         {
-            IsFullScreen = IsFullScreen ? !Player.VideoView.NormalScreen() : Player.VideoView.FullScreen();
+            // Needed to prevent triggering another toggle from window state changed event
+            IsFullScreen = !IsFullScreen;
+            IsFullScreen = !IsFullScreen ? !Player.VideoView.NormalScreen() : Player.VideoView.FullScreen();
         }
 
         public void TogglePause()
