@@ -93,6 +93,7 @@ namespace RaceControl.Flyleaf
 
                 if (SetProperty(ref _volume, volume))
                 {
+                    IsMuted = false;
                     Player.audioPlayer.Volume = _volume;
                 }
             }
