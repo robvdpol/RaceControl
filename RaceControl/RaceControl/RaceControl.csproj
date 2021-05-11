@@ -6,12 +6,12 @@
     <AssemblyName>RaceControl</AssemblyName>
     <SignAssembly>false</SignAssembly>
     <ApplicationIcon>f1.ico</ApplicationIcon>
-    <Platforms>x64</Platforms>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <PlatformTarget>x64</PlatformTarget>
+    <Platforms>x64;x86</Platforms>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
