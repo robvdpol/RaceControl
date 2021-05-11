@@ -11,8 +11,4 @@
     </Content>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Libs\x64\FFmpeg\" />
-  </ItemGroup>
-
 </Project>
