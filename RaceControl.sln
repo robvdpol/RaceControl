@@ -15,8 +15,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RaceControl.Core", "RaceCon
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RaceControl.Common", "RaceControl\RaceControl.Common\RaceControl.Common.csproj", "{429905E6-0DEE-4CFA-AB4B-C0BF8E897F6E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RaceControl.Mpv", "RaceControl\RaceControl.Mpv\RaceControl.Mpv.csproj", "{10B35B16-A352-462F-B1E2-FDED5CF869BF}"
-EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "RaceControl.Installer", "RaceControl\RaceControl.Installer\RaceControl.Installer.vdproj", "{24118D77-DDC8-40DB-800A-22478E220153}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{114B4790-C604-4508-9E5A-1B07B513FF4E}"
@@ -28,34 +26,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{C7167F0D-BC9F-4E6E-AFE1-012C56B48DB5}") = "RaceControl.Package", "RaceControl\RaceControl.Package\RaceControl.Package.wapproj", "{EA81E946-E298-4589-BB5E-86C6D9213FB7}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libs", "Libs", "{30011734-1B26-4C81-AF16-A688895D47EB}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "x64", "x64", "{F3D44E9A-8F92-473E-ABE5-16A307256A46}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "x86", "x86", "{5071049F-1793-4FDE-B33A-879C74B9AE2B}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FFmpeg", "FFmpeg", "{7100927E-0B78-46D5-9130-65FCBA5139B0}"
-	ProjectSection(SolutionItems) = preProject
-		Libs\x64\FFmpeg\avcodec-58.dll = Libs\x64\FFmpeg\avcodec-58.dll
-		Libs\x64\FFmpeg\avdevice-58.dll = Libs\x64\FFmpeg\avdevice-58.dll
-		Libs\x64\FFmpeg\avformat-58.dll = Libs\x64\FFmpeg\avformat-58.dll
-		Libs\x64\FFmpeg\avutil-56.dll = Libs\x64\FFmpeg\avutil-56.dll
-		Libs\x64\FFmpeg\postproc-55.dll = Libs\x64\FFmpeg\postproc-55.dll
-		Libs\x64\FFmpeg\swresample-3.dll = Libs\x64\FFmpeg\swresample-3.dll
-		Libs\x64\FFmpeg\swscale-5.dll = Libs\x64\FFmpeg\swscale-5.dll
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FFmpeg", "FFmpeg", "{310AF10C-8DC5-4BC9-9548-7B163B6F6B37}"
-	ProjectSection(SolutionItems) = preProject
-		Libs\x86\FFmpeg\avcodec-58.dll = Libs\x86\FFmpeg\avcodec-58.dll
-		Libs\x86\FFmpeg\avdevice-58.dll = Libs\x86\FFmpeg\avdevice-58.dll
-		Libs\x86\FFmpeg\avformat-58.dll = Libs\x86\FFmpeg\avformat-58.dll
-		Libs\x86\FFmpeg\avutil-56.dll = Libs\x86\FFmpeg\avutil-56.dll
-		Libs\x86\FFmpeg\postproc-55.dll = Libs\x86\FFmpeg\postproc-55.dll
-		Libs\x86\FFmpeg\swresample-3.dll = Libs\x86\FFmpeg\swresample-3.dll
-		Libs\x86\FFmpeg\swscale-5.dll = Libs\x86\FFmpeg\swscale-5.dll
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -105,14 +75,6 @@ Global
 		{429905E6-0DEE-4CFA-AB4B-C0BF8E897F6E}.Release|x64.Build.0 = Release|x64
 		{429905E6-0DEE-4CFA-AB4B-C0BF8E897F6E}.Release|x86.ActiveCfg = Release|x86
 		{429905E6-0DEE-4CFA-AB4B-C0BF8E897F6E}.Release|x86.Build.0 = Release|x86
-		{10B35B16-A352-462F-B1E2-FDED5CF869BF}.Debug|x64.ActiveCfg = Debug|x64
-		{10B35B16-A352-462F-B1E2-FDED5CF869BF}.Debug|x64.Build.0 = Debug|x64
-		{10B35B16-A352-462F-B1E2-FDED5CF869BF}.Debug|x86.ActiveCfg = Debug|x86
-		{10B35B16-A352-462F-B1E2-FDED5CF869BF}.Debug|x86.Build.0 = Debug|x86
-		{10B35B16-A352-462F-B1E2-FDED5CF869BF}.Release|x64.ActiveCfg = Release|x64
-		{10B35B16-A352-462F-B1E2-FDED5CF869BF}.Release|x64.Build.0 = Release|x64
-		{10B35B16-A352-462F-B1E2-FDED5CF869BF}.Release|x86.ActiveCfg = Release|x86
-		{10B35B16-A352-462F-B1E2-FDED5CF869BF}.Release|x86.Build.0 = Release|x86
 		{24118D77-DDC8-40DB-800A-22478E220153}.Debug|x64.ActiveCfg = Debug
 		{24118D77-DDC8-40DB-800A-22478E220153}.Debug|x86.ActiveCfg = Debug
 		{24118D77-DDC8-40DB-800A-22478E220153}.Release|x64.ActiveCfg = Release
@@ -134,10 +96,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{FACE09EB-E48D-4701-8B64-44E98B15577A} = {97CDA5AD-8348-4D9F-826D-EFF966FE8BFA}
 		{0C5968EB-DC33-4DAB-A848-A22DC3E914C2} = {97CDA5AD-8348-4D9F-826D-EFF966FE8BFA}
-		{F3D44E9A-8F92-473E-ABE5-16A307256A46} = {30011734-1B26-4C81-AF16-A688895D47EB}
-		{5071049F-1793-4FDE-B33A-879C74B9AE2B} = {30011734-1B26-4C81-AF16-A688895D47EB}
-		{7100927E-0B78-46D5-9130-65FCBA5139B0} = {F3D44E9A-8F92-473E-ABE5-16A307256A46}
-		{310AF10C-8DC5-4BC9-9548-7B163B6F6B37} = {5071049F-1793-4FDE-B33A-879C74B9AE2B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A6D2AA3D-4CC3-42E0-97C1-A6EE411EB4A0}
