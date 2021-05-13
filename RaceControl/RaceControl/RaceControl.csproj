@@ -69,7 +69,9 @@
   <ItemGroup>
     <Folder Include="Properties\PublishProfiles\" />
   </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy $(SolutionDir)Libs\$(PlatformName)\* $(TargetDir) /E /Y" />
-  </Target>
+  <ItemGroup>
+    <Content Include="$(SolutionDir)Libs\$(PlatformName)\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>
