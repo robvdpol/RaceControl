@@ -340,4 +340,4 @@ ASALocalRun/
 healthchecksdb
 
 # FFmpeg exceptions
-!RaceControl/RaceControl.FFmpeg/Libs/**/*
+!Libs/**/*

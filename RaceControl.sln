@@ -29,7 +29,33 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{C7167F0D-BC9F-4E6E-AFE1-012C56B48DB5}") = "RaceControl.Package", "RaceControl\RaceControl.Package\RaceControl.Package.wapproj", "{EA81E946-E298-4589-BB5E-86C6D9213FB7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RaceControl.FFmpeg", "RaceControl\RaceControl.FFmpeg\RaceControl.FFmpeg.csproj", "{805D758E-5713-4050-9765-FEDB5C80C5EC}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libs", "Libs", "{30011734-1B26-4C81-AF16-A688895D47EB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "x64", "x64", "{F3D44E9A-8F92-473E-ABE5-16A307256A46}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "x86", "x86", "{5071049F-1793-4FDE-B33A-879C74B9AE2B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FFmpeg", "FFmpeg", "{7100927E-0B78-46D5-9130-65FCBA5139B0}"
+	ProjectSection(SolutionItems) = preProject
+		Libs\x64\FFmpeg\avcodec-58.dll = Libs\x64\FFmpeg\avcodec-58.dll
+		Libs\x64\FFmpeg\avdevice-58.dll = Libs\x64\FFmpeg\avdevice-58.dll
+		Libs\x64\FFmpeg\avformat-58.dll = Libs\x64\FFmpeg\avformat-58.dll
+		Libs\x64\FFmpeg\avutil-56.dll = Libs\x64\FFmpeg\avutil-56.dll
+		Libs\x64\FFmpeg\postproc-55.dll = Libs\x64\FFmpeg\postproc-55.dll
+		Libs\x64\FFmpeg\swresample-3.dll = Libs\x64\FFmpeg\swresample-3.dll
+		Libs\x64\FFmpeg\swscale-5.dll = Libs\x64\FFmpeg\swscale-5.dll
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FFmpeg", "FFmpeg", "{310AF10C-8DC5-4BC9-9548-7B163B6F6B37}"
+	ProjectSection(SolutionItems) = preProject
+		Libs\x86\FFmpeg\avcodec-58.dll = Libs\x86\FFmpeg\avcodec-58.dll
+		Libs\x86\FFmpeg\avdevice-58.dll = Libs\x86\FFmpeg\avdevice-58.dll
+		Libs\x86\FFmpeg\avformat-58.dll = Libs\x86\FFmpeg\avformat-58.dll
+		Libs\x86\FFmpeg\avutil-56.dll = Libs\x86\FFmpeg\avutil-56.dll
+		Libs\x86\FFmpeg\postproc-55.dll = Libs\x86\FFmpeg\postproc-55.dll
+		Libs\x86\FFmpeg\swresample-3.dll = Libs\x86\FFmpeg\swresample-3.dll
+		Libs\x86\FFmpeg\swscale-5.dll = Libs\x86\FFmpeg\swscale-5.dll
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -101,14 +127,6 @@ Global
 		{EA81E946-E298-4589-BB5E-86C6D9213FB7}.Release|x86.ActiveCfg = Release|x86
 		{EA81E946-E298-4589-BB5E-86C6D9213FB7}.Release|x86.Build.0 = Release|x86
 		{EA81E946-E298-4589-BB5E-86C6D9213FB7}.Release|x86.Deploy.0 = Release|x86
-		{805D758E-5713-4050-9765-FEDB5C80C5EC}.Debug|x64.ActiveCfg = Debug|x64
-		{805D758E-5713-4050-9765-FEDB5C80C5EC}.Debug|x64.Build.0 = Debug|x64
-		{805D758E-5713-4050-9765-FEDB5C80C5EC}.Debug|x86.ActiveCfg = Debug|x86
-		{805D758E-5713-4050-9765-FEDB5C80C5EC}.Debug|x86.Build.0 = Debug|x86
-		{805D758E-5713-4050-9765-FEDB5C80C5EC}.Release|x64.ActiveCfg = Release|x64
-		{805D758E-5713-4050-9765-FEDB5C80C5EC}.Release|x64.Build.0 = Release|x64
-		{805D758E-5713-4050-9765-FEDB5C80C5EC}.Release|x86.ActiveCfg = Release|x86
-		{805D758E-5713-4050-9765-FEDB5C80C5EC}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -116,6 +134,10 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{FACE09EB-E48D-4701-8B64-44E98B15577A} = {97CDA5AD-8348-4D9F-826D-EFF966FE8BFA}
 		{0C5968EB-DC33-4DAB-A848-A22DC3E914C2} = {97CDA5AD-8348-4D9F-826D-EFF966FE8BFA}
+		{F3D44E9A-8F92-473E-ABE5-16A307256A46} = {30011734-1B26-4C81-AF16-A688895D47EB}
+		{5071049F-1793-4FDE-B33A-879C74B9AE2B} = {30011734-1B26-4C81-AF16-A688895D47EB}
+		{7100927E-0B78-46D5-9130-65FCBA5139B0} = {F3D44E9A-8F92-473E-ABE5-16A307256A46}
+		{310AF10C-8DC5-4BC9-9548-7B163B6F6B37} = {5071049F-1793-4FDE-B33A-879C74B9AE2B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A6D2AA3D-4CC3-42E0-97C1-A6EE411EB4A0}

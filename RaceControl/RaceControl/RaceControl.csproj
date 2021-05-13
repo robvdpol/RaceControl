@@ -63,7 +63,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RaceControl.Core\RaceControl.Core.csproj" />
-    <ProjectReference Include="..\RaceControl.FFmpeg\RaceControl.FFmpeg.csproj" />
     <ProjectReference Include="..\RaceControl.Mpv\RaceControl.Mpv.csproj" />
     <ProjectReference Include="..\Services\RaceControl.Services.Interfaces\RaceControl.Services.Interfaces.csproj" />
     <ProjectReference Include="..\Services\RaceControl.Services\RaceControl.Services.csproj" />
@@ -71,4 +70,7 @@
   <ItemGroup>
     <Folder Include="Properties\PublishProfiles\" />
   </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy $(SolutionDir)Libs\$(PlatformName)\* $(TargetDir) /E /Y" />
+  </Target>
 </Project>

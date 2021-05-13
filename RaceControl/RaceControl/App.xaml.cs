@@ -60,7 +60,8 @@ namespace RaceControl
         {
             InitializeLogging();
 
-            Master.RegisterFFmpeg(":2");
+            var path = Path.Combine(Environment.CurrentDirectory, "FFmpeg");
+            Master.RegisterFFmpeg(path);
             Master.PreventAborts = true;
 
             base.Initialize();
