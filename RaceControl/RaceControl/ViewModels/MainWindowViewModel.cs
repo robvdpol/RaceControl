@@ -41,7 +41,7 @@ namespace RaceControl.ViewModels
 {
     // ReSharper disable UnusedMember.Global
     // ReSharper disable once UnusedType.Global
-    public class MainWindowViewModel : ViewModelBase
+    public class MainWindowViewModel : ViewModelBase, ICloseWindow
     {
         private readonly IExtendedDialogService _dialogService;
         private readonly IEventAggregator _eventAggregator;
@@ -55,6 +55,8 @@ namespace RaceControl.ViewModels
 
         private ICommand _loadedCommand;
         private ICommand _closingCommand;
+        private ICommand _closeCommand;
+        private ICommand _openLogFileCommand;
         private ICommand _mouseMoveCommand;
         private ICommand _previewKeyDownCommand;
         private ICommand _keyDownCommand;
@@ -136,6 +138,8 @@ namespace RaceControl.ViewModels
 
         public ICommand LoadedCommand => _loadedCommand ??= new DelegateCommand<RoutedEventArgs>(LoadedExecute);
         public ICommand ClosingCommand => _closingCommand ??= new DelegateCommand(ClosingExecute);
+        public ICommand CloseCommand => _closeCommand ??= new DelegateCommand(CloseExecute);
+        public ICommand OpenLogFileCommand => _openLogFileCommand ??= new DelegateCommand(OpenLogFileExecute);
         public ICommand MouseMoveCommand => _mouseMoveCommand ??= new DelegateCommand(MouseMoveExecute);
         public ICommand PreviewKeyDownCommand => _previewKeyDownCommand ??= new DelegateCommand<KeyEventArgs>(PreviewKeyDownExecute);
         public ICommand KeyDownCommand => _keyDownCommand ??= new DelegateCommand<KeyEventArgs>(KeyDownExecute);
@@ -159,6 +163,8 @@ namespace RaceControl.ViewModels
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand(AudioTrackSelectionChangedExecute);
         public ICommand LogOutCommand => _logOutCommand ??= new DelegateCommand(LogOutExecute);
         public ICommand RequestNavigateCommand => _requestNavigateCommand ??= new DelegateCommand<RequestNavigateEventArgs>(RequestNavigateExecute);
+
+        public Action Close { get; set; }
 
         public ISettings Settings { get; }
 
@@ -315,6 +321,17 @@ namespace RaceControl.ViewModels
         {
             RemoveRefreshTimer();
             Settings.Save();
+        }
+
+        private void CloseExecute()
+        {
+            Close?.Invoke();
+        }
+
+        private static void OpenLogFileExecute()
+        {
+            using var process = ProcessUtils.CreateProcess(FolderUtils.GetLogFilePath(), string.Empty, true);
+            process.Start();
         }
 
         private static void MouseMoveExecute()

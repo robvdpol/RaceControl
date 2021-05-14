@@ -1,5 +1,6 @@
 ﻿using RaceControl.Common.Utils;
 using RaceControl.Core.Helpers;
+using RaceControl.Core.Mvvm;
 using System;
 using System.Windows;
 using System.Windows.Forms;
@@ -23,6 +24,16 @@ namespace RaceControl.Views
         }
 
         private void MainWindowLoaded(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is ICloseWindow vm)
+            {
+                vm.Close += Close;
+            }
+
+            SetWindowsPositionAndSize();
+        }
+
+        private void SetWindowsPositionAndSize()
         {
             var screen = Screen.FromHandle(new WindowInteropHelper(this).Handle);
             var screenScale = ScreenHelper.GetScreenScale();

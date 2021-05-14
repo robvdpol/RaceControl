@@ -19,5 +19,10 @@ namespace RaceControl.Common.Utils
         {
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RaceControl");
         }
+
+        public static string GetLogFilePath()
+        {
+            return GetLocalApplicationDataFilename("RaceControl.log");
+        }
     }
 }

@@ -3,7 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:behaviors="clr-namespace:RaceControl.Core.Behaviors;assembly=RaceControl.Core"
-    xmlns:core="clr-namespace:RaceControl.Core.Converters;assembly=RaceControl.Core"
+    xmlns:converters="clr-namespace:RaceControl.Core.Converters;assembly=RaceControl.Core"
     xmlns:ctrls="clr-namespace:RaceControl.Core.Controls;assembly=RaceControl.Core"
     xmlns:enums="clr-namespace:RaceControl.Common.Enums;assembly=RaceControl.Common"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
@@ -16,9 +16,9 @@
     WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-        <core:InverseBooleanConverter x:Key="InverseBooleanConverter" />
-        <core:CollectionContainsConverter x:Key="CollectionContainsConverter" />
-        <core:DatePassedConverter x:Key="DatePassedConverter" />
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <converters:CollectionContainsConverter x:Key="CollectionContainsConverter" />
+        <converters:DatePassedConverter x:Key="DatePassedConverter" />
         <Style x:Key="HeaderLabelStyle" TargetType="Label">
             <Setter Property="Margin" Value="2" />
             <Setter Property="Height" Value="28" />
@@ -78,169 +78,588 @@
             <i:InvokeCommandAction Command="{Binding KeyDownCommand}" PassEventArgsToCommand="True" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
-    <Grid IsHitTestVisible="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}">
-        <ctrls:BusyIndicator Panel.ZIndex="1000" Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}" />
-        <Grid Margin="2">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition
-                    Width="1*"
-                    MinWidth="250"
-                    MaxWidth="325" />
-                <ColumnDefinition Width="1*" />
-                <ColumnDefinition Width="3*" />
-            </Grid.ColumnDefinitions>
-            <Grid
-                Grid.Row="0"
-                Grid.RowSpan="2"
-                Grid.Column="0">
+    <DockPanel>
+        <Menu
+            Background="White"
+            DockPanel.Dock="Top"
+            IsMainMenu="True">
+            <MenuItem Header="_File">
+                <MenuItem Command="{Binding OpenLogFileCommand}" Header="Open _log file" />
+                <Separator />
+                <MenuItem Command="{Binding CloseCommand}" Header="_Exit" />
+            </MenuItem>
+        </Menu>
+        <Grid IsHitTestVisible="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}">
+            <ctrls:BusyIndicator Panel.ZIndex="1000" Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}" />
+            <Grid Margin="2">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="2*" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Label
-                    Grid.Row="0"
-                    Grid.Column="0"
-                    Content="Race Seasons"
-                    Style="{StaticResource HeaderLabelStyle}" />
-                <ListBox
-                    Grid.Row="1"
-                    Grid.Column="0"
-                    ItemsSource="{Binding Seasons}"
-                    SelectedItem="{Binding SelectedSeason}"
-                    Style="{StaticResource ContentListBoxStyle}">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="SelectionChanged">
-                            <i:InvokeCommandAction Command="{Binding SeasonSelectionChangedCommand}" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </ListBox>
-                <Label
-                    Grid.Row="2"
-                    Grid.Column="0"
-                    Content="Series"
-                    Style="{StaticResource HeaderLabelStyle}" />
-                <ListBox
-                    Grid.Row="3"
-                    Grid.Column="0"
-                    ItemsSource="{Binding Series}"
-                    Style="{StaticResource ContentListBoxStyle}">
-                    <ListBox.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem">
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                            <Setter Property="Focusable" Value="False" />
-                        </Style>
-                    </ListBox.ItemContainerStyle>
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <CheckBox Content="{Binding}" Tag="{Binding UID}">
-                                <i:Interaction.Behaviors>
-                                    <behaviors:CheckBoxMultiSelectBehavior SelectedItems="{Binding DataContext.Settings.SelectedSeries, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" />
-                                </i:Interaction.Behaviors>
-                            </CheckBox>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </Grid>
-            <Label
-                Grid.Row="0"
-                Grid.Column="1"
-                Content="Events"
-                Style="{StaticResource HeaderLabelStyle}" />
-            <ListBox
-                Grid.Row="1"
-                Grid.Column="1"
-                ItemsSource="{Binding Events}"
-                SelectedItem="{Binding SelectedEvent}"
-                Style="{StaticResource ContentListBoxStyle}">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="SelectionChanged">
-                        <i:InvokeCommandAction Command="{Binding EventSelectionChangedCommand}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem">
-                        <Setter Property="Visibility" Value="Collapsed" />
-                        <Style.Triggers>
-                            <DataTrigger Value="True">
-                                <DataTrigger.Binding>
-                                    <Binding Converter="{StaticResource DatePassedConverter}" Path="StartDate">
-                                        <Binding.ConverterParameter>
-                                            <sys:Int32>-3</sys:Int32>
-                                        </Binding.ConverterParameter>
-                                    </Binding>
-                                </DataTrigger.Binding>
-                                <Setter Property="Visibility" Value="Visible" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </ListBox.ItemContainerStyle>
-            </ListBox>
-            <Grid
-                Grid.Row="0"
-                Grid.RowSpan="2"
-                Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="48" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*" />
-                    <ColumnDefinition Width="5*" />
+                    <ColumnDefinition
+                        Width="1*"
+                        MinWidth="250"
+                        MaxWidth="325" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="3*" />
                 </Grid.ColumnDefinitions>
+                <Grid
+                    Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="2*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Label
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Content="Race Seasons"
+                        Style="{StaticResource HeaderLabelStyle}" />
+                    <ListBox
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        ItemsSource="{Binding Seasons}"
+                        SelectedItem="{Binding SelectedSeason}"
+                        Style="{StaticResource ContentListBoxStyle}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="SelectionChanged">
+                                <i:InvokeCommandAction Command="{Binding SeasonSelectionChangedCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ListBox>
+                    <Label
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Content="Series"
+                        Style="{StaticResource HeaderLabelStyle}" />
+                    <ListBox
+                        Grid.Row="3"
+                        Grid.Column="0"
+                        ItemsSource="{Binding Series}"
+                        Style="{StaticResource ContentListBoxStyle}">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="Focusable" Value="False" />
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox Content="{Binding}" Tag="{Binding UID}">
+                                    <i:Interaction.Behaviors>
+                                        <behaviors:CheckBoxMultiSelectBehavior SelectedItems="{Binding DataContext.Settings.SelectedSeries, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" />
+                                    </i:Interaction.Behaviors>
+                                </CheckBox>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
                 <Label
                     Grid.Row="0"
-                    Grid.Column="0"
-                    Grid.ColumnSpan="2"
-                    Content="Live Now">
-                    <Label.Style>
-                        <Style BasedOn="{StaticResource HeaderLabelStyle}" TargetType="Label">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding HasItems, ElementName=LvLiveSessions}" Value="True">
-                                    <Setter Property="Background" Value="LightGreen" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Label.Style>
-                </Label>
+                    Grid.Column="1"
+                    Content="Events"
+                    Style="{StaticResource HeaderLabelStyle}" />
                 <ListBox
-                    x:Name="LvLiveSessions"
                     Grid.Row="1"
-                    Grid.Column="0"
-                    Grid.ColumnSpan="2"
-                    DisplayMemberPath="LongName"
-                    ItemsSource="{Binding LiveSessions}"
-                    ScrollViewer.HorizontalScrollBarVisibility="Hidden"
-                    SelectedItem="{Binding SelectedLiveSession}"
+                    Grid.Column="1"
+                    ItemsSource="{Binding Events}"
+                    SelectedItem="{Binding SelectedEvent}"
                     Style="{StaticResource ContentListBoxStyle}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="SelectionChanged">
-                            <i:InvokeCommandAction Command="{Binding LiveSessionSelectionChangedCommand}" />
+                            <i:InvokeCommandAction Command="{Binding EventSelectionChangedCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Value="True">
+                                    <DataTrigger.Binding>
+                                        <Binding Converter="{StaticResource DatePassedConverter}" Path="StartDate">
+                                            <Binding.ConverterParameter>
+                                                <sys:Int32>-3</sys:Int32>
+                                            </Binding.ConverterParameter>
+                                        </Binding>
+                                    </DataTrigger.Binding>
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+                <Grid
+                    Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Grid.Column="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="48" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="5*" />
+                    </Grid.ColumnDefinitions>
+                    <Label
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2"
+                        Content="Live Now">
+                        <Label.Style>
+                            <Style BasedOn="{StaticResource HeaderLabelStyle}" TargetType="Label">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HasItems, ElementName=LvLiveSessions}" Value="True">
+                                        <Setter Property="Background" Value="LightGreen" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Label.Style>
+                    </Label>
+                    <ListBox
+                        x:Name="LvLiveSessions"
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2"
+                        DisplayMemberPath="LongName"
+                        ItemsSource="{Binding LiveSessions}"
+                        ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                        SelectedItem="{Binding SelectedLiveSession}"
+                        Style="{StaticResource ContentListBoxStyle}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="SelectionChanged">
+                                <i:InvokeCommandAction Command="{Binding LiveSessionSelectionChangedCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ListBox>
+                    <Label
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Content="Sessions"
+                        Style="{StaticResource HeaderLabelStyle}" />
+                    <ListBox
+                        Grid.Row="3"
+                        Grid.Column="0"
+                        ItemsSource="{Binding Sessions}"
+                        SelectedItem="{Binding SelectedSession}"
+                        Style="{StaticResource ContentListBoxStyle}">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="ToolTip">
+                                    <Setter.Value>
+                                        <ToolTip Placement="Left">
+                                            <ToolTip.Style>
+                                                <Style TargetType="ToolTip">
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate TargetType="ToolTip">
+                                                                <ContentPresenter />
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Style>
+                                            </ToolTip.Style>
+                                            <ToolTip.Triggers>
+                                                <EventTrigger RoutedEvent="ToolTip.Opened">
+                                                    <BeginStoryboard>
+                                                        <Storyboard TargetProperty="Opacity">
+                                                            <DoubleAnimation
+                                                                From="0.0"
+                                                                To="1.0"
+                                                                Duration="0:0:0.75" />
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger>
+                                            </ToolTip.Triggers>
+                                            <Image
+                                                Width="354"
+                                                RenderOptions.BitmapScalingMode="HighQuality"
+                                                Source="{Binding ThumbnailUrl, TargetNullValue={x:Null}}" />
+                                        </ToolTip>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsLive}" Value="True">
+                                        <Setter Property="Background" Value="LightGreen" />
+                                    </DataTrigger>
+                                    <DataTrigger Value="True">
+                                        <DataTrigger.Binding>
+                                            <MultiBinding Converter="{StaticResource CollectionContainsConverter}">
+                                                <Binding Path="SeriesUID" />
+                                                <Binding Path="DataContext.Settings.SelectedSeries" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Window}" />
+                                                <!--  Needed to trigger converter  -->
+                                                <Binding Path="DataContext.Settings.SelectedSeries.Count" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Window}" />
+                                            </MultiBinding>
+                                        </DataTrigger.Binding>
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="SelectionChanged">
+                                <i:InvokeCommandAction Command="{Binding SessionSelectionChangedCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ListBox>
+                    <Label
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        Content="Channels"
+                        Style="{StaticResource HeaderLabelStyle}" />
+                    <ListBox
+                        Grid.Row="3"
+                        Grid.Column="1"
+                        HorizontalContentAlignment="Stretch"
+                        ItemsSource="{Binding Channels}"
+                        ScrollViewer.VerticalScrollBarVisibility="Visible"
+                        Style="{StaticResource ContentListBoxStyle}">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Focusable" Value="False" />
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="{Binding}" />
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                        <Button
+                                            Width="70"
+                                            Margin="2,0"
+                                            Command="{Binding DataContext.DownloadContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                            CommandParameter="{Binding}"
+                                            Content="Download"
+                                            ToolTip="Download copy to file system"
+                                            Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                        <Button
+                                            Width="50"
+                                            Margin="2,0"
+                                            Command="{Binding DataContext.CopyContentUrlCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                            CommandParameter="{Binding}"
+                                            Content="Copy"
+                                            ToolTip="Copy URL to clipboard" />
+                                        <Button
+                                            Width="50"
+                                            Margin="2,0"
+                                            Command="{Binding DataContext.CastContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                            CommandParameter="{Binding}"
+                                            Content="Cast"
+                                            ToolTip="Cast to selected Chromecast device"
+                                            Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                        <Button
+                                            Width="60"
+                                            Margin="2,0"
+                                            Command="{Binding DataContext.WatchContentInMpcCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                            CommandParameter="{Binding}"
+                                            Content="MPC-HC"
+                                            ToolTip="Watch with MPC-HC"
+                                            Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                        <Button
+                                            Width="50"
+                                            Margin="2,0"
+                                            Command="{Binding DataContext.WatchContentInMpvCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                            CommandParameter="{Binding}"
+                                            Content="MPV"
+                                            ToolTip="Watch with MPV" />
+                                        <Button
+                                            Width="50"
+                                            Margin="2,0"
+                                            Command="{Binding DataContext.WatchContentInVlcCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                            CommandParameter="{Binding}"
+                                            Content="VLC"
+                                            ToolTip="Watch with VLC media player"
+                                            Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                        <Button
+                                            Width="50"
+                                            Margin="2,0,0,0"
+                                            Command="{Binding DataContext.WatchContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                            CommandParameter="{Binding}"
+                                            Content="Watch"
+                                            ToolTip="Watch with internal player" />
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+                <Label
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    Content="Options"
+                    Style="{StaticResource HeaderLabelStyle}" />
+                <Border
+                    Grid.Row="3"
+                    Grid.Column="0"
+                    Style="{StaticResource OptionBorderStyle}">
+                    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <GroupBox
+                                Grid.Row="0"
+                                Margin="5,3"
+                                Header="Settings">
+                                <StackPanel Orientation="Vertical">
+                                    <TextBlock Margin="3" Text="Default audio language:" />
+                                    <ComboBox
+                                        Margin="3"
+                                        DisplayMemberPath="Value"
+                                        ItemsSource="{Binding AudioLanguages}"
+                                        SelectedValue="{Binding Settings.DefaultAudioLanguage}"
+                                        SelectedValuePath="Key" />
+                                    <CheckBox
+                                        Margin="3"
+                                        Content="Disable MPV borderless mode"
+                                        IsChecked="{Binding Settings.DisableMpvNoBorder}" />
+                                    <TextBlock Margin="3" Text="Additional MPV parameters:" />
+                                    <TextBox
+                                        Height="22"
+                                        Margin="3,1"
+                                        VerticalContentAlignment="Center"
+                                        MaxLength="200"
+                                        Text="{Binding Settings.AdditionalMpvParameters, UpdateSourceTrigger=PropertyChanged}" />
+                                </StackPanel>
+                            </GroupBox>
+                            <GroupBox
+                                Grid.Row="1"
+                                Margin="5,3"
+                                Header="Video player layout">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Button
+                                        Grid.Row="0"
+                                        Grid.Column="0"
+                                        Command="{Binding SaveVideoDialogLayoutCommand}"
+                                        Content="Save layout"
+                                        Style="{StaticResource OptionButtonStyle}"
+                                        ToolTip="Saves the position and size of all currently open video players (Ctrl+S)" />
+                                    <Button
+                                        Grid.Row="0"
+                                        Grid.Column="1"
+                                        Command="{Binding ImportVideoDialogLayoutCommand}"
+                                        Content="Import layout"
+                                        Style="{StaticResource OptionButtonStyle}"
+                                        ToolTip="Import a saved layout from file" />
+                                    <Button
+                                        Grid.Row="1"
+                                        Grid.Column="0"
+                                        Command="{Binding OpenVideoDialogLayoutCommand}"
+                                        CommandParameter="{x:Static enums:PlayerType.Internal}"
+                                        Content="Open internal"
+                                        Style="{StaticResource OptionButtonStyle}"
+                                        ToolTip="Watch the selected session in the previously saved layout using the internal player (Ctrl+I)" />
+                                    <Button
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        Command="{Binding OpenVideoDialogLayoutCommand}"
+                                        CommandParameter="{x:Static enums:PlayerType.Mpv}"
+                                        Content="Open in MPV"
+                                        Style="{StaticResource OptionButtonStyle}"
+                                        ToolTip="Watch the selected session in the previously saved layout using MPV (Ctrl+M)" />
+                                </Grid>
+                            </GroupBox>
+                            <GroupBox
+                                Grid.Row="2"
+                                Margin="5,3"
+                                Header="Chromecast">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock
+                                        Grid.Row="0"
+                                        Grid.Column="0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Text="Interface:" />
+                                    <ComboBox
+                                        Grid.Row="0"
+                                        Grid.Column="1"
+                                        Margin="3"
+                                        DisplayMemberPath="Description"
+                                        IsEnabled="{Binding HasItems, RelativeSource={RelativeSource Self}}"
+                                        ItemsSource="{Binding NetworkInterfaces}"
+                                        SelectedItem="{Binding SelectedNetworkInterface}" />
+                                    <Button
+                                        Grid.Row="1"
+                                        Grid.Column="0"
+                                        Command="{Binding ScanReceiversCommand}"
+                                        Content="Scan"
+                                        Style="{StaticResource OptionButtonStyle}"
+                                        ToolTip="Scan for Chromecast devices in local network" />
+                                    <ComboBox
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        Margin="3"
+                                        DisplayMemberPath="FriendlyName"
+                                        IsEnabled="{Binding HasItems, RelativeSource={RelativeSource Self}}"
+                                        ItemsSource="{Binding Receivers}"
+                                        SelectedItem="{Binding SelectedReceiver}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="SelectionChanged">
+                                                <i:InvokeCommandAction Command="{Binding ReceiverSelectionChangedCommand}" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </ComboBox>
+                                    <TextBlock
+                                        Grid.Row="2"
+                                        Grid.Column="0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Text="Audio:" />
+                                    <ComboBox
+                                        Grid.Row="2"
+                                        Grid.Column="1"
+                                        Margin="3"
+                                        DisplayMemberPath="Name"
+                                        IsEnabled="{Binding HasItems, RelativeSource={RelativeSource Self}}"
+                                        ItemsSource="{Binding AudioTracks}"
+                                        SelectedItem="{Binding SelectedAudioTrack}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="SelectionChanged">
+                                                <i:InvokeCommandAction Command="{Binding AudioTrackSelectionChangedCommand}" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </ComboBox>
+                                </Grid>
+                            </GroupBox>
+                            <GroupBox
+                                Grid.Row="3"
+                                Margin="5,3"
+                                Header="Account">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Margin="3">
+                                        <Run Text="Subscription status:" />
+                                        <Run Text="{Binding SubscriptionStatus}" />
+                                    </TextBlock>
+                                    <Button
+                                        Grid.Row="1"
+                                        Command="{Binding LogOutCommand}"
+                                        Content="Log out"
+                                        Style="{StaticResource OptionButtonStyle}" />
+                                </Grid>
+                            </GroupBox>
+                            <StackPanel
+                                Grid.Row="4"
+                                Margin="8,3"
+                                Orientation="Vertical">
+                                <TextBlock>
+                                    <Run>Found a bug?</Run>
+                                    <Hyperlink NavigateUri="https://github.com/robvdpol/RaceControl/issues">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="RequestNavigate">
+                                                <i:InvokeCommandAction Command="{Binding RequestNavigateCommand}" PassEventArgsToCommand="True" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                        Click here
+                                    </Hyperlink>
+                                    <Run>to report it.</Run>
+                                </TextBlock>
+                                <TextBlock>
+                                    <Run>Like this app?</Run>
+                                    <Hyperlink NavigateUri="https://github.com/sponsors/robvdpol">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="RequestNavigate">
+                                                <i:InvokeCommandAction Command="{Binding RequestNavigateCommand}" PassEventArgsToCommand="True" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                        Click here
+                                    </Hyperlink>
+                                    <Run>to support me.</Run>
+                                </TextBlock>
+                            </StackPanel>
+                        </Grid>
+                    </ScrollViewer>
+                </Border>
+                <Label
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    Content="Archive"
+                    Style="{StaticResource HeaderLabelStyle}" />
+                <ListBox
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    ItemsSource="{Binding VodGenres}"
+                    SelectedItem="{Binding SelectedVodGenre}"
+                    Style="{StaticResource ContentListBoxStyle}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SelectionChanged">
+                            <i:InvokeCommandAction Command="{Binding VodGenreSelectionChangedCommand}" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </ListBox>
                 <Label
                     Grid.Row="2"
-                    Grid.Column="0"
-                    Content="Sessions"
-                    Style="{StaticResource HeaderLabelStyle}" />
+                    Grid.Column="2"
+                    HorizontalContentAlignment="Stretch"
+                    Style="{StaticResource HeaderLabelStyle}">
+                    <Label.Content>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Text="Episodes" />
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <TextBlock VerticalAlignment="Center" Text="Filter: " />
+                                <TextBox
+                                    Width="250"
+                                    Height="22"
+                                    VerticalContentAlignment="Center"
+                                    MaxLength="200"
+                                    Text="{Binding EpisodeFilterText, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                        </Grid>
+                    </Label.Content>
+                </Label>
                 <ListBox
                     Grid.Row="3"
-                    Grid.Column="0"
-                    ItemsSource="{Binding Sessions}"
-                    SelectedItem="{Binding SelectedSession}"
+                    Grid.Column="2"
+                    HorizontalContentAlignment="Stretch"
+                    ItemsSource="{Binding EpisodesView}"
+                    ScrollViewer.VerticalScrollBarVisibility="Visible"
                     Style="{StaticResource ContentListBoxStyle}">
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
+                            <Setter Property="Focusable" Value="False" />
                             <Setter Property="ToolTip">
                                 <Setter.Value>
                                     <ToolTip Placement="Left">
@@ -268,7 +687,7 @@
                                             </EventTrigger>
                                         </ToolTip.Triggers>
                                         <Image
-                                            Width="354"
+                                            Width="400"
                                             RenderOptions.BitmapScalingMode="HighQuality"
                                             Source="{Binding ThumbnailUrl, TargetNullValue={x:Null}}" />
                                     </ToolTip>
@@ -276,9 +695,6 @@
                             </Setter>
                             <Setter Property="Visibility" Value="Collapsed" />
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsLive}" Value="True">
-                                    <Setter Property="Background" Value="LightGreen" />
-                                </DataTrigger>
                                 <DataTrigger Value="True">
                                     <DataTrigger.Binding>
                                         <MultiBinding Converter="{StaticResource CollectionContainsConverter}">
@@ -291,29 +707,6 @@
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                             </Style.Triggers>
-                        </Style>
-                    </ListBox.ItemContainerStyle>
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="SelectionChanged">
-                            <i:InvokeCommandAction Command="{Binding SessionSelectionChangedCommand}" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </ListBox>
-                <Label
-                    Grid.Row="2"
-                    Grid.Column="1"
-                    Content="Channels"
-                    Style="{StaticResource HeaderLabelStyle}" />
-                <ListBox
-                    Grid.Row="3"
-                    Grid.Column="1"
-                    HorizontalContentAlignment="Stretch"
-                    ItemsSource="{Binding Channels}"
-                    ScrollViewer.VerticalScrollBarVisibility="Visible"
-                    Style="{StaticResource ContentListBoxStyle}">
-                    <ListBox.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem">
-                            <Setter Property="Focusable" Value="False" />
                         </Style>
                     </ListBox.ItemContainerStyle>
                     <ListBox.ItemTemplate>
@@ -384,387 +777,6 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
             </Grid>
-            <Label
-                Grid.Row="2"
-                Grid.Column="0"
-                Content="Options"
-                Style="{StaticResource HeaderLabelStyle}" />
-            <Border
-                Grid.Row="3"
-                Grid.Column="0"
-                Style="{StaticResource OptionBorderStyle}">
-                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <GroupBox
-                            Grid.Row="0"
-                            Margin="5,3"
-                            Header="Settings">
-                            <StackPanel Orientation="Vertical">
-                                <TextBlock Margin="3" Text="Default audio language:" />
-                                <ComboBox
-                                    Margin="3"
-                                    DisplayMemberPath="Value"
-                                    ItemsSource="{Binding AudioLanguages}"
-                                    SelectedValue="{Binding Settings.DefaultAudioLanguage}"
-                                    SelectedValuePath="Key" />
-                                <CheckBox
-                                    Margin="3"
-                                    Content="Disable MPV borderless mode"
-                                    IsChecked="{Binding Settings.DisableMpvNoBorder}" />
-                                <TextBlock Margin="3" Text="Additional MPV parameters:" />
-                                <TextBox
-                                    Height="22"
-                                    Margin="3,1"
-                                    VerticalContentAlignment="Center"
-                                    MaxLength="200"
-                                    Text="{Binding Settings.AdditionalMpvParameters, UpdateSourceTrigger=PropertyChanged}" />
-                            </StackPanel>
-                        </GroupBox>
-                        <GroupBox
-                            Grid.Row="1"
-                            Margin="5,3"
-                            Header="Video player layout">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition />
-                                    <RowDefinition />
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <Button
-                                    Grid.Row="0"
-                                    Grid.Column="0"
-                                    Command="{Binding SaveVideoDialogLayoutCommand}"
-                                    Content="Save layout"
-                                    Style="{StaticResource OptionButtonStyle}"
-                                    ToolTip="Saves the position and size of all currently open video players (Ctrl+S)" />
-                                <Button
-                                    Grid.Row="0"
-                                    Grid.Column="1"
-                                    Command="{Binding ImportVideoDialogLayoutCommand}"
-                                    Content="Import layout"
-                                    Style="{StaticResource OptionButtonStyle}"
-                                    ToolTip="Import a saved layout from file" />
-                                <Button
-                                    Grid.Row="1"
-                                    Grid.Column="0"
-                                    Command="{Binding OpenVideoDialogLayoutCommand}"
-                                    CommandParameter="{x:Static enums:PlayerType.Internal}"
-                                    Content="Open internal"
-                                    Style="{StaticResource OptionButtonStyle}"
-                                    ToolTip="Watch the selected session in the previously saved layout using the internal player (Ctrl+I)" />
-                                <Button
-                                    Grid.Row="1"
-                                    Grid.Column="1"
-                                    Command="{Binding OpenVideoDialogLayoutCommand}"
-                                    CommandParameter="{x:Static enums:PlayerType.Mpv}"
-                                    Content="Open in MPV"
-                                    Style="{StaticResource OptionButtonStyle}"
-                                    ToolTip="Watch the selected session in the previously saved layout using MPV (Ctrl+M)" />
-                            </Grid>
-                        </GroupBox>
-                        <GroupBox
-                            Grid.Row="2"
-                            Margin="5,3"
-                            Header="Chromecast">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="50" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition />
-                                    <RowDefinition />
-                                    <RowDefinition />
-                                </Grid.RowDefinitions>
-                                <TextBlock
-                                    Grid.Row="0"
-                                    Grid.Column="0"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    Text="Interface:" />
-                                <ComboBox
-                                    Grid.Row="0"
-                                    Grid.Column="1"
-                                    Margin="3"
-                                    DisplayMemberPath="Description"
-                                    IsEnabled="{Binding HasItems, RelativeSource={RelativeSource Self}}"
-                                    ItemsSource="{Binding NetworkInterfaces}"
-                                    SelectedItem="{Binding SelectedNetworkInterface}" />
-                                <Button
-                                    Grid.Row="1"
-                                    Grid.Column="0"
-                                    Command="{Binding ScanReceiversCommand}"
-                                    Content="Scan"
-                                    Style="{StaticResource OptionButtonStyle}"
-                                    ToolTip="Scan for Chromecast devices in local network" />
-                                <ComboBox
-                                    Grid.Row="1"
-                                    Grid.Column="1"
-                                    Margin="3"
-                                    DisplayMemberPath="FriendlyName"
-                                    IsEnabled="{Binding HasItems, RelativeSource={RelativeSource Self}}"
-                                    ItemsSource="{Binding Receivers}"
-                                    SelectedItem="{Binding SelectedReceiver}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="SelectionChanged">
-                                            <i:InvokeCommandAction Command="{Binding ReceiverSelectionChangedCommand}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </ComboBox>
-                                <TextBlock
-                                    Grid.Row="2"
-                                    Grid.Column="0"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    Text="Audio:" />
-                                <ComboBox
-                                    Grid.Row="2"
-                                    Grid.Column="1"
-                                    Margin="3"
-                                    DisplayMemberPath="Name"
-                                    IsEnabled="{Binding HasItems, RelativeSource={RelativeSource Self}}"
-                                    ItemsSource="{Binding AudioTracks}"
-                                    SelectedItem="{Binding SelectedAudioTrack}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="SelectionChanged">
-                                            <i:InvokeCommandAction Command="{Binding AudioTrackSelectionChangedCommand}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </ComboBox>
-                            </Grid>
-                        </GroupBox>
-                        <GroupBox
-                            Grid.Row="3"
-                            Margin="5,3"
-                            Header="Account">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition />
-                                    <RowDefinition />
-                                </Grid.RowDefinitions>
-                                <TextBlock Grid.Row="0" Margin="3">
-                                    <Run Text="Subscription status:" />
-                                    <Run Text="{Binding SubscriptionStatus}" />
-                                </TextBlock>
-                                <Button
-                                    Grid.Row="1"
-                                    Command="{Binding LogOutCommand}"
-                                    Content="Log out"
-                                    Style="{StaticResource OptionButtonStyle}" />
-                            </Grid>
-                        </GroupBox>
-                        <StackPanel
-                            Grid.Row="4"
-                            Margin="8,3"
-                            Orientation="Vertical">
-                            <TextBlock>
-                                <Run>Found a bug?</Run>
-                                <Hyperlink NavigateUri="https://github.com/robvdpol/RaceControl/issues">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="RequestNavigate">
-                                            <i:InvokeCommandAction Command="{Binding RequestNavigateCommand}" PassEventArgsToCommand="True" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                    Click here
-                                </Hyperlink>
-                                <Run>to report it.</Run>
-                            </TextBlock>
-                            <TextBlock>
-                                <Run>Like this app?</Run>
-                                <Hyperlink NavigateUri="https://github.com/sponsors/robvdpol">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="RequestNavigate">
-                                            <i:InvokeCommandAction Command="{Binding RequestNavigateCommand}" PassEventArgsToCommand="True" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                    Click here
-                                </Hyperlink>
-                                <Run>to support me.</Run>
-                            </TextBlock>
-                        </StackPanel>
-                    </Grid>
-                </ScrollViewer>
-            </Border>
-            <Label
-                Grid.Row="2"
-                Grid.Column="1"
-                Content="Archive"
-                Style="{StaticResource HeaderLabelStyle}" />
-            <ListBox
-                Grid.Row="3"
-                Grid.Column="1"
-                ItemsSource="{Binding VodGenres}"
-                SelectedItem="{Binding SelectedVodGenre}"
-                Style="{StaticResource ContentListBoxStyle}">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="SelectionChanged">
-                        <i:InvokeCommandAction Command="{Binding VodGenreSelectionChangedCommand}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </ListBox>
-            <Label
-                Grid.Row="2"
-                Grid.Column="2"
-                HorizontalContentAlignment="Stretch"
-                Style="{StaticResource HeaderLabelStyle}">
-                <Label.Content>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock
-                            Grid.Column="0"
-                            VerticalAlignment="Center"
-                            Text="Episodes" />
-                        <StackPanel Grid.Column="1" Orientation="Horizontal">
-                            <TextBlock VerticalAlignment="Center" Text="Filter: " />
-                            <TextBox
-                                Width="250"
-                                Height="22"
-                                VerticalContentAlignment="Center"
-                                MaxLength="200"
-                                Text="{Binding EpisodeFilterText, UpdateSourceTrigger=PropertyChanged}" />
-                        </StackPanel>
-                    </Grid>
-                </Label.Content>
-            </Label>
-            <ListBox
-                Grid.Row="3"
-                Grid.Column="2"
-                HorizontalContentAlignment="Stretch"
-                ItemsSource="{Binding EpisodesView}"
-                ScrollViewer.VerticalScrollBarVisibility="Visible"
-                Style="{StaticResource ContentListBoxStyle}">
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem">
-                        <Setter Property="Focusable" Value="False" />
-                        <Setter Property="ToolTip">
-                            <Setter.Value>
-                                <ToolTip Placement="Left">
-                                    <ToolTip.Style>
-                                        <Style TargetType="ToolTip">
-                                            <Setter Property="Template">
-                                                <Setter.Value>
-                                                    <ControlTemplate TargetType="ToolTip">
-                                                        <ContentPresenter />
-                                                    </ControlTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Style>
-                                    </ToolTip.Style>
-                                    <ToolTip.Triggers>
-                                        <EventTrigger RoutedEvent="ToolTip.Opened">
-                                            <BeginStoryboard>
-                                                <Storyboard TargetProperty="Opacity">
-                                                    <DoubleAnimation
-                                                        From="0.0"
-                                                        To="1.0"
-                                                        Duration="0:0:0.75" />
-                                                </Storyboard>
-                                            </BeginStoryboard>
-                                        </EventTrigger>
-                                    </ToolTip.Triggers>
-                                    <Image
-                                        Width="400"
-                                        RenderOptions.BitmapScalingMode="HighQuality"
-                                        Source="{Binding ThumbnailUrl, TargetNullValue={x:Null}}" />
-                                </ToolTip>
-                            </Setter.Value>
-                        </Setter>
-                        <Setter Property="Visibility" Value="Collapsed" />
-                        <Style.Triggers>
-                            <DataTrigger Value="True">
-                                <DataTrigger.Binding>
-                                    <MultiBinding Converter="{StaticResource CollectionContainsConverter}">
-                                        <Binding Path="SeriesUID" />
-                                        <Binding Path="DataContext.Settings.SelectedSeries" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Window}" />
-                                        <!--  Needed to trigger converter  -->
-                                        <Binding Path="DataContext.Settings.SelectedSeries.Count" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Window}" />
-                                    </MultiBinding>
-                                </DataTrigger.Binding>
-                                <Setter Property="Visibility" Value="Visible" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </ListBox.ItemContainerStyle>
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="{Binding}" />
-                            <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                <Button
-                                    Width="70"
-                                    Margin="2,0"
-                                    Command="{Binding DataContext.DownloadContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                                    CommandParameter="{Binding}"
-                                    Content="Download"
-                                    ToolTip="Download copy to file system"
-                                    Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                                <Button
-                                    Width="50"
-                                    Margin="2,0"
-                                    Command="{Binding DataContext.CopyContentUrlCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                                    CommandParameter="{Binding}"
-                                    Content="Copy"
-                                    ToolTip="Copy URL to clipboard" />
-                                <Button
-                                    Width="50"
-                                    Margin="2,0"
-                                    Command="{Binding DataContext.CastContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                                    CommandParameter="{Binding}"
-                                    Content="Cast"
-                                    ToolTip="Cast to selected Chromecast device"
-                                    Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                                <Button
-                                    Width="60"
-                                    Margin="2,0"
-                                    Command="{Binding DataContext.WatchContentInMpcCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                                    CommandParameter="{Binding}"
-                                    Content="MPC-HC"
-                                    ToolTip="Watch with MPC-HC"
-                                    Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                                <Button
-                                    Width="50"
-                                    Margin="2,0"
-                                    Command="{Binding DataContext.WatchContentInMpvCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                                    CommandParameter="{Binding}"
-                                    Content="MPV"
-                                    ToolTip="Watch with MPV" />
-                                <Button
-                                    Width="50"
-                                    Margin="2,0"
-                                    Command="{Binding DataContext.WatchContentInVlcCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                                    CommandParameter="{Binding}"
-                                    Content="VLC"
-                                    ToolTip="Watch with VLC media player"
-                                    Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                                <Button
-                                    Width="50"
-                                    Margin="2,0,0,0"
-                                    Command="{Binding DataContext.WatchContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
-                                    CommandParameter="{Binding}"
-                                    Content="Watch"
-                                    ToolTip="Watch with internal player" />
-                            </StackPanel>
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
         </Grid>
-    </Grid>
+    </DockPanel>
 </Window>
