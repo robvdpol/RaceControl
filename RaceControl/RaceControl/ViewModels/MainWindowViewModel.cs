@@ -1054,7 +1054,8 @@ namespace RaceControl.ViewModels
 
         private async Task OpenVideoDialogLayoutAsync(PlayerType? playerType)
         {
-            var delaySeconds = playerType == PlayerType.Mpv ? 2 : 1;
+            const int delaySeconds = 2;
+
             var delayTimeSpan = TimeSpan.FromSeconds(delaySeconds);
 
             foreach (var settings in VideoDialogLayout.Instances)
