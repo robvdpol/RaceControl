@@ -27,6 +27,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{C7167F0D-BC9F-4E6E-AFE1-012C56B48DB5}") = "RaceControl.Package", "RaceControl\RaceControl.Package\RaceControl.Package.wapproj", "{EA81E946-E298-4589-BB5E-86C6D9213FB7}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RaceControl.Libs", "RaceControl\RaceControl.Libs\RaceControl.Libs.csproj", "{12FE234F-CF0D-467C-B6D4-00B9B804A7CC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -89,6 +91,14 @@ Global
 		{EA81E946-E298-4589-BB5E-86C6D9213FB7}.Release|x86.ActiveCfg = Release|x86
 		{EA81E946-E298-4589-BB5E-86C6D9213FB7}.Release|x86.Build.0 = Release|x86
 		{EA81E946-E298-4589-BB5E-86C6D9213FB7}.Release|x86.Deploy.0 = Release|x86
+		{12FE234F-CF0D-467C-B6D4-00B9B804A7CC}.Debug|x64.ActiveCfg = Debug|x64
+		{12FE234F-CF0D-467C-B6D4-00B9B804A7CC}.Debug|x64.Build.0 = Debug|x64
+		{12FE234F-CF0D-467C-B6D4-00B9B804A7CC}.Debug|x86.ActiveCfg = Debug|x86
+		{12FE234F-CF0D-467C-B6D4-00B9B804A7CC}.Debug|x86.Build.0 = Debug|x86
+		{12FE234F-CF0D-467C-B6D4-00B9B804A7CC}.Release|x64.ActiveCfg = Release|x64
+		{12FE234F-CF0D-467C-B6D4-00B9B804A7CC}.Release|x64.Build.0 = Release|x64
+		{12FE234F-CF0D-467C-B6D4-00B9B804A7CC}.Release|x86.ActiveCfg = Release|x86
+		{12FE234F-CF0D-467C-B6D4-00B9B804A7CC}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

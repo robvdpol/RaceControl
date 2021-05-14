@@ -63,15 +63,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RaceControl.Core\RaceControl.Core.csproj" />
+    <ProjectReference Include="..\RaceControl.Libs\RaceControl.Libs.csproj" />
     <ProjectReference Include="..\Services\RaceControl.Services.Interfaces\RaceControl.Services.Interfaces.csproj" />
     <ProjectReference Include="..\Services\RaceControl.Services\RaceControl.Services.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\PublishProfiles\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="$(SolutionDir)Libs\$(PlatformName)\**\*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 </Project>
