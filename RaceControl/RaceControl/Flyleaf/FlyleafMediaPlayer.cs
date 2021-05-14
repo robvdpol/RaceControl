@@ -20,6 +20,7 @@ namespace RaceControl.Flyleaf
     {
         private readonly ILogger _logger;
 
+        private bool _isStarting;
         private bool _isStarted;
         private bool _isPlaying;
         private bool _isPaused;
@@ -47,6 +48,12 @@ namespace RaceControl.Flyleaf
         }
 
         public Player Player { get; }
+
+        public bool IsStarting
+        {
+            get => _isStarting;
+            private set => SetProperty(ref _isStarting, value);
+        }
 
         public bool IsStarted
         {
@@ -202,6 +209,8 @@ namespace RaceControl.Flyleaf
 
             Player.PropertyChanged += PlayerOnPropertyChanged;
 
+            IsStarting = true;
+
             if (settings.FullScreen)
             {
                 ToggleFullScreen();
@@ -310,6 +319,7 @@ namespace RaceControl.Flyleaf
 
                     if (IsPlaying)
                     {
+                        IsStarting = false;
                         IsStarted = true;
                     }
                 });

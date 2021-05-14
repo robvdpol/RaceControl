@@ -7,6 +7,8 @@ namespace RaceControl.Interfaces
 {
     public interface IMediaPlayer : IDisposable
     {
+        bool IsStarting { get; }
+
         bool IsStarted { get; }
 
         bool IsPlaying { get; }
