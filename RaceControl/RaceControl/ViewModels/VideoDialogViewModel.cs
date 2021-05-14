@@ -93,7 +93,7 @@ namespace RaceControl.ViewModels
         public ICommand TogglePauseAllCommand => _togglePauseAllCommand ??= new DelegateCommand(TogglePauseAllExecute);
         public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand<bool?>(ToggleMuteExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
         public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<int?>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => PlayableContent);
-        public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
+        public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => PlayableContent);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand<long?>(ToggleFullScreenExecute, CanToggleFullScreenExecute).ObservesProperty(() => MediaPlayer.IsStarting).ObservesProperty(() => MediaPlayer.IsStarted);
         public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => MediaPlayer.IsFullScreen);
         public ICommand ZoomCommand => _zoomCommand ??= new DelegateCommand<int?>(ZoomExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
@@ -299,6 +299,11 @@ namespace RaceControl.ViewModels
                 Logger.Info($"Fast forwarding stream {seconds.Value} seconds...");
                 MediaPlayer.Time += TimeSpan.FromSeconds(seconds.Value).Ticks;
             }
+        }
+
+        private bool CanSyncSessionExecute()
+        {
+            return MediaPlayer.IsStarted && !PlayableContent.IsLive;
         }
 
         private void SyncSessionExecute()
