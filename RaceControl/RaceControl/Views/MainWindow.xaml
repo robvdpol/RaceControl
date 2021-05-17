@@ -565,7 +565,7 @@
                                     </Grid.RowDefinitions>
                                     <TextBlock Grid.Row="0" Margin="3">
                                         <Run Text="Subscription status:" />
-                                        <Run Text="{Binding SubscriptionStatus}" />
+                                        <Run Text="{Binding Settings.SubscriptionStatus}" />
                                     </TextBlock>
                                     <Button
                                         Grid.Row="1"

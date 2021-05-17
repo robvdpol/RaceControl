@@ -81,8 +81,6 @@ namespace RaceControl.ViewModels
         private ICommand _logOutCommand;
         private ICommand _requestNavigateCommand;
 
-        private string _subscriptionToken;
-        private string _subscriptionStatus;
         private string _episodeFilterText;
         private string _vlcExeLocation;
         private string _mpvExeLocation;
@@ -181,18 +179,6 @@ namespace RaceControl.ViewModels
             { LanguageCodes.Dutch, "Dutch" },
             { LanguageCodes.Portuguese, "Portuguese" }
         };
-
-        public string SubscriptionToken
-        {
-            get => _subscriptionToken;
-            set => SetProperty(ref _subscriptionToken, value);
-        }
-
-        public string SubscriptionStatus
-        {
-            get => _subscriptionStatus;
-            set => SetProperty(ref _subscriptionStatus, value);
-        }
 
         public string EpisodeFilterText
         {
@@ -303,7 +289,7 @@ namespace RaceControl.ViewModels
             SetMpvExeLocation();
             SetMpcExeLocation();
 
-            if (Login())
+            if (Settings.HasValidSubscriptionToken() || Login())
             {
                 InitializeAsync().Await(() =>
                 {
@@ -696,8 +682,7 @@ namespace RaceControl.ViewModels
         private bool Login()
         {
             var success = false;
-            SubscriptionToken = null;
-            SubscriptionStatus = null;
+            Settings.ClearSubscriptionToken();
 
             _dialogService.ShowDialog(nameof(LoginDialog), null, dialogResult =>
             {
@@ -705,8 +690,9 @@ namespace RaceControl.ViewModels
 
                 if (success)
                 {
-                    SubscriptionToken = dialogResult.Parameters.GetValue<string>(ParameterNames.SubscriptionToken);
-                    SubscriptionStatus = dialogResult.Parameters.GetValue<string>(ParameterNames.SubscriptionStatus);
+                    var subscriptionToken = dialogResult.Parameters.GetValue<string>(ParameterNames.SubscriptionToken);
+                    var subscriptionStatus = dialogResult.Parameters.GetValue<string>(ParameterNames.SubscriptionStatus);
+                    Settings.UpdateSubscriptionToken(subscriptionToken, subscriptionStatus);
                 }
                 else
                 {
@@ -891,7 +877,6 @@ namespace RaceControl.ViewModels
             var identifier = _numberGenerator.GetNextNumber();
             var parameters = new DialogParameters
             {
-                { ParameterNames.SubscriptionToken, SubscriptionToken },
                 { ParameterNames.Identifier, identifier },
                 { ParameterNames.Content, playableContent },
                 { ParameterNames.Settings, settings }
@@ -902,7 +887,7 @@ namespace RaceControl.ViewModels
 
         private async Task WatchInVlcAsync(IPlayableContent playableContent)
         {
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, playableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(Settings.SubscriptionToken, playableContent);
             ValidateStreamUrl(streamUrl);
             using var process = ProcessUtils.CreateProcess(VlcExeLocation, $"\"{streamUrl}\" --meta-title=\"{playableContent.Title}\"");
             process.Start();
@@ -910,7 +895,7 @@ namespace RaceControl.ViewModels
 
         private async Task WatchInMpvAsync(IPlayableContent playableContent, VideoDialogSettings settings = null)
         {
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, playableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(Settings.SubscriptionToken, playableContent);
             ValidateStreamUrl(streamUrl);
 
             var arguments = new List<string>
@@ -992,7 +977,7 @@ namespace RaceControl.ViewModels
 
         private async Task WatchInMpcAsync(IPlayableContent playableContent)
         {
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, playableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(Settings.SubscriptionToken, playableContent);
             ValidateStreamUrl(streamUrl);
             using var process = ProcessUtils.CreateProcess(MpcExeLocation, $"\"{streamUrl}\"");
             process.Start();
@@ -1000,7 +985,7 @@ namespace RaceControl.ViewModels
 
         private async Task CastContentAsync(IReceiver receiver, IPlayableContent playableContent)
         {
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, playableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(Settings.SubscriptionToken, playableContent);
             ValidateStreamUrl(streamUrl);
             AudioTracks.Clear();
 
@@ -1029,7 +1014,7 @@ namespace RaceControl.ViewModels
 
         private async Task CopyUrlAsync(IPlayableContent playableContent)
         {
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(SubscriptionToken, playableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(Settings.SubscriptionToken, playableContent);
             ValidateStreamUrl(streamUrl);
             Clipboard.SetText(streamUrl);
         }
@@ -1043,7 +1028,6 @@ namespace RaceControl.ViewModels
             {
                 var parameters = new DialogParameters
                 {
-                    { ParameterNames.SubscriptionToken, SubscriptionToken },
                     { ParameterNames.Content, playableContent},
                     { ParameterNames.Filename, filename }
                 };

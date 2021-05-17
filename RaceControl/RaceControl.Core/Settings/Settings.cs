@@ -15,6 +15,9 @@ namespace RaceControl.Core.Settings
         private readonly ILogger _logger;
         private readonly JsonSerializer _serializer;
 
+        private string _subscriptionToken;
+        private string _subscriptionStatus;
+        private DateTime? _lastLogin;
         private string _defaultAudioLanguage;
         private bool _disableMpvNoBorder;
         private string _additionalMpvParameters;
@@ -25,6 +28,24 @@ namespace RaceControl.Core.Settings
         {
             _logger = logger;
             _serializer = serializer;
+        }
+
+        public string SubscriptionToken
+        {
+            get => _subscriptionToken;
+            set => SetProperty(ref _subscriptionToken, value);
+        }
+
+        public string SubscriptionStatus
+        {
+            get => _subscriptionStatus;
+            set => SetProperty(ref _subscriptionStatus, value);
+        }
+
+        public DateTime? LastLogin
+        {
+            get => _lastLogin;
+            set => SetProperty(ref _lastLogin, value);
         }
 
         public string DefaultAudioLanguage
@@ -90,6 +111,25 @@ namespace RaceControl.Core.Settings
             }
 
             _logger.Info("Settings saved.");
+        }
+
+        public void ClearSubscriptionToken()
+        {
+            SubscriptionToken = null;
+            SubscriptionStatus = null;
+            LastLogin = null;
+        }
+
+        public void UpdateSubscriptionToken(string subscriptionToken, string subscriptionStatus)
+        {
+            SubscriptionToken = subscriptionToken;
+            SubscriptionStatus = subscriptionStatus;
+            LastLogin = DateTime.UtcNow;
+        }
+
+        public bool HasValidSubscriptionToken()
+        {
+            return !string.IsNullOrWhiteSpace(SubscriptionToken) && LastLogin.HasValue && LastLogin.Value >= DateTime.UtcNow.AddDays(-7);
         }
     }
 }

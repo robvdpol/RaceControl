@@ -54,7 +54,6 @@ namespace RaceControl.ViewModels
         private ICommand _closeAllWindowsCommand;
         private ICommand _windowStateChangedCommand;
 
-        private string _subscriptionToken;
         private long _identifier;
         private IPlayableContent _playableContent;
         private VideoDialogSettings _dialogSettings;
@@ -151,7 +150,6 @@ namespace RaceControl.ViewModels
 
         public override void OnDialogOpened(IDialogParameters parameters)
         {
-            _subscriptionToken = parameters.GetValue<string>(ParameterNames.SubscriptionToken);
             _identifier = parameters.GetValue<long>(ParameterNames.Identifier);
             PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.Content);
 
@@ -506,7 +504,7 @@ namespace RaceControl.ViewModels
 
         private async Task StartStreamAsync()
         {
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(_subscriptionToken, PlayableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(_settings.SubscriptionToken, PlayableContent);
 
             if (string.IsNullOrWhiteSpace(streamUrl))
             {

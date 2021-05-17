@@ -3,6 +3,7 @@ using Prism.Services.Dialogs;
 using RaceControl.Common.Enums;
 using RaceControl.Common.Interfaces;
 using RaceControl.Core.Mvvm;
+using RaceControl.Core.Settings;
 using RaceControl.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
 using System;
@@ -12,13 +13,20 @@ namespace RaceControl.ViewModels
 {
     public class DownloadDialogViewModel : DialogViewModelBase
     {
+        private readonly ISettings _settings;
         private readonly IApiService _apiService;
 
         private IPlayableContent _playableContent;
         private string _filename;
 
-        public DownloadDialogViewModel(ILogger logger, IApiService apiService, IMediaDownloader mediaDownloader) : base(logger)
+        public DownloadDialogViewModel(
+            ILogger logger,
+            ISettings settings,
+            IApiService apiService,
+            IMediaDownloader mediaDownloader)
+            : base(logger)
         {
+            _settings = settings;
             _apiService = apiService;
             MediaDownloader = mediaDownloader;
         }
@@ -41,10 +49,9 @@ namespace RaceControl.ViewModels
 
         public override void OnDialogOpened(IDialogParameters parameters)
         {
-            var subscriptionToken = parameters.GetValue<string>(ParameterNames.SubscriptionToken);
             PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.Content);
             Filename = parameters.GetValue<string>(ParameterNames.Filename);
-            StartDownloadAsync(subscriptionToken).Await(DownloadStarted, DownloadFailed);
+            StartDownloadAsync().Await(DownloadStarted, DownloadFailed);
         }
 
         public override void OnDialogClosed()
@@ -53,9 +60,9 @@ namespace RaceControl.ViewModels
             MediaDownloader.Dispose();
         }
 
-        private async Task StartDownloadAsync(string subscriptionToken)
+        private async Task StartDownloadAsync()
         {
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(subscriptionToken, PlayableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(_settings.SubscriptionToken, PlayableContent);
             await MediaDownloader.StartDownloadAsync(streamUrl, Filename);
         }
 
