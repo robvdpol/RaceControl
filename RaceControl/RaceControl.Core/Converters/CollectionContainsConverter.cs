@@ -12,7 +12,7 @@ namespace RaceControl.Core.Converters
         {
             if (values[0] is string identifier && values[1] is ICollection collection)
             {
-                return collection.Cast<string>().Any(item => item == identifier);
+                return collection.Cast<string>().Any(item => item == identifier) || string.IsNullOrWhiteSpace(identifier);
             }
 
             return false;

@@ -181,13 +181,18 @@ namespace RaceControl.Services.F1TV
         {
             _logger.Info("Querying vod genres...");
 
-            var apiResponse = await QueryVodGenresAsync();
+            var showsResponse = await QueryPageAsync(410);
+            var documentariesResponse = await QueryPageAsync(413);
+            var archiveResponse = await QueryPageAsync(493);
 
-            return apiResponse.ResultObj.Containers
+            return showsResponse.ResultObj.Containers
+                .Union(documentariesResponse.ResultObj.Containers)
+                .Union(archiveResponse.ResultObj.Containers)
                 .Where(c => c.RetrieveItems.ResultObj.Containers != null)
                 .SelectMany(c1 => c1.RetrieveItems.ResultObj.Containers
                     .SelectMany(c2 => c2.Metadata.Genres))
                 .Distinct()
+                .OrderBy(g => g)
                 .ToList();
         }
 
@@ -278,12 +283,12 @@ namespace RaceControl.Services.F1TV
             return await restClient.GetAsync<ApiResponse>(restRequest);
         }
 
-        private async Task<ApiResponse> QueryVodGenresAsync()
+        private async Task<ApiResponse> QueryPageAsync(int page)
         {
             var restClient = _restClientFactory();
             restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
 
-            var restRequest = new RestRequest($"2.0/R/ENG/{DefaultStreamType}/ALL/PAGE/410/F1_TV_Pro_Annual/2", DataFormat.Json);
+            var restRequest = new RestRequest($"2.0/R/ENG/{DefaultStreamType}/ALL/PAGE/{page}/F1_TV_Pro_Annual/2", DataFormat.Json);
 
             return await restClient.GetAsync<ApiResponse>(restRequest);
         }
