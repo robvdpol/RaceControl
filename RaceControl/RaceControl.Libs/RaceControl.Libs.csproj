@@ -9,6 +9,9 @@
     <Content Include="$(SolutionDir)Libs\$(PlatformName)\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+	<Content Include="$(SolutionDir)Libs\Scripts\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

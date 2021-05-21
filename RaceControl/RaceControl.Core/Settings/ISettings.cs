@@ -15,6 +15,8 @@ namespace RaceControl.Core.Settings
 
         bool DisableMpvNoBorder { get; set; }
 
+        bool EnableMpvAutoSync { get; set; }
+
         string AdditionalMpvParameters { get; set; }
 
         string LatestRelease { get; set; }

@@ -429,6 +429,10 @@
                                         Margin="3"
                                         Content="Disable MPV borderless mode"
                                         IsChecked="{Binding Settings.DisableMpvNoBorder}" />
+                                    <CheckBox
+                                        Margin="3"
+                                        Content="Enable MPV auto sync (experimental)"
+                                        IsChecked="{Binding Settings.EnableMpvAutoSync}" />
                                     <TextBlock Margin="3" Text="Additional MPV parameters:" />
                                     <TextBox
                                         Height="22"

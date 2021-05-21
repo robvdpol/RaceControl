@@ -20,6 +20,7 @@ namespace RaceControl.Core.Settings
         private DateTime? _lastLogin;
         private string _defaultAudioLanguage;
         private bool _disableMpvNoBorder;
+        private bool _enableMpvAutoSync;
         private string _additionalMpvParameters;
         private string _latestRelease;
         private ObservableCollection<string> _selectedSeries;
@@ -58,6 +59,12 @@ namespace RaceControl.Core.Settings
         {
             get => _disableMpvNoBorder;
             set => SetProperty(ref _disableMpvNoBorder, value);
+        }
+
+        public bool EnableMpvAutoSync
+        {
+            get => _enableMpvAutoSync;
+            set => SetProperty(ref _enableMpvAutoSync, value);
         }
 
         public string AdditionalMpvParameters

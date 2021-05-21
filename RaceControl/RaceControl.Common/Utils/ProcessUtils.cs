@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
 
 namespace RaceControl.Common.Utils
 {
@@ -6,12 +8,15 @@ namespace RaceControl.Common.Utils
     {
         public static Process CreateProcess(string filename, string arguments, bool useShellExecute = false, bool createNoWindow = false, bool redirectOutput = false)
         {
+            var workingDirectory = Path.GetDirectoryName(filename) ?? Environment.CurrentDirectory;
+
             return new()
             {
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = filename,
                     Arguments = arguments,
+                    WorkingDirectory = workingDirectory,
                     UseShellExecute = useShellExecute,
                     CreateNoWindow = createNoWindow,
                     RedirectStandardOutput = redirectOutput,

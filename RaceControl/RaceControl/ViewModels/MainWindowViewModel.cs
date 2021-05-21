@@ -909,6 +909,11 @@ namespace RaceControl.ViewModels
                 arguments.Add("--no-border");
             }
 
+            if (Settings.EnableMpvAutoSync && playableContent.ContentType == ContentType.Channel && playableContent.IsLive)
+            {
+                arguments.Add("--script=autosync.lua");
+            }
+
             var hasAudioLanguage = false;
 
             if (!string.IsNullOrWhiteSpace(Settings.AdditionalMpvParameters))
