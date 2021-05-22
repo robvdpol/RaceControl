@@ -12,7 +12,6 @@ using RaceControl.Events;
 using RaceControl.Extensions;
 using RaceControl.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
-using RaceControl.Views;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -52,7 +51,6 @@ namespace RaceControl.ViewModels
         private ICommand _selectAudioDeviceCommand;
         private ICommand _closeVideoWindowCommand;
         private ICommand _closeAllWindowsCommand;
-        private ICommand _windowStateChangedCommand;
 
         private long _identifier;
         private IPlayableContent _playableContent;
@@ -93,14 +91,13 @@ namespace RaceControl.ViewModels
         public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand<bool?>(ToggleMuteExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
         public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<int?>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => PlayableContent);
         public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => PlayableContent);
-        public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand<long?>(ToggleFullScreenExecute, CanToggleFullScreenExecute).ObservesProperty(() => MediaPlayer.IsStarting).ObservesProperty(() => MediaPlayer.IsStarted);
-        public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => MediaPlayer.IsFullScreen);
+        public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand<long?>(ToggleFullScreenExecute);
+        public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => DialogSettings.FullScreen);
         public ICommand ZoomCommand => _zoomCommand ??= new DelegateCommand<int?>(ZoomExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
         public ICommand SelectAspectRatioCommand => _selectAspectRatioCommand ??= new DelegateCommand<IAspectRatio>(SelectAspectRatioExecute, CanSelectAspectRatioExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => MediaPlayer.AspectRatio);
         public ICommand SelectAudioDeviceCommand => _selectAudioDeviceCommand ??= new DelegateCommand<IAudioDevice>(SelectAudioDeviceExecute, CanSelectAudioDeviceExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => MediaPlayer.AudioDevice);
         public ICommand CloseVideoWindowCommand => _closeVideoWindowCommand ??= new DelegateCommand(RaiseRequestClose, CanCloseVideoWindowExecute).ObservesProperty(() => MediaPlayer.IsStarting).ObservesProperty(() => MediaPlayer.IsStarted);
         public ICommand CloseAllWindowsCommand => _closeAllWindowsCommand ??= new DelegateCommand(CloseAllWindowsExecute);
-        public ICommand WindowStateChangedCommand => _windowStateChangedCommand ??= new DelegateCommand<Window>(WindowStateChangedExecute);
 
         public IMediaPlayer MediaPlayer { get; }
 
@@ -343,27 +340,24 @@ namespace RaceControl.ViewModels
 
         private void OnToggleFullScreen(long identifier)
         {
-            if (ToggleFullScreenCommand.TryExecute() && MediaPlayer.IsFullScreen)
+            if (ToggleFullScreenCommand.TryExecute() && DialogSettings.FullScreen)
             {
                 _eventAggregator.GetEvent<MuteAllEvent>().Publish(identifier);
             }
-        }
-
-        private bool CanToggleFullScreenExecute(long? identifier)
-        {
-            return MediaPlayer.IsStarting || MediaPlayer.IsStarted;
         }
 
         private void ToggleFullScreenExecute(long? identifier)
         {
             if (identifier == null)
             {
-                if (!MediaPlayer.IsFullScreen)
+                if (!DialogSettings.FullScreen)
                 {
-                    DialogSettings.ResizeMode = ResizeMode.CanResize;
+                    SetFullScreen();
                 }
-
-                MediaPlayer.ToggleFullScreen();
+                else
+                {
+                    SetWindowed();
+                }
             }
             else
             {
@@ -373,7 +367,7 @@ namespace RaceControl.ViewModels
 
         private bool CanMoveToCornerExecute(WindowLocation? location)
         {
-            return !MediaPlayer.IsFullScreen && location != null;
+            return !DialogSettings.FullScreen && location != null;
         }
 
         private void MoveToCornerExecute(WindowLocation? location)
@@ -436,31 +430,11 @@ namespace RaceControl.ViewModels
             _eventAggregator.GetEvent<CloseAllEvent>().Publish(null);
         }
 
-        private void WindowStateChangedExecute(Window window)
-        {
-            // Prevent maximizing the video window by snapping it to the top of the screen; it doesn't have a toolbar nor
-            // is it visible on the task bar, so users can't restore it by dragging it down or clicking the "restore" icon(#119).
-
-            // This event is raised by the FlyLeaf player as well when maximizing, on this window but with different content
-            // (namely a WindowsFormsHost with the FlyLeaf player itself), then skip the overruling of the change in state.
-            switch (window.WindowState)
-            {
-                case WindowState.Maximized when !MediaPlayer.IsFullScreen && window.Content is VideoDialog:
-                    window.WindowState = WindowState.Normal;
-                    MediaPlayer.ToggleFullScreen();
-                    break;
-
-                case WindowState.Normal when MediaPlayer.IsFullScreen:
-                    MediaPlayer.ToggleFullScreen();
-                    break;
-            }
-        }
-
         private void LoadDialogSettings(VideoDialogSettings settings)
         {
             // Properties need to be set in this order
-            DialogSettings.FullScreen = settings.FullScreen;
             DialogSettings.ResizeMode = settings.ResizeMode;
+            DialogSettings.FullScreen = settings.FullScreen;
             DialogSettings.Topmost = settings.Topmost;
             DialogSettings.Top = settings.Top;
             DialogSettings.Left = settings.Left;
@@ -488,7 +462,7 @@ namespace RaceControl.ViewModels
                 Left = DialogSettings.Left,
                 Width = DialogSettings.Width,
                 Height = DialogSettings.Height,
-                FullScreen = MediaPlayer.IsFullScreen,
+                FullScreen = DialogSettings.FullScreen,
                 ResizeMode = DialogSettings.ResizeMode,
                 VideoQuality = MediaPlayer.VideoQuality,
                 Topmost = DialogSettings.Topmost,
@@ -589,6 +563,17 @@ namespace RaceControl.ViewModels
 
                 _showControlsTimer?.Start();
             }
+        }
+
+        private void SetFullScreen()
+        {
+            DialogSettings.ResizeMode = ResizeMode.NoResize;
+            DialogSettings.FullScreen = true;
+        }
+
+        private void SetWindowed()
+        {
+            DialogSettings.FullScreen = false;
         }
 
         private void SetVolume(int delta)

@@ -15,6 +15,7 @@
         <sys:Boolean x:Key="False">False</sys:Boolean>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <core:AreEqualConverter x:Key="AreEqualConverter" />
+        <core:BooleanToWindowStateConverter x:Key="BooleanToWindowStateConverter" />
         <core:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <core:LogicalAndConverter x:Key="LogicalAndConverter" />
         <core:ResizeModeToBooleanConverter x:Key="ResizeModeToBooleanConverter" />
@@ -54,6 +55,7 @@
             <Setter Property="prism:Dialog.WindowStartupLocation" Value="{Binding StartupLocation}" />
             <Setter Property="WindowStyle" Value="None" />
             <Setter Property="ResizeMode" Value="{Binding DialogSettings.ResizeMode}" />
+            <Setter Property="WindowState" Value="{Binding DialogSettings.FullScreen, Converter={StaticResource BooleanToWindowStateConverter}}" />
             <Setter Property="Topmost" Value="{Binding DialogSettings.Topmost}" />
             <Setter Property="Top" Value="{Binding DialogSettings.Top, Mode=TwoWay}" />
             <Setter Property="Left" Value="{Binding DialogSettings.Left, Mode=TwoWay}" />
@@ -348,7 +350,7 @@
                                 VerticalAlignment="Center"
                                 Content="Resizable window"
                                 IsChecked="{Binding DialogSettings.ResizeMode, Converter={StaticResource ResizeModeToBooleanConverter}}"
-                                IsEnabled="{Binding MediaPlayer.IsFullScreen, Converter={StaticResource InverseBooleanConverter}}" />
+                                IsEnabled="{Binding DialogSettings.FullScreen, Converter={StaticResource InverseBooleanConverter}}" />
                             <CheckBox
                                 Grid.Column="1"
                                 Margin="4,0"
@@ -474,7 +476,7 @@
                                     <Style BasedOn="{StaticResource ControlBarButtonStyleLarge}" TargetType="Button">
                                         <Setter Property="Content" Value="{StaticResource FullscreenImage}" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding MediaPlayer.IsFullScreen}" Value="True">
+                                            <DataTrigger Binding="{Binding DialogSettings.FullScreen}" Value="True">
                                                 <Setter Property="Content" Value="{StaticResource WindowedImage}" />
                                             </DataTrigger>
                                         </Style.Triggers>

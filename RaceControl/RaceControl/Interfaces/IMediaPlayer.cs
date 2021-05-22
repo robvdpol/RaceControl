@@ -25,8 +25,6 @@ namespace RaceControl.Interfaces
 
         bool IsMuted { get; }
 
-        bool IsFullScreen { get; }
-
         int Zoom { get; set; }
 
         VideoQuality VideoQuality { get; set; }
@@ -44,8 +42,6 @@ namespace RaceControl.Interfaces
         IMediaTrack AudioTrack { get; set; }
 
         void StartPlayback(string streamUrl, VideoDialogSettings settings);
-
-        void ToggleFullScreen();
 
         void TogglePause();
 

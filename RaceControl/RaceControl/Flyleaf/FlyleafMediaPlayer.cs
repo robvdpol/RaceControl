@@ -28,7 +28,6 @@ namespace RaceControl.Flyleaf
         private long _duration;
         private int _volume;
         private bool _isMuted;
-        private bool _isFullScreen;
         private int _zoom;
         private VideoQuality _videoQuality;
         private ObservableCollection<IAspectRatio> _aspectRatios;
@@ -118,12 +117,6 @@ namespace RaceControl.Flyleaf
             }
         }
 
-        public bool IsFullScreen
-        {
-            get => _isFullScreen;
-            private set => SetProperty(ref _isFullScreen, value);
-        }
-
         public int Zoom
         {
             get => _zoom;
@@ -199,6 +192,8 @@ namespace RaceControl.Flyleaf
 
         public void StartPlayback(string streamUrl, VideoDialogSettings settings)
         {
+            IsStarting = true;
+
             Player.OpenCompleted += (_, args) =>
             {
                 if (args.success)
@@ -208,22 +203,7 @@ namespace RaceControl.Flyleaf
             };
 
             Player.PropertyChanged += PlayerOnPropertyChanged;
-
-            IsStarting = true;
-
-            if (settings.FullScreen)
-            {
-                ToggleFullScreen();
-            }
-
             Player.Open(streamUrl);
-        }
-
-        public void ToggleFullScreen()
-        {
-            // Needed to prevent triggering another toggle from window state changed event
-            IsFullScreen = !IsFullScreen;
-            IsFullScreen = !IsFullScreen ? !Player.VideoView.NormalScreen() : Player.VideoView.FullScreen();
         }
 
         public void TogglePause()
