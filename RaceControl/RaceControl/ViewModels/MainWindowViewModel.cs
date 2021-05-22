@@ -911,7 +911,7 @@ namespace RaceControl.ViewModels
 
             if (Settings.EnableMpvAutoSync && playableContent.ContentType == ContentType.Channel && playableContent.IsLive)
             {
-                arguments.Add("--script=autosync.lua");
+                arguments.Add("--script=autosync.lua --script-opts=autosync-lag=20.0");
             }
 
             var hasAudioLanguage = false;
