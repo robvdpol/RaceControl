@@ -1,11 +1,12 @@
 ﻿using NLog;
 using Prism.Services.Dialogs;
-using RaceControl.Common.Constants;
 using RaceControl.Common.Enums;
 using RaceControl.Common.Interfaces;
 using RaceControl.Core.Mvvm;
 using RaceControl.Core.Settings;
+using RaceControl.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
+using System;
 using System.Threading.Tasks;
 
 namespace RaceControl.ViewModels
@@ -18,14 +19,19 @@ namespace RaceControl.ViewModels
         private IPlayableContent _playableContent;
         private string _filename;
 
-        public DownloadDialogViewModel(ILogger logger, ISettings settings, IApiService apiService, IMediaDownloader mediaDownloader) : base(logger)
+        public DownloadDialogViewModel(
+            ILogger logger,
+            ISettings settings,
+            IApiService apiService,
+            IMediaDownloader mediaDownloader)
+            : base(logger)
         {
             _settings = settings;
             _apiService = apiService;
             MediaDownloader = mediaDownloader;
         }
 
-        public override string Title { get; } = "Download";
+        public override string Title => "Download";
 
         public IMediaDownloader MediaDownloader { get; }
 
@@ -43,31 +49,34 @@ namespace RaceControl.ViewModels
 
         public override void OnDialogOpened(IDialogParameters parameters)
         {
-            var subscriptionToken = parameters.GetValue<string>(ParameterNames.SubscriptionToken);
             PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.Content);
             Filename = parameters.GetValue<string>(ParameterNames.Filename);
-            GetTokenisedUrlAndStartDownloadAsync(subscriptionToken).Await(ex =>
-            {
-                HandleNonCriticalError(ex);
-                MediaDownloader.SetDownloadStatus(DownloadStatus.Failed);
-            });
-
-            base.OnDialogOpened(parameters);
+            StartDownloadAsync().Await(DownloadStarted, DownloadFailed);
         }
 
         public override void OnDialogClosed()
         {
-            MediaDownloader.StopDownload();
-            MediaDownloader.Dispose();
-
             base.OnDialogClosed();
+            MediaDownloader.Dispose();
         }
 
-        private async Task GetTokenisedUrlAndStartDownloadAsync(string subscriptionToken)
+        private async Task StartDownloadAsync()
         {
-            var streamType = _settings.GetStreamType(StreamTypeKeys.BigScreenHls);
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(subscriptionToken, streamType, PlayableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(_settings.SubscriptionToken, PlayableContent);
             await MediaDownloader.StartDownloadAsync(streamUrl, Filename);
+        }
+
+        private void DownloadStarted()
+        {
+            base.OnDialogOpened(null);
+            MediaDownloader.SetDownloadStatus(DownloadStatus.Downloading);
+        }
+
+        private void DownloadFailed(Exception ex)
+        {
+            base.OnDialogOpened(null);
+            MediaDownloader.SetDownloadStatus(DownloadStatus.Failed);
+            HandleCriticalError(ex);
         }
     }
 }

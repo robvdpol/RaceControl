@@ -10,10 +10,10 @@ using RaceControl.Core.Mvvm;
 using RaceControl.Core.Settings;
 using RaceControl.Events;
 using RaceControl.Extensions;
+using RaceControl.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -32,14 +32,13 @@ namespace RaceControl.ViewModels
         private readonly IVideoDialogLayout _videoDialogLayout;
         private readonly object _showControlsTimerLock = new();
 
-        private ICommand _mouseDownVideoCommand;
+        private ICommand _mouseDownCommand;
         private ICommand _mouseEnterOrLeaveOrMoveVideoCommand;
         private ICommand _mouseWheelVideoCommand;
-        private ICommand _mouseMoveControlBarCommand;
         private ICommand _mouseEnterControlBarCommand;
         private ICommand _mouseLeaveControlBarCommand;
+        private ICommand _mouseMoveControlBarCommand;
         private ICommand _mouseWheelControlBarCommand;
-        private ICommand _closeAllWindowsCommand;
         private ICommand _togglePauseCommand;
         private ICommand _togglePauseAllCommand;
         private ICommand _toggleMuteCommand;
@@ -47,15 +46,20 @@ namespace RaceControl.ViewModels
         private ICommand _syncSessionCommand;
         private ICommand _toggleFullScreenCommand;
         private ICommand _moveToCornerCommand;
+        private ICommand _zoomCommand;
+        private ICommand _selectAspectRatioCommand;
         private ICommand _selectAudioDeviceCommand;
-        private ICommand _videoQualitySelectionChangedCommand;
+        private ICommand _closeVideoWindowCommand;
+        private ICommand _closeAllWindowsCommand;
+        private ICommand _windowStateChangedCommand;
 
-        private string _subscriptionToken;
         private long _identifier;
         private IPlayableContent _playableContent;
         private VideoDialogSettings _dialogSettings;
         private WindowStartupLocation _startupLocation = WindowStartupLocation.CenterOwner;
+        private bool _isMouseOver;
         private bool _showControls = true;
+        private bool _contextMenuIsOpen;
         private Timer _showControlsTimer;
 
         public VideoDialogViewModel(
@@ -76,23 +80,26 @@ namespace RaceControl.ViewModels
 
         public override string Title => $"{_identifier}. {PlayableContent?.Title}";
 
-        public ICommand MouseDownVideoCommand => _mouseDownVideoCommand ??= new DelegateCommand<MouseButtonEventArgs>(MouseDownVideoExecute);
-        public ICommand MouseEnterOrLeaveOrMoveVideoCommand => _mouseEnterOrLeaveOrMoveVideoCommand ??= new DelegateCommand(MouseEnterOrLeaveOrMoveVideoExecute);
+        public ICommand MouseDownCommand => _mouseDownCommand ??= new DelegateCommand<MouseButtonEventArgs>(MouseDownExecute);
+        public ICommand MouseEnterOrLeaveOrMoveVideoCommand => _mouseEnterOrLeaveOrMoveVideoCommand ??= new DelegateCommand<bool?>(MouseEnterOrLeaveOrMoveVideoExecute);
         public ICommand MouseWheelVideoCommand => _mouseWheelVideoCommand ??= new DelegateCommand<MouseWheelEventArgs>(MouseWheelVideoExecute);
-        public ICommand MouseMoveControlBarCommand => _mouseMoveControlBarCommand ??= new DelegateCommand(MouseMoveControlBarExecute);
         public ICommand MouseEnterControlBarCommand => _mouseEnterControlBarCommand ??= new DelegateCommand(MouseEnterControlBarExecute);
         public ICommand MouseLeaveControlBarCommand => _mouseLeaveControlBarCommand ??= new DelegateCommand(MouseLeaveControlBarExecute);
+        public ICommand MouseMoveControlBarCommand => _mouseMoveControlBarCommand ??= new DelegateCommand(MouseMoveControlBarExecute);
         public ICommand MouseWheelControlBarCommand => _mouseWheelControlBarCommand ??= new DelegateCommand<MouseWheelEventArgs>(MouseWheelControlBarExecute);
-        public ICommand CloseAllWindowsCommand => _closeAllWindowsCommand ??= new DelegateCommand(CloseAllWindowsExecute);
-        public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute).ObservesCanExecute(() => CanClose);
-        public ICommand TogglePauseAllCommand => _togglePauseAllCommand ??= new DelegateCommand(TogglePauseAllExecute).ObservesCanExecute(() => CanClose);
-        public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand<bool?>(ToggleMuteExecute).ObservesCanExecute(() => CanClose);
-        public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<int?>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent);
-        public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => CanClose).ObservesProperty(() => PlayableContent);
+        public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
+        public ICommand TogglePauseAllCommand => _togglePauseAllCommand ??= new DelegateCommand(TogglePauseAllExecute);
+        public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand<bool?>(ToggleMuteExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
+        public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<int?>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => PlayableContent);
+        public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => PlayableContent);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand<long?>(ToggleFullScreenExecute);
-        public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => DialogSettings.WindowState);
-        public ICommand SelectAudioDeviceCommand => _selectAudioDeviceCommand ??= new DelegateCommand<IAudioDevice>(SelectAudioDeviceExecute, CanSelectAudioDeviceExecute).ObservesProperty(() => MediaPlayer.AudioDevice);
-        public ICommand VideoQualitySelectionChangedCommand => _videoQualitySelectionChangedCommand ??= new DelegateCommand(VideoQualitySelectionChangedExecute);
+        public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => DialogSettings.FullScreen);
+        public ICommand ZoomCommand => _zoomCommand ??= new DelegateCommand<int?>(ZoomExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
+        public ICommand SelectAspectRatioCommand => _selectAspectRatioCommand ??= new DelegateCommand<IAspectRatio>(SelectAspectRatioExecute, CanSelectAspectRatioExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => MediaPlayer.AspectRatio);
+        public ICommand SelectAudioDeviceCommand => _selectAudioDeviceCommand ??= new DelegateCommand<IAudioDevice>(SelectAudioDeviceExecute, CanSelectAudioDeviceExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => MediaPlayer.AudioDevice);
+        public ICommand CloseVideoWindowCommand => _closeVideoWindowCommand ??= new DelegateCommand(RaiseRequestClose, CanCloseVideoWindowExecute).ObservesProperty(() => MediaPlayer.IsStarting).ObservesProperty(() => MediaPlayer.IsStarted);
+        public ICommand CloseAllWindowsCommand => _closeAllWindowsCommand ??= new DelegateCommand(CloseAllWindowsExecute);
+        public ICommand WindowStateChangedCommand => _windowStateChangedCommand ??= new DelegateCommand<Window>(WindowStateChangedExecute);
 
         public IMediaPlayer MediaPlayer { get; }
 
@@ -122,15 +129,26 @@ namespace RaceControl.ViewModels
             set => SetProperty(ref _startupLocation, value);
         }
 
+        public bool IsMouseOver
+        {
+            get => _isMouseOver;
+            set => SetProperty(ref _isMouseOver, value);
+        }
+
         public bool ShowControls
         {
             get => _showControls;
             set => SetProperty(ref _showControls, value);
         }
 
+        public bool ContextMenuIsOpen
+        {
+            get => _contextMenuIsOpen;
+            set => SetProperty(ref _contextMenuIsOpen, value);
+        }
+
         public override void OnDialogOpened(IDialogParameters parameters)
         {
-            _subscriptionToken = parameters.GetValue<string>(ParameterNames.SubscriptionToken);
             _identifier = parameters.GetValue<long>(ParameterNames.Identifier);
             PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.Content);
 
@@ -144,32 +162,34 @@ namespace RaceControl.ViewModels
             else
             {
                 StartupLocation = WindowStartupLocation.CenterScreen;
+                DialogSettings.AudioTrack = PlayableContent.GetPreferredAudioLanguage(_settings.DefaultAudioLanguage);
             }
 
-            InitializeAsync().Await(InitializeCompleted, InitializeError, true);
+            StartStreamAsync().Await(StreamStarted, StreamFailed, true);
         }
 
         public override void OnDialogClosed()
         {
-            MediaPlayer.StopPlayback();
+            base.OnDialogClosed();
             MediaPlayer.Dispose();
             RemoveShowControlsTimer();
             UnsubscribeEvents();
-
-            base.OnDialogClosed();
         }
 
         private void ShowControlsTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            ShowControls = false;
-
             Application.Current.Dispatcher.Invoke(() =>
             {
-                Mouse.OverrideCursor = Cursors.None;
+                ShowControls = false;
+
+                if (IsMouseOver && !ContextMenuIsOpen)
+                {
+                    Mouse.OverrideCursor = Cursors.None;
+                }
             });
         }
 
-        private void MouseDownVideoExecute(MouseButtonEventArgs e)
+        private void MouseDownExecute(MouseButtonEventArgs e)
         {
             if (e.ChangedButton != MouseButton.Left || e.LeftButton != MouseButtonState.Pressed)
             {
@@ -198,23 +218,20 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void MouseEnterOrLeaveOrMoveVideoExecute()
+        private void MouseEnterOrLeaveOrMoveVideoExecute(bool? isMouseOver)
         {
+            if (isMouseOver.HasValue)
+            {
+                IsMouseOver = isMouseOver.Value;
+            }
+
             ShowControlsAndResetTimer();
         }
 
         private void MouseWheelVideoExecute(MouseWheelEventArgs e)
         {
-            MediaPlayer.Volume += e.Delta / MouseWheelDelta;
+            SetVolume(e.Delta / MouseWheelDelta);
             ShowControlsAndResetTimer();
-        }
-
-        private static void MouseMoveControlBarExecute()
-        {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                Mouse.OverrideCursor = null;
-            });
         }
 
         private void MouseEnterControlBarExecute()
@@ -233,14 +250,20 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private void MouseWheelControlBarExecute(MouseWheelEventArgs e)
+        private static void MouseMoveControlBarExecute()
         {
-            MediaPlayer.Volume += e.Delta / MouseWheelDelta;
+            if (Mouse.OverrideCursor != null)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    Mouse.OverrideCursor = null;
+                });
+            }
         }
 
-        private void CloseAllWindowsExecute()
+        private void MouseWheelControlBarExecute(MouseWheelEventArgs e)
         {
-            _eventAggregator.GetEvent<CloseAllEvent>().Publish(null);
+            SetVolume(e.Delta / MouseWheelDelta);
         }
 
         private void TogglePauseExecute()
@@ -263,7 +286,7 @@ namespace RaceControl.ViewModels
 
         private bool CanFastForwardExecute(int? seconds)
         {
-            return CanClose && !PlayableContent.IsLive;
+            return MediaPlayer.IsStarted && !PlayableContent.IsLive;
         }
 
         private void FastForwardExecute(int? seconds)
@@ -271,13 +294,13 @@ namespace RaceControl.ViewModels
             if (seconds.HasValue)
             {
                 Logger.Info($"Fast forwarding stream {seconds.Value} seconds...");
-                MediaPlayer.Time += seconds.Value * 1000;
+                MediaPlayer.Time += TimeSpan.FromSeconds(seconds.Value).Ticks;
             }
         }
 
         private bool CanSyncSessionExecute()
         {
-            return CanClose;
+            return MediaPlayer.IsStarted && !PlayableContent.IsLive;
         }
 
         private void SyncSessionExecute()
@@ -289,7 +312,7 @@ namespace RaceControl.ViewModels
 
         private void OnSyncStreams(SyncStreamsEventPayload payload)
         {
-            if (CanClose && PlayableContent.SyncUID == payload.SyncUID)
+            if (MediaPlayer.IsStarted && PlayableContent.SyncUID == payload.SyncUID)
             {
                 MediaPlayer.Time = payload.Time;
             }
@@ -308,7 +331,7 @@ namespace RaceControl.ViewModels
 
         private void OnCloseAll(ContentType? contentType)
         {
-            CloseWindowCommand.TryExecute();
+            CloseVideoWindowCommand.TryExecute();
         }
 
         private void OnSaveLayout(ContentType contentType)
@@ -319,7 +342,7 @@ namespace RaceControl.ViewModels
 
         private void OnToggleFullScreen(long identifier)
         {
-            if (ToggleFullScreenCommand.TryExecute() && DialogSettings.WindowState == WindowState.Maximized)
+            if (ToggleFullScreenCommand.TryExecute() && DialogSettings.FullScreen)
             {
                 _eventAggregator.GetEvent<MuteAllEvent>().Publish(identifier);
             }
@@ -329,7 +352,7 @@ namespace RaceControl.ViewModels
         {
             if (identifier == null)
             {
-                if (DialogSettings.WindowState != WindowState.Maximized)
+                if (!DialogSettings.FullScreen)
                 {
                     SetFullScreen();
                 }
@@ -346,7 +369,7 @@ namespace RaceControl.ViewModels
 
         private bool CanMoveToCornerExecute(WindowLocation? location)
         {
-            return DialogSettings.WindowState != WindowState.Maximized && location != null;
+            return !DialogSettings.FullScreen && location != null;
         }
 
         private void MoveToCornerExecute(WindowLocation? location)
@@ -367,9 +390,31 @@ namespace RaceControl.ViewModels
             DialogSettings.Left = windowLeft;
         }
 
+        private void ZoomExecute(int? zoom)
+        {
+            if (zoom.HasValue)
+            {
+                MediaPlayer.Zoom += zoom.Value;
+            }
+            else
+            {
+                MediaPlayer.Zoom = 0;
+            }
+        }
+
+        private bool CanSelectAspectRatioExecute(IAspectRatio aspectRatio)
+        {
+            return MediaPlayer.IsStarted && MediaPlayer.AspectRatio != aspectRatio;
+        }
+
+        private void SelectAspectRatioExecute(IAspectRatio aspectRatio)
+        {
+            MediaPlayer.AspectRatio = aspectRatio;
+        }
+
         private bool CanSelectAudioDeviceExecute(IAudioDevice audioDevice)
         {
-            return MediaPlayer.AudioDevice != audioDevice;
+            return MediaPlayer.IsStarted && MediaPlayer.AudioDevice != audioDevice;
         }
 
         private void SelectAudioDeviceExecute(IAudioDevice audioDevice)
@@ -377,38 +422,55 @@ namespace RaceControl.ViewModels
             MediaPlayer.AudioDevice = audioDevice;
         }
 
-        private void VideoQualitySelectionChangedExecute()
+        private bool CanCloseVideoWindowExecute()
         {
-            var time = MediaPlayer.Time;
-            MediaPlayer.StopPlayback();
-            StartPlaybackAsync().Await(() =>
+            return !MediaPlayer.IsStarting || MediaPlayer.IsStarted;
+        }
+
+        private void CloseAllWindowsExecute()
+        {
+            _eventAggregator.GetEvent<CloseAllEvent>().Publish(null);
+        }
+
+        private void WindowStateChangedExecute(Window window)
+        {
+            // Needed to set the resizemode to 'NoResize' when going fullscreen using a Windows key combination
+            if (window.WindowState == WindowState.Maximized && DialogSettings.ResizeMode != ResizeMode.NoResize)
             {
-                if (!PlayableContent.IsLive)
-                {
-                    MediaPlayer.Time = time;
-                }
-            }, HandleCriticalError);
+                SetWindowed();
+                SetFullScreen();
+            }
         }
 
         private void LoadDialogSettings(VideoDialogSettings settings)
         {
             // Properties need to be set in this order
-            DialogSettings.ResizeMode = settings.ResizeMode;
-            DialogSettings.WindowState = settings.WindowState;
+            if (settings.FullScreen)
+            {
+                SetFullScreen();
+            }
+            else
+            {
+                SetWindowed(settings.ResizeMode);
+            }
+
             DialogSettings.Topmost = settings.Topmost;
             DialogSettings.Top = settings.Top;
             DialogSettings.Left = settings.Left;
 
-            if (settings.WindowState != WindowState.Maximized)
+            if (!settings.FullScreen)
             {
                 DialogSettings.Width = settings.Width;
                 DialogSettings.Height = settings.Height;
             }
 
+            DialogSettings.VideoQuality = settings.VideoQuality;
             DialogSettings.IsMuted = settings.IsMuted;
             DialogSettings.Volume = settings.Volume;
+            DialogSettings.Zoom = settings.Zoom;
+            DialogSettings.AspectRatio = settings.AspectRatio;
             DialogSettings.AudioDevice = settings.AudioDevice;
-            DialogSettings.VideoQuality = settings.VideoQuality;
+            DialogSettings.AudioTrack = settings.AudioTrack;
         }
 
         private VideoDialogSettings GetDialogSettings()
@@ -419,64 +481,44 @@ namespace RaceControl.ViewModels
                 Left = DialogSettings.Left,
                 Width = DialogSettings.Width,
                 Height = DialogSettings.Height,
+                FullScreen = DialogSettings.FullScreen,
                 ResizeMode = DialogSettings.ResizeMode,
-                WindowState = DialogSettings.WindowState,
-                VideoQuality = DialogSettings.VideoQuality,
+                VideoQuality = MediaPlayer.VideoQuality,
                 Topmost = DialogSettings.Topmost,
                 IsMuted = MediaPlayer.IsMuted,
                 Volume = MediaPlayer.Volume,
-                AudioDevice = MediaPlayer.AudioDevice?.Description,
+                Zoom = MediaPlayer.Zoom,
+                AspectRatio = MediaPlayer.AspectRatio?.Value,
+                AudioDevice = MediaPlayer.AudioDevice?.Identifier,
+                AudioTrack = LanguageCodes.GetStandardCode(MediaPlayer.AudioTrack?.Id),
                 ChannelName = PlayableContent.Name
             };
         }
 
-        private async Task InitializeAsync()
-        {
-            await StartStreamAsync();
-            SubscribeEvents();
-            CreateShowControlsTimer();
-        }
-
-        private void InitializeCompleted()
-        {
-            base.OnDialogOpened(null);
-        }
-
-        private void InitializeError(Exception ex)
-        {
-            base.OnDialogOpened(null);
-            RaiseRequestClose();
-            HandleCriticalError(ex);
-        }
-
         private async Task StartStreamAsync()
         {
-            if (!string.IsNullOrWhiteSpace(DialogSettings.AudioDevice))
-            {
-                var audioDevice = MediaPlayer.AudioDevices.FirstOrDefault(ad => ad.Description == DialogSettings.AudioDevice);
-
-                if (audioDevice != null)
-                {
-                    MediaPlayer.AudioDevice = audioDevice;
-                }
-            }
-
-            await StartPlaybackAsync();
-            MediaPlayer.ToggleMute(DialogSettings.IsMuted);
-            MediaPlayer.Volume = DialogSettings.Volume;
-        }
-
-        private async Task StartPlaybackAsync()
-        {
-            var streamType = _settings.GetStreamType(StreamTypeKeys.BigScreenHls);
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(_subscriptionToken, streamType, PlayableContent);
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(_settings.SubscriptionToken, PlayableContent);
 
             if (string.IsNullOrWhiteSpace(streamUrl))
             {
                 throw new Exception("An error occurred while retrieving the stream URL.");
             }
 
-            await MediaPlayer.StartPlaybackAsync(streamUrl, DialogSettings.VideoQuality);
+            MediaPlayer.StartPlayback(streamUrl, DialogSettings);
+        }
+
+        private void StreamStarted()
+        {
+            base.OnDialogOpened(null);
+            SubscribeEvents();
+            CreateShowControlsTimer();
+        }
+
+        private void StreamFailed(Exception ex)
+        {
+            base.OnDialogOpened(null);
+            RaiseRequestClose();
+            HandleCriticalError(ex);
         }
 
         private void SubscribeEvents()
@@ -531,7 +573,11 @@ namespace RaceControl.ViewModels
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     ShowControls = true;
-                    Mouse.OverrideCursor = null;
+
+                    if (Mouse.OverrideCursor != null)
+                    {
+                        Mouse.OverrideCursor = null;
+                    }
                 });
 
                 _showControlsTimer?.Start();
@@ -540,15 +586,23 @@ namespace RaceControl.ViewModels
 
         private void SetFullScreen()
         {
-            Logger.Info("Changing to fullscreen mode...");
             DialogSettings.ResizeMode = ResizeMode.NoResize;
-            DialogSettings.WindowState = WindowState.Maximized;
+            DialogSettings.FullScreen = true;
         }
 
-        private void SetWindowed()
+        private void SetWindowed(ResizeMode? resizeMode = null)
         {
-            Logger.Info("Changing to windowed mode...");
-            DialogSettings.WindowState = WindowState.Normal;
+            if (resizeMode.HasValue)
+            {
+                DialogSettings.ResizeMode = resizeMode.Value;
+            }
+
+            DialogSettings.FullScreen = false;
+        }
+
+        private void SetVolume(int delta)
+        {
+            MediaPlayer.Volume += delta;
         }
     }
 }

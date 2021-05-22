@@ -30,7 +30,6 @@ namespace RaceControl.ViewModels
         public override void OnDialogOpened(IDialogParameters parameters)
         {
             Release = parameters.GetValue<Release>(ParameterNames.Release);
-
             base.OnDialogOpened(parameters);
         }
 

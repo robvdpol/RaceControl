@@ -339,5 +339,5 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 
-# Streamlink exceptions
-!**/Streamlink/**/[Pp]ackages/*
+# FFmpeg exceptions
+!Libs/**/*

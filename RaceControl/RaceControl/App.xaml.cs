@@ -1,6 +1,8 @@
 ﻿using DryIoc;
+using FlyleafLib;
+using FlyleafLib.MediaFramework.MediaDemuxer;
+using FlyleafLib.MediaPlayer;
 using GoogleCast;
-using LibVLCSharp.Shared;
 using Newtonsoft.Json;
 using NLog;
 using NLog.Config;
@@ -9,12 +11,12 @@ using NLog.Targets;
 using Prism.DryIoc;
 using Prism.Ioc;
 using RaceControl.Common.Generators;
-using RaceControl.Common.Interfaces;
 using RaceControl.Common.Utils;
 using RaceControl.Core.Helpers;
 using RaceControl.Core.Settings;
 using RaceControl.Extensions;
-using RaceControl.GoogleCast;
+using RaceControl.Flyleaf;
+using RaceControl.Interfaces;
 using RaceControl.Services.Credential;
 using RaceControl.Services.F1TV;
 using RaceControl.Services.Github;
@@ -23,7 +25,6 @@ using RaceControl.Services.Interfaces.F1TV;
 using RaceControl.Services.Interfaces.Github;
 using RaceControl.ViewModels;
 using RaceControl.Views;
-using RaceControl.Vlc;
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
 using System;
@@ -32,9 +33,6 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Threading;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
-using LibVLCSharpCore = LibVLCSharp.Shared.Core;
-using LogLevelNLog = NLog.LogLevel;
-using LogLevelVLC = LibVLCSharp.Shared.LogLevel;
 
 namespace RaceControl
 {
@@ -42,9 +40,11 @@ namespace RaceControl
     {
         private readonly SplashScreen _splashScreen = new("splashscreen.png");
 
+        private static int _flyleafUniqueId;
+
         protected override void OnStartup(StartupEventArgs e)
         {
-            _splashScreen.Show(false);
+            _splashScreen.Show(false, true);
 
             var currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
@@ -59,7 +59,11 @@ namespace RaceControl
         protected override void Initialize()
         {
             InitializeLogging();
-            LibVLCSharpCore.Initialize();
+
+            var path = Path.Combine(Environment.CurrentDirectory, "FFmpeg");
+            Master.RegisterFFmpeg(path);
+            Master.PreventAborts = true;
+
             base.Initialize();
         }
 
@@ -76,18 +80,18 @@ namespace RaceControl
                 .RegisterSingleton<IExtendedDialogService, ExtendedDialogService>()
                 .RegisterSingleton<ISettings, Settings>()
                 .RegisterSingleton<IVideoDialogLayout, VideoDialogLayout>()
-                .RegisterInstance(CreateLibVLC())
-                .Register<MediaPlayer>(CreateMediaPlayer)
+                .Register<Player>(CreateFlyleafPlayer)
+                .Register<VideoDemuxer>(CreateFlyleafDownloader)
                 .Register<JsonSerializer>(() => new JsonSerializer { Formatting = Formatting.Indented })
                 .Register<IAuthorizationService, AuthorizationService>()
                 .Register<IApiService, ApiService>()
                 .Register<IGithubService, GithubService>()
                 .Register<ICredentialService, CredentialService>()
                 .Register<INumberGenerator, NumberGenerator>()
-                .Register<ICustomDeviceLocator, CustomDeviceLocator>()
+                .Register<IDeviceLocator, DeviceLocator>()
                 .Register<ISender>(() => new Sender())
-                .Register<IMediaPlayer, VlcMediaPlayer>()
-                .Register<IMediaDownloader, VlcMediaDownloader>();
+                .Register<IMediaPlayer, FlyleafMediaPlayer>()
+                .Register<IMediaDownloader, FlyleafMediaDownloader>();
 
             var container = registry.GetContainer();
             container.Register(Made.Of(() => CreateRestClient()), setup: Setup.With(asResolutionCall: true));
@@ -96,19 +100,9 @@ namespace RaceControl
 
         protected override Window CreateShell()
         {
-            return Container.Resolve<MainWindow>();
-        }
-
-        protected override void OnInitialized()
-        {
-            base.OnInitialized();
             _splashScreen.Close(TimeSpan.Zero);
-        }
 
-        protected override void OnExit(ExitEventArgs e)
-        {
-            base.OnExit(e);
-            Container.Resolve<LibVLC>()?.Dispose();
+            return Container.Resolve<MainWindow>();
         }
 
         private static void InitializeLogging()
@@ -116,61 +110,37 @@ namespace RaceControl
             var config = new LoggingConfiguration();
             var logfile = new FileTarget("logfile")
             {
-                FileName = FolderUtils.GetLocalApplicationDataFilename("RaceControl.log"),
+                FileName = FolderUtils.GetLogFilePath(),
                 Layout = Layout.FromString("${longdate} ${uppercase:${level}} ${message}${onexception:inner=${newline}${exception:format=tostring}}"),
                 ArchiveAboveSize = 1024 * 1024,
                 ArchiveNumbering = ArchiveNumberingMode.Rolling,
                 MaxArchiveFiles = 2
             };
-            config.AddRule(LogLevelNLog.Info, LogLevelNLog.Fatal, logfile);
+            config.AddRule(LogLevel.Info, LogLevel.Fatal, logfile);
             LogManager.Configuration = config;
         }
 
-        private static LibVLC CreateLibVLC()
+        private static Player CreateFlyleafPlayer()
         {
-            var libVLC = new LibVLC("--no-ts-trust-pcr", "--adaptive-livedelay=5000", "--adaptive-maxbuffer=15000");
-            var logger = LogManager.GetLogger(libVLC.GetType().FullName);
-
-            libVLC.Log += (_, args) =>
-            {
-                switch (args.Level)
-                {
-                    case LogLevelVLC.Debug:
-                        logger.Debug($"[VLC] {args.Message}");
-                        break;
-
-                    case LogLevelVLC.Notice:
-                        logger.Info($"[VLC] {args.Message}");
-                        break;
-
-                    case LogLevelVLC.Warning:
-                        logger.Warn($"[VLC] {args.Message}");
-                        break;
-
-                    case LogLevelVLC.Error:
-                        logger.Error($"[VLC] {args.Message}");
-                        break;
-                }
-            };
-
-            return libVLC;
+            return new();
         }
 
-        private static MediaPlayer CreateMediaPlayer(IContainerProvider container)
+        private static VideoDemuxer CreateFlyleafDownloader()
         {
-            return new(container.Resolve<LibVLC>())
-            {
-                EnableHardwareDecoding = true,
-                EnableMouseInput = false,
-                EnableKeyInput = false,
-                FileCaching = 5000,
-                NetworkCaching = 10000
-            };
+            _flyleafUniqueId++;
+
+            return new VideoDemuxer(new Config(), _flyleafUniqueId);
         }
 
         private static IRestClient CreateRestClient()
         {
-            var restClient = new RestClient { UserAgent = nameof(RaceControl), ThrowOnAnyError = true };
+            var restClient = new RestClient
+            {
+                UserAgent = nameof(RaceControl),
+                Timeout = 30000,
+                ReadWriteTimeout = 60000,
+                ThrowOnAnyError = true
+            };
             restClient.UseNewtonsoftJson();
 
             return restClient;

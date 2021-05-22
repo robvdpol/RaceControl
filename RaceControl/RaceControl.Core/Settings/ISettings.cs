@@ -1,14 +1,23 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 
 namespace RaceControl.Core.Settings
 {
     public interface ISettings
     {
+        string SubscriptionToken { get; set; }
+
+        string SubscriptionStatus { get; set; }
+
+        DateTime? LastLogin { get; set; }
+
+        string DefaultAudioLanguage { get; set; }
+
         bool DisableMpvNoBorder { get; set; }
 
-        string AdditionalMpvParameters { get; set; }
+        bool EnableMpvAutoSync { get; set; }
 
-        string PreferredStreamType { get; set; }
+        string AdditionalMpvParameters { get; set; }
 
         string LatestRelease { get; set; }
 
@@ -18,6 +27,10 @@ namespace RaceControl.Core.Settings
 
         void Save();
 
-        string GetStreamType(string autoStreamType);
+        void ClearSubscriptionToken();
+
+        void UpdateSubscriptionToken(string subscriptionToken, string subscriptionStatus);
+
+        bool HasValidSubscriptionToken();
     }
 }

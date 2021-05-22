@@ -1,18 +1,23 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
 
 namespace RaceControl.Common.Utils
 {
     public static class ProcessUtils
     {
-        public static Process CreateProcess(string filename, string arguments, bool createNoWindow = false, bool redirectOutput = false)
+        public static Process CreateProcess(string filename, string arguments, bool useShellExecute = false, bool createNoWindow = false, bool redirectOutput = false)
         {
+            var workingDirectory = Path.GetDirectoryName(filename) ?? Environment.CurrentDirectory;
+
             return new()
             {
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = filename,
                     Arguments = arguments,
-                    UseShellExecute = false,
+                    WorkingDirectory = workingDirectory,
+                    UseShellExecute = useShellExecute,
                     CreateNoWindow = createNoWindow,
                     RedirectStandardOutput = redirectOutput,
                     RedirectStandardError = redirectOutput
