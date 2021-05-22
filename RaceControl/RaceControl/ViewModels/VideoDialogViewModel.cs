@@ -51,6 +51,7 @@ namespace RaceControl.ViewModels
         private ICommand _selectAudioDeviceCommand;
         private ICommand _closeVideoWindowCommand;
         private ICommand _closeAllWindowsCommand;
+        private ICommand _windowStateChangedCommand;
 
         private long _identifier;
         private IPlayableContent _playableContent;
@@ -98,6 +99,7 @@ namespace RaceControl.ViewModels
         public ICommand SelectAudioDeviceCommand => _selectAudioDeviceCommand ??= new DelegateCommand<IAudioDevice>(SelectAudioDeviceExecute, CanSelectAudioDeviceExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => MediaPlayer.AudioDevice);
         public ICommand CloseVideoWindowCommand => _closeVideoWindowCommand ??= new DelegateCommand(RaiseRequestClose, CanCloseVideoWindowExecute).ObservesProperty(() => MediaPlayer.IsStarting).ObservesProperty(() => MediaPlayer.IsStarted);
         public ICommand CloseAllWindowsCommand => _closeAllWindowsCommand ??= new DelegateCommand(CloseAllWindowsExecute);
+        public ICommand WindowStateChangedCommand => _windowStateChangedCommand ??= new DelegateCommand<Window>(WindowStateChangedExecute);
 
         public IMediaPlayer MediaPlayer { get; }
 
@@ -428,6 +430,16 @@ namespace RaceControl.ViewModels
         private void CloseAllWindowsExecute()
         {
             _eventAggregator.GetEvent<CloseAllEvent>().Publish(null);
+        }
+
+        private void WindowStateChangedExecute(Window window)
+        {
+            // Needed to set the resizemode to 'NoResize' when going fullscreen using a Windows key combination
+            if (window.WindowState == WindowState.Maximized && DialogSettings.ResizeMode != ResizeMode.NoResize)
+            {
+                SetWindowed();
+                SetFullScreen();
+            }
         }
 
         private void LoadDialogSettings(VideoDialogSettings settings)
