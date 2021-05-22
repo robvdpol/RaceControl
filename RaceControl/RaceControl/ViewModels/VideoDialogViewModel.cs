@@ -445,8 +445,15 @@ namespace RaceControl.ViewModels
         private void LoadDialogSettings(VideoDialogSettings settings)
         {
             // Properties need to be set in this order
-            DialogSettings.ResizeMode = settings.ResizeMode;
-            DialogSettings.FullScreen = settings.FullScreen;
+            if (settings.FullScreen)
+            {
+                SetFullScreen();
+            }
+            else
+            {
+                SetWindowed(settings.ResizeMode);
+            }
+
             DialogSettings.Topmost = settings.Topmost;
             DialogSettings.Top = settings.Top;
             DialogSettings.Left = settings.Left;
@@ -583,8 +590,13 @@ namespace RaceControl.ViewModels
             DialogSettings.FullScreen = true;
         }
 
-        private void SetWindowed()
+        private void SetWindowed(ResizeMode? resizeMode = null)
         {
+            if (resizeMode.HasValue)
+            {
+                DialogSettings.ResizeMode = resizeMode.Value;
+            }
+
             DialogSettings.FullScreen = false;
         }
 
