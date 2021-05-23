@@ -346,7 +346,7 @@ namespace RaceControl.Services.F1TV
 
         private static Session CreateSession(Container container)
         {
-            var seriesUID = container.Properties.First().Series;
+            var seriesUID = container.Properties?.FirstOrDefault()?.Series;
 
             return new()
             {
@@ -366,6 +366,8 @@ namespace RaceControl.Services.F1TV
 
         private static Episode CreateEpisode(Container container)
         {
+            var seriesUID = container.Properties?.FirstOrDefault()?.Series;
+
             return new()
             {
                 UID = container.Id,
@@ -374,7 +376,7 @@ namespace RaceControl.Services.F1TV
                 ContentSubtype = container.Metadata.ContentSubtype,
                 ShortName = container.Metadata.TitleBrief,
                 LongName = container.Metadata.Title,
-                SeriesUID = container.Properties.First().Series,
+                SeriesUID = seriesUID,
                 PlaybackUrl = GetPlaybackUrl(container.Metadata.ContentId),
                 ThumbnailUrl = GetThumbnailUrl(container.Metadata.PictureUrl),
                 StartDate = container.Metadata.EmfAttributes.SessionStartDate.GetDateTimeFromEpoch(),
@@ -387,7 +389,7 @@ namespace RaceControl.Services.F1TV
 
         private static string GetSessionShortName(string titleBrief, string seriesUID)
         {
-            if (seriesUID == SeriesIds.Formula1 || !SeriesNames.ShortNames.TryGetValue(seriesUID, out var shortNames) || shortNames.Any(shortName => titleBrief.Contains(shortName, StringComparison.OrdinalIgnoreCase)))
+            if (string.IsNullOrWhiteSpace(seriesUID) || seriesUID == SeriesIds.Formula1 || !SeriesNames.ShortNames.TryGetValue(seriesUID, out var shortNames) || shortNames.Any(shortName => titleBrief.Contains(shortName, StringComparison.OrdinalIgnoreCase)))
             {
                 return titleBrief;
             }
