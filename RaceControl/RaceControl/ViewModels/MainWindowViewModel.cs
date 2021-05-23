@@ -28,6 +28,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Media;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 using System.Timers;
@@ -51,6 +52,7 @@ namespace RaceControl.ViewModels
         private readonly INumberGenerator _numberGenerator;
         private readonly IDeviceLocator _deviceLocator;
         private readonly ISender _sender;
+        private readonly SoundPlayer _liveSessionPlayer;
         private readonly object _refreshTimerLock = new();
 
         private ICommand _loadedCommand;
@@ -129,6 +131,7 @@ namespace RaceControl.ViewModels
             _deviceLocator = deviceLocator;
             _sender = sender;
             Settings = settings;
+            _liveSessionPlayer = new SoundPlayer("livesession.wav");
             VideoDialogLayout = videoDialogLayout;
             EpisodesView = CollectionViewSource.GetDefaultView(Episodes);
             EpisodesView.Filter = EpisodesViewFilter;
@@ -298,7 +301,7 @@ namespace RaceControl.ViewModels
                     SelectedNetworkInterface = NetworkInterfaces.FirstOrDefault(n => n.OperationalStatus == OperationalStatus.Up && n.NetworkInterfaceType != NetworkInterfaceType.Loopback);
                 },
                 HandleCriticalError);
-                RefreshLiveSessionsAsync().Await(CreateRefreshTimer, HandleNonCriticalError);
+                RefreshLiveSessionsAsync(true).Await(CreateRefreshTimer, HandleNonCriticalError);
                 CheckForUpdatesAsync().Await(HandleNonCriticalError);
             }
         }
@@ -591,7 +594,7 @@ namespace RaceControl.ViewModels
                 _refreshTimer?.Stop();
             }
 
-            RefreshLiveSessionsAsync().Await(() =>
+            RefreshLiveSessionsAsync(false).Await(() =>
             {
                 lock (_refreshTimerLock)
                 {
@@ -758,7 +761,7 @@ namespace RaceControl.ViewModels
             }
         }
 
-        private async Task RefreshLiveSessionsAsync()
+        private async Task RefreshLiveSessionsAsync(bool isFirstRefresh)
         {
             Logger.Info("Refreshing live sessions...");
 
@@ -784,6 +787,11 @@ namespace RaceControl.ViewModels
                     if (sessionsToAdd.Any())
                     {
                         LiveSessions.AddRange(sessionsToAdd);
+
+                        if (!isFirstRefresh)
+                        {
+                            _liveSessionPlayer.Play();
+                        }
                     }
                 });
             }

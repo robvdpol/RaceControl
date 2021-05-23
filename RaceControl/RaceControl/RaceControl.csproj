@@ -31,7 +31,13 @@
     <None Remove="Icons\shutdown_96px.png" />
     <None Remove="Icons\synchronize_48px.png" />
     <None Remove="Icons\windowed_96px.png" />
+    <None Remove="livesession.wav" />
     <None Remove="splashscreen.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="livesession.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\audio_48px.png" />
