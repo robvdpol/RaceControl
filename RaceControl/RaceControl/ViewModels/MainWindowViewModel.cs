@@ -291,6 +291,7 @@ namespace RaceControl.ViewModels
             SetVlcExeLocation();
             SetMpvExeLocation();
             SetMpcExeLocation();
+            SetNetworkInterface();
 
             if (Settings.HasValidSubscriptionToken() || Login())
             {
@@ -298,7 +299,6 @@ namespace RaceControl.ViewModels
                 {
                     SetNotBusy();
                     SelectedSeason = Seasons.FirstOrDefault();
-                    SelectedNetworkInterface = NetworkInterfaces.FirstOrDefault(n => n.OperationalStatus == OperationalStatus.Up && n.NetworkInterfaceType != NetworkInterfaceType.Loopback);
                 },
                 HandleCriticalError);
                 RefreshLiveSessionsAsync(true).Await(CreateRefreshTimer, HandleNonCriticalError);
@@ -309,6 +309,7 @@ namespace RaceControl.ViewModels
         private void ClosingExecute()
         {
             RemoveRefreshTimer();
+            Settings.SelectedNetworkInterface = SelectedNetworkInterface?.Id;
             Settings.Save();
         }
 
@@ -646,6 +647,13 @@ namespace RaceControl.ViewModels
             {
                 Logger.Warn("Could not find MPC-HC installation.");
             }
+        }
+
+        private void SetNetworkInterface()
+        {
+            SelectedNetworkInterface = !string.IsNullOrWhiteSpace(Settings.SelectedNetworkInterface) ?
+                NetworkInterfaces.FirstOrDefault(n => n.Id == Settings.SelectedNetworkInterface) :
+                NetworkInterfaces.FirstOrDefault(n => n.OperationalStatus == OperationalStatus.Up && n.NetworkInterfaceType != NetworkInterfaceType.Loopback);
         }
 
         private async Task CheckForUpdatesAsync()

@@ -21,6 +21,8 @@ namespace RaceControl.Core.Settings
 
         string LatestRelease { get; set; }
 
+        string SelectedNetworkInterface { get; set; }
+
         ObservableCollection<string> SelectedSeries { get; set; }
 
         void Load();
