@@ -5,7 +5,7 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>RaceControl</AssemblyName>
     <SignAssembly>false</SignAssembly>
-    <ApplicationIcon>f1.ico</ApplicationIcon>
+    <ApplicationIcon>racecontrol.ico</ApplicationIcon>
     <Platforms>x64;x86</Platforms>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
