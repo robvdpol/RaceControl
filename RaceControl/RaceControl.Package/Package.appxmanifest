@@ -9,7 +9,7 @@
   <Identity
     Name="16380RobvanderPol.F1RaceControl"
     Publisher="CN=93FEE21F-9153-4B7D-ACA0-ACD1141B0D83"
-    Version="2.3.0.0" />
+    Version="2.3.1.0" />
 
   <Properties>
     <DisplayName>F1 Race Control</DisplayName>
