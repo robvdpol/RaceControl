@@ -796,7 +796,7 @@ namespace RaceControl.ViewModels
                     {
                         LiveSessions.AddRange(sessionsToAdd);
 
-                        if (!isFirstRefresh)
+                        if (!isFirstRefresh && LiveSessions.Count == 1)
                         {
                             _liveSessionPlayer.Play();
                         }
