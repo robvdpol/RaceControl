@@ -942,18 +942,6 @@ namespace RaceControl.ViewModels
                 }
             }
 
-            var useCustomMpvPath = false;
-            var customMpvPath = new String("");
-            if (!string.IsNullOrWhiteSpace(Settings.CustomMpvPath) && File.Exists(Settings.CustomMpvPath))
-            {
-                useCustomMpvPath = true;
-                customMpvPath = Settings.CustomMpvPath;
-            }
-            else if (!string.IsNullOrWhiteSpace(Settings.CustomMpvPath) && !File.Exists(Settings.CustomMpvPath))
-            {
-                Logger.Warn($"Error finding the MPV executable at '{Settings.CustomMpvPath}'. Falling back to the default MPV executable path. Please check your custom MPV path.");
-            }
-
             if (!hasAudioLanguage)
             {
                 var languageCodes = playableContent.GetAudioLanguages(Settings.DefaultAudioLanguage);
@@ -1004,7 +992,22 @@ namespace RaceControl.ViewModels
                 arguments.Add($"--mute={settings.IsMuted.GetYesNoString()}");
             }
 
-            using var process = ProcessUtils.CreateProcess(useCustomMpvPath ? customMpvPath : MpvExeLocation, string.Join(" ", arguments));
+            var mpvExeLocation = MpvExeLocation;
+            var customMpvPath = Settings.CustomMpvPath?.Trim();
+
+            if (!string.IsNullOrWhiteSpace(customMpvPath))
+            {
+                if (File.Exists(customMpvPath))
+                {
+                    mpvExeLocation = customMpvPath;
+                }
+                else
+                {
+                    Logger.Warn($"Could not find MPV executable at '{customMpvPath}', falling back to included MPV executable.");
+                }
+            }
+
+            using var process = ProcessUtils.CreateProcess(mpvExeLocation, string.Join(" ", arguments));
             process.Start();
         }
 
