@@ -19,6 +19,8 @@ namespace RaceControl.Core.Settings
 
         string AdditionalMpvParameters { get; set; }
 
+        string CustomMpvPath { get; set; }
+
         string LatestRelease { get; set; }
 
         string SelectedNetworkInterface { get; set; }

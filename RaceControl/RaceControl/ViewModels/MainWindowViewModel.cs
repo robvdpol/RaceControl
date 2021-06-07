@@ -992,7 +992,22 @@ namespace RaceControl.ViewModels
                 arguments.Add($"--mute={settings.IsMuted.GetYesNoString()}");
             }
 
-            using var process = ProcessUtils.CreateProcess(MpvExeLocation, string.Join(" ", arguments));
+            var mpvExeLocation = MpvExeLocation;
+            var customMpvPath = Settings.CustomMpvPath?.Trim();
+
+            if (!string.IsNullOrWhiteSpace(customMpvPath))
+            {
+                if (File.Exists(customMpvPath))
+                {
+                    mpvExeLocation = customMpvPath;
+                }
+                else
+                {
+                    Logger.Warn($"Could not find MPV executable at '{customMpvPath}', falling back to included MPV executable.");
+                }
+            }
+
+            using var process = ProcessUtils.CreateProcess(mpvExeLocation, string.Join(" ", arguments));
             process.Start();
         }
 
