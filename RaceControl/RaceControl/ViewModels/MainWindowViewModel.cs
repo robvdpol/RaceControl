@@ -30,6 +30,7 @@ using System.IO;
 using System.Linq;
 using System.Media;
 using System.Net.NetworkInformation;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -1029,6 +1030,13 @@ namespace RaceControl.ViewModels
             {
                 await _sender.ConnectAsync(receiver);
                 var mediaChannel = _sender.GetChannel<IMediaChannel>();
+
+                // hacking mediachannel to update app id
+                var type = Assembly.GetAssembly(typeof(Sender)).GetTypes().First(t => t.FullName == "GoogleCast.Channels.MediaChannel");
+                var fields = type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+                var field = fields.First(f => f.Name.Contains("ApplicationId"));
+                field.SetValue(mediaChannel, "B3E81094");
+
 
                 if (mediaChannel != null)
                 {
