@@ -1030,11 +1030,10 @@ namespace RaceControl.ViewModels
                 await _sender.ConnectAsync(receiver);
                 var mediaChannel = _sender.GetChannel<IMediaChannel>();
 
-                // hacking mediachannel to update app id
-                mediaChannel.UpdateMediaChannelAppId();
-                
                 if (mediaChannel != null)
                 {
+                    // hacking mediachannel to update app id
+                    mediaChannel.SetApplicationId("B3E81094");
                     await _sender.LaunchAsync(mediaChannel);
                     var status = await mediaChannel.LoadAsync(new MediaInformation { ContentId = streamUrl });
 
