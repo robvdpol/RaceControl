@@ -440,6 +440,13 @@
                                         VerticalContentAlignment="Center"
                                         MaxLength="200"
                                         Text="{Binding Settings.AdditionalMpvParameters, UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBlock Margin="3" Text="Custom MPV path:" />
+                                    <TextBox
+                                        Height="22"
+                                        Margin="3,1"
+                                        VerticalContentAlignment="Center"
+                                        MaxLength="200"
+                                        Text="{Binding Settings.CustomMpvPath, UpdateSourceTrigger=PropertyChanged}" />
                                 </StackPanel>
                             </GroupBox>
                             <GroupBox

@@ -102,13 +102,13 @@ To open and build the solution you need:
 ## Acknowledgements
 * [Flyleaf](https://github.com/SuRGeoNix/Flyleaf) for providing an excellent video player and .NET library
 * [MPV](https://mpv.io) for providing an excellent video player
-* [Flaticon](https://www.flaticon.com) for providing the application icon
 * [Prism Library](https://prismlibrary.com)
 * [Newtonsoft Json.NET](https://www.newtonsoft.com/json)
 * [RestSharp](https://restsharp.dev)
 * [NLog](https://nlog-project.org)
 * [CredentialManagement.Standard NuGet package](https://www.nuget.org/packages/CredentialManagement.Standard)
 * [GoogleCast](https://github.com/kakone/GoogleCast)
+* [Jake Causier](https://github.com/jakecausier) for creating the application logo
 
 ## Screenshots
 #### Main application

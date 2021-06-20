@@ -22,7 +22,9 @@ namespace RaceControl.Core.Settings
         private bool _disableMpvNoBorder;
         private bool _enableMpvAutoSync;
         private string _additionalMpvParameters;
+        private string _customMpvPath;
         private string _latestRelease;
+        private string _selectedNetworkInterface;
         private ObservableCollection<string> _selectedSeries;
 
         public Settings(ILogger logger, JsonSerializer serializer)
@@ -73,10 +75,22 @@ namespace RaceControl.Core.Settings
             set => SetProperty(ref _additionalMpvParameters, value);
         }
 
+        public string CustomMpvPath
+        {
+            get => _customMpvPath;
+            set => SetProperty(ref _customMpvPath, value);
+        }
+
         public string LatestRelease
         {
             get => _latestRelease;
             set => SetProperty(ref _latestRelease, value);
+        }
+
+        public string SelectedNetworkInterface
+        {
+            get => _selectedNetworkInterface;
+            set => SetProperty(ref _selectedNetworkInterface, value);
         }
 
         public ObservableCollection<string> SelectedSeries

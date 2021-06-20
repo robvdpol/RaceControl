@@ -294,12 +294,12 @@ namespace RaceControl.Flyleaf
             {
                 Application.Current.Dispatcher.Invoke(() =>
                 {
+                    IsStarting = Player.Status == Status.Opening;
                     IsPlaying = Player.Status == Status.Playing;
                     IsPaused = Player.Status == Status.Paused;
 
                     if (IsPlaying)
                     {
-                        IsStarting = false;
                         IsStarted = true;
                     }
                 });

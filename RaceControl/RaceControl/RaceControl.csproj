@@ -5,7 +5,7 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>RaceControl</AssemblyName>
     <SignAssembly>false</SignAssembly>
-    <ApplicationIcon>f1.ico</ApplicationIcon>
+    <ApplicationIcon>racecontrol.ico</ApplicationIcon>
     <Platforms>x64;x86</Platforms>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -31,7 +31,13 @@
     <None Remove="Icons\shutdown_96px.png" />
     <None Remove="Icons\synchronize_48px.png" />
     <None Remove="Icons\windowed_96px.png" />
+    <None Remove="livesession.wav" />
     <None Remove="splashscreen.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="livesession.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\audio_48px.png" />
@@ -57,7 +63,7 @@
     <PackageReference Include="GoogleCast" Version="1.7.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.31" />
     <PackageReference Include="NLog" Version="4.7.10" />
-    <PackageReference Include="Prism.DryIoc" Version="8.0.0.1909" />
+    <PackageReference Include="Prism.DryIoc" Version="8.1.97" />
     <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="106.11.7" />
     <PackageReference Include="Zeroconf" Version="3.4.2" />
   </ItemGroup>
