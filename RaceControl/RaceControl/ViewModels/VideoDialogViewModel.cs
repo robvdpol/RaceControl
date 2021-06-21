@@ -50,6 +50,7 @@ namespace RaceControl.ViewModels
         private ICommand _selectAspectRatioCommand;
         private ICommand _selectAudioDeviceCommand;
         private ICommand _closeVideoWindowCommand;
+        private ICommand _exitFullScreenOrCloseWindowCommand;
         private ICommand _closeAllWindowsCommand;
         private ICommand _windowStateChangedCommand;
 
@@ -98,6 +99,7 @@ namespace RaceControl.ViewModels
         public ICommand SelectAspectRatioCommand => _selectAspectRatioCommand ??= new DelegateCommand<IAspectRatio>(SelectAspectRatioExecute, CanSelectAspectRatioExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => MediaPlayer.AspectRatio);
         public ICommand SelectAudioDeviceCommand => _selectAudioDeviceCommand ??= new DelegateCommand<IAudioDevice>(SelectAudioDeviceExecute, CanSelectAudioDeviceExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => MediaPlayer.AudioDevice);
         public ICommand CloseVideoWindowCommand => _closeVideoWindowCommand ??= new DelegateCommand(RaiseRequestClose, CanCloseVideoWindowExecute).ObservesProperty(() => MediaPlayer.IsStarting);
+        public ICommand ExitFullScreenOrCloseWindowCommand => _exitFullScreenOrCloseWindowCommand ??= new DelegateCommand(ExitFullScreenOrCloseWindowExecute);
         public ICommand CloseAllWindowsCommand => _closeAllWindowsCommand ??= new DelegateCommand(CloseAllWindowsExecute);
         public ICommand WindowStateChangedCommand => _windowStateChangedCommand ??= new DelegateCommand<Window>(WindowStateChangedExecute);
 
@@ -430,6 +432,18 @@ namespace RaceControl.ViewModels
         private bool CanCloseVideoWindowExecute()
         {
             return !MediaPlayer.IsStarting;
+        }
+
+        private void ExitFullScreenOrCloseWindowExecute()
+        {
+            if (DialogSettings.FullScreen)
+            {
+                ToggleFullScreenCommand.TryExecute();
+            }
+            else
+            {
+                CloseVideoWindowCommand.TryExecute();
+            }
         }
 
         private void CloseAllWindowsExecute()
