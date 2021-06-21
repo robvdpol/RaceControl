@@ -427,6 +427,10 @@
                                         SelectedValuePath="Key" />
                                     <CheckBox
                                         Margin="3"
+                                        Content="Disable live session notification"
+                                        IsChecked="{Binding Settings.DisableLiveSessionNotification}" />
+                                    <CheckBox
+                                        Margin="3"
                                         Content="Disable MPV borderless mode"
                                         IsChecked="{Binding Settings.DisableMpvNoBorder}" />
                                     <CheckBox

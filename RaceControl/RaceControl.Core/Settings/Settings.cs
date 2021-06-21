@@ -19,6 +19,7 @@ namespace RaceControl.Core.Settings
         private string _subscriptionStatus;
         private DateTime? _lastLogin;
         private string _defaultAudioLanguage;
+        private bool _disableLiveSessionNotification;
         private bool _disableMpvNoBorder;
         private bool _enableMpvAutoSync;
         private string _additionalMpvParameters;
@@ -55,6 +56,12 @@ namespace RaceControl.Core.Settings
         {
             get => _defaultAudioLanguage;
             set => SetProperty(ref _defaultAudioLanguage, value);
+        }
+
+        public bool DisableLiveSessionNotification
+        {
+            get => _disableLiveSessionNotification;
+            set => SetProperty(ref _disableLiveSessionNotification, value);
         }
 
         public bool DisableMpvNoBorder

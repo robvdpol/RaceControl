@@ -13,6 +13,8 @@ namespace RaceControl.Core.Settings
 
         string DefaultAudioLanguage { get; set; }
 
+        bool DisableLiveSessionNotification { get; set; }
+
         bool DisableMpvNoBorder { get; set; }
 
         bool EnableMpvAutoSync { get; set; }
