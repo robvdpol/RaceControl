@@ -879,7 +879,7 @@ namespace RaceControl.ViewModels
                 });
             }
 
-            Channels.AddRange(channels.OrderBy(c => c.ChannelType, new ChannelTypeComparer()).Select(c => new PlayableChannel(session, c)));
+            Channels.AddRange(channels.OrderBy(c => c.ChannelType, new ChannelTypeComparer()).ThenBy(c => c.Name).Select(c => new PlayableChannel(session, c)));
         }
 
         private async Task LoadEpisodesForGenreAsync(string genre)
