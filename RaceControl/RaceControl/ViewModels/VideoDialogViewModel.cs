@@ -191,29 +191,34 @@ namespace RaceControl.ViewModels
 
         private void MouseDownExecute(MouseButtonEventArgs e)
         {
-            if (e.ChangedButton != MouseButton.Left || e.LeftButton != MouseButtonState.Pressed)
+            switch (e.ChangedButton)
             {
-                return;
-            }
-
-            switch (e.ClickCount)
-            {
-                case 1:
-                    if (e.Source is DependencyObject dependencyObject)
-                    {
-                        var window = Window.GetWindow(dependencyObject)?.Owner;
-
-                        if (window != null)
-                        {
-                            window.Focus();
-                            window.DragMove();
-                        }
-                    }
-
+                case MouseButton.Middle when e.MiddleButton == MouseButtonState.Pressed:
+                    SetVolume(100);
                     break;
 
-                case 2:
-                    ToggleFullScreenCommand.TryExecute();
+                case MouseButton.Left when e.LeftButton == MouseButtonState.Pressed:
+                    switch (e.ClickCount)
+                    {
+                        case 1:
+                            if (e.Source is DependencyObject dependencyObject)
+                            {
+                                var window = Window.GetWindow(dependencyObject)?.Owner;
+
+                                if (window != null)
+                                {
+                                    window.Focus();
+                                    window.DragMove();
+                                }
+                            }
+
+                            break;
+
+                        case 2:
+                            ToggleFullScreenCommand.TryExecute();
+                            break;
+                    }
+
                     break;
             }
         }
@@ -230,7 +235,7 @@ namespace RaceControl.ViewModels
 
         private void MouseWheelVideoExecute(MouseWheelEventArgs e)
         {
-            SetVolume(e.Delta / MouseWheelDelta);
+            AddVolume(e.Delta / MouseWheelDelta);
             ShowControlsAndResetTimer();
         }
 
@@ -263,7 +268,7 @@ namespace RaceControl.ViewModels
 
         private void MouseWheelControlBarExecute(MouseWheelEventArgs e)
         {
-            SetVolume(e.Delta / MouseWheelDelta);
+            AddVolume(e.Delta / MouseWheelDelta);
         }
 
         private void TogglePauseExecute()
@@ -600,9 +605,17 @@ namespace RaceControl.ViewModels
             DialogSettings.FullScreen = false;
         }
 
-        private void SetVolume(int delta)
+        private void SetVolume(int volume)
         {
-            MediaPlayer.Volume += delta;
+            if (MediaPlayer.IsStarted)
+            {
+                MediaPlayer.Volume = volume;
+            }
+        }
+
+        private void AddVolume(int delta)
+        {
+            SetVolume(MediaPlayer.Volume + delta);
         }
     }
 }
