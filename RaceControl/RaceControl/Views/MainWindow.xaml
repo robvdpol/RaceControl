@@ -252,39 +252,6 @@
                         Style="{StaticResource ContentListBoxStyle}">
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem">
-                                <Setter Property="ToolTip">
-                                    <Setter.Value>
-                                        <ToolTip Placement="Left">
-                                            <ToolTip.Style>
-                                                <Style TargetType="ToolTip">
-                                                    <Setter Property="Template">
-                                                        <Setter.Value>
-                                                            <ControlTemplate TargetType="ToolTip">
-                                                                <ContentPresenter />
-                                                            </ControlTemplate>
-                                                        </Setter.Value>
-                                                    </Setter>
-                                                </Style>
-                                            </ToolTip.Style>
-                                            <ToolTip.Triggers>
-                                                <EventTrigger RoutedEvent="ToolTip.Opened">
-                                                    <BeginStoryboard>
-                                                        <Storyboard TargetProperty="Opacity">
-                                                            <DoubleAnimation
-                                                                From="0.0"
-                                                                To="1.0"
-                                                                Duration="0:0:0.75" />
-                                                        </Storyboard>
-                                                    </BeginStoryboard>
-                                                </EventTrigger>
-                                            </ToolTip.Triggers>
-                                            <Image
-                                                Width="354"
-                                                RenderOptions.BitmapScalingMode="HighQuality"
-                                                Source="{Binding ThumbnailUrl, TargetNullValue={x:Null}}" />
-                                        </ToolTip>
-                                    </Setter.Value>
-                                </Setter>
                                 <Setter Property="Visibility" Value="Collapsed" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding IsLive}" Value="True">
@@ -300,6 +267,41 @@
                                             </MultiBinding>
                                         </DataTrigger.Binding>
                                         <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding DataContext.Settings.DisableThumbnailTooltips, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" Value="False">
+                                        <Setter Property="ToolTip">
+                                            <Setter.Value>
+                                                <ToolTip Placement="Left">
+                                                    <ToolTip.Style>
+                                                        <Style TargetType="ToolTip">
+                                                            <Setter Property="Template">
+                                                                <Setter.Value>
+                                                                    <ControlTemplate TargetType="ToolTip">
+                                                                        <ContentPresenter />
+                                                                    </ControlTemplate>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                        </Style>
+                                                    </ToolTip.Style>
+                                                    <ToolTip.Triggers>
+                                                        <EventTrigger RoutedEvent="ToolTip.Opened">
+                                                            <BeginStoryboard>
+                                                                <Storyboard TargetProperty="Opacity">
+                                                                    <DoubleAnimation
+                                                                        From="0.0"
+                                                                        To="1.0"
+                                                                        Duration="0:0:0.75" />
+                                                                </Storyboard>
+                                                            </BeginStoryboard>
+                                                        </EventTrigger>
+                                                    </ToolTip.Triggers>
+                                                    <Image
+                                                        Width="354"
+                                                        RenderOptions.BitmapScalingMode="HighQuality"
+                                                        Source="{Binding ThumbnailUrl, TargetNullValue={x:Null}}" />
+                                                </ToolTip>
+                                            </Setter.Value>
+                                        </Setter>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -425,6 +427,10 @@
                                         ItemsSource="{Binding AudioLanguages}"
                                         SelectedValue="{Binding Settings.DefaultAudioLanguage}"
                                         SelectedValuePath="Key" />
+                                    <CheckBox
+                                        Margin="3"
+                                        Content="Disable thumbnail tooltips"
+                                        IsChecked="{Binding Settings.DisableThumbnailTooltips}" />
                                     <CheckBox
                                         Margin="3"
                                         Content="Disable live session notification"
@@ -675,39 +681,6 @@
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
                             <Setter Property="Focusable" Value="False" />
-                            <Setter Property="ToolTip">
-                                <Setter.Value>
-                                    <ToolTip Placement="Left">
-                                        <ToolTip.Style>
-                                            <Style TargetType="ToolTip">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate TargetType="ToolTip">
-                                                            <ContentPresenter />
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </Style>
-                                        </ToolTip.Style>
-                                        <ToolTip.Triggers>
-                                            <EventTrigger RoutedEvent="ToolTip.Opened">
-                                                <BeginStoryboard>
-                                                    <Storyboard TargetProperty="Opacity">
-                                                        <DoubleAnimation
-                                                            From="0.0"
-                                                            To="1.0"
-                                                            Duration="0:0:0.75" />
-                                                    </Storyboard>
-                                                </BeginStoryboard>
-                                            </EventTrigger>
-                                        </ToolTip.Triggers>
-                                        <Image
-                                            Width="400"
-                                            RenderOptions.BitmapScalingMode="HighQuality"
-                                            Source="{Binding ThumbnailUrl, TargetNullValue={x:Null}}" />
-                                    </ToolTip>
-                                </Setter.Value>
-                            </Setter>
                             <Setter Property="Visibility" Value="Collapsed" />
                             <Style.Triggers>
                                 <DataTrigger Value="True">
@@ -720,6 +693,41 @@
                                         </MultiBinding>
                                     </DataTrigger.Binding>
                                     <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding DataContext.Settings.DisableThumbnailTooltips, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" Value="False">
+                                    <Setter Property="ToolTip">
+                                        <Setter.Value>
+                                            <ToolTip Placement="Left">
+                                                <ToolTip.Style>
+                                                    <Style TargetType="ToolTip">
+                                                        <Setter Property="Template">
+                                                            <Setter.Value>
+                                                                <ControlTemplate TargetType="ToolTip">
+                                                                    <ContentPresenter />
+                                                                </ControlTemplate>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Style>
+                                                </ToolTip.Style>
+                                                <ToolTip.Triggers>
+                                                    <EventTrigger RoutedEvent="ToolTip.Opened">
+                                                        <BeginStoryboard>
+                                                            <Storyboard TargetProperty="Opacity">
+                                                                <DoubleAnimation
+                                                                    From="0.0"
+                                                                    To="1.0"
+                                                                    Duration="0:0:0.75" />
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </EventTrigger>
+                                                </ToolTip.Triggers>
+                                                <Image
+                                                    Width="400"
+                                                    RenderOptions.BitmapScalingMode="HighQuality"
+                                                    Source="{Binding ThumbnailUrl, TargetNullValue={x:Null}}" />
+                                            </ToolTip>
+                                        </Setter.Value>
+                                    </Setter>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>

@@ -19,6 +19,7 @@ namespace RaceControl.Core.Settings
         private string _subscriptionStatus;
         private DateTime? _lastLogin;
         private string _defaultAudioLanguage;
+        private bool _disableThumbnailTooltips;
         private bool _disableLiveSessionNotification;
         private bool _disableMpvNoBorder;
         private bool _enableMpvAutoSync;
@@ -56,6 +57,12 @@ namespace RaceControl.Core.Settings
         {
             get => _defaultAudioLanguage;
             set => SetProperty(ref _defaultAudioLanguage, value);
+        }
+
+        public bool DisableThumbnailTooltips
+        {
+            get => _disableThumbnailTooltips;
+            set => SetProperty(ref _disableThumbnailTooltips, value);
         }
 
         public bool DisableLiveSessionNotification
