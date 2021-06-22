@@ -353,22 +353,18 @@ namespace RaceControl.ViewModels
 
         private void SeasonSelectionChangedExecute()
         {
-            ClearEvents();
-
             if (SelectedSeason != null)
             {
-                IsBusy = true;
+                ClearEvents();
                 SelectSeasonAsync(SelectedSeason).Await(SetNotBusy, HandleCriticalError);
             }
         }
 
         private void EventSelectionChangedExecute()
         {
-            ClearSessions();
-
             if (SelectedEvent != null)
             {
-                IsBusy = true;
+                ClearSessions();
                 SelectEventAsync(SelectedEvent).Await(SetNotBusy, HandleCriticalError);
             }
         }
@@ -377,7 +373,6 @@ namespace RaceControl.ViewModels
         {
             if (SelectedLiveSession != null)
             {
-                IsBusy = true;
                 SelectedSession = null;
                 SelectSessionAsync(SelectedLiveSession).Await(SetNotBusy, HandleCriticalError);
             }
@@ -387,7 +382,6 @@ namespace RaceControl.ViewModels
         {
             if (SelectedSession != null)
             {
-                IsBusy = true;
                 SelectedLiveSession = null;
                 SelectSessionAsync(SelectedSession).Await(SetNotBusy, HandleCriticalError);
             }
@@ -397,7 +391,6 @@ namespace RaceControl.ViewModels
         {
             if (!string.IsNullOrWhiteSpace(SelectedVodGenre))
             {
-                IsBusy = true;
                 SelectGenreAsync(SelectedVodGenre).Await(SetNotBusy, HandleCriticalError);
             }
         }
@@ -807,6 +800,8 @@ namespace RaceControl.ViewModels
 
         private async Task SelectSeasonAsync(Season season)
         {
+            IsBusy = true;
+
             if (season.Year >= 2018)
             {
                 await LoadEventsForSeasonAsync(season);
@@ -819,11 +814,14 @@ namespace RaceControl.ViewModels
 
         private async Task SelectEventAsync(Event evt)
         {
+            IsBusy = true;
+
             await Task.WhenAll(LoadSessionsForEventAsync(evt), LoadEpisodesForEventAsync(evt));
         }
 
         private async Task SelectSessionAsync(Session session)
         {
+            IsBusy = true;
             Channels.Clear();
             SelectedVodGenre = null;
 
@@ -832,6 +830,7 @@ namespace RaceControl.ViewModels
 
         private async Task SelectGenreAsync(string genre)
         {
+            IsBusy = true;
             Episodes.Clear();
             Channels.Clear();
             Sessions.Clear();
