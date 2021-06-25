@@ -84,7 +84,7 @@ namespace RaceControl.Services.F1TV
 
             return apiResponse.ResultObj.Containers
                 .SelectMany(c1 => c1.RetrieveItems.ResultObj.Containers
-                    .Where(c2 => c2.Metadata.ContentType == "VIDEO" && c2.Metadata.ContentSubtype == "LIVE")
+                    .Where(c2 => c2.Metadata?.ContentType == "VIDEO" && c2.Metadata?.ContentSubtype == "LIVE")
                     .Select(CreateSession))
                 .DistinctBy(s => s.ContentID)
                 .OrderBy(s => s.SeriesUID)
