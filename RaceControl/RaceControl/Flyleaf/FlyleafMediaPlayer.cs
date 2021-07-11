@@ -213,11 +213,6 @@ namespace RaceControl.Flyleaf
 
             Player.OpenCompleted += _openCompletedEventHandler;
 
-            if (settings.FullScreen)
-            {
-                ToggleFullScreen();
-            }
-
             Player.Open(streamUrl);
         }
 

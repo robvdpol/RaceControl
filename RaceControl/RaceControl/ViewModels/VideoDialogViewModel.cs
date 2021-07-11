@@ -481,16 +481,6 @@ namespace RaceControl.ViewModels
             }
         }
 		
-        private bool CanSelectChannelExecute(IPlayableChannel channel)
-        {
-            return Channels.CurrentChannel != channel;
-        }
-
-        private void SelectChannelExecute(IPlayableChannel channel)
-        {
-            Channels.CurrentChannel = channel;
-        }
-
         private void CloseAllWindowsExecute()
         {
             _eventAggregator.GetEvent<CloseAllEvent>().Publish(null);
