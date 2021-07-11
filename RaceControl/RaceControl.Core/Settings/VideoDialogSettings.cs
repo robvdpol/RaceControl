@@ -21,6 +21,7 @@ namespace RaceControl.Core.Settings
         private string _audioDevice;
         private string _audioTrack;
         private string _channelName;
+        private long _startTime;
 
         public double Top
         {
@@ -112,10 +113,18 @@ namespace RaceControl.Core.Settings
             set => SetProperty(ref _channelName, value);
         }
 
+        public long StartTime
+        {
+            get => _startTime;
+            set => SetProperty(ref _startTime, value);
+        }
+
         public static VideoDialogSettings GetDefaultSettings()
         {
             return new()
             {
+                // Default to the "und(etermined)" track, which (at least for now) seems to be the default track for the selected channel
+                AudioTrack = "und", 
                 FullScreen = false,
                 ResizeMode = ResizeMode.CanResize,
                 VideoQuality = VideoQuality.High,
