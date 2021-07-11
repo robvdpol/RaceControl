@@ -11,6 +11,9 @@
         <i:EventTrigger EventName="StateChanged">
             <i:InvokeCommandAction Command="{Binding WindowStateChangedCommand}" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" />
         </i:EventTrigger>
+        <i:EventTrigger EventName="KeyDown">
+            <i:InvokeCommandAction Command="{Binding KeyDownCommand}" PassEventArgsToCommand="True" />
+        </i:EventTrigger>
     </i:Interaction.Triggers>
     <Window.Style>
         <Style TargetType="{x:Type Window}">
