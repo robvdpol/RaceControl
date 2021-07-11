@@ -196,7 +196,7 @@ namespace RaceControl.Flyleaf
         public void StartPlayback(string streamUrl, VideoDialogSettings settings)
         {
             IsStarting = true;
-			
+
             if (_openCompletedEventHandler != null)
             {
                 Player.OpenCompleted -= _openCompletedEventHandler;
@@ -319,9 +319,10 @@ namespace RaceControl.Flyleaf
                     IsPlaying = Player.Status == Status.Playing;
                     IsPaused = Player.Status == Status.Paused;
 
-                    if (IsPlaying)
+                    // Assign when playing or stopping, not when starting, pausing or any other status.
+                    if (new []{ Status.Playing, Status.Stopping, Status.Stopped }.Contains(Player.Status))
                     {
-                        IsStarted = true;
+                        IsStarted = IsPlaying;
                     }
                 });
             }
