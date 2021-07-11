@@ -39,11 +39,14 @@ namespace RaceControl.Flyleaf
         private bool _videoInitialized;
         private bool _audioInitialized;
         private bool _disposed;
+        private EventHandler<Player.OpenCompletedArgs> _openCompletedEventHandler;
 
         public FlyleafMediaPlayer(ILogger logger, Player player)
         {
             _logger = logger;
+
             Player = player;
+            Player.PropertyChanged += PlayerOnPropertyChanged;
         }
 
         public Player Player { get; }
@@ -193,8 +196,14 @@ namespace RaceControl.Flyleaf
         public void StartPlayback(string streamUrl, VideoDialogSettings settings)
         {
             IsStarting = true;
+			
+            if (_openCompletedEventHandler != null)
+            {
+                Player.OpenCompleted -= _openCompletedEventHandler;
+            }
 
-            Player.OpenCompleted += (_, args) =>
+            // Create and remember a new event handler instance with the given settings instance.
+            _openCompletedEventHandler = (_, args) =>
             {
                 if (args.success)
                 {
@@ -202,8 +211,23 @@ namespace RaceControl.Flyleaf
                 }
             };
 
-            Player.PropertyChanged += PlayerOnPropertyChanged;
+            Player.OpenCompleted += _openCompletedEventHandler;
+
+            if (settings.FullScreen)
+            {
+                ToggleFullScreen();
+            }
+
             Player.Open(streamUrl);
+        }
+
+        public void StopPlayback()
+        {
+            Player.Stop();
+            _videoInitialized = false;
+
+            AudioTrack = null;
+            _audioInitialized = false;
         }
 
         public void TogglePause()
@@ -253,6 +277,7 @@ namespace RaceControl.Flyleaf
             }
 
             _disposed = true;
+
         }
 
         private void PlayerOnOpenCompleted(MediaType mediaType, VideoDialogSettings settings)
@@ -264,7 +289,7 @@ namespace RaceControl.Flyleaf
                     {
                         Application.Current.Dispatcher.Invoke(() =>
                         {
-                            InitializeVideo(settings.VideoQuality, settings.Zoom, settings.AspectRatio);
+                            InitializeVideo(settings.VideoQuality, settings.Zoom, settings.AspectRatio, settings.StartTime);
                         });
 
                         _videoInitialized = true;
@@ -317,8 +342,11 @@ namespace RaceControl.Flyleaf
             }
         }
 
-        private void InitializeVideo(VideoQuality videoQuality, int zoom, string aspectRatio)
+        private void InitializeVideo(VideoQuality videoQuality, int zoom, string aspectRatio, long startTime)
         {
+            AspectRatios.Clear();
+            
+            Player.Session.PropertyChanged -= SessionOnPropertyChanged;
             Player.Session.PropertyChanged += SessionOnPropertyChanged;
             AspectRatios.AddRange(FlyleafLibAspectRatio.AspectRatios.Where(ar => ar != FlyleafLibAspectRatio.Custom).Select(ar => new FlyleafAspectRatio(ar)));
             Duration = Player.Session.Movie.Duration;
@@ -335,12 +363,22 @@ namespace RaceControl.Flyleaf
             }
 
             Zoom = zoom;
+
+            if (startTime > 0)
+            {
+                Player.Session.CurTime = startTime;
+                Player.Seek((int)startTime);
+            }
         }
 
         private void InitializeAudio(string audioDevice, string audioTrack, bool isMuted, int volume)
         {
+            AudioDevices.Clear();
             AudioDevices.AddRange(Master.AudioMaster.Devices.Select(device => new FlyleafAudioDevice(device)));
+
+            AudioTracks.Clear();
             AudioTracks.AddRange(Player.curAudioPlugin.AudioStreams.Select(stream => new FlyleafAudioTrack(stream)));
+            
             Volume = volume;
             ToggleMute(isMuted);
 

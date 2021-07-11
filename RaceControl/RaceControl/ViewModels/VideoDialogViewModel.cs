@@ -15,6 +15,7 @@ using RaceControl.Services.Interfaces.F1TV;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
@@ -51,6 +52,7 @@ namespace RaceControl.ViewModels
         private ICommand _zoomCommand;
         private ICommand _selectAspectRatioCommand;
         private ICommand _selectAudioDeviceCommand;
+        private ICommand _selectChannelCommand;
         private ICommand _closeVideoWindowCommand;
         private ICommand _exitFullScreenOrCloseWindowCommand;
         private ICommand _selectChannelCommand;
@@ -106,8 +108,10 @@ namespace RaceControl.ViewModels
         public ICommand ExitFullScreenOrCloseWindowCommand => _exitFullScreenOrCloseWindowCommand ??= new DelegateCommand(ExitFullScreenOrCloseWindowExecute);
         public ICommand CloseAllWindowsCommand => _closeAllWindowsCommand ??= new DelegateCommand(CloseAllWindowsExecute);
         public ICommand WindowStateChangedCommand => _windowStateChangedCommand ??= new DelegateCommand<Window>(WindowStateChangedExecute);
+        public ICommand SelectChannelCommand => _selectChannelCommand ??= new DelegateCommand<IPlayableChannel>(SelectChannelExecute, CanSelectChannelExecute).ObservesProperty(() => Channels.CurrentChannel);
         
         public IMediaPlayer MediaPlayer { get; }
+		
         public IChannelCollection Channels { get; private set; }
 		
         public IDictionary<VideoQuality, string> VideoQualities { get; } = new Dictionary<VideoQuality, string>
@@ -121,7 +125,11 @@ namespace RaceControl.ViewModels
         public IPlayableContent PlayableContent
         {
             get => _playableContent;
-            set => SetProperty(ref _playableContent, value);
+            set 
+            {
+                SetProperty(ref _playableContent, value);
+                RaisePropertyChanged(nameof(Title));
+            }
         }
 
         public VideoDialogSettings DialogSettings
@@ -403,6 +411,27 @@ namespace RaceControl.ViewModels
             DialogSettings.Left = windowLeft;
         }
 
+        private bool CanSelectChannelExecute(IPlayableChannel channel)
+        {
+            return Channels.CurrentChannel != channel;
+        }
+
+        private async void SelectChannelExecute(IPlayableChannel channel)
+        {
+            var currentTime = MediaPlayer.Time;
+            MediaPlayer.StopPlayback();
+            
+            Channels.CurrentChannel = channel;
+            PlayableContent = channel;
+            
+            if (!PlayableContent.IsLive)
+            {
+                DialogSettings.StartTime = currentTime;
+            }
+
+            await StartStreamAsync();
+        }
+
         private void ZoomExecute(int? zoom)
         {
             if (zoom.HasValue)
@@ -538,6 +567,8 @@ namespace RaceControl.ViewModels
             {
                 throw new Exception("An error occurred while retrieving the stream URL.");
             }
+
+            DialogSettings.IsMuted = Channels.Graphs.Contains(PlayableContent as IPlayableChannel);
 
             MediaPlayer.StartPlayback(streamUrl, DialogSettings);
         }
