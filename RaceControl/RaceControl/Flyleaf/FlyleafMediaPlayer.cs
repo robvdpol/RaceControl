@@ -218,7 +218,8 @@ namespace RaceControl.Flyleaf
 
         public void StopPlayback()
         {
-            Player.Stop();
+            // Calling Stop() on the UI thread deadlocks
+            Task.Run(() => Player.Stop());
             _videoInitialized = false;
 
             AudioTrack = null;
