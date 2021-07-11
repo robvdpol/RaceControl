@@ -93,7 +93,7 @@ namespace RaceControl.ViewModels
         private ObservableCollection<Session> _sessions;
         private ObservableCollection<Session> _liveSessions;
         private ObservableCollection<string> _vodGenres;
-        private ObservableCollection<IPlayableContent> _channels;
+        private ObservableCollection<IPlayableChannel> _channels;
         private ObservableCollection<IPlayableContent> _episodes;
         private ObservableCollection<NetworkInterface> _networkInterfaces;
         private ObservableCollection<IReceiver> _receivers;
@@ -225,7 +225,7 @@ namespace RaceControl.ViewModels
 
         public ObservableCollection<string> VodGenres => _vodGenres ??= new ObservableCollection<string>();
 
-        public ObservableCollection<IPlayableContent> Channels => _channels ??= new ObservableCollection<IPlayableContent>();
+        public ObservableCollection<IPlayableChannel> Channels => _channels ??= new ObservableCollection<IPlayableChannel>();
 
         public ObservableCollection<IPlayableContent> Episodes => _episodes ??= new ObservableCollection<IPlayableContent>();
 
@@ -894,7 +894,8 @@ namespace RaceControl.ViewModels
             {
                 { ParameterNames.Identifier, identifier },
                 { ParameterNames.Content, playableContent },
-                { ParameterNames.Settings, settings }
+                { ParameterNames.Settings, settings },
+                { ParameterNames.Channels, Channels }
             };
 
             _dialogService.Show(nameof(VideoDialog), parameters, _ => _numberGenerator.RemoveNumber(identifier), nameof(VideoDialogWindow));

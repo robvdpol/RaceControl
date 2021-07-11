@@ -14,6 +14,8 @@ using RaceControl.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -51,6 +53,7 @@ namespace RaceControl.ViewModels
         private ICommand _selectAudioDeviceCommand;
         private ICommand _closeVideoWindowCommand;
         private ICommand _exitFullScreenOrCloseWindowCommand;
+        private ICommand _selectChannelCommand;
         private ICommand _closeAllWindowsCommand;
         private ICommand _windowStateChangedCommand;
 
@@ -99,12 +102,14 @@ namespace RaceControl.ViewModels
         public ICommand SelectAspectRatioCommand => _selectAspectRatioCommand ??= new DelegateCommand<IAspectRatio>(SelectAspectRatioExecute, CanSelectAspectRatioExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => MediaPlayer.AspectRatio);
         public ICommand SelectAudioDeviceCommand => _selectAudioDeviceCommand ??= new DelegateCommand<IAudioDevice>(SelectAudioDeviceExecute, CanSelectAudioDeviceExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => MediaPlayer.AudioDevice);
         public ICommand CloseVideoWindowCommand => _closeVideoWindowCommand ??= new DelegateCommand(RaiseRequestClose, CanCloseVideoWindowExecute).ObservesProperty(() => MediaPlayer.IsStarting);
+        public ICommand SelectChannelCommand => _selectChannelCommand ??= new DelegateCommand<IPlayableChannel>(SelectChannelExecute, CanSelectChannelExecute).ObservesProperty(() => Channels.CurrentChannel);
         public ICommand ExitFullScreenOrCloseWindowCommand => _exitFullScreenOrCloseWindowCommand ??= new DelegateCommand(ExitFullScreenOrCloseWindowExecute);
         public ICommand CloseAllWindowsCommand => _closeAllWindowsCommand ??= new DelegateCommand(CloseAllWindowsExecute);
         public ICommand WindowStateChangedCommand => _windowStateChangedCommand ??= new DelegateCommand<Window>(WindowStateChangedExecute);
-
+        
         public IMediaPlayer MediaPlayer { get; }
-
+        public IChannelCollection Channels { get; private set; }
+		
         public IDictionary<VideoQuality, string> VideoQualities { get; } = new Dictionary<VideoQuality, string>
         {
             { VideoQuality.High, "High" },
@@ -153,6 +158,7 @@ namespace RaceControl.ViewModels
         {
             _identifier = parameters.GetValue<long>(ParameterNames.Identifier);
             PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.Content);
+            Channels = new ChannelCollection(parameters.GetValue<ObservableCollection<IPlayableChannel>>(ParameterNames.Channels), PlayableContent as IPlayableChannel);
 
             var dialogSettings = parameters.GetValue<VideoDialogSettings>(ParameterNames.Settings);
 
@@ -444,6 +450,16 @@ namespace RaceControl.ViewModels
             {
                 CloseVideoWindowCommand.TryExecute();
             }
+        }
+		
+        private bool CanSelectChannelExecute(IPlayableChannel channel)
+        {
+            return Channels.CurrentChannel != channel;
+        }
+
+        private void SelectChannelExecute(IPlayableChannel channel)
+        {
+            Channels.CurrentChannel = channel;
         }
 
         private void CloseAllWindowsExecute()
