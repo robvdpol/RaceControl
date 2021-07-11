@@ -231,11 +231,12 @@
                                 Header="Bottom Right" />
                         </MenuItem>
                         <Separator />
-	                <MenuItem Height="22" Header="Channel">
-	                    <MenuItem Header="Globals" ItemsSource="{Binding Channels.Globals}" ItemContainerStyle="{StaticResource ChannelMenuItemContainerStyle}" />
-	                    <MenuItem Header="Graphs" ItemsSource="{Binding Channels.Graphs}" ItemContainerStyle="{StaticResource ChannelMenuItemContainerStyle}" />
-	                    <MenuItem Header="Onboards" ItemsSource="{Binding Channels.Onboards}" ItemContainerStyle="{StaticResource ChannelMenuItemContainerStyle}" />
-	                </MenuItem>
+	                    <MenuItem Height="22" Header="Channel">
+	                        <MenuItem Header="Globals" ItemsSource="{Binding Channels.Globals}" ItemContainerStyle="{StaticResource ChannelMenuItemContainerStyle}" />
+	                        <MenuItem Header="Graphs" ItemsSource="{Binding Channels.Graphs}" ItemContainerStyle="{StaticResource ChannelMenuItemContainerStyle}" />
+	                        <MenuItem Header="Onboards" ItemsSource="{Binding Channels.Onboards}" ItemContainerStyle="{StaticResource ChannelMenuItemContainerStyle}" />
+                        </MenuItem>
+                        <Separator />
                         <MenuItem Command="{Binding CloseVideoWindowCommand}" Header="Close Player" />
                         <MenuItem Command="{Binding CloseAllWindowsCommand}" Header="Close All Players" />
                     </ContextMenu>
