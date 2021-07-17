@@ -35,7 +35,7 @@
             TextWrapping="Wrap" />
         <TextBlock
             Grid.Row="2"
-            Text="Would you like to go to Github to download this release?"
+            Text="Would you like to go to GitHub to download this release?"
             TextWrapping="Wrap" />
         <TextBlock
             Grid.Row="3"
@@ -54,7 +54,7 @@
                 Margin="10,0"
                 Command="{Binding CloseCommand}"
                 CommandParameter="{StaticResource True}"
-                Content="Go to Github" />
+                Content="Go to GitHub" />
             <Button
                 Width="100"
                 Height="24"
