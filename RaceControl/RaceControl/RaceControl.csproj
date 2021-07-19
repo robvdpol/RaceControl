@@ -59,7 +59,7 @@
     <Resource Include="splashscreen.png" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FlyleafLib" Version="3.1.8" />
+    <PackageReference Include="FlyleafLib" Version="3.1.9" />
     <PackageReference Include="GoogleCast" Version="1.7.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.31" />
     <PackageReference Include="NLog" Version="4.7.10" />
