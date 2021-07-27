@@ -62,7 +62,7 @@ namespace RaceControl
 
             var path = Path.Combine(Environment.CurrentDirectory, "FFmpeg");
             Master.RegisterFFmpeg(path);
-            Master.PreventAborts = true;
+            Master.PreventAutoDispose = true;
 
             base.Initialize();
         }
