@@ -19,6 +19,7 @@ namespace RaceControl.Core.Settings
         private string _subscriptionStatus;
         private DateTime? _lastLogin;
         private string _defaultAudioLanguage;
+        private string _recordingLocation = FolderUtils.GetSpecialFolderPath(Environment.SpecialFolder.Desktop);
         private bool _disableThumbnailTooltips;
         private bool _disableLiveSessionNotification;
         private bool _disableMpvNoBorder;
@@ -57,6 +58,12 @@ namespace RaceControl.Core.Settings
         {
             get => _defaultAudioLanguage;
             set => SetProperty(ref _defaultAudioLanguage, value);
+        }
+
+        public string RecordingLocation
+        {
+            get => _recordingLocation;
+            set => SetProperty(ref _recordingLocation, value);
         }
 
         public bool DisableThumbnailTooltips

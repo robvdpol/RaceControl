@@ -5,6 +5,7 @@ using Prism.Services.Dialogs;
 using RaceControl.Common.Constants;
 using RaceControl.Common.Enums;
 using RaceControl.Common.Interfaces;
+using RaceControl.Common.Utils;
 using RaceControl.Core.Helpers;
 using RaceControl.Core.Mvvm;
 using RaceControl.Core.Settings;
@@ -14,6 +15,7 @@ using RaceControl.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
@@ -44,6 +46,7 @@ namespace RaceControl.ViewModels
         private ICommand _toggleMuteCommand;
         private ICommand _fastForwardCommand;
         private ICommand _syncSessionCommand;
+        private ICommand _toggleRecordingCommand;
         private ICommand _toggleFullScreenCommand;
         private ICommand _moveToCornerCommand;
         private ICommand _zoomCommand;
@@ -93,6 +96,7 @@ namespace RaceControl.ViewModels
         public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand<bool?>(ToggleMuteExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
         public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<int?>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => PlayableContent);
         public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => PlayableContent);
+        public ICommand ToggleRecordingCommand => _toggleRecordingCommand ??= new DelegateCommand(ToggleRecordingExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand<long?>(ToggleFullScreenExecute);
         public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => DialogSettings.FullScreen);
         public ICommand ZoomCommand => _zoomCommand ??= new DelegateCommand<int?>(ZoomExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
@@ -317,41 +321,22 @@ namespace RaceControl.ViewModels
             _eventAggregator.GetEvent<SyncStreamsEvent>().Publish(payload);
         }
 
-        private void OnSyncStreams(SyncStreamsEventPayload payload)
+        private void ToggleRecordingExecute()
         {
-            if (MediaPlayer.IsStarted && PlayableContent.SyncUID == payload.SyncUID)
+            if (!MediaPlayer.IsRecording)
             {
-                MediaPlayer.Time = payload.Time;
+                var filename = $"{DateTime.Now:yyyyMMddHHmmss} {PlayableContent.Title}.mp4".RemoveInvalidFileNameChars();
+
+                if (!string.IsNullOrWhiteSpace(_settings.RecordingLocation))
+                {
+                    filename = Path.Combine(_settings.RecordingLocation, filename);
+                }
+
+                MediaPlayer.StartRecording(filename);
             }
-        }
-
-        private void OnPauseAll()
-        {
-            TogglePauseCommand.TryExecute();
-        }
-
-        private void OnMuteAll(long identifier)
-        {
-            var mute = identifier != _identifier;
-            ToggleMuteCommand.TryExecute(mute);
-        }
-
-        private void OnCloseAll(ContentType? contentType)
-        {
-            CloseVideoWindowCommand.TryExecute();
-        }
-
-        private void OnSaveLayout(ContentType contentType)
-        {
-            var dialogSettings = GetDialogSettings();
-            _videoDialogLayout.Instances.Add(dialogSettings);
-        }
-
-        private void OnToggleFullScreen(long identifier)
-        {
-            if (ToggleFullScreenCommand.TryExecute() && DialogSettings.FullScreen)
+            else
             {
-                _eventAggregator.GetEvent<MuteAllEvent>().Publish(identifier);
+                MediaPlayer.StopRecording();
             }
         }
 
@@ -458,6 +443,44 @@ namespace RaceControl.ViewModels
             {
                 SetWindowed();
                 SetFullScreen();
+            }
+        }
+
+        private void OnSyncStreams(SyncStreamsEventPayload payload)
+        {
+            if (MediaPlayer.IsStarted && PlayableContent.SyncUID == payload.SyncUID)
+            {
+                MediaPlayer.Time = payload.Time;
+            }
+        }
+
+        private void OnPauseAll()
+        {
+            TogglePauseCommand.TryExecute();
+        }
+
+        private void OnMuteAll(long identifier)
+        {
+            var mute = identifier != _identifier;
+            ToggleMuteCommand.TryExecute(mute);
+        }
+
+        private void OnCloseAll(ContentType? contentType)
+        {
+            CloseVideoWindowCommand.TryExecute();
+        }
+
+        private void OnSaveLayout(ContentType contentType)
+        {
+            var dialogSettings = GetDialogSettings();
+            _videoDialogLayout.Instances.Add(dialogSettings);
+        }
+
+        private void OnToggleFullScreen(long identifier)
+        {
+            if (ToggleFullScreenCommand.TryExecute() && DialogSettings.FullScreen)
+            {
+                _eventAggregator.GetEvent<MuteAllEvent>().Publish(identifier);
             }
         }
 

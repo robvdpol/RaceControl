@@ -24,15 +24,20 @@
     <None Remove="Icons\no_audio_48px.png" />
     <None Remove="Icons\pause_48px.png" />
     <None Remove="Icons\play_48px.png" />
+    <None Remove="Icons\record_48px.png" />
     <None Remove="Icons\rewind_10_48px.png" />
     <None Remove="Icons\rewind_60_48px.png" />
     <None Remove="Icons\right_down_48px.png" />
     <None Remove="Icons\right_up_48px.png" />
     <None Remove="Icons\shutdown_96px.png" />
+    <None Remove="Icons\stop_48px.png" />
     <None Remove="Icons\synchronize_48px.png" />
     <None Remove="Icons\windowed_96px.png" />
     <None Remove="livesession.wav" />
     <None Remove="splashscreen.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\record_48px.png" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="livesession.wav">
@@ -54,6 +59,7 @@
     <Resource Include="Icons\right_down_48px.png" />
     <Resource Include="Icons\right_up_48px.png" />
     <Resource Include="Icons\shutdown_96px.png" />
+    <Resource Include="Icons\stop_48px.png" />
     <Resource Include="Icons\synchronize_48px.png" />
     <Resource Include="Icons\windowed_96px.png" />
     <Resource Include="splashscreen.png" />

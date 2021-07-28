@@ -1058,10 +1058,10 @@ namespace RaceControl.ViewModels
 
         private void StartDownload(IPlayableContent playableContent)
         {
-            var defaultFilename = $"{playableContent.Title}.ts".RemoveInvalidFileNameChars();
-            var initialDirectory = FolderUtils.GetSpecialFolderPath(Environment.SpecialFolder.Desktop);
+            var defaultFilename = $"{playableContent.Title}.mp4".RemoveInvalidFileNameChars();
+            var initialDirectory = !string.IsNullOrWhiteSpace(Settings.RecordingLocation) ? Settings.RecordingLocation : FolderUtils.GetSpecialFolderPath(Environment.SpecialFolder.Desktop);
 
-            if (_dialogService.SaveFile("Select a filename", initialDirectory, defaultFilename, ".ts", out var filename))
+            if (_dialogService.SaveFile("Select a filename", initialDirectory, defaultFilename, ".mp4", out var filename))
             {
                 var parameters = new DialogParameters
                 {

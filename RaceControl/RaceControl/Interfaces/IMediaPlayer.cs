@@ -15,6 +15,8 @@ namespace RaceControl.Interfaces
 
         bool IsPaused { get; }
 
+        bool IsRecording { get; }
+
         long Time { get; set; }
 
         long Duration { get; }
@@ -42,6 +44,10 @@ namespace RaceControl.Interfaces
         IMediaTrack AudioTrack { get; set; }
 
         void StartPlayback(string streamUrl, VideoDialogSettings settings);
+
+        void StartRecording(string filename);
+
+        void StopRecording();
 
         void TogglePause();
 
