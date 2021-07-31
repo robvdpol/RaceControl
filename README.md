@@ -22,7 +22,7 @@ Race Control is an open source [F1TV](https://f1tv.formula1.com) desktop client 
 
 ## Installation
 #### Microsoft Store
-Due to a Content Infringement Complaint from Formula One Licensing BV, Race Control has been pulled from the Microsoft Store until further notice. Please perform a manual installation instead. (see below).
+Due to a Content Infringement Complaint from Formula One Licensing BV, Race Control has been pulled from the Microsoft Store until further notice. Please perform a manual installation instead (see below).
 
 #### Manual installation
 * Make sure the [.NET 5.0 Desktop Runtime (x64)](https://dotnet.microsoft.com/download/dotnet-core/5.0/runtime) is installed on your system.
