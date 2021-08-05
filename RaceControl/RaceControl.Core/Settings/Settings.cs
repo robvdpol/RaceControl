@@ -29,6 +29,7 @@ namespace RaceControl.Core.Settings
         private string _latestRelease;
         private string _selectedNetworkInterface;
         private ObservableCollection<string> _selectedSeries;
+        private ObservableCollection<HotkeyBinding> _hotkeys;
 
         public Settings(ILogger logger, JsonSerializer serializer)
         {
@@ -119,7 +120,13 @@ namespace RaceControl.Core.Settings
             get => _selectedSeries ??= new ObservableCollection<string>();
             set => SetProperty(ref _selectedSeries, value);
         }
-
+        
+        public ObservableCollection<HotkeyBinding> Hotkeys
+        {
+            get => _hotkeys ??= new ObservableCollection<HotkeyBinding>();
+            set => SetProperty(ref _hotkeys, value);
+        }
+        
         public void Load()
         {
             if (!File.Exists(Filename))

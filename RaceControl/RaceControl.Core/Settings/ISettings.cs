@@ -33,6 +33,8 @@ namespace RaceControl.Core.Settings
 
         ObservableCollection<string> SelectedSeries { get; set; }
 
+        ObservableCollection<HotkeyBinding> Hotkeys { get; set; }
+
         void Load();
 
         void Save();

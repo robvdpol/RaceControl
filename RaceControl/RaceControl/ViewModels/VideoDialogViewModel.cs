@@ -15,11 +15,18 @@ using RaceControl.Interfaces;
 using RaceControl.Services.Interfaces.F1TV;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.IO;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Input;
+using Newtonsoft.Json;
+using Application = System.Windows.Application;
+using Cursors = System.Windows.Input.Cursors;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using Timer = System.Timers.Timer;
 
 namespace RaceControl.ViewModels
 {
@@ -34,6 +41,8 @@ namespace RaceControl.ViewModels
         private readonly IVideoDialogLayout _videoDialogLayout;
         private readonly object _showControlsTimerLock = new();
 
+
+        private ICommand _keyDownCommand;
         private ICommand _mouseDownCommand;
         private ICommand _mouseEnterOrLeaveOrMoveVideoCommand;
         private ICommand _mouseWheelVideoCommand;
@@ -52,6 +61,7 @@ namespace RaceControl.ViewModels
         private ICommand _zoomCommand;
         private ICommand _selectAspectRatioCommand;
         private ICommand _selectAudioDeviceCommand;
+        private ICommand _selectChannelCommand;
         private ICommand _closeVideoWindowCommand;
         private ICommand _exitFullScreenOrCloseWindowCommand;
         private ICommand _closeAllWindowsCommand;
@@ -65,6 +75,8 @@ namespace RaceControl.ViewModels
         private bool _showControls = true;
         private bool _contextMenuIsOpen;
         private Timer _showControlsTimer;
+        private readonly IReadOnlyCollection<(ModifierKeys Modifiers, Key Key, Func<Task> Action)> _boundHotkeys;
+
 
         public VideoDialogViewModel(
             ILogger logger,
@@ -80,10 +92,13 @@ namespace RaceControl.ViewModels
             _apiService = apiService;
             _videoDialogLayout = videoDialogLayout;
             MediaPlayer = mediaPlayer;
-        }
 
+            _boundHotkeys = HookUpHotkeys();
+        }
+        
         public override string Title => $"{_identifier}. {PlayableContent?.Title}";
 
+        public ICommand KeyDownCommand => _keyDownCommand ??= new DelegateCommand<KeyEventArgs>(KeyDownExecute);
         public ICommand MouseDownCommand => _mouseDownCommand ??= new DelegateCommand<MouseButtonEventArgs>(MouseDownExecute);
         public ICommand MouseEnterOrLeaveOrMoveVideoCommand => _mouseEnterOrLeaveOrMoveVideoCommand ??= new DelegateCommand<bool?>(MouseEnterOrLeaveOrMoveVideoExecute);
         public ICommand MouseWheelVideoCommand => _mouseWheelVideoCommand ??= new DelegateCommand<MouseWheelEventArgs>(MouseWheelVideoExecute);
@@ -106,8 +121,11 @@ namespace RaceControl.ViewModels
         public ICommand ExitFullScreenOrCloseWindowCommand => _exitFullScreenOrCloseWindowCommand ??= new DelegateCommand(ExitFullScreenOrCloseWindowExecute);
         public ICommand CloseAllWindowsCommand => _closeAllWindowsCommand ??= new DelegateCommand(CloseAllWindowsExecute);
         public ICommand WindowStateChangedCommand => _windowStateChangedCommand ??= new DelegateCommand<Window>(WindowStateChangedExecute);
+        public ICommand SelectChannelCommand => _selectChannelCommand ??= new DelegateCommand<IPlayableChannel>(SelectChannelExecute, CanSelectChannelExecute).ObservesProperty(() => Channels.CurrentChannel);
 
         public IMediaPlayer MediaPlayer { get; }
+
+        public IChannelCollection Channels { get; private set; }
 
         public IDictionary<VideoQuality, string> VideoQualities { get; } = new Dictionary<VideoQuality, string>
         {
@@ -120,7 +138,11 @@ namespace RaceControl.ViewModels
         public IPlayableContent PlayableContent
         {
             get => _playableContent;
-            set => SetProperty(ref _playableContent, value);
+            set
+            {
+                SetProperty(ref _playableContent, value);
+                RaisePropertyChanged(nameof(Title));
+            }
         }
 
         public VideoDialogSettings DialogSettings
@@ -157,6 +179,7 @@ namespace RaceControl.ViewModels
         {
             _identifier = parameters.GetValue<long>(ParameterNames.Identifier);
             PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.Content);
+            Channels = new ChannelCollection(parameters.GetValue<ObservableCollection<IPlayableChannel>>(ParameterNames.Channels), PlayableContent as IPlayableChannel);
 
             var dialogSettings = parameters.GetValue<VideoDialogSettings>(ParameterNames.Settings);
 
@@ -168,6 +191,8 @@ namespace RaceControl.ViewModels
             else
             {
                 StartupLocation = WindowStartupLocation.CenterScreen;
+
+                // TODO: not for onboards
                 DialogSettings.AudioTrack = PlayableContent.GetPreferredAudioLanguage(_settings.DefaultAudioLanguage);
             }
 
@@ -193,6 +218,24 @@ namespace RaceControl.ViewModels
                     Mouse.OverrideCursor = Cursors.None;
                 }
             });
+        }
+
+        private readonly Key[] _keysToIgnore = { Key.LeftShift, Key.RightShift, Key.LeftCtrl, Key.RightCtrl, Key.LeftAlt, Key.RightAlt, Key.System, Key.LWin, Key.RWin };
+        private async void KeyDownExecute(KeyEventArgs args)
+        {
+            if (args.Handled || _keysToIgnore.Contains(args.Key))
+            {
+                return;
+            }
+
+            foreach (var hotkey in _boundHotkeys)
+            {
+                if (hotkey.Modifiers == Keyboard.Modifiers && hotkey.Key == args.Key)
+                {
+                    // Fire that action!
+                    await hotkey.Action();
+                }
+            }
         }
 
         private void MouseDownExecute(MouseButtonEventArgs e)
@@ -382,6 +425,32 @@ namespace RaceControl.ViewModels
             DialogSettings.Left = windowLeft;
         }
 
+        private bool CanSelectChannelExecute(IPlayableChannel channel)
+        {
+            return Channels.CurrentChannel != channel;
+        }
+
+        private async void SelectChannelExecute(IPlayableChannel channel)
+        {
+            await ChangeChannelAsync(channel);
+        }
+
+        private async Task ChangeChannelAsync(IPlayableChannel channel)
+        {
+            var currentTime = MediaPlayer.Time;
+            MediaPlayer.StopPlayback();
+
+            Channels.CurrentChannel = channel;
+            PlayableContent = channel;
+
+            if (!PlayableContent.IsLive)
+            {
+                DialogSettings.StartTime = currentTime;
+            }
+
+            await StartStreamAsync();
+        }
+
         private void ZoomExecute(int? zoom)
         {
             if (zoom.HasValue)
@@ -546,6 +615,8 @@ namespace RaceControl.ViewModels
                 throw new Exception("An error occurred while retrieving the stream URL.");
             }
 
+            DialogSettings.IsMuted = Channels.Graphs.Contains(PlayableContent as IPlayableChannel);
+
             MediaPlayer.StartPlayback(streamUrl, DialogSettings);
         }
 
@@ -654,5 +725,88 @@ namespace RaceControl.ViewModels
         {
             SetVolume(MediaPlayer.Volume + delta);
         }
+
+        /// <summary>
+        /// Reads hotkeys from settings and maps them to async actions.
+        /// </summary>
+        /// <returns></returns>
+        private IReadOnlyCollection<(ModifierKeys, Key, Func<Task>)> HookUpHotkeys()
+        {
+            var boundHotkeys = new List<(ModifierKeys, Key, Func<Task>)>();
+
+            foreach (var hotkey in _settings.Hotkeys)
+            {
+                var (modifiers, key) = GetKeyAndModifiers(hotkey);
+                if (key == null)
+                {
+                    continue;
+                }
+
+                if (hotkey.Action == "SelectChannel")
+                {
+                    boundHotkeys.Add((modifiers, key.Value, async () =>
+                    {
+                        var channel = FindChannel(hotkey.Parameters);
+                        if (channel != null)
+                        {
+                            await ChangeChannelAsync(channel);
+                        }
+                        else
+                        {
+                            Logger.Info($"Could not find channel '{hotkey.Parameters[0]}.{hotkey.Parameters[1]}' bound to key {hotkey.Key}");
+                        }
+                    }));
+                }
+            }
+
+            return boundHotkeys.AsReadOnly();
+        }
+
+        private (ModifierKeys modifiers, Key? key) GetKeyAndModifiers(HotkeyBinding hotkey)
+        {
+            var controlIndex = hotkey.Key.IndexOf("^", StringComparison.Ordinal);
+            var shiftlIndex = hotkey.Key.IndexOf("+", StringComparison.Ordinal);
+            var altIndex = hotkey.Key.IndexOf("&", StringComparison.Ordinal);
+
+            var modifiers = (controlIndex > -1 ? ModifierKeys.Control : 0)
+                            | (shiftlIndex > -1 ? ModifierKeys.Shift : 0)
+                            | (altIndex > -1 ? ModifierKeys.Alt : 0);
+
+            var modifierIndex = Math.Max(controlIndex, Math.Max(shiftlIndex, altIndex));
+
+            var keyString = hotkey.Key.Substring(modifierIndex > -1 ? modifierIndex + 1 : 0);
+
+            if (!Enum.TryParse(keyString, out Key key))
+            {
+                Logger.Info($"Could not parse key '{hotkey.Key}' ('{keyString}')");
+                return (modifiers, null);
+            }
+
+            return (modifiers, key);
+        }
+
+        /// <summary>
+        /// Turn an array of [ "$groupName", "$channelName" ] into a channel, when found.
+        /// </summary>
+        private IPlayableChannel FindChannel(string[] parameters)
+        {
+            static bool ChannelEquals(IPlayableChannel channel, string channelName)
+            {
+                return channel.Name.Equals(channelName, StringComparison.InvariantCultureIgnoreCase)
+                    || channel.DisplayName.Equals(channelName, StringComparison.InvariantCultureIgnoreCase);
+            }
+
+            var groupName = parameters[0];
+            var channelName = parameters[1];
+
+            return groupName switch
+            {
+                nameof(ChannelType.Global) => Channels.Globals.FirstOrDefault(c => ChannelEquals(c, channelName)),
+                nameof(ChannelType.Graph) => Channels.Graphs.FirstOrDefault(c => ChannelEquals(c, channelName)),
+                nameof(ChannelType.Onboard) => Channels.Onboards.FirstOrDefault(c => ChannelEquals(c, channelName)),
+                _ => null,
+            };
+        }
+
     }
 }

@@ -93,7 +93,7 @@ namespace RaceControl.ViewModels
         private ObservableCollection<Session> _sessions;
         private ObservableCollection<Session> _liveSessions;
         private ObservableCollection<string> _vodGenres;
-        private ObservableCollection<IPlayableContent> _channels;
+        private ObservableCollection<IPlayableChannel> _channels;
         private ObservableCollection<IPlayableContent> _episodes;
         private ObservableCollection<NetworkInterface> _networkInterfaces;
         private ObservableCollection<IReceiver> _receivers;
@@ -225,7 +225,7 @@ namespace RaceControl.ViewModels
 
         public ObservableCollection<string> VodGenres => _vodGenres ??= new ObservableCollection<string>();
 
-        public ObservableCollection<IPlayableContent> Channels => _channels ??= new ObservableCollection<IPlayableContent>();
+        public ObservableCollection<IPlayableChannel> Channels => _channels ??= new ObservableCollection<IPlayableChannel>();
 
         public ObservableCollection<IPlayableContent> Episodes => _episodes ??= new ObservableCollection<IPlayableContent>();
 
@@ -303,6 +303,34 @@ namespace RaceControl.ViewModels
                 HandleCriticalError);
                 RefreshLiveSessionsAsync(true).Await(CreateRefreshTimer, HandleNonCriticalError);
                 CheckForUpdatesAsync().Await(HandleNonCriticalError);
+            }
+
+            InitializeHotkeys();
+        }
+
+        private void InitializeHotkeys()
+        {
+            // TODO: should we add these default shortcuts, and should we do that here?
+            if (!Settings.Hotkeys.Any())
+            {
+                // TODO: move action names to enums
+                Settings.Hotkeys.Add(new HotkeyBinding("^F1", "SelectChannel", new[] { "Global", "World Feed" }));
+                Settings.Hotkeys.Add(new HotkeyBinding("^F2", "SelectChannel", new[] { "Global", "Pit Lane" }));
+                Settings.Hotkeys.Add(new HotkeyBinding("^F3", "SelectChannel", new[] { "Graph", "Live Timings" }));
+                Settings.Hotkeys.Add(new HotkeyBinding("^F4", "SelectChannel", new[] { "Graph", "Driver Tracker" }));
+                
+                // Fingerbenders, more like a demo, TODO: document format
+                Settings.Hotkeys.Add(new HotkeyBinding("+^&Z", "SelectChannel", new[] { "Graph", "Driver Tracker" }));
+                Settings.Hotkeys.Add(new HotkeyBinding("+&^T", "SelectChannel", new[] { "Graph", "DATA" }));
+                Settings.Hotkeys.Add(new HotkeyBinding("^&+D", "SelectChannel", new[] { "Graph", "TRACKER" }));
+
+                // TODO: implement
+                Settings.Hotkeys.Add(new HotkeyBinding("^P", "PlayerControl", new[] { "TogglePlayPause" }));
+
+                Settings.Hotkeys.Add(new HotkeyBinding("+F1", "SelectChannel", new[] { "Onboard", "Max Verstappen" }));
+                Settings.Hotkeys.Add(new HotkeyBinding("+F2", "SelectChannel", new[] { "Onboard", "Lewis Hamilton" }));
+                Settings.Hotkeys.Add(new HotkeyBinding("+F3", "SelectChannel", new[] { "Onboard", "Valtteri Bottas" }));
+
             }
         }
 
@@ -894,7 +922,8 @@ namespace RaceControl.ViewModels
             {
                 { ParameterNames.Identifier, identifier },
                 { ParameterNames.Content, playableContent },
-                { ParameterNames.Settings, settings }
+                { ParameterNames.Settings, settings },
+                { ParameterNames.Channels, Channels }
             };
 
             _dialogService.Show(nameof(VideoDialog), parameters, _ => _numberGenerator.RemoveNumber(identifier), nameof(VideoDialogWindow));

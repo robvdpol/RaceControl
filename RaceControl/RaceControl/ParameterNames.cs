@@ -9,5 +9,6 @@
         public const string Settings = nameof(Settings);
         public const string Release = nameof(Release);
         public const string Filename = nameof(Filename);
+        public const string Channels = nameof(Channels);
     }
 }
