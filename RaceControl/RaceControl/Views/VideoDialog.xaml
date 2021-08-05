@@ -42,6 +42,8 @@
         <BitmapImage x:Key="Rewind10BitmapImage" UriSource="/Icons/rewind_10_48px.png" />
         <BitmapImage x:Key="Rewind60BitmapImage" UriSource="/Icons/rewind_60_48px.png" />
         <BitmapImage x:Key="SynchronizeBitmapImage" UriSource="/Icons/synchronize_48px.png" />
+        <BitmapImage x:Key="RecordBitmapImage" UriSource="/Icons/record_48px.png" />
+        <BitmapImage x:Key="StopBitmapImage" UriSource="/Icons/stop_48px.png" />
         <BitmapImage x:Key="FullscreenBitmapImage" UriSource="/Icons/fullscreen_96px.png" />
         <BitmapImage x:Key="WindowedBitmapImage" UriSource="/Icons/windowed_96px.png" />
         <BitmapImage x:Key="LeftDownBitmapImage" UriSource="/Icons/left_down_48px.png" />
@@ -469,6 +471,22 @@
                                 <Button.Content>
                                     <Image Source="{StaticResource SynchronizeBitmapImage}" />
                                 </Button.Content>
+                            </Button>
+                            <Button Command="{Binding ToggleRecordingCommand}" ToolTip="Start/stop recording">
+                                <Button.Resources>
+                                    <Image x:Key="RecordImage" Source="{StaticResource RecordBitmapImage}" />
+                                    <Image x:Key="StopImage" Source="{StaticResource StopBitmapImage}" />
+                                </Button.Resources>
+                                <Button.Style>
+                                    <Style BasedOn="{StaticResource ControlBarButtonStyle}" TargetType="Button">
+                                        <Setter Property="Content" Value="{StaticResource RecordImage}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding MediaPlayer.IsRecording}" Value="True">
+                                                <Setter Property="Content" Value="{StaticResource StopImage}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
                             </Button>
                         </StackPanel>
                         <Grid

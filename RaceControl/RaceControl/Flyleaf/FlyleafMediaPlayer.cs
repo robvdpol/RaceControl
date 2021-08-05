@@ -24,6 +24,7 @@ namespace RaceControl.Flyleaf
         private bool _isStarted;
         private bool _isPlaying;
         private bool _isPaused;
+        private bool _isRecording;
         private long _time;
         private long _duration;
         private int _volume;
@@ -73,6 +74,12 @@ namespace RaceControl.Flyleaf
         {
             get => _isPaused;
             private set => SetProperty(ref _isPaused, value);
+        }
+
+        public bool IsRecording
+        {
+            get => _isRecording;
+            set => SetProperty(ref _isRecording, value);
         }
 
         public long Time
@@ -224,6 +231,29 @@ namespace RaceControl.Flyleaf
 
             AudioTrack = null;
             _audioInitialized = false;
+        }
+
+        public void StartRecording(string filename)
+        {
+            if (!Player.Session.CanPlay)
+            {
+                return;
+            }
+
+            if (!Player.decoder.VideoDemuxer.IsRecording)
+            {
+                Player.decoder.VideoDemuxer.StartRecording(filename);
+                IsRecording = Player.decoder.VideoDemuxer.IsRecording;
+            }
+        }
+
+        public void StopRecording()
+        {
+            if (Player.decoder.VideoDemuxer.IsRecording)
+            {
+                Player.decoder.VideoDemuxer.StopRecording();
+                IsRecording = Player.decoder.VideoDemuxer.IsRecording;
+            }
         }
 
         public void TogglePause()

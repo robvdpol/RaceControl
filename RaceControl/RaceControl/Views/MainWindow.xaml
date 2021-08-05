@@ -427,6 +427,13 @@
                                         ItemsSource="{Binding AudioLanguages}"
                                         SelectedValue="{Binding Settings.DefaultAudioLanguage}"
                                         SelectedValuePath="Key" />
+                                    <TextBlock Margin="3" Text="Recording location:" />
+                                    <TextBox
+                                        Height="22"
+                                        Margin="3,1"
+                                        VerticalContentAlignment="Center"
+                                        MaxLength="200"
+                                        Text="{Binding Settings.RecordingLocation, UpdateSourceTrigger=PropertyChanged}" />
                                     <CheckBox
                                         Margin="3"
                                         Content="Disable thumbnail tooltips"
