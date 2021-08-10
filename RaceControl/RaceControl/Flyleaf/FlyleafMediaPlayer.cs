@@ -10,6 +10,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using FlyleafLibAspectRatio = FlyleafLib.AspectRatio;
@@ -217,13 +218,19 @@ namespace RaceControl.Flyleaf
             {
                 Task.Run(() =>
                 {
-                    while((Player.videoPlugins == null || Player.videoPlugins.Count == 0) && Player.Plugins != null) System.Threading.Thread.Sleep(50);
-                    System.Threading.Thread.Sleep(50);
+                    while ((Player.videoPlugins == null || Player.videoPlugins.Count == 0) && Player.Plugins != null)
+                    {
+                        Thread.Sleep(50);
+                    }
+
+                    Thread.Sleep(50);
                     Player.Open(streamUrl);
                 });
             }
             else
+            {
                 Player.Open(streamUrl);
+            }
         }
 
         public void StartRecording(string filename)
