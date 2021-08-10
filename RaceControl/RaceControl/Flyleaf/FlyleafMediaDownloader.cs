@@ -1,4 +1,4 @@
-﻿using FlyleafLib.MediaFramework.MediaDemuxer;
+﻿using FlyleafLib.MediaFramework.MediaContext;
 using NLog;
 using Prism.Mvvm;
 using RaceControl.Common.Enums;
@@ -14,13 +14,13 @@ namespace RaceControl.Flyleaf
     public class FlyleafMediaDownloader : BindableBase, IMediaDownloader
     {
         private readonly ILogger _logger;
-        private readonly VideoDemuxer _downloader;
+        private readonly Downloader _downloader;
 
         private DownloadStatus _status = DownloadStatus.Pending;
         private float _progress;
         private bool _disposed;
 
-        public FlyleafMediaDownloader(ILogger logger, VideoDemuxer downloader)
+        public FlyleafMediaDownloader(ILogger logger, Downloader downloader)
         {
             _logger = logger;
             _downloader = downloader;
@@ -52,16 +52,16 @@ namespace RaceControl.Flyleaf
                 }
 
                 // Only download the highest quality video stream
-                if (_downloader.VideoStreams.Any())
+                if (_downloader.Demuxer.VideoStreams.Any())
                 {
-                    var videoStream = _downloader.VideoStreams.OrderByDescending(s => s.Height).ThenByDescending(s => s.Width).ThenByDescending(s => s.FPS).First();
-                    _downloader.EnableStream(videoStream);
+                    var videoStream = _downloader.Demuxer.VideoStreams.OrderByDescending(s => s.Height).ThenByDescending(s => s.Width).ThenByDescending(s => s.FPS).First();
+                    _downloader.Demuxer.EnableStream(videoStream);
                 }
 
                 // Download all audio streams
-                foreach (var audioStream in _downloader.AudioStreams)
+                foreach (var audioStream in _downloader.Demuxer.AudioStreams)
                 {
-                    _downloader.EnableStream(audioStream);
+                    _downloader.Demuxer.EnableStream(audioStream);
                 }
 
                 _downloader.Download(filename);

@@ -1,6 +1,6 @@
 ﻿using DryIoc;
 using FlyleafLib;
-using FlyleafLib.MediaFramework.MediaDemuxer;
+using FlyleafLib.MediaFramework.MediaContext;
 using FlyleafLib.MediaPlayer;
 using GoogleCast;
 using Newtonsoft.Json;
@@ -81,7 +81,7 @@ namespace RaceControl
                 .RegisterSingleton<ISettings, Settings>()
                 .RegisterSingleton<IVideoDialogLayout, VideoDialogLayout>()
                 .Register<Player>(CreateFlyleafPlayer)
-                .Register<VideoDemuxer>(CreateFlyleafDownloader)
+                .Register<Downloader>(CreateFlyleafDownloader)
                 .Register<JsonSerializer>(() => new JsonSerializer { Formatting = Formatting.Indented })
                 .Register<IAuthorizationService, AuthorizationService>()
                 .Register<IApiService, ApiService>()
@@ -125,11 +125,11 @@ namespace RaceControl
             return new();
         }
 
-        private static VideoDemuxer CreateFlyleafDownloader()
+        private static Downloader CreateFlyleafDownloader()
         {
             _flyleafUniqueId++;
 
-            return new VideoDemuxer(new Config(), _flyleafUniqueId);
+            return new Downloader(new Config.Demuxer() { MaxQueueSize = 1000 }, _flyleafUniqueId);
         }
 
         private static IRestClient CreateRestClient()

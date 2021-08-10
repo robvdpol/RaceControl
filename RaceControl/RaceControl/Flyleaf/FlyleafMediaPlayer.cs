@@ -210,7 +210,20 @@ namespace RaceControl.Flyleaf
             };
 
             Player.PropertyChanged += PlayerOnPropertyChanged;
-            Player.Open(streamUrl);
+
+            // This call comes from dialog open and might the player's control have not initialized yet (handle was not created)
+            // Temporary solution but should be reviewed
+            if (Player.videoPlugins == null || Player.videoPlugins.Count == 0)
+            {
+                Task.Run(() =>
+                {
+                    while((Player.videoPlugins == null || Player.videoPlugins.Count == 0) && Player.Plugins != null) System.Threading.Thread.Sleep(50);
+                    System.Threading.Thread.Sleep(50);
+                    Player.Open(streamUrl);
+                });
+            }
+            else
+                Player.Open(streamUrl);
         }
 
         public void StartRecording(string filename)
