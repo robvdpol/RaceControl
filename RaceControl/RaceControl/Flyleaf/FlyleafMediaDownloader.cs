@@ -64,7 +64,8 @@ namespace RaceControl.Flyleaf
                     _downloader.Demuxer.EnableStream(audioStream);
                 }
 
-                _downloader.Download(filename);
+                // Selected filename will already have MP4-extension
+                _downloader.Download(ref filename, false);
             });
         }
 

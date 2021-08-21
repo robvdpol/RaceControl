@@ -242,7 +242,7 @@ namespace RaceControl.Flyleaf
 
             if (!Player.decoder.VideoDemuxer.IsRecording)
             {
-                Player.decoder.VideoDemuxer.StartRecording(filename);
+                Player.decoder.VideoDemuxer.StartRecording(ref filename);
                 IsRecording = Player.decoder.VideoDemuxer.IsRecording;
             }
         }

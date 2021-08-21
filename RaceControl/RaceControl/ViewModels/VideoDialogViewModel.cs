@@ -325,7 +325,7 @@ namespace RaceControl.ViewModels
         {
             if (!MediaPlayer.IsRecording)
             {
-                var filename = $"{DateTime.Now:yyyyMMddHHmmss} {PlayableContent.Title}.mp4".RemoveInvalidFileNameChars();
+                var filename = $"{DateTime.Now:yyyyMMddHHmmss} {PlayableContent.Title}".RemoveInvalidFileNameChars();
 
                 if (!string.IsNullOrWhiteSpace(_settings.RecordingLocation))
                 {
