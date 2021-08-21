@@ -71,7 +71,6 @@
     <PackageReference Include="NLog" Version="4.7.11" />
     <PackageReference Include="Prism.DryIoc" Version="8.1.97" />
     <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="106.12.0" />
-    <PackageReference Include="Zeroconf" Version="3.5.11" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RaceControl.Core\RaceControl.Core.csproj" />
