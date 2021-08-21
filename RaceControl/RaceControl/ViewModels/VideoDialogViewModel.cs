@@ -94,8 +94,8 @@ namespace RaceControl.ViewModels
         public ICommand TogglePauseCommand => _togglePauseCommand ??= new DelegateCommand(TogglePauseExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
         public ICommand TogglePauseAllCommand => _togglePauseAllCommand ??= new DelegateCommand(TogglePauseAllExecute);
         public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand<bool?>(ToggleMuteExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
-        public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<int?>(FastForwardExecute, CanFastForwardExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => PlayableContent);
-        public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute, CanSyncSessionExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => PlayableContent);
+        public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<int?>(FastForwardExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
+        public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
         public ICommand ToggleRecordingCommand => _toggleRecordingCommand ??= new DelegateCommand(ToggleRecordingExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand<long?>(ToggleFullScreenExecute);
         public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => DialogSettings.FullScreen);
@@ -295,11 +295,6 @@ namespace RaceControl.ViewModels
             MediaPlayer.ToggleMute(mute);
         }
 
-        private bool CanFastForwardExecute(int? seconds)
-        {
-            return MediaPlayer.IsStarted && !PlayableContent.IsLive;
-        }
-
         private void FastForwardExecute(int? seconds)
         {
             if (seconds.HasValue)
@@ -307,11 +302,6 @@ namespace RaceControl.ViewModels
                 Logger.Info($"Fast forwarding stream {seconds.Value} seconds...");
                 MediaPlayer.Time += TimeSpan.FromSeconds(seconds.Value).Ticks;
             }
-        }
-
-        private bool CanSyncSessionExecute()
-        {
-            return MediaPlayer.IsStarted && !PlayableContent.IsLive;
         }
 
         private void SyncSessionExecute()
