@@ -272,12 +272,17 @@
                         <Slider
                             Grid.Column="1"
                             Margin="2"
-                            IsEnabled="{Binding MediaPlayer.IsStarted}"
                             IsMoveToPointEnabled="True"
                             IsSnapToTickEnabled="False"
                             Maximum="{Binding MediaPlayer.Duration}"
                             TickPlacement="BottomRight"
                             Value="{Binding MediaPlayer.Time}">
+                            <Slider.IsEnabled>
+                                <MultiBinding Converter="{StaticResource LogicalAndConverter}">
+                                    <Binding Converter="{StaticResource InverseBooleanConverter}" Path="PlayableContent.IsLive" />
+                                    <Binding Path="MediaPlayer.IsStarted" />
+                                </MultiBinding>
+                            </Slider.IsEnabled>
                             <Slider.TickFrequency>
                                 <Binding Converter="{StaticResource DivideDoubleConverter}" Path="MediaPlayer.Duration">
                                     <Binding.ConverterParameter>
