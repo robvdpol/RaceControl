@@ -19,8 +19,8 @@ namespace RaceControl.Services.F1TV
     public class ApiService : IApiService
     {
         private const int F1TVArchiveStartYear = 1981;
-        private const string DefaultStreamType = @"BIG_SCREEN_HLS";
-        private const string SearchVodUrl = @"2.0/R/ENG/BIG_SCREEN_HLS/ALL/PAGE/SEARCH/VOD/F1_TV_Pro_Annual/2";
+        private const string DefaultStreamType = StreamTypeKeys.WebHls;
+        private const string SearchVodUrl = "2.0/R/ENG/" + DefaultStreamType + "/ALL/PAGE/SEARCH/VOD/F1_TV_Pro_Annual/2";
 
         private readonly ILogger _logger;
         private readonly Func<IRestClient> _restClientFactory;
@@ -212,9 +212,24 @@ namespace RaceControl.Services.F1TV
 
         public async Task<string> GetTokenisedUrlAsync(string subscriptionToken, IPlayableContent playableContent)
         {
+            return await GetTokenisedUrlAsync(subscriptionToken, playableContent, DefaultStreamType);
+        }
+
+        public async Task<string> GetTokenisedUrlAsync(string subscriptionToken, IPlayableContent playableContent, string streamType)
+        {
             _logger.Info($"Getting tokenised URL for content-type '{playableContent.ContentType}' and content-URL '{playableContent.ContentUrl}'...");
 
-            return playableContent.ContentType == ContentType.Backup ? (await GetBackupStream()).StreamManifest : (await QueryTokenisedUrlAsync(subscriptionToken, StreamTypeKeys.BigScreenHls, playableContent.ContentUrl)).ResultObj.Url;
+            return playableContent.ContentType == ContentType.Backup ? (await GetBackupStream()).StreamManifest : (await QueryTokenisedUrlAsync(subscriptionToken, streamType, playableContent.ContentUrl)).ResultObj.Url;
+        }
+
+        public async Task<PlayToken> GetPlayTokenAsync(string streamUrl)
+        {
+            var restClient = _restClientFactory();
+            var restRequest = new RestRequest(streamUrl, Method.HEAD);
+            var restResponse = await Task.Run(() => restClient.Head(restRequest));
+            var playToken = restResponse.Cookies.FirstOrDefault(cookie => string.Equals(cookie.Name, "playToken", StringComparison.OrdinalIgnoreCase));
+
+            return playToken != null ? new PlayToken(playToken.Domain, playToken.Path, playToken.Value) : null;
         }
 
         private async Task<ApiResponse> QueryLiveSessionsAsync()

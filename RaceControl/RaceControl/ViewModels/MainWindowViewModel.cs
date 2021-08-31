@@ -910,7 +910,8 @@ namespace RaceControl.ViewModels
 
         private async Task WatchInMpvAsync(IPlayableContent playableContent, VideoDialogSettings settings = null)
         {
-            var streamUrl = await _apiService.GetTokenisedUrlAsync(Settings.SubscriptionToken, playableContent);
+            // Use different stream type because this one doesn't require a playToken cookie (not supported by MPV)
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(Settings.SubscriptionToken, playableContent, StreamTypeKeys.BigScreenHls);
             ValidateStreamUrl(streamUrl);
 
             var arguments = new List<string>

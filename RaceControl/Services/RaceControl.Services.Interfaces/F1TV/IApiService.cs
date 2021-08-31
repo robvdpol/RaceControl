@@ -1,4 +1,5 @@
 ﻿using RaceControl.Common.Interfaces;
+using RaceControl.Services.Interfaces.F1TV.Api;
 using RaceControl.Services.Interfaces.F1TV.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -28,5 +29,9 @@ namespace RaceControl.Services.Interfaces.F1TV
         Task<List<Episode>> GetEpisodesForGenreAsync(string genre);
 
         Task<string> GetTokenisedUrlAsync(string subscriptionToken, IPlayableContent playableContent);
+
+        Task<string> GetTokenisedUrlAsync(string subscriptionToken, IPlayableContent playableContent, string streamType);
+
+        Task<PlayToken> GetPlayTokenAsync(string streamUrl);
     }
 }

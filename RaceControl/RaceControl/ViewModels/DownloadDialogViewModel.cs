@@ -63,7 +63,8 @@ namespace RaceControl.ViewModels
         private async Task StartDownloadAsync()
         {
             var streamUrl = await _apiService.GetTokenisedUrlAsync(_settings.SubscriptionToken, PlayableContent);
-            await MediaDownloader.StartDownloadAsync(streamUrl, Filename);
+            var playToken = await _apiService.GetPlayTokenAsync(streamUrl);
+            await MediaDownloader.StartDownloadAsync(streamUrl, playToken, Filename);
         }
 
         private void DownloadStarted()

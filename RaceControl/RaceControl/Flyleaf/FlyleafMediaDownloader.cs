@@ -3,6 +3,7 @@ using NLog;
 using Prism.Mvvm;
 using RaceControl.Common.Enums;
 using RaceControl.Interfaces;
+using RaceControl.Services.Interfaces.F1TV.Api;
 using System;
 using System.ComponentModel;
 using System.Linq;
@@ -40,10 +41,15 @@ namespace RaceControl.Flyleaf
             private set => SetProperty(ref _progress, value);
         }
 
-        public Task StartDownloadAsync(string streamUrl, string filename)
+        public Task StartDownloadAsync(string streamUrl, PlayToken playToken, string filename)
         {
             return Task.Run(() =>
             {
+                if (playToken != null)
+                {
+                    _downloader.Demuxer.Config.FormatOpt.Add("headers", playToken.GetCookieString());
+                }
+
                 var error = _downloader.Open(streamUrl);
 
                 if (error != 0)

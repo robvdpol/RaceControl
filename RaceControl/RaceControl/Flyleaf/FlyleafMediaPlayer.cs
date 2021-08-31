@@ -6,6 +6,7 @@ using RaceControl.Common.Constants;
 using RaceControl.Common.Enums;
 using RaceControl.Core.Settings;
 using RaceControl.Interfaces;
+using RaceControl.Services.Interfaces.F1TV.Api;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -198,7 +199,7 @@ namespace RaceControl.Flyleaf
             }
         }
 
-        public void StartPlayback(string streamUrl, VideoDialogSettings settings)
+        public void StartPlayback(string streamUrl, PlayToken playToken, VideoDialogSettings settings)
         {
             IsStarting = true;
 
@@ -211,6 +212,11 @@ namespace RaceControl.Flyleaf
             };
 
             Player.PropertyChanged += PlayerOnPropertyChanged;
+
+            if (playToken != null)
+            {
+                Player.Config.demuxer.FormatOpt.Add("headers", playToken.GetCookieString());
+            }
 
             // This call comes from dialog open and might the player's control have not initialized yet (handle was not created)
             // Temporary solution but should be reviewed

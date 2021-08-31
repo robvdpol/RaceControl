@@ -1,5 +1,6 @@
 ﻿using RaceControl.Common.Enums;
 using RaceControl.Core.Settings;
+using RaceControl.Services.Interfaces.F1TV.Api;
 using System;
 using System.Collections.ObjectModel;
 
@@ -43,7 +44,7 @@ namespace RaceControl.Interfaces
 
         IMediaTrack AudioTrack { get; set; }
 
-        void StartPlayback(string streamUrl, VideoDialogSettings settings);
+        void StartPlayback(string streamUrl, PlayToken playToken, VideoDialogSettings settings);
 
         void StartRecording(string filename);
 
