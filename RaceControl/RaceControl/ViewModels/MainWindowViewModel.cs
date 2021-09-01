@@ -601,10 +601,19 @@ namespace RaceControl.ViewModels
         {
             var registryKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\VideoLAN\VLC") ?? Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\VideoLAN\VLC");
 
-            if (registryKey?.GetValue(null) is string vlcExeLocation && File.Exists(vlcExeLocation))
+            if (registryKey?.GetValue("InstallDir") is string vlcInstallDir && !string.IsNullOrWhiteSpace(vlcInstallDir))
             {
-                VlcExeLocation = vlcExeLocation;
-                Logger.Info($"Found VLC installation at '{vlcExeLocation}'.");
+                var vlcExeLocation = Path.Combine(vlcInstallDir, "vlc.exe");
+
+                if (File.Exists(vlcExeLocation))
+                {
+                    VlcExeLocation = vlcExeLocation;
+                    Logger.Info($"Found VLC installation at '{vlcExeLocation}'.");
+                }
+                else
+                {
+                    Logger.Warn("Could not find VLC installation.");
+                }
             }
             else
             {
