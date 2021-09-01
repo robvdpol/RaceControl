@@ -19,7 +19,7 @@ namespace RaceControl.Services.F1TV
     public class ApiService : IApiService
     {
         private const int F1TVArchiveStartYear = 1981;
-        private const string DefaultStreamType = StreamTypeKeys.WebHls;
+        private const string DefaultStreamType = StreamTypeKeys.BigScreenHls;
         private const string SearchVodUrl = "2.0/R/ENG/" + DefaultStreamType + "/ALL/PAGE/SEARCH/VOD/F1_TV_Pro_Annual/2";
 
         private readonly ILogger _logger;
@@ -54,7 +54,7 @@ namespace RaceControl.Services.F1TV
                 {
                     UID = SeriesIds.PorscheSupercup,
                     Name = SeriesNames.PorscheSupercup
-                },
+                }
             };
         }
 
