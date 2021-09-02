@@ -8,7 +8,7 @@
 -- The real-time of a stream is estimated from the maximum value of available cache.
 
 -- CONTEXT
--- Designed for use with F1 Race Control:  https://github.com/robvdpol/RaceControl
+-- Designed for use with Race Control:  https://github.com/robvdpol/RaceControl
 -- and MPV:  https://mpv.io/manual/stable/#lua-scripting
 -- and Lua:  https://www.lua.org/manual
 --

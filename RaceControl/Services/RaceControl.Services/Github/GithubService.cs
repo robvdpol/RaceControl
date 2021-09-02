@@ -21,7 +21,7 @@ namespace RaceControl.Services.Github
 
         public async Task<Release> GetLatestRelease()
         {
-            _logger.Info("Getting latest release from Github...");
+            _logger.Info("Getting latest release from GitHub...");
             var restClient = _restClientFactory();
             var restRequest = new RestRequest(RaceControlLatestReleaseUrl, DataFormat.Json);
 

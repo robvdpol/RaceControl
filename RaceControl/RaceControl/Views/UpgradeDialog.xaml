@@ -41,7 +41,7 @@
             Grid.Row="3"
             Margin="0,10"
             FontStyle="Italic"
-            Text="Note: if you're using the Microsoft store app, please go to the Microsoft store to update the app."
+            Text="Note: Race Control has been removed from the Microsoft Store until further notice. Please perform a manual installation instead."
             TextWrapping="Wrap" />
         <StackPanel
             Grid.Row="4"
