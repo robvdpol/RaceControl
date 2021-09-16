@@ -171,7 +171,7 @@ namespace RaceControl.Core.Settings
 
         public bool HasValidSubscriptionToken()
         {
-            return !string.IsNullOrWhiteSpace(SubscriptionToken) && LastLogin.HasValue && LastLogin.Value >= DateTime.UtcNow.AddDays(-7);
+            return !string.IsNullOrWhiteSpace(SubscriptionToken) && LastLogin.HasValue && LastLogin.Value >= DateTime.UtcNow.AddDays(-4);
         }
     }
 }
