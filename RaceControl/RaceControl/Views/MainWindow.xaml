@@ -11,8 +11,8 @@
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     Width="1200"
     Height="900"
-    prism:ViewModelLocator.AutoWireViewModel="True"
     Style="{DynamicResource WindowStyle}"
+    prism:ViewModelLocator.AutoWireViewModel="True"
     Loaded="MainWindowLoaded"
     WindowStartupLocation="CenterScreen">
     <Window.Resources>

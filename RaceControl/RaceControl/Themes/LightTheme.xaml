@@ -4,6 +4,15 @@
     <Style x:Key="WindowStyle" TargetType="Window">
         <Setter Property="Background" Value="#FFFFFF" />
     </Style>
+    <Style x:Key="UserControlStyle" TargetType="UserControl">
+        <Setter Property="Background" Value="#FFFFFF" />
+    </Style>
+    <Style x:Key="UserControlGridStyle" TargetType="Grid">
+        <Setter Property="Background" Value="#FFFFFF" />
+    </Style>
+    <Style x:Key="UserControlBorderStyle" TargetType="Border">
+        <Setter Property="BorderBrush" Value="#403f3b" />
+    </Style>
 
     <Style x:Key="HeaderLabelStyle" TargetType="Label">
         <Setter Property="Margin" Value="2" />

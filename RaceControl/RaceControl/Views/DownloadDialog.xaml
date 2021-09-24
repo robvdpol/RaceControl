@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:enums="clr-namespace:RaceControl.Common.Enums;assembly=RaceControl.Common"
     xmlns:prism="http://prismlibrary.com/"
+    Style="{DynamicResource UserControlStyle}"
     prism:ViewModelLocator.AutoWireViewModel="True">
     <prism:Dialog.WindowStyle>
         <Style TargetType="Window">

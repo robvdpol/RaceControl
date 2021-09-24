@@ -247,10 +247,10 @@
             <Border
                 Grid.Row="1"
                 Height="Auto"
-                BorderBrush="#ABADB3"
+                Style="{DynamicResource UserControlBorderStyle}"
                 BorderThickness="1"
                 Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <Grid Background="White">
+                <Grid Style="{DynamicResource UserControlGridStyle}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="MouseDown">
                             <i:InvokeCommandAction Command="{Binding MouseDownCommand}" PassEventArgsToCommand="True" />
