@@ -86,6 +86,7 @@ namespace RaceControl.ViewModels
         private ICommand _audioTrackSelectionChangedCommand;
         private ICommand _logOutCommand;
         private ICommand _requestNavigateCommand;
+        private ICommand _updateTheme;
 
         private HwndSource _hwndSource;
         private string _episodeFilterText;
@@ -169,6 +170,7 @@ namespace RaceControl.ViewModels
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand(AudioTrackSelectionChangedExecute);
         public ICommand LogOutCommand => _logOutCommand ??= new DelegateCommand(LogOutExecute);
         public ICommand RequestNavigateCommand => _requestNavigateCommand ??= new DelegateCommand<RequestNavigateEventArgs>(RequestNavigateExecute);
+        public ICommand UpdateTheme => _updateTheme ??= new DelegateCommand(UpdateThemeExecute);
 
         public Action Close { get; set; }
 
@@ -303,6 +305,7 @@ namespace RaceControl.ViewModels
 
             IsBusy = true;
             Settings.Load();
+            UpdateThemeExecute();
             VideoDialogLayout.Load();
             SetVlcExeLocation();
             SetMpvExeLocation();
@@ -745,9 +748,6 @@ namespace RaceControl.ViewModels
             LoadSeasons();
             LoadSeries();
             await LoadVodGenresAsync();
-
-            // Test
-            //await F1Timing.Run();
         }
 
         private void LoadSeasons()
