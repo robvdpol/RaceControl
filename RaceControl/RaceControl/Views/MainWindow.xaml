@@ -11,6 +11,7 @@
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     Width="1200"
     Height="900"
+    Background="#212121"
     prism:ViewModelLocator.AutoWireViewModel="True"
     Loaded="MainWindowLoaded"
     WindowStartupLocation="CenterScreen">
@@ -19,28 +20,24 @@
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <converters:CollectionContainsConverter x:Key="CollectionContainsConverter" />
         <converters:DatePassedConverter x:Key="DatePassedConverter" />
-        <Style x:Key="HeaderLabelStyle" TargetType="Label">
-            <Setter Property="Margin" Value="2" />
-            <Setter Property="Height" Value="28" />
-            <Setter Property="Padding" Value="5,0" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="Background" Value="#DDDDDD" />
-            <Setter Property="BorderBrush" Value="#ABADB3" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="FontWeight" Value="Bold" />
-        </Style>
+        
         <Style x:Key="OptionButtonStyle" TargetType="Button">
             <Setter Property="Margin" Value="3" />
             <Setter Property="Height" Value="24" />
+            <Setter Property="Background" Value="#313131" />
+            <Setter Property="Foreground" Value="#d7d7d7" />
         </Style>
         <Style x:Key="ContentListBoxStyle" TargetType="ListBox">
             <Setter Property="Margin" Value="2" />
-            <Setter Property="Background" Value="#FFFFFF" />
+            <Setter Property="Background" Value="#212121" />
+            <Setter Property="Foreground" Value="#d7d7d7" />
+            <Setter Property="BorderBrush" Value="#403f3b" />
+            <Setter Property="BorderThickness" Value="1" />
         </Style>
         <Style x:Key="OptionBorderStyle" TargetType="Border">
             <Setter Property="Margin" Value="2" />
-            <Setter Property="Background" Value="#FFFFFF" />
-            <Setter Property="BorderBrush" Value="#ABADB3" />
+            <Setter Property="Background" Value="#d7d7d7" />
+            <Setter Property="BorderBrush" Value="#403f3b" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="UseLayoutRounding" Value="True" />
         </Style>
@@ -80,11 +77,12 @@
     </i:Interaction.Triggers>
     <DockPanel>
         <Menu
-            Background="White"
+            Background="#212121"
+            Foreground="#EEEEEE"
             DockPanel.Dock="Top"
             IsMainMenu="True">
             <MenuItem Header="_File">
-                <MenuItem Command="{Binding OpenLogFileCommand}" Header="Open _log file" />
+                <MenuItem  Command="{Binding OpenLogFileCommand}" Header="Open _log file" />
                 <Separator />
                 <MenuItem Command="{Binding CloseCommand}" Header="_Exit" />
             </MenuItem>
@@ -147,6 +145,7 @@
                             <Style TargetType="ListBoxItem">
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                                 <Setter Property="Focusable" Value="False" />
+                                <Setter Property="Foreground" Value="#EEEEEE" />
                             </Style>
                         </ListBox.ItemContainerStyle>
                         <ListBox.ItemTemplate>
@@ -217,7 +216,7 @@
                             <Style BasedOn="{StaticResource HeaderLabelStyle}" TargetType="Label">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding HasItems, ElementName=LvLiveSessions}" Value="True">
-                                        <Setter Property="Background" Value="LightGreen" />
+                                        <Setter Property="Background" Value="#2f8941" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -255,7 +254,7 @@
                                 <Setter Property="Visibility" Value="Collapsed" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding IsLive}" Value="True">
-                                        <Setter Property="Background" Value="LightGreen" />
+                                        <Setter Property="Background" Value="#2f8941" />
                                     </DataTrigger>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
@@ -339,6 +338,7 @@
                                     <TextBlock Grid.Column="0" Text="{Binding}" />
                                     <StackPanel Grid.Column="1" Orientation="Horizontal">
                                         <Button
+                                            Style="{StaticResource OptionButtonStyle}"
                                             Width="70"
                                             Margin="2,0"
                                             Command="{Binding DataContext.DownloadContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
@@ -347,6 +347,7 @@
                                             ToolTip="Download copy to file system"
                                             Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                         <Button
+                                            Style="{StaticResource OptionButtonStyle}"
                                             Width="50"
                                             Margin="2,0"
                                             Command="{Binding DataContext.CopyContentUrlCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
@@ -354,6 +355,7 @@
                                             Content="Copy"
                                             ToolTip="Copy URL to clipboard" />
                                         <Button
+                                            Style="{StaticResource OptionButtonStyle}"
                                             Width="50"
                                             Margin="2,0"
                                             Command="{Binding DataContext.CastContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
@@ -362,6 +364,7 @@
                                             ToolTip="Cast to selected Chromecast device"
                                             Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                         <Button
+                                            Style="{StaticResource OptionButtonStyle}"
                                             Width="60"
                                             Margin="2,0"
                                             Command="{Binding DataContext.WatchContentInMpcCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
@@ -370,6 +373,7 @@
                                             ToolTip="Watch with MPC-HC"
                                             Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                         <Button
+                                            Style="{StaticResource OptionButtonStyle}"
                                             Width="50"
                                             Margin="2,0"
                                             Command="{Binding DataContext.WatchContentInMpvCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
@@ -377,6 +381,7 @@
                                             Content="MPV"
                                             ToolTip="Watch with MPV" />
                                         <Button
+                                            Style="{StaticResource OptionButtonStyle}"
                                             Width="50"
                                             Margin="2,0"
                                             Command="{Binding DataContext.WatchContentInVlcCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
@@ -385,6 +390,7 @@
                                             ToolTip="Watch with VLC media player"
                                             Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                         <Button
+                                            Style="{StaticResource OptionButtonStyle}"
                                             Width="50"
                                             Margin="2,0,0,0"
                                             Command="{Binding DataContext.WatchContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
@@ -461,6 +467,10 @@
                                         Margin="3"
                                         Content="Enable MPV auto sync (experimental)"
                                         IsChecked="{Binding Settings.EnableMpvAutoSync}" />
+                                    <CheckBox
+                                        Margin="3"
+                                        Content="Use dark theme (experimental)"
+                                        IsChecked="{Binding Settings.UseDarkTheme}" />
                                     <TextBlock Margin="3" Text="Additional MPV parameters:" />
                                     <TextBox
                                         Height="22"
@@ -682,6 +692,9 @@
                                 <TextBox
                                     Width="250"
                                     Height="22"
+                                    Background="#212121"
+                                    BorderBrush="#403f3b"
+                                    Foreground="#EEEEEE"
                                     VerticalContentAlignment="Center"
                                     MaxLength="200"
                                     Text="{Binding EpisodeFilterText, UpdateSourceTrigger=PropertyChanged}" />
@@ -760,6 +773,7 @@
                                 <TextBlock Grid.Column="0" Text="{Binding}" />
                                 <StackPanel Grid.Column="1" Orientation="Horizontal">
                                     <Button
+                                        Style="{StaticResource OptionButtonStyle}"
                                         Width="70"
                                         Margin="2,0"
                                         Command="{Binding DataContext.DownloadContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
@@ -768,6 +782,7 @@
                                         ToolTip="Download copy to file system"
                                         Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                     <Button
+                                        Style="{StaticResource OptionButtonStyle}"
                                         Width="50"
                                         Margin="2,0"
                                         Command="{Binding DataContext.CopyContentUrlCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
@@ -775,6 +790,7 @@
                                         Content="Copy"
                                         ToolTip="Copy URL to clipboard" />
                                     <Button
+                                        Style="{StaticResource OptionButtonStyle}"
                                         Width="50"
                                         Margin="2,0"
                                         Command="{Binding DataContext.CastContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
@@ -783,6 +799,7 @@
                                         ToolTip="Cast to selected Chromecast device"
                                         Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                     <Button
+                                        Style="{StaticResource OptionButtonStyle}"
                                         Width="60"
                                         Margin="2,0"
                                         Command="{Binding DataContext.WatchContentInMpcCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
@@ -791,6 +808,7 @@
                                         ToolTip="Watch with MPC-HC"
                                         Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                     <Button
+                                        Style="{StaticResource OptionButtonStyle}"
                                         Width="50"
                                         Margin="2,0"
                                         Command="{Binding DataContext.WatchContentInMpvCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
@@ -798,6 +816,7 @@
                                         Content="MPV"
                                         ToolTip="Watch with MPV" />
                                     <Button
+                                        Style="{StaticResource OptionButtonStyle}"
                                         Width="50"
                                         Margin="2,0"
                                         Command="{Binding DataContext.WatchContentInVlcCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
@@ -806,6 +825,7 @@
                                         ToolTip="Watch with VLC media player"
                                         Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                     <Button
+                                        Style="{StaticResource OptionButtonStyle}"
                                         Width="50"
                                         Margin="2,0,0,0"
                                         Command="{Binding DataContext.WatchContentCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"

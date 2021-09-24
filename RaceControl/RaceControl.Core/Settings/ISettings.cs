@@ -28,6 +28,8 @@ namespace RaceControl.Core.Settings
 
         bool EnableMpvAutoSync { get; set; }
 
+        bool UseDarkTheme { get; set; }
+
         string AdditionalMpvParameters { get; set; }
 
         string CustomMpvPath { get; set; }

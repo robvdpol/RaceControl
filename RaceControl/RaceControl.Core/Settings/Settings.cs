@@ -27,6 +27,7 @@ namespace RaceControl.Core.Settings
         private bool _disableLiveSessionNotification;
         private bool _disableMpvNoBorder;
         private bool _enableMpvAutoSync;
+        private bool _useDarkTheme;
         private string _additionalMpvParameters;
         private string _customMpvPath;
         private string _latestRelease;
@@ -103,6 +104,12 @@ namespace RaceControl.Core.Settings
         {
             get => _enableMpvAutoSync;
             set => SetProperty(ref _enableMpvAutoSync, value);
+        }
+
+        public bool UseDarkTheme
+        {
+            get => _useDarkTheme;
+            set => SetProperty(ref _useDarkTheme, value);
         }
 
         public string AdditionalMpvParameters

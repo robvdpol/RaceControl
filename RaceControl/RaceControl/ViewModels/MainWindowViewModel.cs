@@ -745,6 +745,9 @@ namespace RaceControl.ViewModels
             LoadSeasons();
             LoadSeries();
             await LoadVodGenresAsync();
+
+            // Test
+            //await F1Timing.Run();
         }
 
         private void LoadSeasons()
