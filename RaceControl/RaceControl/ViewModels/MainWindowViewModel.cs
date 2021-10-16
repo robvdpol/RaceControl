@@ -47,6 +47,8 @@ namespace RaceControl.ViewModels
     public class MainWindowViewModel : ViewModelBase, ICloseWindow
     {
         private const int PlayPauseHotKeyID = 9000;
+        private static readonly ResourceDictionary LightTheme = new() { Source = new Uri(@"/Themes/LightTheme.xaml", UriKind.Relative) };
+        private static readonly ResourceDictionary DarkTheme = new() { Source = new Uri(@"/Themes/DarkTheme.xaml", UriKind.Relative) };
 
         private readonly IExtendedDialogService _dialogService;
         private readonly IEventAggregator _eventAggregator;
@@ -86,7 +88,7 @@ namespace RaceControl.ViewModels
         private ICommand _audioTrackSelectionChangedCommand;
         private ICommand _logOutCommand;
         private ICommand _requestNavigateCommand;
-        private ICommand _updateTheme;
+        private ICommand _updateThemeCommand;
 
         private HwndSource _hwndSource;
         private string _episodeFilterText;
@@ -170,7 +172,7 @@ namespace RaceControl.ViewModels
         public ICommand AudioTrackSelectionChangedCommand => _audioTrackSelectionChangedCommand ??= new DelegateCommand(AudioTrackSelectionChangedExecute);
         public ICommand LogOutCommand => _logOutCommand ??= new DelegateCommand(LogOutExecute);
         public ICommand RequestNavigateCommand => _requestNavigateCommand ??= new DelegateCommand<RequestNavigateEventArgs>(RequestNavigateExecute);
-        public ICommand UpdateTheme => _updateTheme ??= new DelegateCommand(UpdateThemeExecute);
+        public ICommand UpdateThemeCommand => _updateThemeCommand ??= new DelegateCommand(UpdateThemeExecute);
 
         public Action Close { get; set; }
 
@@ -305,8 +307,8 @@ namespace RaceControl.ViewModels
 
             IsBusy = true;
             Settings.Load();
-            UpdateThemeExecute();
             VideoDialogLayout.Load();
+            UpdateThemeCommand.TryExecute();
             SetVlcExeLocation();
             SetMpvExeLocation();
             SetMpcExeLocation();
@@ -605,6 +607,12 @@ namespace RaceControl.ViewModels
         private static void RequestNavigateExecute(RequestNavigateEventArgs e)
         {
             ProcessUtils.BrowseToUrl(e.Uri.AbsoluteUri);
+        }
+
+        private void UpdateThemeExecute()
+        {
+            Application.Current.Resources.MergedDictionaries.Clear();
+            Application.Current.Resources.MergedDictionaries.Add(Settings.UseDarkTheme ? DarkTheme : LightTheme);
         }
 
         private void RefreshTimer_Elapsed(object sender, ElapsedEventArgs e)

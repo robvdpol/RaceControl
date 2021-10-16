@@ -8,10 +8,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Themes/LightTheme.xaml" />
-                <ResourceDictionary Source="Themes/Generic.xaml" />
             </ResourceDictionary.MergedDictionaries>
-
-            <!-- more global styles -->
         </ResourceDictionary>
     </Application.Resources>
 </prism:PrismApplication>

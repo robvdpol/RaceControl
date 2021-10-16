@@ -11,9 +11,9 @@
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     Width="1200"
     Height="900"
-    Style="{DynamicResource WindowStyle}"
     prism:ViewModelLocator.AutoWireViewModel="True"
     Loaded="MainWindowLoaded"
+    Style="{DynamicResource WindowStyle}"
     WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
@@ -56,11 +56,9 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <DockPanel>
-        <Menu
-            DockPanel.Dock="Top"
-            IsMainMenu="True">
+        <Menu DockPanel.Dock="Top" IsMainMenu="True">
             <MenuItem Header="_File">
-                <MenuItem  Command="{Binding OpenLogFileCommand}" Header="Open _log file" />
+                <MenuItem Command="{Binding OpenLogFileCommand}" Header="Open _log file" />
                 <Separator />
                 <MenuItem Command="{Binding CloseCommand}" Header="_Exit" />
             </MenuItem>
@@ -190,9 +188,8 @@
                         Grid.Column="0"
                         Grid.ColumnSpan="2"
                         Content="Live Now"
-                        Style="{DynamicResource LiveHeaderLabelStyle}"
                         DataContext="{Binding HasItems, ElementName=LvLiveSessions}"
-                        />
+                        Style="{DynamicResource LiveHeaderLabelStyle}" />
 
                     <ListBox
                         x:Name="LvLiveSessions"
@@ -434,8 +431,8 @@
                                         IsChecked="{Binding Settings.EnableMpvAutoSync}" />
                                     <CheckBox
                                         Margin="3"
+                                        Command="{Binding UpdateThemeCommand}"
                                         Content="Use dark theme (experimental)"
-                                        Command="{Binding UpdateTheme}"
                                         IsChecked="{Binding Settings.UseDarkTheme}" />
                                     <TextBlock Margin="3" Text="Additional MPV parameters:" />
                                     <TextBox
