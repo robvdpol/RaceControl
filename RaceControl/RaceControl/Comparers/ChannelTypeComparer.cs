@@ -43,16 +43,6 @@ namespace RaceControl.Comparers
                 return 1;
             }
 
-            if (x == ChannelTypes.Backup)
-            {
-                return 1;
-            }
-
-            if (y == ChannelTypes.Backup)
-            {
-                return -1;
-            }
-
             return 0;
         }
     }

@@ -1,8 +1,6 @@
 ﻿using MoreLinq;
-using Newtonsoft.Json;
 using NLog;
 using RaceControl.Common.Constants;
-using RaceControl.Common.Enums;
 using RaceControl.Common.Interfaces;
 using RaceControl.Common.Utils;
 using RaceControl.Services.Interfaces.F1TV;
@@ -219,7 +217,7 @@ namespace RaceControl.Services.F1TV
         {
             _logger.Info($"Getting tokenised URL for content-type '{playableContent.ContentType}' and content-URL '{playableContent.ContentUrl}'...");
 
-            return playableContent.ContentType == ContentType.Backup ? (await GetBackupStream()).StreamManifest : (await QueryTokenisedUrlAsync(subscriptionToken, streamType, playableContent.ContentUrl)).ResultObj.Url;
+            return (await QueryTokenisedUrlAsync(subscriptionToken, streamType, playableContent.ContentUrl)).ResultObj.Url;
         }
 
         public async Task<PlayToken> GetPlayTokenAsync(string streamUrl)
@@ -332,20 +330,6 @@ namespace RaceControl.Services.F1TV
             restRequest.AddHeader("ascendontoken", subscriptionToken);
 
             return await restClient.GetAsync<ApiResponse>(restRequest);
-        }
-
-        private async Task<BackupStream> GetBackupStream()
-        {
-            var restClient = _restClientFactory();
-            var restRequest = new RestRequest(Constants.BackupStreamUrl, DataFormat.Json);
-            var restResponse = await restClient.ExecuteGetAsync(restRequest);
-
-            if (!restResponse.IsSuccessful)
-            {
-                throw new Exception($"Could not retrieve backup stream URL (HTTP status code {(int)restResponse.StatusCode}).", restResponse.ErrorException);
-            }
-
-            return JsonConvert.DeserializeObject<BackupStream>(restResponse.Content);
         }
 
         private static Event CreateEvent(Container container)

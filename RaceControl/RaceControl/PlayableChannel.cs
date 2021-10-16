@@ -13,7 +13,7 @@ namespace RaceControl
             Title = $"{session.LongName} - {displayName}";
             Name = channel.Name;
             DisplayName = displayName;
-            ContentType = GetContentType(channel);
+            ContentType = ContentType.Channel;
             ContentUrl = channel.PlaybackUrl;
             IsLive = session.IsLive;
             SyncUID = session.UID;
@@ -39,11 +39,6 @@ namespace RaceControl
                 default:
                     return channel.Name;
             }
-        }
-
-        private static ContentType GetContentType(Channel channel)
-        {
-            return channel.ChannelType == ChannelTypes.Backup ? ContentType.Backup : ContentType.Channel;
         }
     }
 }

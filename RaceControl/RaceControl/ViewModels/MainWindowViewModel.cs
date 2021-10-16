@@ -36,7 +36,6 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Navigation;
-using Channel = RaceControl.Services.Interfaces.F1TV.Entities.Channel;
 
 namespace RaceControl.ViewModels
 {
@@ -877,15 +876,6 @@ namespace RaceControl.ViewModels
         private async Task LoadChannelsForSessionAsync(Session session)
         {
             var channels = await _apiService.GetChannelsForSessionAsync(session);
-
-            if (session.IsLive && channels.Count > 1)
-            {
-                channels.Add(new Channel
-                {
-                    ChannelType = ChannelTypes.Backup,
-                    Name = "Backup stream"
-                });
-            }
 
             Channels.AddRange(channels.OrderBy(c => c.ChannelType, new ChannelTypeComparer()).ThenBy(c => c.Name).Select(c => new PlayableChannel(session, c)));
         }
