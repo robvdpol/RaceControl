@@ -328,7 +328,7 @@ namespace RaceControl.Services.F1TV
             var restClient = _restClientFactory();
             restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
 
-            var restRequest = new RestRequest($"/1.0/R/ENG/{streamType}/ALL/{contentUrl}", DataFormat.Json);
+            var restRequest = new RestRequest($"/2.0/R/ENG/{streamType}/ALL/{contentUrl}", DataFormat.Json);
             restRequest.AddHeader("ascendontoken", subscriptionToken);
 
             return await restClient.GetAsync<ApiResponse>(restRequest);
