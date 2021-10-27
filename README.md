@@ -17,7 +17,7 @@ Race Control is an open source [F1TV](https://f1tv.formula1.com) desktop client 
 * Open as many streams as you like, using the layout that you like
 * Create and save your own custom video player layout
 * Support for multi-monitor setups
-* Cast to your Chromecast with a single click of a button
+* Cast to your Chromecast with a single click of a button (no quality drops!)
 * Experimental synchronization of streams
 
 ## Installation
