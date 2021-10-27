@@ -11,7 +11,8 @@ namespace RaceControl.Common.Constants
         public const string Portuguese = "por";
         public const string Dutch = "nld";
         public const string SoundFx = "cfx";
-        public const string Onboard = "obc";
+        public const string Onboard = "teamradio";
+        public const string OnboardOld = "obc";
         public const string Undetermined = "und";
 
         private static readonly IDictionary<string, string> FlyleafCodes = new Dictionary<string, string>
@@ -20,6 +21,7 @@ namespace RaceControl.Common.Constants
             { French, "fre" },
             { Dutch, "dut" },
             { Onboard, "und" },
+            { OnboardOld, "und" },
             { SoundFx, "und" }
         };
 
