@@ -1,6 +1,5 @@
 ﻿using FlyleafLib;
 using FlyleafLib.MediaPlayer;
-using NLog;
 using Prism.Mvvm;
 using RaceControl.Common.Constants;
 using RaceControl.Common.Enums;
@@ -11,8 +10,6 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using FlyleafLibAspectRatio = FlyleafLib.AspectRatio;
 
@@ -20,8 +17,6 @@ namespace RaceControl.Flyleaf
 {
     public class FlyleafMediaPlayer : BindableBase, IMediaPlayer
     {
-        private readonly ILogger _logger;
-
         private bool _isStarting;
         private bool _isStarted;
         private bool _isPlaying;
@@ -32,20 +27,17 @@ namespace RaceControl.Flyleaf
         private int _volume;
         private bool _isMuted;
         private int _zoom;
-        private VideoQuality _videoQuality;
+        private VideoQuality _videoQuality = VideoQuality.Default;
         private ObservableCollection<IAspectRatio> _aspectRatios;
         private ObservableCollection<IAudioDevice> _audioDevices;
         private ObservableCollection<IMediaTrack> _audioTracks;
         private IAspectRatio _aspectRatio;
         private IAudioDevice _audioDevice;
         private IMediaTrack _audioTrack;
-        private bool _videoInitialized;
-        private bool _audioInitialized;
         private bool _disposed;
 
-        public FlyleafMediaPlayer(ILogger logger, Player player)
+        public FlyleafMediaPlayer(Player player)
         {
-            _logger = logger;
             Player = player;
         }
 
@@ -109,7 +101,7 @@ namespace RaceControl.Flyleaf
                 if (SetProperty(ref _volume, volume))
                 {
                     IsMuted = false;
-                    Player.audioPlayer.Volume = _volume;
+                    Player.Volume = _volume;
                 }
             }
         }
@@ -121,7 +113,7 @@ namespace RaceControl.Flyleaf
             {
                 if (SetProperty(ref _isMuted, value))
                 {
-                    Player.audioPlayer.Mute = _isMuted;
+                    Player.Mute = _isMuted;
                 }
             }
         }
@@ -165,7 +157,7 @@ namespace RaceControl.Flyleaf
             {
                 if (SetProperty(ref _aspectRatio, value) && _aspectRatio != null)
                 {
-                    Player.Config.video.AspectRatio = new FlyleafLibAspectRatio(_aspectRatio.Value);
+                    Player.Config.Video.AspectRatio = new FlyleafLibAspectRatio(_aspectRatio.Value);
                 }
             }
         }
@@ -177,7 +169,7 @@ namespace RaceControl.Flyleaf
             {
                 if (SetProperty(ref _audioDevice, value) && _audioDevice != null)
                 {
-                    Player.audioPlayer.Device = _audioDevice.Identifier;
+                    Player.AudioDevice = _audioDevice.Identifier;
                 }
             }
         }
@@ -189,11 +181,11 @@ namespace RaceControl.Flyleaf
             {
                 if (SetProperty(ref _audioTrack, value) && _audioTrack != null)
                 {
-                    var audioStream = Player.curAudioPlugin.AudioStreams.FirstOrDefault(stream => new FlyleafAudioTrack(stream).Id == _audioTrack.Id);
+                    var audioStream = Player.Audio.Streams.FirstOrDefault(stream => new FlyleafAudioTrack(stream).Id == _audioTrack.Id);
 
                     if (audioStream != null)
                     {
-                        Player.Open(audioStream);
+                        Player.OpenAsync(audioStream, true, false);
                     }
                 }
             }
@@ -205,9 +197,17 @@ namespace RaceControl.Flyleaf
 
             Player.OpenCompleted += (_, args) =>
             {
-                if (args.success)
+                if (args.Success)
                 {
-                    PlayerOnOpenCompleted(args.type, settings);
+                    PlayerOnOpenCompleted(settings);
+                }
+            };
+
+            Player.OpenStreamCompleted += (_, args) =>
+            {
+                if (args.Success)
+                {
+                    PlayerOnOpenStreamCompleted();
                 }
             };
 
@@ -215,50 +215,32 @@ namespace RaceControl.Flyleaf
 
             if (playToken != null)
             {
-                Player.Config.demuxer.FormatOpt.Add("headers", playToken.GetCookieString());
+                Player.Config.Demuxer.FormatOpt.Add("headers", playToken.GetCookieString());
             }
 
-            // This call comes from dialog open and might the player's control have not initialized yet (handle was not created)
-            // Temporary solution but should be reviewed
-            if (Player.videoPlugins == null || Player.videoPlugins.Count == 0)
-            {
-                Task.Run(() =>
-                {
-                    while ((Player.videoPlugins == null || Player.videoPlugins.Count == 0) && Player.Plugins != null)
-                    {
-                        Thread.Sleep(50);
-                    }
-
-                    Thread.Sleep(50);
-                    Player.Open(streamUrl);
-                });
-            }
-            else
-            {
-                Player.Open(streamUrl);
-            }
+            Player.OpenAsync(streamUrl, true, false, false, false);
         }
 
         public void StartRecording(string filename)
         {
-            if (!Player.Session.CanPlay)
+            if (!Player.CanPlay)
             {
                 return;
             }
 
-            if (!Player.decoder.VideoDemuxer.IsRecording)
+            if (!Player.IsRecording)
             {
-                Player.decoder.VideoDemuxer.StartRecording(ref filename);
-                IsRecording = Player.decoder.VideoDemuxer.IsRecording;
+                Player.StartRecording(ref filename);
+                IsRecording = Player.IsRecording;
             }
         }
 
         public void StopRecording()
         {
-            if (Player.decoder.VideoDemuxer.IsRecording)
+            if (Player.IsRecording)
             {
-                Player.decoder.VideoDemuxer.StopRecording();
-                IsRecording = Player.decoder.VideoDemuxer.IsRecording;
+                Player.StopRecording();
+                IsRecording = Player.IsRecording;
             }
         }
 
@@ -294,54 +276,24 @@ namespace RaceControl.Flyleaf
 
             if (disposing)
             {
-                // Prevent main application from hanging after closing an internal player
-                Task.Run(() =>
-                {
-                    try
-                    {
-                        Player.Dispose();
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.Warn(ex, "A non-critical error occurred.");
-                    }
-                });
+                Player.Dispose();
             }
 
             _disposed = true;
         }
 
-        private void PlayerOnOpenCompleted(MediaType mediaType, VideoDialogSettings settings)
+        private void PlayerOnOpenCompleted(VideoDialogSettings settings)
         {
-            switch (mediaType)
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                case MediaType.Video:
-                    if (!_videoInitialized)
-                    {
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            InitializeVideo(settings.VideoQuality, settings.Zoom, settings.AspectRatio);
-                        });
+                InitializeVideo(settings);
+                InitializeAudio(settings);
+            });
+        }
 
-                        _videoInitialized = true;
-                    }
-
-                    Player.Play();
-                    break;
-
-                case MediaType.Audio:
-                    if (!_audioInitialized)
-                    {
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            InitializeAudio(settings.AudioDevice, settings.AudioTrack, settings.IsMuted, settings.Volume);
-                        });
-
-                        _audioInitialized = true;
-                    }
-
-                    break;
-            }
+        private void PlayerOnOpenStreamCompleted()
+        {
+            Player.Play();
         }
 
         private void PlayerOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -360,29 +312,25 @@ namespace RaceControl.Flyleaf
                     }
                 });
             }
-        }
 
-        private void SessionOnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(Player.Session.CurTime))
+            if (e.PropertyName == nameof(Player.CurTime))
             {
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    SetProperty(ref _time, Player.Session.CurTime, nameof(Time));
+                    SetProperty(ref _time, Player.CurTime, nameof(Time));
                 });
             }
         }
 
-        private void InitializeVideo(VideoQuality videoQuality, int zoom, string aspectRatio)
+        private void InitializeVideo(VideoDialogSettings settings)
         {
-            Player.Session.PropertyChanged += SessionOnPropertyChanged;
             AspectRatios.AddRange(FlyleafLibAspectRatio.AspectRatios.Where(ar => ar != FlyleafLibAspectRatio.Custom).Select(ar => new FlyleafAspectRatio(ar)));
-            Duration = Player.Session.Movie.Duration;
-            VideoQuality = videoQuality;
+            Duration = Player.VideoDemuxer.Duration;
+            VideoQuality = settings.VideoQuality;
 
-            if (!string.IsNullOrWhiteSpace(aspectRatio))
+            if (!string.IsNullOrWhiteSpace(settings.AspectRatio))
             {
-                AspectRatio = AspectRatios.FirstOrDefault(ar => ar.Value == aspectRatio);
+                AspectRatio = AspectRatios.FirstOrDefault(ar => ar.Value == settings.AspectRatio);
             }
             else
             {
@@ -390,27 +338,27 @@ namespace RaceControl.Flyleaf
                 SetProperty(ref _aspectRatio, ratio, nameof(AspectRatio));
             }
 
-            Zoom = zoom;
+            Zoom = settings.Zoom;
         }
 
-        private void InitializeAudio(string audioDevice, string audioTrack, bool isMuted, int volume)
+        private void InitializeAudio(VideoDialogSettings settings)
         {
             AudioDevices.AddRange(Master.AudioMaster.Devices.Select(device => new FlyleafAudioDevice(device)));
-            AudioTracks.AddRange(Player.curAudioPlugin.AudioStreams.Select(stream => new FlyleafAudioTrack(stream)));
-            Volume = volume;
-            ToggleMute(isMuted);
+            AudioTracks.AddRange(Player.Audio.Streams.Select(stream => new FlyleafAudioTrack(stream)).OrderBy(t => t.Name));
+            Volume = settings.Volume;
+            ToggleMute(settings.IsMuted);
 
-            if (!string.IsNullOrWhiteSpace(audioDevice))
+            if (!string.IsNullOrWhiteSpace(settings.AudioDevice))
             {
-                AudioDevice = AudioDevices.FirstOrDefault(d => d.Identifier == audioDevice);
+                AudioDevice = AudioDevices.FirstOrDefault(d => d.Identifier == settings.AudioDevice);
             }
             else
             {
-                var device = AudioDevices.FirstOrDefault(d => d.Identifier == Player.audioPlayer.Device);
+                var device = AudioDevices.FirstOrDefault(d => d.Identifier == Player.AudioDevice);
                 SetProperty(ref _audioDevice, device, nameof(AudioDevice));
             }
 
-            var flyleafCode = LanguageCodes.GetFlyleafCode(audioTrack);
+            var flyleafCode = LanguageCodes.GetFlyleafCode(settings.AudioTrack);
 
             AudioTrack = AudioTracks.FirstOrDefault(t => t.Id == flyleafCode) ??
                          AudioTracks.FirstOrDefault(t => t.Id == LanguageCodes.English) ??
@@ -419,12 +367,12 @@ namespace RaceControl.Flyleaf
 
         private void SetVideoQuality(VideoQuality videoQuality)
         {
-            if (Player.curVideoPlugin == null || !Player.curVideoPlugin.VideoStreams.Any())
+            if (Player.Video == null || !Player.Video.Streams.Any())
             {
                 return;
             }
 
-            var maxHeight = Player.curVideoPlugin.VideoStreams.Max(stream => stream.Height);
+            var maxHeight = Player.Video.Streams.Max(stream => stream.Height);
             var minHeight = maxHeight;
 
             switch (videoQuality)
@@ -442,11 +390,11 @@ namespace RaceControl.Flyleaf
                     break;
             }
 
-            var videoStream = Player.curVideoPlugin.VideoStreams.OrderBy(stream => stream.Height).FirstOrDefault(stream => stream.Height >= minHeight);
+            var videoStream = Player.Video.Streams.OrderBy(stream => stream.Height).FirstOrDefault(stream => stream.Height >= minHeight);
 
             if (videoStream != null)
             {
-                Player.Open(videoStream);
+                Player.OpenAsync(videoStream, true, false);
             }
         }
     }

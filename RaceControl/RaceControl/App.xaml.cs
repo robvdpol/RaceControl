@@ -62,7 +62,6 @@ namespace RaceControl
 
             var path = Path.Combine(Environment.CurrentDirectory, "FFmpeg");
             Master.RegisterFFmpeg(path);
-            Master.PreventAutoDispose = true;
 
             base.Initialize();
         }
@@ -122,14 +121,19 @@ namespace RaceControl
 
         private static Player CreateFlyleafPlayer()
         {
-            return new();
+            var config = new Config();
+            config.Demuxer.FormatOpt.Add("probesize", (50 * (long)1024 * 1024).ToString());
+            config.Demuxer.FormatOpt.Add("analyzeduration", (10 * (long)1000 * 1000).ToString());
+            config.Demuxer.BufferDuration = TimeSpan.FromMinutes(1).Ticks;
+
+            return new(config);
         }
 
         private static Downloader CreateFlyleafDownloader()
         {
             _flyleafUniqueId++;
 
-            return new Downloader(new Config.Demuxer() { MaxQueueSize = 1000 }, _flyleafUniqueId);
+            return new Downloader(new Config(), _flyleafUniqueId);
         }
 
         private static IRestClient CreateRestClient()

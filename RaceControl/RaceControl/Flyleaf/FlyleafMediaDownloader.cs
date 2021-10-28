@@ -1,5 +1,4 @@
 ﻿using FlyleafLib.MediaFramework.MediaContext;
-using NLog;
 using Prism.Mvvm;
 using RaceControl.Common.Enums;
 using RaceControl.Interfaces;
@@ -14,16 +13,14 @@ namespace RaceControl.Flyleaf
 {
     public class FlyleafMediaDownloader : BindableBase, IMediaDownloader
     {
-        private readonly ILogger _logger;
         private readonly Downloader _downloader;
 
         private DownloadStatus _status = DownloadStatus.Pending;
         private float _progress;
         private bool _disposed;
 
-        public FlyleafMediaDownloader(ILogger logger, Downloader downloader)
+        public FlyleafMediaDownloader(Downloader downloader)
         {
-            _logger = logger;
             _downloader = downloader;
             _downloader.PropertyChanged += DownloaderOnPropertyChanged;
             _downloader.DownloadCompleted += DownloaderOnDownloadCompleted;
@@ -47,27 +44,27 @@ namespace RaceControl.Flyleaf
             {
                 if (playToken != null)
                 {
-                    _downloader.Demuxer.Config.FormatOpt.Add("headers", playToken.GetCookieString());
+                    _downloader.DecCtx.Config.Demuxer.FormatOpt.Add("headers", playToken.GetCookieString());
                 }
 
-                var error = _downloader.Open(streamUrl);
+                var error = _downloader.Open(streamUrl, true, false, false);
 
-                if (error != 0)
+                if (!string.IsNullOrEmpty(error))
                 {
-                    throw new Exception($"An error occurred while opening the stream URL (error code: {error}).");
+                    throw new Exception($"An error occurred while opening the stream URL (error: '{error}').");
                 }
 
                 // Only download the highest quality video stream
-                if (_downloader.Demuxer.VideoStreams.Any())
+                if (_downloader.DecCtx.VideoDemuxer.VideoStreams.Any())
                 {
-                    var videoStream = _downloader.Demuxer.VideoStreams.OrderByDescending(s => s.Height).ThenByDescending(s => s.Width).ThenByDescending(s => s.FPS).First();
-                    _downloader.Demuxer.EnableStream(videoStream);
+                    var videoStream = _downloader.DecCtx.VideoDemuxer.VideoStreams.OrderByDescending(s => s.Height).ThenByDescending(s => s.Width).ThenByDescending(s => s.Fps).First();
+                    _downloader.DecCtx.VideoDemuxer.EnableStream(videoStream);
                 }
 
                 // Download all audio streams
-                foreach (var audioStream in _downloader.Demuxer.AudioStreams)
+                foreach (var audioStream in _downloader.DecCtx.VideoDemuxer.AudioStreams)
                 {
-                    _downloader.Demuxer.EnableStream(audioStream);
+                    _downloader.DecCtx.VideoDemuxer.EnableStream(audioStream);
                 }
 
                 // Selected filename will already have MP4-extension
@@ -95,18 +92,7 @@ namespace RaceControl.Flyleaf
 
             if (disposing)
             {
-                // Prevent main application from hanging after closing a download window
-                Task.Run(() =>
-                {
-                    try
-                    {
-                        _downloader.Stop();
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.Warn(ex, "A non-critical error occurred.");
-                    }
-                });
+                _downloader.Dispose();
             }
 
             _disposed = true;

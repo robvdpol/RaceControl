@@ -5,6 +5,7 @@
         High,
         Medium,
         Low,
-        Lowest
+        Lowest,
+        Default
     }
 }

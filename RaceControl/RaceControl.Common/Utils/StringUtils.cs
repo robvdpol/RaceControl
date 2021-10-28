@@ -13,5 +13,15 @@ namespace RaceControl.Common.Utils
         {
             return value ? "yes" : "no";
         }
+
+        public static string FirstCharToUpper(this string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return value;
+            }
+
+            return string.Concat(value[..1].ToUpper(), value[1..]);
+        }
     }
 }

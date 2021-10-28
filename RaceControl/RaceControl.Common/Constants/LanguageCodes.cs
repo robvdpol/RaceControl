@@ -10,7 +10,8 @@ namespace RaceControl.Common.Constants
         public const string Spanish = "spa";
         public const string Portuguese = "por";
         public const string Dutch = "nld";
-        public const string SoundFx = "cfx";
+        public const string SoundFx = "fx";
+        public const string SoundFxOld = "cfx";
         public const string Onboard = "teamradio";
         public const string OnboardOld = "obc";
         public const string Undetermined = "und";
@@ -22,7 +23,8 @@ namespace RaceControl.Common.Constants
             { Dutch, "dut" },
             { Onboard, "und" },
             { OnboardOld, "und" },
-            { SoundFx, "und" }
+            { SoundFx, "und" },
+            { SoundFxOld, "und" }
         };
 
         private static readonly IDictionary<string, string> TwoLetterCodes = new Dictionary<string, string>
