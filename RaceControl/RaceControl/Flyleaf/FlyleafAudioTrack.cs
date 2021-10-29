@@ -10,7 +10,7 @@ namespace RaceControl.Flyleaf
         public FlyleafAudioTrack(StreamBase audioStream)
         {
             var language = audioStream.Language ?? Language.Get(null);
-            Id = language.IdSubLanguage;
+            Id = language.OriginalInput ?? language.IdSubLanguage;
             Name = language.OriginalInput != null ? language.OriginalInput.FirstCharToUpper() : language.LanguageName;
         }
 
