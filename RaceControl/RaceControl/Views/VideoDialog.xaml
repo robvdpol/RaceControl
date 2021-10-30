@@ -215,7 +215,7 @@
                                 Header="Bottom Right" />
                         </MenuItem>
                         <Separator />
-                        <MenuItem Command="{Binding CloseVideoWindowCommand}" Header="Close Player" />
+                        <MenuItem Command="{Binding CloseWindowCommand}" Header="Close Player" />
                         <MenuItem Command="{Binding CloseAllWindowsCommand}" Header="Close All Players" />
                     </ContextMenu>
                 </Grid.ContextMenu>
@@ -553,7 +553,7 @@
                                 Grid.Row="0"
                                 Grid.RowSpan="2"
                                 Grid.Column="3"
-                                Command="{Binding CloseVideoWindowCommand}"
+                                Command="{Binding CloseWindowCommand}"
                                 Style="{StaticResource ControlBarButtonStyleLarge}"
                                 ToolTip="Close window">
                                 <Button.Content>
