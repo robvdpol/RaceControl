@@ -929,25 +929,20 @@ namespace RaceControl.ViewModels
                 arguments.Add("--script=autosync.lua --script-opts=autosync-lag=20.0");
             }
 
-            var hasAudioLanguage = false;
-
             if (!string.IsNullOrWhiteSpace(Settings.AdditionalMpvParameters))
             {
                 arguments.Add(Settings.AdditionalMpvParameters.Trim());
+            }
 
-                if (Settings.AdditionalMpvParameters.Contains("--alang", StringComparison.OrdinalIgnoreCase))
+            if (settings == null)
+            {
+                if (!arguments.Any(argument => argument.Contains("--alang", StringComparison.OrdinalIgnoreCase)))
                 {
-                    hasAudioLanguage = true;
+                    var languageCodes = playableContent.GetAudioLanguages(Settings.DefaultAudioLanguage);
+                    arguments.Add($"--alang={string.Join(',', languageCodes)}");
                 }
             }
-
-            if (!hasAudioLanguage)
-            {
-                var languageCodes = playableContent.GetAudioLanguages(Settings.DefaultAudioLanguage);
-                arguments.Add($"--alang={string.Join(',', languageCodes)}");
-            }
-
-            if (settings != null)
+            else
             {
                 var screenIndex = ScreenHelper.GetScreenIndex(settings);
 
@@ -987,6 +982,7 @@ namespace RaceControl.ViewModels
                         break;
                 }
 
+                arguments.Add($"--alang={settings.AudioTrack}");
                 arguments.Add($"--volume={settings.Volume}");
                 arguments.Add($"--mute={settings.IsMuted.GetYesNoString()}");
             }
