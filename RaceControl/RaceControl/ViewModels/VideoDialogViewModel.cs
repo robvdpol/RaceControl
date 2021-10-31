@@ -123,7 +123,7 @@ namespace RaceControl.ViewModels
 
         public VideoDialogSettings DialogSettings
         {
-            get => _dialogSettings ??= VideoDialogSettings.GetDefaultSettings();
+            get => _dialogSettings ??= VideoDialogSettings.GetDefaultSettings(_settings);
             set => SetProperty(ref _dialogSettings, value);
         }
 
@@ -507,8 +507,8 @@ namespace RaceControl.ViewModels
                 Width = DialogSettings.Width,
                 Height = DialogSettings.Height,
                 FullScreen = DialogSettings.FullScreen,
-                ResizeMode = DialogSettings.ResizeMode,
-                VideoQuality = MediaPlayer.VideoQuality,
+                ResizeMode = DialogSettings.ResizeMode,                
+                VideoQuality = _settings.DefaultVideoQuality,
                 Topmost = DialogSettings.Topmost,
                 IsMuted = MediaPlayer.IsMuted,
                 Volume = MediaPlayer.Volume,

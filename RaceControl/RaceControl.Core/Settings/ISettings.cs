@@ -1,46 +1,49 @@
-﻿using System;
+﻿using RaceControl.Common.Enums;
+using System;
 using System.Collections.ObjectModel;
 
 namespace RaceControl.Core.Settings
 {
-    public interface ISettings
-    {
-        string SubscriptionToken { get; set; }
+	public interface ISettings
+	{
+		string SubscriptionToken { get; set; }
 
-        string SubscriptionStatus { get; set; }
+		string SubscriptionStatus { get; set; }
 
-        DateTime? LastLogin { get; set; }
+		DateTime? LastLogin { get; set; }
 
-        string DefaultAudioLanguage { get; set; }
+		string DefaultAudioLanguage { get; set; }
 
-        string RecordingLocation { get; set; }
+		VideoQuality DefaultVideoQuality { get; set; }
 
-        bool DisableThumbnailTooltips { get; set; }
+		string RecordingLocation { get; set; }
 
-        bool DisableLiveSessionNotification { get; set; }
+		bool DisableThumbnailTooltips { get; set; }
 
-        bool DisableMpvNoBorder { get; set; }
+		bool DisableLiveSessionNotification { get; set; }
 
-        bool EnableMpvAutoSync { get; set; }
+		bool DisableMpvNoBorder { get; set; }
 
-        string AdditionalMpvParameters { get; set; }
+		bool EnableMpvAutoSync { get; set; }
 
-        string CustomMpvPath { get; set; }
+		string AdditionalMpvParameters { get; set; }
 
-        string LatestRelease { get; set; }
+		string CustomMpvPath { get; set; }
 
-        string SelectedNetworkInterface { get; set; }
+		string LatestRelease { get; set; }
 
-        ObservableCollection<string> SelectedSeries { get; set; }
+		string SelectedNetworkInterface { get; set; }
 
-        void Load();
+		ObservableCollection<string> SelectedSeries { get; set; }
 
-        void Save();
+		void Load();
 
-        void ClearSubscriptionToken();
+		void Save();
 
-        void UpdateSubscriptionToken(string subscriptionToken, string subscriptionStatus);
+		void ClearSubscriptionToken();
 
-        bool HasValidSubscriptionToken();
-    }
+		void UpdateSubscriptionToken(string subscriptionToken, string subscriptionStatus);
+
+		bool HasValidSubscriptionToken();
+	}
 }
