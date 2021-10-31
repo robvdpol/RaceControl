@@ -20,7 +20,7 @@ namespace RaceControl.Core.Settings
         private string _aspectRatio;
         private string _audioDevice;
         private string _audioTrack;
-        private string _channelName;        
+        private string _channelName;
 
         public double Top
         {
@@ -112,13 +112,13 @@ namespace RaceControl.Core.Settings
             set => SetProperty(ref _channelName, value);
         }
 
-        public static VideoDialogSettings GetDefaultSettings(ISettings settings)
-        {           
+        public static VideoDialogSettings GetDefaultSettings()
+        {
             return new()
             {
                 FullScreen = false,
                 ResizeMode = ResizeMode.CanResize,
-                VideoQuality = settings.DefaultVideoQuality,
+                VideoQuality = VideoQuality.High,
                 Width = 960,
                 Height = 550,
                 Volume = 100

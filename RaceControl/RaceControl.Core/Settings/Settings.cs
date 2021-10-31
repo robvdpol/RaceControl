@@ -62,6 +62,12 @@ namespace RaceControl.Core.Settings
             set => SetProperty(ref _defaultAudioLanguage, value);
         }
 
+        public VideoQuality DefaultVideoQuality
+        {
+            get => _defaultVideoQuality;
+            set => SetProperty(ref _defaultVideoQuality, value);
+        }
+
         public string RecordingLocation
         {
             get => _recordingLocation;
@@ -121,9 +127,8 @@ namespace RaceControl.Core.Settings
             get => _selectedSeries ??= new ObservableCollection<string>();
             set => SetProperty(ref _selectedSeries, value);
         }
-        public VideoQuality DefaultVideoQuality { get => _defaultVideoQuality; set => SetProperty(ref _defaultVideoQuality, value); }
 
-		public void Load()
+        public void Load()
         {
             if (!File.Exists(Filename))
             {

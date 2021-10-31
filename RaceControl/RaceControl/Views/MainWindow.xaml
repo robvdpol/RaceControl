@@ -427,15 +427,15 @@
                                         ItemsSource="{Binding AudioLanguages}"
                                         SelectedValue="{Binding Settings.DefaultAudioLanguage}"
                                         SelectedValuePath="Key" />
-									<TextBlock Margin="3" Text="Default video quality:" />
-									<ComboBox
+                                    <TextBlock Margin="3" Text="Default video quality:" />
+                                    <ComboBox
                                         Margin="3"
                                         DisplayMemberPath="Value"
                                         ItemsSource="{Binding VideoQualities}"
                                         SelectedValue="{Binding Settings.DefaultVideoQuality}"
                                         SelectedValuePath="Key" />
-									<TextBlock Margin="3" Text="Recording location:" />
-									<TextBox
+                                    <TextBlock Margin="3" Text="Recording location:" />
+                                    <TextBox
                                         Height="22"
                                         Margin="3,1"
                                         VerticalContentAlignment="Center"
