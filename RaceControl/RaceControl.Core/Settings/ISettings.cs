@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RaceControl.Common.Enums;
+using System;
 using System.Collections.ObjectModel;
 
 namespace RaceControl.Core.Settings
@@ -12,6 +13,8 @@ namespace RaceControl.Core.Settings
         DateTime? LastLogin { get; set; }
 
         string DefaultAudioLanguage { get; set; }
+
+        VideoQuality DefaultVideoQuality { get; set; }
 
         string RecordingLocation { get; set; }
 

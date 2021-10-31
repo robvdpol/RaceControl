@@ -182,6 +182,14 @@ namespace RaceControl.ViewModels
             { LanguageCodes.Portuguese, "Portuguese" }
         };
 
+        public IDictionary<VideoQuality, string> VideoQualities { get; } = new Dictionary<VideoQuality, string>
+        {
+            { VideoQuality.High, "High" },
+            { VideoQuality.Medium, "Medium" },
+            { VideoQuality.Low, "Low" },
+            { VideoQuality.Lowest, "Potato" }
+        };
+
         public string EpisodeFilterText
         {
             get => _episodeFilterText;

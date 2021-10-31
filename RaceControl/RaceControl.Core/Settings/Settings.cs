@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using NLog;
 using Prism.Mvvm;
+using RaceControl.Common.Enums;
 using RaceControl.Common.Utils;
 using System;
 using System.Collections.ObjectModel;
@@ -19,6 +20,7 @@ namespace RaceControl.Core.Settings
         private string _subscriptionStatus;
         private DateTime? _lastLogin;
         private string _defaultAudioLanguage;
+        private VideoQuality _defaultVideoQuality;
         private string _recordingLocation = FolderUtils.GetSpecialFolderPath(Environment.SpecialFolder.Desktop);
         private bool _disableThumbnailTooltips;
         private bool _disableLiveSessionNotification;
@@ -58,6 +60,12 @@ namespace RaceControl.Core.Settings
         {
             get => _defaultAudioLanguage;
             set => SetProperty(ref _defaultAudioLanguage, value);
+        }
+
+        public VideoQuality DefaultVideoQuality
+        {
+            get => _defaultVideoQuality;
+            set => SetProperty(ref _defaultVideoQuality, value);
         }
 
         public string RecordingLocation

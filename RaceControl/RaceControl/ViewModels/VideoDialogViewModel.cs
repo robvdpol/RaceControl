@@ -166,6 +166,7 @@ namespace RaceControl.ViewModels
             else
             {
                 StartupLocation = WindowStartupLocation.CenterScreen;
+                DialogSettings.VideoQuality = _settings.DefaultVideoQuality;
                 DialogSettings.AudioTrack = PlayableContent.GetPreferredAudioLanguage(_settings.DefaultAudioLanguage);
             }
 
