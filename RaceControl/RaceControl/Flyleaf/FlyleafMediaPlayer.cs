@@ -1,5 +1,6 @@
 ﻿using FlyleafLib;
 using FlyleafLib.MediaPlayer;
+using NLog;
 using Prism.Mvvm;
 using RaceControl.Common.Constants;
 using RaceControl.Common.Enums;
@@ -17,6 +18,8 @@ namespace RaceControl.Flyleaf
 {
     public class FlyleafMediaPlayer : BindableBase, IMediaPlayer
     {
+        private readonly ILogger _logger;
+
         private bool _isStarting;
         private bool _isStarted;
         private bool _isPlaying;
@@ -36,8 +39,9 @@ namespace RaceControl.Flyleaf
         private IMediaTrack _audioTrack;
         private bool _disposed;
 
-        public FlyleafMediaPlayer(Player player)
+        public FlyleafMediaPlayer(ILogger logger, Player player)
         {
+            _logger = logger;
             Player = player;
         }
 
@@ -286,14 +290,28 @@ namespace RaceControl.Flyleaf
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                InitializeVideo(settings);
-                InitializeAudio(settings);
+                try
+                {
+                    InitializeVideo(settings);
+                    InitializeAudio(settings);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "An error occurred while initializing audio or video.");
+                }
             });
         }
 
         private void PlayerOnOpenStreamCompleted()
         {
-            Player.Play();
+            try
+            {
+                Player.Play();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "An error occurred while playing stream.");
+            }
         }
 
         private void PlayerOnPropertyChanged(object sender, PropertyChangedEventArgs e)
