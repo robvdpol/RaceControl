@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Input;
+using Timer = System.Timers.Timer;
 
 namespace RaceControl.ViewModels
 {
@@ -451,7 +452,8 @@ namespace RaceControl.ViewModels
 
         private void OnCloseAll(ContentType? contentType)
         {
-            CloseWindowCommand.TryExecute();
+            var delay = TimeSpan.FromMilliseconds((_identifier - 1) * 250);
+            DelayAsync(delay).Await(() => CloseWindowCommand.TryExecute(), null, true);
         }
 
         private void OnSaveLayout(ContentType contentType)
@@ -546,6 +548,11 @@ namespace RaceControl.ViewModels
             base.OnDialogOpened(null);
             RaiseRequestClose();
             HandleCriticalError(ex);
+        }
+
+        private static async Task DelayAsync(TimeSpan delay)
+        {
+            await Task.Delay(delay);
         }
 
         private void SubscribeEvents()
