@@ -281,19 +281,16 @@ namespace RaceControl.ViewModels
 
         private void TogglePauseExecute()
         {
-            Logger.Info("Toggling pause...");
             MediaPlayer.TogglePause();
         }
 
         private void TogglePauseAllExecute()
         {
-            Logger.Info("Toggling pause for all video players...");
             _eventAggregator.GetEvent<PauseAllEvent>().Publish();
         }
 
         private void ToggleMuteExecute(bool? mute)
         {
-            Logger.Info("Toggling mute...");
             MediaPlayer.ToggleMute(mute);
         }
 
@@ -301,7 +298,6 @@ namespace RaceControl.ViewModels
         {
             if (seconds.HasValue)
             {
-                Logger.Info($"Fast forwarding stream {seconds.Value} seconds...");
                 MediaPlayer.Time += TimeSpan.FromSeconds(seconds.Value).Ticks;
             }
         }
@@ -309,7 +305,6 @@ namespace RaceControl.ViewModels
         private void SyncSessionExecute()
         {
             var payload = new SyncStreamsEventPayload(PlayableContent.SyncUID, MediaPlayer.Time);
-            Logger.Info($"Syncing streams with sync-UID '{payload.SyncUID}' to timestamp '{payload.Time}'...");
             _eventAggregator.GetEvent<SyncStreamsEvent>().Publish(payload);
         }
 
