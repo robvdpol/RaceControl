@@ -98,6 +98,7 @@ namespace RaceControl.Services.F1TV
 
             return apiResponse.ResultObj.Containers
                 .Select(CreateEvent)
+                .Reverse()
                 .ToList();
         }
 
