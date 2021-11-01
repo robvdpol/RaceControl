@@ -452,7 +452,7 @@ namespace RaceControl.ViewModels
 
         private void OnCloseAll(ContentType? contentType)
         {
-            var delay = TimeSpan.FromMilliseconds((_identifier - 1) * 200);
+            var delay = TimeSpan.FromMilliseconds((_identifier - 1) * 150);
             DelayAsync(delay).Await(() => CloseWindowCommand.TryExecute(), null, true);
         }
 
