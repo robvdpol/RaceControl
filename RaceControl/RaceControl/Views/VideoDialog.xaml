@@ -215,6 +215,7 @@
                                 Header="Bottom Right" />
                         </MenuItem>
                         <Separator />
+                        <MenuItem Command="{Binding ShowMainWindowCommand}" Header="Show main window" />
                         <MenuItem Command="{Binding CloseWindowCommand}" Header="Close Player" />
                         <MenuItem Command="{Binding CloseAllWindowsCommand}" Header="Close All Players" />
                     </ContextMenu>

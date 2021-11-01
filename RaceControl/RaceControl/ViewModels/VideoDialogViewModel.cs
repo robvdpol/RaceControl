@@ -47,6 +47,7 @@ namespace RaceControl.ViewModels
         private ICommand _toggleMuteCommand;
         private ICommand _fastForwardCommand;
         private ICommand _syncSessionCommand;
+        private ICommand _showMainWindowCommand;
         private ICommand _toggleRecordingCommand;
         private ICommand _toggleFullScreenCommand;
         private ICommand _moveToCornerCommand;
@@ -96,6 +97,7 @@ namespace RaceControl.ViewModels
         public ICommand ToggleMuteCommand => _toggleMuteCommand ??= new DelegateCommand<bool?>(ToggleMuteExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
         public ICommand FastForwardCommand => _fastForwardCommand ??= new DelegateCommand<int?>(FastForwardExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
         public ICommand SyncSessionCommand => _syncSessionCommand ??= new DelegateCommand(SyncSessionExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
+        public ICommand ShowMainWindowCommand => _showMainWindowCommand ??= new DelegateCommand(ShowMainWindowExecute);
         public ICommand ToggleRecordingCommand => _toggleRecordingCommand ??= new DelegateCommand(ToggleRecordingExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand<long?>(ToggleFullScreenExecute);
         public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => DialogSettings.FullScreen);
@@ -309,6 +311,17 @@ namespace RaceControl.ViewModels
             var payload = new SyncStreamsEventPayload(PlayableContent.SyncUID, MediaPlayer.Time);
             Logger.Info($"Syncing streams with sync-UID '{payload.SyncUID}' to timestamp '{payload.Time}'...");
             _eventAggregator.GetEvent<SyncStreamsEvent>().Publish(payload);
+        }
+
+        private static void ShowMainWindowExecute()
+        {
+            var mainWindow = Application.Current.MainWindow;
+
+            if (mainWindow != null)
+            {
+                mainWindow.WindowState = WindowState.Normal;
+                mainWindow.Focus();
+            }
         }
 
         private void ToggleRecordingExecute()

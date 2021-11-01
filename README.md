@@ -39,6 +39,7 @@ The internal player supports the following keyboard shortcuts:
 | Shift + Escape      | Close all players                      |
 | Space               | Toggle pause                           |
 | Shift + Space       | Toggle pause for all players           |
+| W                   | Show main window                       |
 | M                   | Toggle mute                            |
 | F                   | Toggle fullscreen                      |
 | 1 - 9               | Toggle fullscreen for specific player  |

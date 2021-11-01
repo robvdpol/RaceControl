@@ -32,6 +32,7 @@
         <KeyBinding Key="F" Command="{Binding ToggleFullScreenCommand}" />
         <KeyBinding Key="R" Command="{Binding ToggleRecordingCommand}" />
         <KeyBinding Key="S" Command="{Binding SyncSessionCommand}" />
+        <KeyBinding Key="W" Command="{Binding ShowMainWindowCommand}" />
         <KeyBinding Key="Add" Command="{Binding ZoomCommand}">
             <KeyBinding.CommandParameter>
                 <sys:Int32>50</sys:Int32>
