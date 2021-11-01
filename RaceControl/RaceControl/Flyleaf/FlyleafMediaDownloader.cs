@@ -1,6 +1,7 @@
 ﻿using FlyleafLib.MediaFramework.MediaContext;
 using Prism.Mvvm;
 using RaceControl.Common.Enums;
+using RaceControl.Core.Settings;
 using RaceControl.Interfaces;
 using RaceControl.Services.Interfaces.F1TV.Api;
 using System;
@@ -13,14 +14,16 @@ namespace RaceControl.Flyleaf
 {
     public class FlyleafMediaDownloader : BindableBase, IMediaDownloader
     {
+        private readonly ISettings _settings;
         private readonly Downloader _downloader;
 
         private DownloadStatus _status = DownloadStatus.Pending;
         private float _progress;
         private bool _disposed;
 
-        public FlyleafMediaDownloader(Downloader downloader)
+        public FlyleafMediaDownloader(ISettings settings, Downloader downloader)
         {
+            _settings = settings;
             _downloader = downloader;
             _downloader.PropertyChanged += DownloaderOnPropertyChanged;
             _downloader.DownloadCompleted += DownloaderOnDownloadCompleted;
@@ -54,10 +57,11 @@ namespace RaceControl.Flyleaf
                     throw new Exception($"An error occurred while opening the stream URL (error: '{error}').");
                 }
 
-                // Only download the highest quality video stream
-                if (_downloader.DecCtx.VideoDemuxer.VideoStreams.Any())
+                var videoStreams = _downloader.DecCtx.VideoDemuxer.VideoStreams;
+
+                if (videoStreams.Any())
                 {
-                    var videoStream = _downloader.DecCtx.VideoDemuxer.VideoStreams.OrderByDescending(s => s.Height).ThenByDescending(s => s.Width).ThenByDescending(s => s.Fps).First();
+                    var videoStream = videoStreams.GetVideoStreamForQuality(_settings.DefaultVideoQuality) ?? videoStreams.OrderByDescending(s => s.Height).ThenByDescending(s => s.Width).ThenByDescending(s => s.Fps).First();
                     _downloader.DecCtx.VideoDemuxer.EnableStream(videoStream);
                 }
 

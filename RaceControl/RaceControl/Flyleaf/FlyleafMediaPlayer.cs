@@ -385,30 +385,7 @@ namespace RaceControl.Flyleaf
 
         private void SetVideoQuality(VideoQuality videoQuality)
         {
-            if (Player.Video == null || !Player.Video.Streams.Any())
-            {
-                return;
-            }
-
-            var maxHeight = Player.Video.Streams.Max(stream => stream.Height);
-            var minHeight = maxHeight;
-
-            switch (videoQuality)
-            {
-                case VideoQuality.Medium:
-                    minHeight = maxHeight / 3 * 2;
-                    break;
-
-                case VideoQuality.Low:
-                    minHeight = maxHeight / 2;
-                    break;
-
-                case VideoQuality.Lowest:
-                    minHeight = maxHeight / 3;
-                    break;
-            }
-
-            var videoStream = Player.Video.Streams.OrderBy(stream => stream.Height).FirstOrDefault(stream => stream.Height >= minHeight);
+            var videoStream = Player.Video?.Streams.GetVideoStreamForQuality(videoQuality);
 
             if (videoStream != null)
             {
