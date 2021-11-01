@@ -131,9 +131,11 @@ namespace RaceControl
 
         private static Downloader CreateFlyleafDownloader()
         {
-            _flyleafUniqueId++;
+            var config = new Config();
+            config.Demuxer.FormatOpt.Add("probesize", (10 * 1024 * 1024).ToString());
+            config.Demuxer.FormatOpt.Add("analyzeduration", (10 * 1000 * 1000).ToString());
 
-            return new Downloader(new Config(), _flyleafUniqueId);
+            return new Downloader(config, ++_flyleafUniqueId);
         }
 
         private static IRestClient CreateRestClient()
