@@ -365,7 +365,12 @@ namespace RaceControl.ViewModels
             if (SelectedSeason != null)
             {
                 ClearEvents();
-                SelectSeasonAsync(SelectedSeason).Await(SetNotBusy, HandleCriticalError);
+                SelectSeasonAsync(SelectedSeason).Await(() =>
+                {
+                    SetNotBusy();
+                    SelectedEvent = Events.FirstOrDefault(e => _datePassedConverter.HasPassed(e.StartDate, -3));
+                },
+                HandleCriticalError);
             }
         }
 
@@ -828,8 +833,6 @@ namespace RaceControl.ViewModels
             {
                 await LoadEpisodesForSeasonAsync(season);
             }
-
-            SelectedEvent = Events.FirstOrDefault(e => _datePassedConverter.HasPassed(e.StartDate, -3));
         }
 
         private async Task SelectEventAsync(Event evt)
