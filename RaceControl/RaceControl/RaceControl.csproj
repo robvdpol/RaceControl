@@ -70,7 +70,7 @@
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.37" />
     <PackageReference Include="NLog" Version="4.7.12" />
     <PackageReference Include="Prism.DryIoc" Version="8.1.97" />
-    <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="106.12.0" />
+    <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="106.13.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RaceControl.Core\RaceControl.Core.csproj" />
