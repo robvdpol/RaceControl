@@ -12,6 +12,7 @@ using RaceControl.Common.Generators;
 using RaceControl.Common.Interfaces;
 using RaceControl.Common.Utils;
 using RaceControl.Comparers;
+using RaceControl.Core.Converters;
 using RaceControl.Core.Helpers;
 using RaceControl.Core.Mvvm;
 using RaceControl.Core.Settings;
@@ -52,6 +53,7 @@ namespace RaceControl.ViewModels
         private readonly IDeviceLocator _deviceLocator;
         private readonly ISender _sender;
         private readonly SoundPlayer _liveSessionPlayer;
+        private readonly DatePassedConverter _datePassedConverter = new();
         private readonly object _refreshTimerLock = new();
 
         private ICommand _loadedCommand;
@@ -826,6 +828,8 @@ namespace RaceControl.ViewModels
             {
                 await LoadEpisodesForSeasonAsync(season);
             }
+
+            SelectedEvent = Events.FirstOrDefault(e => _datePassedConverter.HasPassed(e.StartDate, -3));
         }
 
         private async Task SelectEventAsync(Event evt)

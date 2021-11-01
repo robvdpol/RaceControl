@@ -12,7 +12,7 @@ namespace RaceControl.Core.Converters
         {
             if (value is DateTime date)
             {
-                if (!(parameter is int days))
+                if (parameter is not int days)
                 {
                     days = 0;
                 }
@@ -26,6 +26,11 @@ namespace RaceControl.Core.Converters
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
+        }
+
+        public bool HasPassed(DateTime? date, int offset = 0)
+        {
+            return Convert(date, null, offset, CultureInfo.InvariantCulture) is true;
         }
     }
 }
