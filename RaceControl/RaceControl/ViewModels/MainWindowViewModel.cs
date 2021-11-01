@@ -31,11 +31,13 @@ using System.IO;
 using System.Linq;
 using System.Media;
 using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Navigation;
 
 namespace RaceControl.ViewModels
@@ -44,6 +46,8 @@ namespace RaceControl.ViewModels
     // ReSharper disable once UnusedType.Global
     public class MainWindowViewModel : ViewModelBase, ICloseWindow
     {
+        private const int PlayPauseHotKeyID = 9000;
+
         private readonly IExtendedDialogService _dialogService;
         private readonly IEventAggregator _eventAggregator;
         private readonly IApiService _apiService;
@@ -84,6 +88,7 @@ namespace RaceControl.ViewModels
         private ICommand _logOutCommand;
         private ICommand _requestNavigateCommand;
 
+        private HwndSource _hwndSource;
         private string _episodeFilterText;
         private string _vlcExeLocation;
         private string _mpvExeLocation;
@@ -294,6 +299,9 @@ namespace RaceControl.ViewModels
 
         private void LoadedExecute(RoutedEventArgs args)
         {
+            var helper = new WindowInteropHelper((Window)args.Source);
+            _hwndSource = HwndSource.FromHwnd(helper.Handle);
+
             IsBusy = true;
             Settings.Load();
             VideoDialogLayout.Load();
@@ -301,6 +309,7 @@ namespace RaceControl.ViewModels
             SetMpvExeLocation();
             SetMpcExeLocation();
             SetNetworkInterface();
+            SetHotKeys();
 
             if (Settings.HasValidSubscriptionToken() || Login())
             {
@@ -318,6 +327,7 @@ namespace RaceControl.ViewModels
         private void ClosingExecute()
         {
             RemoveRefreshTimer();
+            RemoveHotKeys();
             Settings.SelectedNetworkInterface = SelectedNetworkInterface?.Id;
             Settings.Save();
         }
@@ -1201,5 +1211,47 @@ namespace RaceControl.ViewModels
                 throw new Exception("An error occurred while retrieving the stream URL.");
             }
         }
+
+        private void SetHotKeys()
+        {
+            if (_hwndSource != null)
+            {
+                _hwndSource.AddHook(HwndHook);
+                RegisterHotKey(_hwndSource.Handle, PlayPauseHotKeyID, 0, (uint)KeyInterop.VirtualKeyFromKey(Key.MediaPlayPause));
+            }
+        }
+
+        private void RemoveHotKeys()
+        {
+            if (_hwndSource != null)
+            {
+                UnregisterHotKey(_hwndSource.Handle, PlayPauseHotKeyID);
+                _hwndSource.RemoveHook(HwndHook);
+            }
+        }
+
+        private IntPtr HwndHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            const int wmHotkey = 0x0312;
+
+            if (msg == wmHotkey && wParam.ToInt32() == PlayPauseHotKeyID)
+            {
+                OnPlayPausePressed();
+                handled = true;
+            }
+
+            return IntPtr.Zero;
+        }
+
+        private void OnPlayPausePressed()
+        {
+            _eventAggregator.GetEvent<PauseAllEvent>().Publish();
+        }
+
+        [DllImport("User32.dll")]
+        private static extern bool RegisterHotKey([In] IntPtr hWnd, [In] int id, [In] uint fsModifiers, [In] uint vk);
+
+        [DllImport("User32.dll")]
+        private static extern bool UnregisterHotKey([In] IntPtr hWnd, [In] int id);
     }
 }
