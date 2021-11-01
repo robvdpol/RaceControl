@@ -95,11 +95,15 @@ namespace RaceControl.Services.F1TV
             _logger.Info($"Querying events for season '{season.Name}'...");
 
             var apiResponse = await QuerySeasonEventsAsync(season.Year);
+            var events = apiResponse.ResultObj.Containers.Select(CreateEvent).ToList();
 
-            return apiResponse.ResultObj.Containers
-                .Select(CreateEvent)
-                .Reverse()
-                .ToList();
+            // Show events for current season in reverse
+            if (season.Year == DateTime.UtcNow.Year)
+            {
+                events.Reverse();
+            }
+
+            return events;
         }
 
         public async Task<List<Episode>> GetEpisodesForSeasonAsync(Season season)
