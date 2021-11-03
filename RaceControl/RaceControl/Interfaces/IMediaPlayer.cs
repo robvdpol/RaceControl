@@ -1,12 +1,11 @@
 ﻿using RaceControl.Common.Enums;
 using RaceControl.Core.Settings;
 using RaceControl.Services.Interfaces.F1TV.Api;
-using System;
 using System.Collections.ObjectModel;
 
 namespace RaceControl.Interfaces
 {
-    public interface IMediaPlayer : IDisposable
+    public interface IMediaPlayer
     {
         bool IsStarting { get; }
 

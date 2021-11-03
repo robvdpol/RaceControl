@@ -37,7 +37,6 @@ namespace RaceControl.Flyleaf
         private IAspectRatio _aspectRatio;
         private IAudioDevice _audioDevice;
         private IMediaTrack _audioTrack;
-        private bool _disposed;
 
         public FlyleafMediaPlayer(ILogger logger, Player player)
         {
@@ -263,27 +262,6 @@ namespace RaceControl.Flyleaf
         public void ToggleMute(bool? mute)
         {
             IsMuted = mute.GetValueOrDefault(!IsMuted);
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposed)
-            {
-                return;
-            }
-
-            if (disposing)
-            {
-                Player.Dispose();
-            }
-
-            _disposed = true;
         }
 
         private void PlayerOnOpenCompleted(VideoDialogSettings settings)
