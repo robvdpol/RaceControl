@@ -17,10 +17,6 @@ namespace RaceControl.Interfaces
 
         bool IsRecording { get; }
 
-        long Time { get; set; }
-
-        long Duration { get; }
-
         int MaxVolume { get; }
 
         int Volume { get; set; }
@@ -52,5 +48,11 @@ namespace RaceControl.Interfaces
         void TogglePause();
 
         void ToggleMute(bool? mute);
+
+        long GetCurrentTime();
+
+        void SetCurrentTime(long time);
+
+        void FastForward(long seconds);
     }
 }

@@ -297,13 +297,13 @@ namespace RaceControl.ViewModels
         {
             if (seconds.HasValue)
             {
-                MediaPlayer.Time += TimeSpan.FromSeconds(seconds.Value).Ticks;
+                MediaPlayer.FastForward(seconds.Value);
             }
         }
 
         private void SyncSessionExecute()
         {
-            var payload = new SyncStreamsEventPayload(PlayableContent.SyncUID, MediaPlayer.Time);
+            var payload = new SyncStreamsEventPayload(PlayableContent.SyncUID, MediaPlayer.GetCurrentTime());
             _eventAggregator.GetEvent<SyncStreamsEvent>().Publish(payload);
         }
 
@@ -442,7 +442,7 @@ namespace RaceControl.ViewModels
         {
             if (MediaPlayer.IsStarted && PlayableContent.SyncUID == payload.SyncUID)
             {
-                MediaPlayer.Time = payload.Time;
+                MediaPlayer.SetCurrentTime(payload.Time);
             }
         }
 
@@ -459,8 +459,7 @@ namespace RaceControl.ViewModels
 
         private void OnCloseAll(ContentType? contentType)
         {
-            var delay = TimeSpan.FromMilliseconds((_identifier - 1) * 150);
-            DelayAsync(delay).Await(() => CloseWindowCommand.TryExecute(), null, true);
+            CloseWindowCommand.TryExecute();
         }
 
         private void OnSaveLayout(ContentType contentType)
@@ -555,11 +554,6 @@ namespace RaceControl.ViewModels
             base.OnDialogOpened(null);
             RaiseRequestClose();
             HandleCriticalError(ex);
-        }
-
-        private static async Task DelayAsync(TimeSpan delay)
-        {
-            await Task.Delay(delay);
         }
 
         private void SubscribeEvents()

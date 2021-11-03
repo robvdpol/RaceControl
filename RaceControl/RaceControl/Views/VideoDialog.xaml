@@ -269,15 +269,15 @@
                             Grid.Column="0"
                             Margin="3,2"
                             VerticalAlignment="Center"
-                            Text="{Binding MediaPlayer.Time, StringFormat=hh\\:mm\\:ss, Converter={StaticResource TicksToTimeSpanConverter}}" />
+                            Text="{Binding MediaPlayer.Player.CurTime, StringFormat=hh\\:mm\\:ss, Converter={StaticResource TicksToTimeSpanConverter}}" />
                         <Slider
                             Grid.Column="1"
                             Margin="2"
                             IsMoveToPointEnabled="True"
                             IsSnapToTickEnabled="False"
-                            Maximum="{Binding MediaPlayer.Duration}"
+                            Maximum="{Binding MediaPlayer.Player.Duration}"
                             TickPlacement="BottomRight"
-                            Value="{Binding MediaPlayer.Time}">
+                            Value="{Binding MediaPlayer.Player.CurTime}">
                             <Slider.IsEnabled>
                                 <MultiBinding Converter="{StaticResource LogicalAndConverter}">
                                     <Binding Converter="{StaticResource InverseBooleanConverter}" Path="PlayableContent.IsLive" />
@@ -285,7 +285,7 @@
                                 </MultiBinding>
                             </Slider.IsEnabled>
                             <Slider.TickFrequency>
-                                <Binding Converter="{StaticResource DivideDoubleConverter}" Path="MediaPlayer.Duration">
+                                <Binding Converter="{StaticResource DivideDoubleConverter}" Path="MediaPlayer.Player.Duration">
                                     <Binding.ConverterParameter>
                                         <sys:Double>60</sys:Double>
                                     </Binding.ConverterParameter>
@@ -296,7 +296,7 @@
                             Grid.Column="2"
                             Margin="3,2"
                             VerticalAlignment="Center"
-                            Text="{Binding MediaPlayer.Duration, StringFormat=hh\\:mm\\:ss, Converter={StaticResource TicksToTimeSpanConverter}}">
+                            Text="{Binding MediaPlayer.Player.Duration, StringFormat=hh\\:mm\\:ss, Converter={StaticResource TicksToTimeSpanConverter}}">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="Visibility" Value="Visible" />

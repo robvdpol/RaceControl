@@ -25,9 +25,7 @@ namespace RaceControl.Flyleaf
         private bool _isPlaying;
         private bool _isPaused;
         private bool _isRecording;
-        private long _time;
-        private long _duration;
-        private int _volume;
+        private int _volume = -1;
         private bool _isMuted;
         private int _zoom;
         private VideoQuality _videoQuality = VideoQuality.Default;
@@ -76,22 +74,6 @@ namespace RaceControl.Flyleaf
             set => SetProperty(ref _isRecording, value);
         }
 
-        public long Time
-        {
-            get => _time;
-            set
-            {
-                var time = TimeSpan.FromTicks(Math.Max(value, 0));
-                Player.Seek((int)time.TotalMilliseconds);
-            }
-        }
-
-        public long Duration
-        {
-            get => _duration;
-            private set => SetProperty(ref _duration, value);
-        }
-
         public int MaxVolume => 150;
 
         public int Volume
@@ -130,7 +112,7 @@ namespace RaceControl.Flyleaf
 
                 if (SetProperty(ref _zoom, zoom))
                 {
-                    Player.renderer.Zoom = _zoom;
+                    Player.Zoom = _zoom;
                 }
             }
         }
@@ -264,6 +246,21 @@ namespace RaceControl.Flyleaf
             IsMuted = mute.GetValueOrDefault(!IsMuted);
         }
 
+        public long GetCurrentTime()
+        {
+            return Player.CurTime;
+        }
+
+        public void SetCurrentTime(long time)
+        {
+            Player.CurTime = time;
+        }
+
+        public void FastForward(long seconds)
+        {
+            Player.CurTime += TimeSpan.FromSeconds(seconds).Ticks;
+        }
+
         private void PlayerOnOpenCompleted(VideoDialogSettings settings)
         {
             Application.Current.Dispatcher.Invoke(() =>
@@ -308,20 +305,11 @@ namespace RaceControl.Flyleaf
                     }
                 });
             }
-
-            if (e.PropertyName == nameof(Player.CurTime))
-            {
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    SetProperty(ref _time, Player.CurTime, nameof(Time));
-                });
-            }
         }
 
         private void InitializeVideo(VideoDialogSettings settings)
         {
             AspectRatios.AddRange(FlyleafLibAspectRatio.AspectRatios.Where(ar => ar != FlyleafLibAspectRatio.Custom).Select(ar => new FlyleafAspectRatio(ar)));
-            Duration = Player.VideoDemuxer.Duration;
             VideoQuality = settings.VideoQuality;
 
             if (!string.IsNullOrWhiteSpace(settings.AspectRatio))
