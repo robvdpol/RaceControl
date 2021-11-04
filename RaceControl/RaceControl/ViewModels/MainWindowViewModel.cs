@@ -12,7 +12,6 @@ using RaceControl.Common.Generators;
 using RaceControl.Common.Interfaces;
 using RaceControl.Common.Utils;
 using RaceControl.Comparers;
-using RaceControl.Core.Converters;
 using RaceControl.Core.Helpers;
 using RaceControl.Core.Mvvm;
 using RaceControl.Core.Settings;
@@ -57,7 +56,6 @@ namespace RaceControl.ViewModels
         private readonly IDeviceLocator _deviceLocator;
         private readonly ISender _sender;
         private readonly SoundPlayer _liveSessionPlayer;
-        private readonly DatePassedConverter _datePassedConverter = new();
         private readonly object _refreshTimerLock = new();
 
         private ICommand _loadedCommand;
@@ -378,7 +376,12 @@ namespace RaceControl.ViewModels
                 SelectSeasonAsync(SelectedSeason).Await(() =>
                 {
                     SetNotBusy();
-                    SelectedEvent = Events.FirstOrDefault(e => _datePassedConverter.HasPassed(e.StartDate, -3));
+
+                    if (SelectedSeason.Year == DateTime.UtcNow.Year)
+                    {
+                        // Select the most recent event
+                        SelectedEvent = Events.OrderByDescending(e => e.StartDate).FirstOrDefault(e => DateTime.UtcNow.Date >= e.StartDate.GetValueOrDefault().Date);
+                    }
                 },
                 HandleCriticalError);
             }
