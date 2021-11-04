@@ -263,7 +263,7 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="38" />
                         </Grid.ColumnDefinitions>
                         <TextBlock
                             Grid.Column="0"
@@ -327,10 +327,11 @@
                             Value="{Binding MediaPlayer.Volume}" />
                         <TextBlock
                             Grid.Column="5"
-                            Width="30"
                             Margin="3,2"
                             VerticalAlignment="Center"
-                            Text="{Binding MediaPlayer.Volume, StringFormat={}{0}%}" />
+                            Text="{Binding MediaPlayer.Volume, StringFormat={}{0}%}"
+                            TextAlignment="Center"
+                            Visibility="{Binding MediaPlayer.IsStarted, Converter={StaticResource BooleanToVisibilityConverter}}" />
                     </Grid>
                     <Grid Grid.Row="1" Margin="2">
                         <Grid.RowDefinitions>
