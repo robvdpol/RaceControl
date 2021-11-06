@@ -2,6 +2,7 @@
 using GoogleCast.Channels;
 using GoogleCast.Models.Media;
 using Microsoft.Win32;
+using Newtonsoft.Json;
 using NLog;
 using Prism.Commands;
 using Prism.Events;
@@ -1064,7 +1065,13 @@ namespace RaceControl.ViewModels
                     // hacking mediachannel to update app id
                     mediaChannel.SetApplicationId("B3E81094");
                     await _sender.LaunchAsync(mediaChannel);
-                    var status = await mediaChannel.LoadAsync(new MediaInformation { ContentId = streamUrl });
+                    var status = await mediaChannel.LoadAsync(new MediaInformation
+                    {
+                        ContentId = streamUrl,
+                        ContentType = "application/x-mpegURL",
+                        StreamType = playableContent.IsLive ? StreamType.Live : StreamType.Buffered,
+                        CustomData = GetCustomData()
+                    });
 
                     if (status?.Media?.Tracks != null)
                     {
@@ -1076,6 +1083,27 @@ namespace RaceControl.ViewModels
             finally
             {
                 _sender.Disconnect();
+            }
+
+            IDictionary<string, string> GetCustomData()
+            {
+                var metadata = new
+                {
+                    ascendontoken = Settings.SubscriptionToken,
+                    requestChannel = StreamTypeKeys.WebHls
+                };
+
+                var options = new
+                {
+                    manifestWithCredentials = true,
+                    withCredentials = true
+                };
+
+                return new Dictionary<string, string>
+                {
+                    { nameof(metadata), JsonConvert.SerializeObject(metadata) },
+                    { nameof(options), JsonConvert.SerializeObject(options) }
+                };
             }
         }
 
