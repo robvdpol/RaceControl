@@ -20,6 +20,8 @@ namespace RaceControl.Flyleaf
     {
         private readonly ILogger _logger;
 
+        private bool _resyncVideo;
+        private bool _resyncAudio;
         private bool _isStarting;
         private bool _isStarted;
         private bool _isPlaying;
@@ -124,7 +126,8 @@ namespace RaceControl.Flyleaf
             {
                 if (SetProperty(ref _videoQuality, value))
                 {
-                    SetVideoQuality(_videoQuality);
+                    OpenVideoStream(_videoQuality, _resyncVideo);
+                    _resyncVideo = true;
                 }
             }
         }
@@ -166,12 +169,8 @@ namespace RaceControl.Flyleaf
             {
                 if (SetProperty(ref _audioTrack, value) && _audioTrack != null)
                 {
-                    var audioStream = Player.Audio.Streams.FirstOrDefault(stream => new FlyleafAudioTrack(stream).Id == _audioTrack.Id);
-
-                    if (audioStream != null)
-                    {
-                        Player.OpenAsync(audioStream, true, false);
-                    }
+                    OpenAudioStream(_audioTrack, _resyncAudio);
+                    _resyncAudio = true;
                 }
             }
         }
@@ -310,7 +309,6 @@ namespace RaceControl.Flyleaf
         private void InitializeVideo(VideoDialogSettings settings)
         {
             AspectRatios.AddRange(FlyleafLibAspectRatio.AspectRatios.Where(ar => ar != FlyleafLibAspectRatio.Custom).Select(ar => new FlyleafAspectRatio(ar)));
-            VideoQuality = settings.VideoQuality;
 
             if (!string.IsNullOrWhiteSpace(settings.AspectRatio))
             {
@@ -323,6 +321,7 @@ namespace RaceControl.Flyleaf
             }
 
             Zoom = settings.Zoom;
+            VideoQuality = settings.VideoQuality;
         }
 
         private void InitializeAudio(VideoDialogSettings settings)
@@ -349,13 +348,23 @@ namespace RaceControl.Flyleaf
                          AudioTracks.FirstOrDefault(t => t.Id == LanguageCodes.Undetermined);
         }
 
-        private void SetVideoQuality(VideoQuality videoQuality)
+        private void OpenVideoStream(VideoQuality videoQuality, bool resync)
         {
             var videoStream = Player.Video?.Streams.GetVideoStreamForQuality(videoQuality);
 
             if (videoStream != null)
             {
-                Player.OpenAsync(videoStream, true, false);
+                Player.OpenAsync(videoStream, resync, false);
+            }
+        }
+
+        private void OpenAudioStream(IMediaTrack audioTrack, bool resync)
+        {
+            var audioStream = Player.Audio?.Streams.FirstOrDefault(stream => new FlyleafAudioTrack(stream).Id == audioTrack.Id);
+
+            if (audioStream != null)
+            {
+                Player.OpenAsync(audioStream, resync, false);
             }
         }
     }
