@@ -964,6 +964,8 @@ namespace RaceControl.ViewModels
 
             if (settings == null)
             {
+                AddVideoQualityArgument(Settings.DefaultVideoQuality);
+
                 if (!arguments.Any(argument => argument.Contains("--alang", StringComparison.OrdinalIgnoreCase)))
                 {
                     var languageCodes = playableContent.GetAudioLanguages(Settings.DefaultAudioLanguage);
@@ -995,21 +997,7 @@ namespace RaceControl.ViewModels
                     arguments.Add("--ontop");
                 }
 
-                switch (settings.VideoQuality)
-                {
-                    case VideoQuality.Lowest:
-                        arguments.Add("--hls-bitrate=2500000");
-                        break;
-
-                    case VideoQuality.Low:
-                        arguments.Add("--hls-bitrate=4000000");
-                        break;
-
-                    case VideoQuality.Medium:
-                        arguments.Add("--hls-bitrate=7000000");
-                        break;
-                }
-
+                AddVideoQualityArgument(settings.VideoQuality);
                 arguments.Add($"--alang={settings.AudioTrack}");
                 arguments.Add($"--volume={settings.Volume}");
                 arguments.Add($"--mute={settings.IsMuted.GetYesNoString()}");
@@ -1027,6 +1015,24 @@ namespace RaceControl.ViewModels
                 else
                 {
                     Logger.Warn($"Could not find MPV executable at '{customMpvPath}', falling back to included MPV executable.");
+                }
+            }
+
+            void AddVideoQualityArgument(VideoQuality videoQuality)
+            {
+                switch (videoQuality)
+                {
+                    case VideoQuality.Lowest:
+                        arguments.Add("--hls-bitrate=2500000");
+                        break;
+
+                    case VideoQuality.Low:
+                        arguments.Add("--hls-bitrate=4000000");
+                        break;
+
+                    case VideoQuality.Medium:
+                        arguments.Add("--hls-bitrate=7000000");
+                        break;
                 }
             }
 
