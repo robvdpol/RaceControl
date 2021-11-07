@@ -39,7 +39,7 @@ namespace RaceControl.Interfaces
 
         IMediaTrack AudioTrack { get; set; }
 
-        void StartPlayback(string streamUrl, PlayToken playToken, VideoDialogSettings settings);
+        void StartPlayback(string streamUrl, bool isLive, PlayToken playToken, VideoDialogSettings settings);
 
         void StartRecording(string filename);
 

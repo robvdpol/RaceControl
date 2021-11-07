@@ -20,8 +20,7 @@ namespace RaceControl.Flyleaf
     {
         private readonly ILogger _logger;
 
-        private bool _resyncVideo;
-        private bool _resyncAudio;
+        private bool _resync;
         private bool _isStarting;
         private bool _isStarted;
         private bool _isPlaying;
@@ -126,8 +125,7 @@ namespace RaceControl.Flyleaf
             {
                 if (SetProperty(ref _videoQuality, value))
                 {
-                    OpenVideoStream(_videoQuality, _resyncVideo);
-                    _resyncVideo = true;
+                    OpenVideoStream(_videoQuality);
                 }
             }
         }
@@ -169,15 +167,15 @@ namespace RaceControl.Flyleaf
             {
                 if (SetProperty(ref _audioTrack, value) && _audioTrack != null)
                 {
-                    OpenAudioStream(_audioTrack, _resyncAudio);
-                    _resyncAudio = true;
+                    OpenAudioStream(_audioTrack);
                 }
             }
         }
 
-        public void StartPlayback(string streamUrl, PlayToken playToken, VideoDialogSettings settings)
+        public void StartPlayback(string streamUrl, bool isLive, PlayToken playToken, VideoDialogSettings settings)
         {
             IsStarting = true;
+            _resync = !isLive;
 
             Player.OpenCompleted += (_, args) =>
             {
@@ -267,11 +265,19 @@ namespace RaceControl.Flyleaf
                 try
                 {
                     InitializeVideo(settings);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "An error occurred while initializing video.");
+                }
+
+                try
+                {
                     InitializeAudio(settings);
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(ex, "An error occurred while initializing audio or video.");
+                    _logger.Error(ex, "An error occurred while initializing audio.");
                 }
             });
         }
@@ -280,7 +286,10 @@ namespace RaceControl.Flyleaf
         {
             try
             {
-                Player.Play();
+                if (!IsStarted)
+                {
+                    Player.Play();
+                }
             }
             catch (Exception ex)
             {
@@ -298,7 +307,7 @@ namespace RaceControl.Flyleaf
                     IsPlaying = Player.Status == Status.Playing;
                     IsPaused = Player.Status == Status.Paused;
 
-                    if (IsPlaying)
+                    if (IsPlaying && !IsStarted)
                     {
                         IsStarted = true;
                     }
@@ -348,23 +357,23 @@ namespace RaceControl.Flyleaf
                          AudioTracks.FirstOrDefault(t => t.Id == LanguageCodes.Undetermined);
         }
 
-        private void OpenVideoStream(VideoQuality videoQuality, bool resync)
+        private void OpenVideoStream(VideoQuality videoQuality)
         {
             var videoStream = Player.Video?.Streams.GetVideoStreamForQuality(videoQuality);
 
             if (videoStream != null)
             {
-                Player.OpenAsync(videoStream, resync, false);
+                Player.OpenAsync(videoStream, _resync, false);
             }
         }
 
-        private void OpenAudioStream(IMediaTrack audioTrack, bool resync)
+        private void OpenAudioStream(IMediaTrack audioTrack)
         {
             var audioStream = Player.Audio?.Streams.FirstOrDefault(stream => new FlyleafAudioTrack(stream).Id == audioTrack.Id);
 
             if (audioStream != null)
             {
-                Player.OpenAsync(audioStream, resync, false);
+                Player.OpenAsync(audioStream, _resync, false);
             }
         }
     }
