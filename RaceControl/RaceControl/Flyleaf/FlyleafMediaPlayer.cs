@@ -11,6 +11,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using FlyleafLibAspectRatio = FlyleafLib.AspectRatio;
 
@@ -172,7 +173,7 @@ namespace RaceControl.Flyleaf
             }
         }
 
-        public void StartPlayback(string streamUrl, bool isLive, PlayToken playToken, VideoDialogSettings settings)
+        public async Task StartPlaybackAsync(string streamUrl, bool isLive, PlayToken playToken, VideoDialogSettings settings)
         {
             IsStarting = true;
             _resync = !isLive;
@@ -198,6 +199,18 @@ namespace RaceControl.Flyleaf
             if (playToken != null)
             {
                 Player.Config.Demuxer.FormatOpt.Add("headers", playToken.GetCookieString());
+            }
+
+            // This call comes from dialog open and might the player's control have not initialized yet (handle was not created)
+            // Temporary solution but should be reviewed
+            if (Player.decoder == null)
+            {
+                while (Player.decoder == null)
+                {
+                    await Task.Delay(50);
+                }
+
+                await Task.Delay(50);
             }
 
             Player.OpenAsync(streamUrl, true, false, false, false);

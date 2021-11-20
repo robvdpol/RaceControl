@@ -2,6 +2,7 @@
 using RaceControl.Core.Settings;
 using RaceControl.Services.Interfaces.F1TV.Api;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
 namespace RaceControl.Interfaces
 {
@@ -39,7 +40,7 @@ namespace RaceControl.Interfaces
 
         IMediaTrack AudioTrack { get; set; }
 
-        void StartPlayback(string streamUrl, bool isLive, PlayToken playToken, VideoDialogSettings settings);
+        Task StartPlaybackAsync(string streamUrl, bool isLive, PlayToken playToken, VideoDialogSettings settings);
 
         void StartRecording(string filename);
 
