@@ -40,7 +40,7 @@ namespace RaceControl.Interfaces
 
         IMediaTrack AudioTrack { get; set; }
 
-        Task StartPlaybackAsync(string streamUrl, bool isLive, PlayToken playToken, VideoDialogSettings settings);
+        Task StartPlaybackAsync(string streamUrl, PlayToken playToken, VideoDialogSettings settings);
 
         void StartRecording(string filename);
 

@@ -21,7 +21,6 @@ namespace RaceControl.Flyleaf
     {
         private readonly ILogger _logger;
 
-        private bool _resync;
         private bool _isStarting;
         private bool _isStarted;
         private bool _isPlaying;
@@ -173,10 +172,9 @@ namespace RaceControl.Flyleaf
             }
         }
 
-        public async Task StartPlaybackAsync(string streamUrl, bool isLive, PlayToken playToken, VideoDialogSettings settings)
+        public async Task StartPlaybackAsync(string streamUrl, PlayToken playToken, VideoDialogSettings settings)
         {
             IsStarting = true;
-            _resync = !isLive;
 
             Player.OpenCompleted += (_, args) =>
             {
@@ -376,7 +374,7 @@ namespace RaceControl.Flyleaf
 
             if (videoStream != null)
             {
-                Player.OpenAsync(videoStream, _resync, false);
+                Player.OpenAsync(videoStream, false, false);
             }
         }
 
@@ -386,7 +384,7 @@ namespace RaceControl.Flyleaf
 
             if (audioStream != null)
             {
-                Player.OpenAsync(audioStream, _resync, false);
+                Player.OpenAsync(audioStream, false, false);
             }
         }
     }

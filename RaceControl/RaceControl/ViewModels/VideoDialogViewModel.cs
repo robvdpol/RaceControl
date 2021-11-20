@@ -549,7 +549,7 @@ namespace RaceControl.ViewModels
             }
 
             var playToken = await _apiService.GetPlayTokenAsync(streamUrl);
-            await MediaPlayer.StartPlaybackAsync(streamUrl, PlayableContent.IsLive, playToken, DialogSettings);
+            await MediaPlayer.StartPlaybackAsync(streamUrl, playToken, DialogSettings);
         }
 
         private void StreamStarted()
