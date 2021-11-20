@@ -71,6 +71,9 @@ namespace RaceControl.Flyleaf
                     _downloader.DecCtx.VideoDemuxer.EnableStream(audioStream);
                 }
 
+                // Always start from the beginning (needed for live sessions)
+                _downloader.DecCtx.Seek(0);
+
                 // Selected filename will already have MP4-extension
                 _downloader.Download(ref filename, false);
             });

@@ -160,7 +160,7 @@ namespace RaceControl.ViewModels
         public ICommand WatchContentInMpcCommand => _watchContentInMpcCommand ??= new DelegateCommand<IPlayableContent>(WatchContentInMpcExecute, CanWatchContentInMpcExecute).ObservesProperty(() => MpcExeLocation);
         public ICommand CastContentCommand => _castContentCommand ??= new DelegateCommand<IPlayableContent>(CastContentExecute, CanCastContentExecute).ObservesProperty(() => SelectedReceiver);
         public ICommand CopyContentUrlCommand => _copyContentUrlCommand ??= new DelegateCommand<IPlayableContent>(CopyContentUrlExecute);
-        public ICommand DownloadContentCommand => _downloadContentCommand ??= new DelegateCommand<IPlayableContent>(DownloadContentExecute, CanDownloadContentExecute);
+        public ICommand DownloadContentCommand => _downloadContentCommand ??= new DelegateCommand<IPlayableContent>(DownloadContentExecute);
         public ICommand SaveVideoDialogLayoutCommand => _saveVideoDialogLayoutCommand ??= new DelegateCommand(SaveVideoDialogLayoutExecute);
         public ICommand ImportVideoDialogLayoutCommand => _importVideoDialogLayoutCommand ??= new DelegateCommand(ImportVideoDialogLayoutExecute);
         public ICommand OpenVideoDialogLayoutCommand => _openVideoDialogLayoutCommand ??= new DelegateCommand<PlayerType?>(OpenVideoDialogLayoutExecute, CanOpenVideoDialogLayoutExecute).ObservesProperty(() => VideoDialogLayout.Instances.Count).ObservesProperty(() => Channels.Count);
@@ -492,11 +492,6 @@ namespace RaceControl.ViewModels
         {
             IsBusy = true;
             CopyUrlAsync(playableContent).Await(SetNotBusy, HandleCriticalError);
-        }
-
-        private static bool CanDownloadContentExecute(IPlayableContent playableContent)
-        {
-            return !playableContent.IsLive;
         }
 
         private void DownloadContentExecute(IPlayableContent playableContent)
