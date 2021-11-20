@@ -124,6 +124,7 @@ namespace RaceControl
             var config = new Config();
             config.Demuxer.FormatOpt.Add("probesize", (50 * 1024 * 1024).ToString());
             config.Demuxer.FormatOpt.Add("analyzeduration", (10 * 1000 * 1000).ToString());
+            config.Demuxer.ReadTimeout = TimeSpan.FromSeconds(30).Ticks;
             config.Demuxer.BufferDuration = TimeSpan.FromSeconds(30).Ticks;
 
             return new(config);
@@ -134,6 +135,7 @@ namespace RaceControl
             var config = new Config();
             config.Demuxer.FormatOpt.Add("probesize", (50 * 1024 * 1024).ToString());
             config.Demuxer.FormatOpt.Add("analyzeduration", (10 * 1000 * 1000).ToString());
+            config.Demuxer.ReadTimeout = TimeSpan.FromSeconds(30).Ticks;
 
             return new Downloader(config, ++_flyleafUniqueId);
         }
