@@ -116,6 +116,6 @@ To open and build the solution you need:
 
 ## Screenshots
 #### Main application
-![preview image](https://imgur.com/GIPIPvP.png)
+![preview image](https://imgur.com/uEbiL6M.png)
 #### Internal player
-![preview image](https://imgur.com/drUlpAV.png)
+![preview image](https://imgur.com/kWcAT56.png)
