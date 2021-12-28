@@ -61,7 +61,7 @@ namespace RaceControl.Flyleaf
 
                 if (videoStreams.Any())
                 {
-                    var videoStream = videoStreams.GetVideoStreamForQuality(_settings.DefaultVideoQuality) ?? videoStreams.OrderByDescending(s => s.Height).ThenByDescending(s => s.Width).ThenByDescending(s => s.Fps).First();
+                    var videoStream = videoStreams.GetVideoStreamForQuality(_settings.DefaultVideoQuality) ?? videoStreams.OrderByDescending(s => s.Height).ThenByDescending(s => s.Width).ThenByDescending(s => s.FPS).First();
                     _downloader.DecCtx.VideoDemuxer.EnableStream(videoStream);
                 }
 
