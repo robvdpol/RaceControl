@@ -443,6 +443,10 @@
                                         Text="{Binding Settings.RecordingLocation, UpdateSourceTrigger=PropertyChanged}" />
                                     <CheckBox
                                         Margin="3"
+                                        Content="Skip save dialog"
+                                        IsChecked="{Binding Settings.SkipSaveDialog}" />
+                                    <CheckBox
+                                        Margin="3"
                                         Content="Disable thumbnail tooltips"
                                         IsChecked="{Binding Settings.DisableThumbnailTooltips}" />
                                     <CheckBox
