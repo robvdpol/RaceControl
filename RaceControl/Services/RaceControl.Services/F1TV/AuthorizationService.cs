@@ -16,6 +16,7 @@ namespace RaceControl.Services.F1TV
         {
             _logger = logger;
             _restClient = restClient;
+            _restClient.AddDefaultHeader("apiKey", Constants.ApiKey);
         }
 
         public async Task<AuthResponse> AuthenticateAsync(string login, string password)
@@ -27,7 +28,7 @@ namespace RaceControl.Services.F1TV
             };
 
             _logger.Info($"Sending authorization request for login '{authRequest.Login}'...");
-            var restRequest = new RestRequest(Constants.AuthenticateUrl, Method.Post).AddJsonBody(authRequest).AddHeader("apiKey", Constants.ApiKey);
+            var restRequest = new RestRequest(Constants.AuthenticateUrl, Method.Post).AddJsonBody(authRequest);
             var restResponse = await _restClient.ExecutePostAsync<AuthResponse>(restRequest);
 
             if (restResponse.IsSuccessful)
