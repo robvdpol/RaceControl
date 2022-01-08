@@ -20,13 +20,15 @@ namespace RaceControl.Services.F1TV
         private const string DefaultStreamType = StreamTypeKeys.BigScreenHls;
         private const string SearchVodUrl = "2.0/R/ENG/" + DefaultStreamType + "/ALL/PAGE/SEARCH/VOD/F1_TV_Pro_Annual/2";
 
-        private readonly ILogger _logger;
-        private readonly Func<IRestClient> _restClientFactory;
+        private static readonly Uri ApiEndpointUri = new(Constants.ApiEndpointUrl);
 
-        public ApiService(ILogger logger, Func<IRestClient> restClientFactory)
+        private readonly ILogger _logger;
+        private readonly RestClient _restClient;
+
+        public ApiService(ILogger logger, RestClient restClient)
         {
             _logger = logger;
-            _restClientFactory = restClientFactory;
+            _restClient = restClient;
         }
 
         public List<Series> GetSeries()
@@ -227,30 +229,23 @@ namespace RaceControl.Services.F1TV
 
         public async Task<PlayToken> GetPlayTokenAsync(string streamUrl)
         {
-            var restClient = _restClientFactory();
-            var restRequest = new RestRequest(streamUrl, Method.HEAD);
-            var restResponse = await Task.Run(() => restClient.Head(restRequest));
-            var playToken = restResponse.Cookies.FirstOrDefault(cookie => string.Equals(cookie.Name, "playToken", StringComparison.OrdinalIgnoreCase));
+            var restRequest = new RestRequest(streamUrl, Method.Head);
+            var restResponse = await _restClient.HeadAsync(restRequest);
+            var playToken = restResponse.Cookies?.FirstOrDefault(cookie => string.Equals(cookie.Name, "playToken", StringComparison.OrdinalIgnoreCase));
 
             return playToken != null ? new PlayToken(playToken.Domain, playToken.Path, playToken.Value) : null;
         }
 
         private async Task<ApiResponse> QueryLiveSessionsAsync()
         {
-            var restClient = _restClientFactory();
-            restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
+            var restRequest = new RestRequest(new Uri(ApiEndpointUri, $"2.0/R/ENG/{DefaultStreamType}/ALL/PAGE/395/F1_TV_Pro_Annual/2"));
 
-            var restRequest = new RestRequest($"2.0/R/ENG/{DefaultStreamType}/ALL/PAGE/395/F1_TV_Pro_Annual/2", DataFormat.Json);
-
-            return await restClient.GetAsync<ApiResponse>(restRequest);
+            return await _restClient.GetAsync<ApiResponse>(restRequest);
         }
 
         private async Task<ApiResponse> QuerySeasonEventsAsync(int year)
         {
-            var restClient = _restClientFactory();
-            restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
-
-            var restRequest = new RestRequest(SearchVodUrl, DataFormat.Json);
+            var restRequest = new RestRequest(new Uri(ApiEndpointUri, SearchVodUrl));
             restRequest.AddQueryParameter("orderBy", "meeting_End_Date");
             restRequest.AddQueryParameter("sortOrder", "asc");
             restRequest.AddQueryParameter("filter_objectSubtype", "Meeting");
@@ -258,83 +253,65 @@ namespace RaceControl.Services.F1TV
             restRequest.AddQueryParameter("filter_orderByFom", "Y");
             restRequest.AddQueryParameter("maxResults", "100");
 
-            return await restClient.GetAsync<ApiResponse>(restRequest);
+            return await _restClient.GetAsync<ApiResponse>(restRequest);
         }
 
         private async Task<ApiResponse> QuerySeasonEpisodesAsync(int year)
         {
-            var restClient = _restClientFactory();
-            restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
-
-            var restRequest = new RestRequest(SearchVodUrl, DataFormat.Json);
+            var restRequest = new RestRequest(new Uri(ApiEndpointUri, SearchVodUrl));
             restRequest.AddQueryParameter("orderBy", "meeting_Number");
             restRequest.AddQueryParameter("sortOrder", "asc");
             restRequest.AddQueryParameter("filter_year", year.ToString());
             restRequest.AddQueryParameter("filter_orderByFom", "Y");
             restRequest.AddQueryParameter("maxResults", "100");
 
-            return await restClient.GetAsync<ApiResponse>(restRequest);
+            return await _restClient.GetAsync<ApiResponse>(restRequest);
         }
 
         private async Task<ApiResponse> QueryEventVideosAsync(string meetingKey)
         {
-            var restClient = _restClientFactory();
-            restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
-
-            var restRequest = new RestRequest(SearchVodUrl, DataFormat.Json);
+            var restRequest = new RestRequest(new Uri(ApiEndpointUri, SearchVodUrl));
             restRequest.AddQueryParameter("orderBy", "meeting_End_Date");
             restRequest.AddQueryParameter("sortOrder", "asc");
             restRequest.AddQueryParameter("filter_MeetingKey", meetingKey);
             restRequest.AddQueryParameter("filter_orderByFom", "Y");
             restRequest.AddQueryParameter("maxResults", "100");
 
-            return await restClient.GetAsync<ApiResponse>(restRequest);
+            return await _restClient.GetAsync<ApiResponse>(restRequest);
         }
 
         private async Task<ApiResponse> QuerySessionChannelsAsync(long contentID)
         {
-            var restClient = _restClientFactory();
-            restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
+            var restRequest = new RestRequest(new Uri(ApiEndpointUri, $"2.0/R/ENG/{DefaultStreamType}/ALL/CONTENT/VIDEO/{contentID}/F1_TV_Pro_Annual/2"));
 
-            var restRequest = new RestRequest($"2.0/R/ENG/{DefaultStreamType}/ALL/CONTENT/VIDEO/{contentID}/F1_TV_Pro_Annual/2", DataFormat.Json);
-
-            return await restClient.GetAsync<ApiResponse>(restRequest);
+            return await _restClient.GetAsync<ApiResponse>(restRequest);
         }
 
         private async Task<ApiResponse> QueryPageAsync(int page)
         {
-            var restClient = _restClientFactory();
-            restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
+            var restRequest = new RestRequest(new Uri(ApiEndpointUri, $"2.0/R/ENG/{DefaultStreamType}/ALL/PAGE/{page}/F1_TV_Pro_Annual/2"));
 
-            var restRequest = new RestRequest($"2.0/R/ENG/{DefaultStreamType}/ALL/PAGE/{page}/F1_TV_Pro_Annual/2", DataFormat.Json);
-
-            return await restClient.GetAsync<ApiResponse>(restRequest);
+            return await _restClient.GetAsync<ApiResponse>(restRequest);
         }
 
         private async Task<ApiResponse> QueryGenreVideosAsync(string genre)
         {
-            var restClient = _restClientFactory();
-            restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
-
-            var restRequest = new RestRequest(SearchVodUrl, DataFormat.Json);
+            var restRequest = new RestRequest(new Uri(ApiEndpointUri, SearchVodUrl));
             restRequest.AddQueryParameter("orderBy", "meeting_Number");
             restRequest.AddQueryParameter("sortOrder", "asc");
             restRequest.AddQueryParameter("filter_genres", genre);
             restRequest.AddQueryParameter("filter_orderByFom", "Y");
             restRequest.AddQueryParameter("maxResults", "100");
 
-            return await restClient.GetAsync<ApiResponse>(restRequest);
+            return await _restClient.GetAsync<ApiResponse>(restRequest);
         }
 
         private async Task<ApiResponse> QueryTokenisedUrlAsync(string subscriptionToken, string streamType, string contentUrl)
         {
-            var restClient = _restClientFactory();
-            restClient.BaseUrl = new Uri(Constants.ApiEndpointUrl);
-
-            var restRequest = new RestRequest($"/2.0/R/ENG/{streamType}/ALL/{contentUrl}", DataFormat.Json);
+            var restRequest = new RestRequest(new Uri(ApiEndpointUri, $"/2.0/R/ENG/{streamType}/ALL/{contentUrl}"));
             restRequest.AddHeader("ascendontoken", subscriptionToken);
 
-            return await restClient.GetAsync<ApiResponse>(restRequest);
+            return await _restClient.GetAsync<ApiResponse>(restRequest);
         }
 
         private static Event CreateEvent(Container container)

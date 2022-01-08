@@ -79,21 +79,21 @@ namespace RaceControl
                 .RegisterSingleton<IExtendedDialogService, ExtendedDialogService>()
                 .RegisterSingleton<ISettings, Settings>()
                 .RegisterSingleton<IVideoDialogLayout, VideoDialogLayout>()
+                .RegisterSingleton<ICredentialService, CredentialService>()
+                .RegisterSingleton<IAuthorizationService, AuthorizationService>()
+                .RegisterSingleton<IApiService, ApiService>()
+                .RegisterSingleton<IGithubService, GithubService>()
                 .Register<Player>(CreateFlyleafPlayer)
                 .Register<Downloader>(CreateFlyleafDownloader)
+                .Register<RestClient>(CreateRestClient)
                 .Register<JsonSerializer>(() => new JsonSerializer { Formatting = Formatting.Indented })
-                .Register<IAuthorizationService, AuthorizationService>()
-                .Register<IApiService, ApiService>()
-                .Register<IGithubService, GithubService>()
-                .Register<ICredentialService, CredentialService>()
+                .Register<IMediaPlayer, FlyleafMediaPlayer>()
+                .Register<IMediaDownloader, FlyleafMediaDownloader>()
                 .Register<INumberGenerator, NumberGenerator>()
                 .Register<IDeviceLocator, DeviceLocator>()
-                .Register<ISender>(() => new Sender())
-                .Register<IMediaPlayer, FlyleafMediaPlayer>()
-                .Register<IMediaDownloader, FlyleafMediaDownloader>();
+                .Register<ISender>(() => new Sender());
 
             var container = registry.GetContainer();
-            container.Register(Made.Of(() => CreateRestClient()), setup: Setup.With(asResolutionCall: true));
             container.Register(Made.Of<ILogger>(() => LogManager.GetLogger(Arg.Index<string>(0)), request => request.Parent.ImplementationType.Name));
         }
 
@@ -140,15 +140,16 @@ namespace RaceControl
             return new Downloader(config, ++_flyleafUniqueId);
         }
 
-        private static IRestClient CreateRestClient()
+        private static RestClient CreateRestClient()
         {
-            var restClient = new RestClient
+            var restClientOptions = new RestClientOptions
             {
-                UserAgent = nameof(RaceControl),
+                ThrowOnAnyError = true,
                 Timeout = 30000,
-                ReadWriteTimeout = 60000,
-                ThrowOnAnyError = true
+                UserAgent = nameof(RaceControl)
             };
+
+            var restClient = new RestClient(restClientOptions);
             restClient.UseNewtonsoftJson();
 
             return restClient;
