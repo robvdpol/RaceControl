@@ -22,6 +22,7 @@ namespace RaceControl.Core.Settings
         private string _defaultAudioLanguage;
         private VideoQuality _defaultVideoQuality;
         private string _recordingLocation = FolderUtils.GetSpecialFolderPath(Environment.SpecialFolder.Desktop);
+        private bool _skipSaveDialog;
         private bool _disableThumbnailTooltips;
         private bool _disableLiveSessionNotification;
         private bool _disableMpvNoBorder;
@@ -72,6 +73,12 @@ namespace RaceControl.Core.Settings
         {
             get => _recordingLocation;
             set => SetProperty(ref _recordingLocation, value);
+        }
+
+        public bool SkipSaveDialog
+        {
+            get => _skipSaveDialog;
+            set => SetProperty(ref _skipSaveDialog, value);
         }
 
         public bool DisableThumbnailTooltips

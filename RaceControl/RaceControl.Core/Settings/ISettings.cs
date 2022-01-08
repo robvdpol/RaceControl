@@ -18,6 +18,8 @@ namespace RaceControl.Core.Settings
 
         string RecordingLocation { get; set; }
 
+        bool SkipSaveDialog { get; set; }
+
         bool DisableThumbnailTooltips { get; set; }
 
         bool DisableLiveSessionNotification { get; set; }

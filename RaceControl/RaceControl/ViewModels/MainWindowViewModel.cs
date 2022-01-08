@@ -1113,8 +1113,9 @@ namespace RaceControl.ViewModels
         {
             var defaultFilename = $"{playableContent.Title}.mp4".RemoveInvalidFileNameChars();
             var initialDirectory = !string.IsNullOrWhiteSpace(Settings.RecordingLocation) ? Settings.RecordingLocation : FolderUtils.GetSpecialFolderPath(Environment.SpecialFolder.Desktop);
+            var filename = Path.Join(initialDirectory, defaultFilename);
 
-            if (_dialogService.SaveFile("Select a filename", initialDirectory, defaultFilename, ".mp4", out var filename))
+            if (Settings.SkipSaveDialog || _dialogService.SaveFile("Select a filename", initialDirectory, defaultFilename, ".mp4", out filename))
             {
                 var parameters = new DialogParameters
                 {
