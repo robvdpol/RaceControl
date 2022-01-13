@@ -87,7 +87,7 @@ namespace RaceControl.Flyleaf
                 if (SetProperty(ref _volume, volume))
                 {
                     IsMuted = false;
-                    Player.Volume = _volume;
+                    Player.Audio.Volume = _volume;
                 }
             }
         }
@@ -99,7 +99,7 @@ namespace RaceControl.Flyleaf
             {
                 if (SetProperty(ref _isMuted, value))
                 {
-                    Player.Mute = _isMuted;
+                    Player.Audio.Mute = _isMuted;
                 }
             }
         }
@@ -155,7 +155,7 @@ namespace RaceControl.Flyleaf
             {
                 if (SetProperty(ref _audioDevice, value) && _audioDevice != null)
                 {
-                    Player.AudioDevice = _audioDevice.Identifier;
+                    Player.Audio.Device = _audioDevice.Identifier;
                 }
             }
         }
@@ -357,7 +357,7 @@ namespace RaceControl.Flyleaf
             }
             else
             {
-                var device = AudioDevices.FirstOrDefault(d => d.Identifier == Player.AudioDevice);
+                var device = AudioDevices.FirstOrDefault(d => d.Identifier == Player.Audio.Device);
                 SetProperty(ref _audioDevice, device, nameof(AudioDevice));
             }
 

@@ -122,20 +122,24 @@ namespace RaceControl
         private static Player CreateFlyleafPlayer()
         {
             var config = new Config();
-            config.Demuxer.FormatOpt.Add("probesize", (50 * 1024 * 1024).ToString());
-            config.Demuxer.FormatOpt.Add("analyzeduration", (10 * 1000 * 1000).ToString());
+            config.Player.KeyBindings.Enabled = false;
+            config.Player.MouseBindings.Enabled = false;
+            config.Player.AutoPlay = false;
             config.Demuxer.ReadTimeout = TimeSpan.FromSeconds(30).Ticks;
             config.Demuxer.BufferDuration = TimeSpan.FromSeconds(1).Ticks;
 
-            return new(config);
+            return new Player(config);
         }
 
         private static Downloader CreateFlyleafDownloader()
         {
-            var config = new Config();
-            config.Demuxer.FormatOpt.Add("probesize", (50 * 1024 * 1024).ToString());
-            config.Demuxer.FormatOpt.Add("analyzeduration", (10 * 1000 * 1000).ToString());
-            config.Demuxer.ReadTimeout = TimeSpan.FromSeconds(30).Ticks;
+            var config = new Config
+            {
+                Demuxer =
+                {
+                    ReadTimeout = TimeSpan.FromSeconds(30).Ticks
+                }
+            };
 
             return new Downloader(config, ++_flyleafUniqueId);
         }
