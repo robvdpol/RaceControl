@@ -25,7 +25,7 @@ Race Control is an open source [F1TV](https://f1tv.formula1.com) desktop client 
 Due to a Content Infringement Complaint from Formula One Licensing BV, Race Control has been pulled from the Microsoft Store until further notice. Please perform a manual installation instead (see below).
 
 #### Manual installation
-* Make sure the [.NET 5.0 Desktop Runtime (x64)](https://dotnet.microsoft.com/download/dotnet-core/5.0/runtime) is installed on your system.
+* Make sure the [.NET 6.0 Desktop Runtime (x64)](https://dotnet.microsoft.com/download/dotnet-core/6.0/runtime) is installed on your system.
 * If you have an 'N' version of Windows, make sure the [Media Feature Pack](https://support.microsoft.com/en-us/topic/media-feature-pack-for-windows-10-n-may-2020-ebbdf559-b84c-0fc2-bd51-e23c9f6a4439) is installed.
 * Download the [latest release](https://github.com/robvdpol/RaceControl/releases/latest) and start the installer. If a SmartScreen warning pops up, select 'More info' and click 'Run anyway'.
 * Follow the steps in the setup wizard to complete the installation.
@@ -99,9 +99,9 @@ Maybe, please create an issue (feature request) and I will consider it. As a wor
 
 ## Contributing
 To open and build the solution you need:
-* Visual Studio 2019 (v16.8.0 or newer)
-* [.NET 5.0 SDK](https://dotnet.microsoft.com/download/visual-studio-sdks)
-* The extension [Microsoft Visual Studio Installer Projects](https://marketplace.visualstudio.com/items?itemName=VisualStudioClient.MicrosoftVisualStudio2017InstallerProjects) to open the RaceControl.Installer project
+* Visual Studio 2022
+* [.NET 6.0 SDK](https://dotnet.microsoft.com/download/visual-studio-sdks)
+* The extension [Microsoft Visual Studio Installer Projects 2022](https://marketplace.visualstudio.com/items?itemName=VisualStudioClient.MicrosoftVisualStudio2022InstallerProjects) to open the RaceControl.Installer project
 
 ## Acknowledgements
 * [Flyleaf](https://github.com/SuRGeoNix/Flyleaf) for providing an excellent video player and .NET library
