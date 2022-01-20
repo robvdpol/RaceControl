@@ -338,7 +338,7 @@ namespace RaceControl.ViewModels
 
         private static void OpenLogFileExecute()
         {
-            using var process = ProcessUtils.CreateProcess(FolderUtils.GetLogFilePath(), string.Empty, true);
+            using var process = ProcessUtils.CreateProcess(FolderUtils.GetApplicationLogFilePath(), string.Empty, true);
             process.Start();
         }
 

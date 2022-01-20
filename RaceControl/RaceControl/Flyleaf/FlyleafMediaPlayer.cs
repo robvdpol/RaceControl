@@ -346,7 +346,7 @@ namespace RaceControl.Flyleaf
 
         private void InitializeAudio(VideoDialogSettings settings)
         {
-            AudioDevices.AddRange(Master.AudioMaster.Devices.Select(device => new FlyleafAudioDevice(device)));
+            AudioDevices.AddRange(Engine.Audio.Devices.Select(device => new FlyleafAudioDevice(device)));
             AudioTracks.AddRange(Player.Audio.Streams.Select(stream => new FlyleafAudioTrack(stream)).OrderBy(t => t.Name));
             Volume = settings.Volume;
             ToggleMute(settings.IsMuted);

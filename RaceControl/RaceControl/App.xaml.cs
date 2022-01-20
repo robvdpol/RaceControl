@@ -59,9 +59,7 @@ namespace RaceControl
         protected override void Initialize()
         {
             InitializeLogging();
-
-            var path = Path.Combine(Environment.CurrentDirectory, "FFmpeg");
-            Master.RegisterFFmpeg(path);
+            InitializeFlyleaf();
 
             base.Initialize();
         }
@@ -109,14 +107,25 @@ namespace RaceControl
             var config = new LoggingConfiguration();
             var logfile = new FileTarget("logfile")
             {
-                FileName = FolderUtils.GetLogFilePath(),
+                FileName = FolderUtils.GetApplicationLogFilePath(),
                 Layout = Layout.FromString("${longdate} ${uppercase:${level}} ${message}${onexception:inner=${newline}${exception:format=tostring}}"),
                 ArchiveAboveSize = 1024 * 1024,
                 ArchiveNumbering = ArchiveNumberingMode.Rolling,
                 MaxArchiveFiles = 2
             };
-            config.AddRule(LogLevel.Info, LogLevel.Fatal, logfile);
+            config.AddRule(NLog.LogLevel.Info, NLog.LogLevel.Fatal, logfile);
             LogManager.Configuration = config;
+        }
+
+        private static void InitializeFlyleaf()
+        {
+            Engine.Start(new EngineConfig
+            {
+                FFmpegPath = Path.Combine(Environment.CurrentDirectory, "FFmpeg"),
+                LogOutput = FolderUtils.GetFlyleafLogFilePath(),
+                LogLevel = FlyleafLib.LogLevel.Warn,
+                FFmpegLogLevel = FFmpegLogLevel.Warning
+            });
         }
 
         private static Player CreateFlyleafPlayer()
