@@ -9,6 +9,8 @@ using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace RaceControl.Services.F1TV
@@ -96,7 +98,7 @@ namespace RaceControl.Services.F1TV
             _logger.Info($"Querying events for season '{season.Name}'...");
 
             var apiResponse = await QuerySeasonEventsAsync(season.Year);
-            var events = apiResponse.ResultObj.Containers.Select(CreateEvent).ToList();
+            var events = apiResponse != null ? apiResponse.ResultObj.Containers.Select(CreateEvent).ToList() : new List<Event>();
 
             // Show events for current season in reverse
             if (season.Year == DateTime.UtcNow.Year)
@@ -252,7 +254,19 @@ namespace RaceControl.Services.F1TV
             restRequest.AddQueryParameter("filter_orderByFom", "Y");
             restRequest.AddQueryParameter("maxResults", "100");
 
-            return await _restClient.GetAsync<ApiResponse>(restRequest);
+            try
+            {
+                return await _restClient.GetAsync<ApiResponse>(restRequest);
+            }
+            catch (HttpRequestException ex)
+            {
+                if (ex.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return null;
+                }
+
+                throw;
+            }
         }
 
         private async Task<ApiResponse> QuerySeasonEpisodesAsync(int year)
