@@ -1,20 +1,20 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using System.Collections.Generic;
 
 namespace RaceControl.Services.Interfaces.F1TV.Authorization
 {
     public class TokenResponse
     {
-        [JsonProperty("token")]
+        [JsonPropertyName("token")]
         public string Token { get; set; }
 
-        [JsonProperty("oauth2_access_token")]
+        [JsonPropertyName("oauth2_access_token")]
         public string OAuth2AccessToken { get; set; }
 
-        [JsonProperty("plan_urls")]
+        [JsonPropertyName("plan_urls")]
         public List<string> PlanUrls { get; set; }
 
-        [JsonProperty("user_is_vip")]
+        [JsonPropertyName("user_is_vip")]
         public bool UserIsVip { get; set; }
     }
 }

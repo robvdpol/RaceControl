@@ -1,16 +1,16 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace RaceControl.Services.Interfaces.F1TV.Api
 {
     public class AudioLanguage
     {
-        [JsonProperty("audioLanguageName")]
+        [JsonPropertyName("audioLanguageName")]
         public string AudioLanguageName { get; set; }
 
-        [JsonProperty("audioId")]
+        [JsonPropertyName("audioId")]
         public string AudioId { get; set; }
 
-        [JsonProperty("isPreferred")]
+        [JsonPropertyName("isPreferred")]
         public bool IsPreferred { get; set; }
     }
 }

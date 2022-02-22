@@ -1,29 +1,29 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using System.Collections.Generic;
 
 namespace RaceControl.Services.Interfaces.F1TV.Api
 {
     public class PlatformVariant
     {
-        [JsonProperty("audioLanguages")]
+        [JsonPropertyName("audioLanguages")]
         public List<AudioLanguage> AudioLanguages { get; set; }
 
-        [JsonProperty("cpId")]
+        [JsonPropertyName("cpId")]
         public int CpId { get; set; }
 
-        [JsonProperty("videoType")]
+        [JsonPropertyName("videoType")]
         public string VideoType { get; set; }
 
-        [JsonProperty("pictureUrl")]
+        [JsonPropertyName("pictureUrl")]
         public string PictureUrl { get; set; }
 
-        [JsonProperty("technicalPackages")]
+        [JsonPropertyName("technicalPackages")]
         public List<TechnicalPackage> TechnicalPackages { get; set; }
 
-        [JsonProperty("trailerUrl")]
+        [JsonPropertyName("trailerUrl")]
         public string TrailerUrl { get; set; }
 
-        [JsonProperty("hasTrailer")]
+        [JsonPropertyName("hasTrailer")]
         public bool HasTrailer { get; set; }
     }
 }

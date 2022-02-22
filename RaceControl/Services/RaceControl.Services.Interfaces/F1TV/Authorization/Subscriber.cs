@@ -1,25 +1,25 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace RaceControl.Services.Interfaces.F1TV.Authorization
 {
     public class Subscriber
     {
-        [JsonProperty("FirstName")]
+        [JsonPropertyName("FirstName")]
         public string FirstName { get; set; }
 
-        [JsonProperty("LastName")]
+        [JsonPropertyName("LastName")]
         public string LastName { get; set; }
 
-        [JsonProperty("HomeCountry")]
+        [JsonPropertyName("HomeCountry")]
         public string HomeCountry { get; set; }
 
-        [JsonProperty("Id")]
+        [JsonPropertyName("Id")]
         public int Id { get; set; }
 
-        [JsonProperty("Email")]
+        [JsonPropertyName("Email")]
         public string Email { get; set; }
 
-        [JsonProperty("Login")]
+        [JsonPropertyName("Login")]
         public string Login { get; set; }
     }
 }

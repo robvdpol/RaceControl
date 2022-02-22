@@ -1,32 +1,32 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using System.Collections.Generic;
 
 namespace RaceControl.Services.Interfaces.F1TV.Api
 {
     public class Category
     {
-        [JsonProperty("categoryPathIds")]
+        [JsonPropertyName("categoryPathIds")]
         public List<int> CategoryPathIds { get; set; }
 
-        [JsonProperty("externalPathIds")]
+        [JsonPropertyName("externalPathIds")]
         public List<string> ExternalPathIds { get; set; }
 
-        [JsonProperty("endDate")]
+        [JsonPropertyName("endDate")]
         public long EndDate { get; set; }
 
-        [JsonProperty("orderId")]
+        [JsonPropertyName("orderId")]
         public int OrderId { get; set; }
 
-        [JsonProperty("isPrimary")]
+        [JsonPropertyName("isPrimary")]
         public bool IsPrimary { get; set; }
 
-        [JsonProperty("categoryName")]
+        [JsonPropertyName("categoryName")]
         public string CategoryName { get; set; }
 
-        [JsonProperty("categoryId")]
+        [JsonPropertyName("categoryId")]
         public int CategoryId { get; set; }
 
-        [JsonProperty("startDate")]
+        [JsonPropertyName("startDate")]
         public long StartDate { get; set; }
     }
 }

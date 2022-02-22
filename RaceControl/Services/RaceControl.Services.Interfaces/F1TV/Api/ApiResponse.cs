@@ -1,25 +1,25 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace RaceControl.Services.Interfaces.F1TV.Api
 {
     public class ApiResponse
     {
-        [JsonProperty("resultCode")]
+        [JsonPropertyName("resultCode")]
         public string ResultCode { get; set; }
 
-        [JsonProperty("message")]
+        [JsonPropertyName("message")]
         public string Message { get; set; }
 
-        [JsonProperty("errorDescription")]
+        [JsonPropertyName("errorDescription")]
         public string ErrorDescription { get; set; }
 
-        [JsonProperty("resultObj")]
+        [JsonPropertyName("resultObj")]
         public ResultObj ResultObj { get; set; }
 
-        [JsonProperty("systemTime")]
+        [JsonPropertyName("systemTime")]
         public long SystemTime { get; set; }
 
-        [JsonProperty("source")]
+        [JsonPropertyName("source")]
         public string Source { get; set; }
     }
 }

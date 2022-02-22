@@ -1,146 +1,146 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using System.Collections.Generic;
 
 namespace RaceControl.Services.Interfaces.F1TV.Api
 {
     public class Metadata
     {
-        [JsonProperty("emfAttributes")]
+        [JsonPropertyName("emfAttributes")]
         public EmfAttributes EmfAttributes { get; set; }
 
-        [JsonProperty("longDescription")]
+        [JsonPropertyName("longDescription")]
         public string LongDescription { get; set; }
 
-        [JsonProperty("year")]
+        [JsonPropertyName("year")]
         public string Year { get; set; }
 
-        [JsonProperty("directors")]
+        [JsonPropertyName("directors")]
         public List<string> Directors { get; set; }
 
-        [JsonProperty("isADVAllowed")]
+        [JsonPropertyName("isADVAllowed")]
         public bool IsADVAllowed { get; set; }
 
-        [JsonProperty("contractStartDate")]
+        [JsonPropertyName("contractStartDate")]
         public long ContractStartDate { get; set; }
 
-        [JsonProperty("contractEndDate")]
+        [JsonPropertyName("contractEndDate")]
         public long ContractEndDate { get; set; }
 
-        [JsonProperty("externalId")]
+        [JsonPropertyName("externalId")]
         public string ExternalId { get; set; }
 
-        [JsonProperty("availableAlso")]
+        [JsonPropertyName("availableAlso")]
         public List<string> AvailableAlso { get; set; }
 
-        [JsonProperty("title")]
+        [JsonPropertyName("title")]
         public string Title { get; set; }
 
-        [JsonProperty("titleBrief")]
+        [JsonPropertyName("titleBrief")]
         public string TitleBrief { get; set; }
 
-        [JsonProperty("objectType")]
+        [JsonPropertyName("objectType")]
         public string ObjectType { get; set; }
 
-        [JsonProperty("duration")]
+        [JsonPropertyName("duration")]
         public int Duration { get; set; }
 
-        [JsonProperty("genres")]
+        [JsonPropertyName("genres")]
         public List<string> Genres { get; set; }
 
-        [JsonProperty("contentSubtype")]
+        [JsonPropertyName("contentSubtype")]
         public string ContentSubtype { get; set; }
 
-        [JsonProperty("pcLevel")]
+        [JsonPropertyName("pcLevel")]
         public int PcLevel { get; set; }
 
-        [JsonProperty("contentId")]
+        [JsonPropertyName("contentId")]
         public long ContentId { get; set; }
 
-        [JsonProperty("starRating")]
+        [JsonPropertyName("starRating")]
         public int StarRating { get; set; }
 
-        [JsonProperty("pictureUrl")]
+        [JsonPropertyName("pictureUrl")]
         public string PictureUrl { get; set; }
 
-        [JsonProperty("contentType")]
+        [JsonPropertyName("contentType")]
         public string ContentType { get; set; }
 
-        [JsonProperty("language")]
+        [JsonPropertyName("language")]
         public string Language { get; set; }
 
-        [JsonProperty("season")]
+        [JsonPropertyName("season")]
         public int Season { get; set; }
 
-        [JsonProperty("uiDuration")]
+        [JsonPropertyName("uiDuration")]
         public string UiDuration { get; set; }
 
-        [JsonProperty("contentProvider")]
+        [JsonPropertyName("contentProvider")]
         public string ContentProvider { get; set; }
 
-        [JsonProperty("isLatest")]
+        [JsonPropertyName("isLatest")]
         public bool IsLatest { get; set; }
 
-        [JsonProperty("isOnAir")]
+        [JsonPropertyName("isOnAir")]
         public bool IsOnAir { get; set; }
 
-        [JsonProperty("isEncrypted")]
+        [JsonPropertyName("isEncrypted")]
         public bool IsEncrypted { get; set; }
 
-        [JsonProperty("objectSubtype")]
+        [JsonPropertyName("objectSubtype")]
         public string ObjectSubtype { get; set; }
 
-        [JsonProperty("metadataLanguage")]
+        [JsonPropertyName("metadataLanguage")]
         public string MetadataLanguage { get; set; }
 
-        [JsonProperty("pcLevelVod")]
+        [JsonPropertyName("pcLevelVod")]
         public string PcLevelVod { get; set; }
 
-        [JsonProperty("isParent")]
+        [JsonPropertyName("isParent")]
         public bool IsParent { get; set; }
 
-        [JsonProperty("leavingSoon")]
+        [JsonPropertyName("leavingSoon")]
         public bool LeavingSoon { get; set; }
 
-        [JsonProperty("pcVodLabel")]
+        [JsonPropertyName("pcVodLabel")]
         public string PcVodLabel { get; set; }
 
-        [JsonProperty("isGeoBlocked")]
+        [JsonPropertyName("isGeoBlocked")]
         public bool IsGeoBlocked { get; set; }
 
-        [JsonProperty("filter")]
+        [JsonPropertyName("filter")]
         public string Filter { get; set; }
 
-        [JsonProperty("actors")]
+        [JsonPropertyName("actors")]
         public List<string> Actors { get; set; }
 
-        [JsonProperty("comingSoon")]
+        [JsonPropertyName("comingSoon")]
         public bool ComingSoon { get; set; }
 
-        [JsonProperty("isPopularEpisode")]
+        [JsonPropertyName("isPopularEpisode")]
         public bool IsPopularEpisode { get; set; }
 
-        [JsonProperty("primaryCategoryId")]
+        [JsonPropertyName("primaryCategoryId")]
         public int PrimaryCategoryId { get; set; }
 
-        [JsonProperty("meetingKey")]
+        [JsonPropertyName("meetingKey")]
         public string MeetingKey { get; set; }
 
-        [JsonProperty("entitlement")]
+        [JsonPropertyName("entitlement")]
         public string Entitlement { get; set; }
 
-        [JsonProperty("locked")]
+        [JsonPropertyName("locked")]
         public bool Locked { get; set; }
 
-        [JsonProperty("videoType")]
+        [JsonPropertyName("videoType")]
         public string VideoType { get; set; }
 
-        [JsonProperty("parentalAdvisory")]
+        [JsonPropertyName("parentalAdvisory")]
         public string ParentalAdvisory { get; set; }
 
-        [JsonProperty("availableLanguages")]
+        [JsonPropertyName("availableLanguages")]
         public List<AvailableLanguage> AvailableLanguages { get; set; }
 
-        [JsonProperty("additionalStreams")]
+        [JsonPropertyName("additionalStreams")]
         public List<AdditionalStream> AdditionalStreams { get; set; }
     }
 }

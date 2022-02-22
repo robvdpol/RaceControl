@@ -1,19 +1,19 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace RaceControl.Services.Interfaces.Github
 {
     public class Asset
     {
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonProperty("content_type")]
+        [JsonPropertyName("content_type")]
         public string ContentType { get; set; }
 
-        [JsonProperty("state")]
+        [JsonPropertyName("state")]
         public string State { get; set; }
 
-        [JsonProperty("browser_download_url")]
+        [JsonPropertyName("browser_download_url")]
         public string BrowserDownloadUrl { get; set; }
     }
 }

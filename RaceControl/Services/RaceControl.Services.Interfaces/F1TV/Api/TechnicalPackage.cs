@@ -1,16 +1,16 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace RaceControl.Services.Interfaces.F1TV.Api
 {
     public class TechnicalPackage
     {
-        [JsonProperty("packageId")]
+        [JsonPropertyName("packageId")]
         public int PackageId { get; set; }
 
-        [JsonProperty("packageName")]
+        [JsonPropertyName("packageName")]
         public string PackageName { get; set; }
 
-        [JsonProperty("packageType")]
+        [JsonPropertyName("packageType")]
         public string PackageType { get; set; }
     }
 }
