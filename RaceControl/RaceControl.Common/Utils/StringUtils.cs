@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace RaceControl.Common.Utils
+﻿namespace RaceControl.Common.Utils
 {
     public static class StringUtils
     {
