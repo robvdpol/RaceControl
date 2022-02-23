@@ -1,19 +1,18 @@
-﻿namespace RaceControl.Common.Enums
+﻿namespace RaceControl.Common.Enums;
+
+public enum WindowLocation
 {
-    public enum WindowLocation
-    {
-        TopLeft,
-        TopRight,
-        BottomLeft,
-        BottomRight,
-        TopLeftSmall,
-        TopSmall,
-        TopRightSmall,
-        LeftSmall,
-        CenterSmall,
-        RightSmall,
-        BottomLeftSmall,
-        BottomSmall,
-        BottomRightSmall
-    }
+    TopLeft,
+    TopRight,
+    BottomLeft,
+    BottomRight,
+    TopLeftSmall,
+    TopSmall,
+    TopRightSmall,
+    LeftSmall,
+    CenterSmall,
+    RightSmall,
+    BottomLeftSmall,
+    BottomSmall,
+    BottomRightSmall
 }

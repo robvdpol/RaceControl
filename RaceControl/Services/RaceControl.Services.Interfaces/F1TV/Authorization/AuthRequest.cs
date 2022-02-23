@@ -1,11 +1,10 @@
-﻿namespace RaceControl.Services.Interfaces.F1TV.Authorization
-{
-    public class AuthRequest
-    {
-        [JsonProperty("Login")]
-        public string Login { get; set; }
+﻿namespace RaceControl.Services.Interfaces.F1TV.Authorization;
 
-        [JsonProperty("Password")]
-        public string Password { get; set; }
-    }
+public class AuthRequest
+{
+    [JsonProperty("Login")]
+    public string Login { get; set; }
+
+    [JsonProperty("Password")]
+    public string Password { get; set; }
 }

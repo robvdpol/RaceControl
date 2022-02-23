@@ -1,6 +1,5 @@
-﻿namespace RaceControl.Events
+﻿namespace RaceControl.Events;
+
+internal class MuteAllEvent : PubSubEvent<long>
 {
-    internal class MuteAllEvent : PubSubEvent<long>
-    {
-    }
 }

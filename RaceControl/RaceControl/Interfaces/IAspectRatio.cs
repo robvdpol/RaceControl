@@ -1,8 +1,7 @@
-﻿namespace RaceControl.Interfaces
+﻿namespace RaceControl.Interfaces;
+
+public interface IAspectRatio
 {
-    public interface IAspectRatio
-    {
-        string Value { get; }
-        string Description { get; }
-    }
+    string Value { get; }
+    string Description { get; }
 }

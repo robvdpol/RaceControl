@@ -1,23 +1,22 @@
-﻿namespace RaceControl.Services.Interfaces.F1TV.Authorization
+﻿namespace RaceControl.Services.Interfaces.F1TV.Authorization;
+
+public class Subscriber
 {
-    public class Subscriber
-    {
-        [JsonProperty("FirstName")]
-        public string FirstName { get; set; }
+    [JsonProperty("FirstName")]
+    public string FirstName { get; set; }
 
-        [JsonProperty("LastName")]
-        public string LastName { get; set; }
+    [JsonProperty("LastName")]
+    public string LastName { get; set; }
 
-        [JsonProperty("HomeCountry")]
-        public string HomeCountry { get; set; }
+    [JsonProperty("HomeCountry")]
+    public string HomeCountry { get; set; }
 
-        [JsonProperty("Id")]
-        public int Id { get; set; }
+    [JsonProperty("Id")]
+    public int Id { get; set; }
 
-        [JsonProperty("Email")]
-        public string Email { get; set; }
+    [JsonProperty("Email")]
+    public string Email { get; set; }
 
-        [JsonProperty("Login")]
-        public string Login { get; set; }
-    }
+    [JsonProperty("Login")]
+    public string Login { get; set; }
 }

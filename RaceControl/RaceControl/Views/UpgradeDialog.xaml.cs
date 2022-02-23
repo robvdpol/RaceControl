@@ -1,10 +1,9 @@
-﻿namespace RaceControl.Views
+﻿namespace RaceControl.Views;
+
+public partial class UpgradeDialog
 {
-    public partial class UpgradeDialog
+    public UpgradeDialog()
     {
-        public UpgradeDialog()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

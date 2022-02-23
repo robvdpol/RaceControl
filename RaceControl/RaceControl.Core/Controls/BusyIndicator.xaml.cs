@@ -1,10 +1,9 @@
-﻿namespace RaceControl.Core.Controls
+﻿namespace RaceControl.Core.Controls;
+
+public partial class BusyIndicator
 {
-    public partial class BusyIndicator
+    public BusyIndicator()
     {
-        public BusyIndicator()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }
