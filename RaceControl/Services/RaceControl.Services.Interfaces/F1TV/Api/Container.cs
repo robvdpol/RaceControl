@@ -6,7 +6,7 @@ namespace RaceControl.Services.Interfaces.F1TV.Api
     public class Container
     {
         [JsonPropertyName("id")]
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         [JsonPropertyName("layout")]
         public string Layout { get; set; }

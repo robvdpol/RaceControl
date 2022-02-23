@@ -344,7 +344,7 @@ namespace RaceControl.Services.F1TV
 
             return new()
             {
-                UID = container.Id,
+                UID = container.Id.ToString(),
                 ContentID = container.Metadata.ContentId,
                 ContentType = container.Metadata.ContentType,
                 ContentSubtype = container.Metadata.ContentSubtype,
@@ -364,7 +364,7 @@ namespace RaceControl.Services.F1TV
 
             return new()
             {
-                UID = container.Id,
+                UID = container.Id.ToString(),
                 ContentID = container.Metadata.ContentId,
                 ContentType = container.Metadata.ContentType,
                 ContentSubtype = container.Metadata.ContentSubtype,
