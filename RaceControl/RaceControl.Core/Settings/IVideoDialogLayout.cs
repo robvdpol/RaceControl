@@ -1,6 +1,4 @@
-﻿using System.Collections.ObjectModel;
-
-namespace RaceControl.Core.Settings
+﻿namespace RaceControl.Core.Settings
 {
     public interface IVideoDialogLayout
     {

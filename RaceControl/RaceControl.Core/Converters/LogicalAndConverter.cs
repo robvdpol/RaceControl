@@ -1,9 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
-using System.Windows.Data;
-
-namespace RaceControl.Core.Converters
+﻿namespace RaceControl.Core.Converters
 {
     public class LogicalAndConverter : IMultiValueConverter
     {

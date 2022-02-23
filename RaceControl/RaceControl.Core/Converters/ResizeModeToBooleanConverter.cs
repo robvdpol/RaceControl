@@ -1,9 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Windows;
-using System.Windows.Data;
-
-namespace RaceControl.Core.Converters
+﻿namespace RaceControl.Core.Converters
 {
     [ValueConversion(typeof(ResizeMode), typeof(bool))]
     public class ResizeModeToBooleanConverter : IValueConverter

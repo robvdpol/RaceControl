@@ -1,6 +1,4 @@
-﻿using System.Windows;
-
-namespace RaceControl.Core.Mvvm
+﻿namespace RaceControl.Core.Mvvm
 {
     public class BindingProxy : Freezable
     {

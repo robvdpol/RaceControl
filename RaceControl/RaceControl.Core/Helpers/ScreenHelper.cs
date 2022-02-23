@@ -1,7 +1,5 @@
 ﻿using RaceControl.Core.Settings;
-using System;
 using System.Drawing;
-using System.Windows;
 using System.Windows.Forms;
 
 namespace RaceControl.Core.Helpers

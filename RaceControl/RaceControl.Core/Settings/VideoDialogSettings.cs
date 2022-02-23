@@ -1,8 +1,4 @@
-﻿using Prism.Mvvm;
-using RaceControl.Common.Enums;
-using System.Windows;
-
-namespace RaceControl.Core.Settings
+﻿namespace RaceControl.Core.Settings
 {
     public class VideoDialogSettings : BindableBase
     {
