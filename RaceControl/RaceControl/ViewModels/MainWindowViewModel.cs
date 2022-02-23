@@ -2,6 +2,8 @@
 using GoogleCast.Channels;
 using GoogleCast.Models.Media;
 using Microsoft.Win32;
+using Timer = System.Timers.Timer;
+using Action = System.Action;
 
 namespace RaceControl.ViewModels
 {

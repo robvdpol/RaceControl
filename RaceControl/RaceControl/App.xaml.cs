@@ -41,7 +41,7 @@ namespace RaceControl
 
         protected override void RegisterTypes(IContainerRegistry registry)
         {
-            registry.RegisterDialogWindow<DialogWindow>();
+            registry.RegisterDialogWindow<Views.DialogWindow>();
             registry.RegisterDialogWindow<VideoDialogWindow>(nameof(VideoDialogWindow));
             registry.RegisterDialog<LoginDialog, LoginDialogViewModel>();
             registry.RegisterDialog<UpgradeDialog, UpgradeDialogViewModel>();
