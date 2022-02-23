@@ -1,6 +1,4 @@
 ﻿using CredentialManagement;
-using NLog;
-using RaceControl.Services.Interfaces.Credential;
 
 namespace RaceControl.Services.Credential
 {

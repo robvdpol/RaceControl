@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace RaceControl.Services.Interfaces.F1TV.Api
+﻿namespace RaceControl.Services.Interfaces.F1TV.Api
 {
     public class RetrieveItems
     {

@@ -1,7 +1,4 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
-
-namespace RaceControl.Services.Interfaces.Github
+﻿namespace RaceControl.Services.Interfaces.Github
 {
     public class Release
     {

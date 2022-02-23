@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace RaceControl.Services.Interfaces.Github
+﻿namespace RaceControl.Services.Interfaces.Github
 {
     public class Asset
     {

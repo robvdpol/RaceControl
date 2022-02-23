@@ -1,6 +1,3 @@
-using Newtonsoft.Json;
-using System;
-
 namespace RaceControl.Services.Interfaces.F1TV.Api
 {
     public class EmfAttributes
