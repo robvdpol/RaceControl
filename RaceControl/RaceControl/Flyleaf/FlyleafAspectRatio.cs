@@ -1,7 +1,4 @@
-﻿using FlyleafLib;
-using RaceControl.Interfaces;
-
-namespace RaceControl.Flyleaf
+﻿namespace RaceControl.Flyleaf
 {
     public class FlyleafAspectRatio : IAspectRatio
     {

@@ -1,19 +1,4 @@
-﻿using FlyleafLib;
-using FlyleafLib.MediaPlayer;
-using NLog;
-using Prism.Mvvm;
-using RaceControl.Common.Constants;
-using RaceControl.Common.Enums;
-using RaceControl.Core.Settings;
-using RaceControl.Interfaces;
-using RaceControl.Services.Interfaces.F1TV.Api;
-using System;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
-using FlyleafLibAspectRatio = FlyleafLib.AspectRatio;
+﻿using FlyleafLibAspectRatio = FlyleafLib.AspectRatio;
 
 namespace RaceControl.Flyleaf
 {

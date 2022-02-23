@@ -1,7 +1,4 @@
-﻿using Prism.Events;
-using RaceControl.Common.Enums;
-
-namespace RaceControl.Events
+﻿namespace RaceControl.Events
 {
     public class SaveLayoutEvent : PubSubEvent<ContentType>
     {

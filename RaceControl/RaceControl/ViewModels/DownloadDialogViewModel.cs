@@ -1,15 +1,4 @@
-﻿using NLog;
-using Prism.Services.Dialogs;
-using RaceControl.Common.Enums;
-using RaceControl.Common.Interfaces;
-using RaceControl.Core.Mvvm;
-using RaceControl.Core.Settings;
-using RaceControl.Interfaces;
-using RaceControl.Services.Interfaces.F1TV;
-using System;
-using System.Threading.Tasks;
-
-namespace RaceControl.ViewModels
+﻿namespace RaceControl.ViewModels
 {
     public class DownloadDialogViewModel : DialogViewModelBase
     {

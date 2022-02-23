@@ -1,9 +1,4 @@
-﻿using FlyleafLib.MediaFramework.MediaStream;
-using RaceControl.Common.Enums;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace RaceControl.Flyleaf
+﻿namespace RaceControl.Flyleaf
 {
     public static class FlyleafUtils
     {

@@ -1,6 +1,4 @@
-﻿using Prism.Events;
-
-namespace RaceControl.Events
+﻿namespace RaceControl.Events
 {
     public class SyncStreamsEvent : PubSubEvent<SyncStreamsEventPayload>
     {

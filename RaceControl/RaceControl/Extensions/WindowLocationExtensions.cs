@@ -1,6 +1,4 @@
-﻿using RaceControl.Common.Enums;
-
-namespace RaceControl.Extensions
+﻿namespace RaceControl.Extensions
 {
     public static class WindowLocationExtensions
     {

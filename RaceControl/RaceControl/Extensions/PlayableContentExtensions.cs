@@ -1,9 +1,4 @@
-﻿using RaceControl.Common.Constants;
-using RaceControl.Common.Enums;
-using RaceControl.Common.Interfaces;
-using System.Collections.Generic;
-
-namespace RaceControl.Extensions
+﻿namespace RaceControl.Extensions
 {
     public static class PlayableContentExtensions
     {

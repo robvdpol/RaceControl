@@ -1,10 +1,4 @@
-﻿using RaceControl.Common.Enums;
-using RaceControl.Core.Settings;
-using RaceControl.Services.Interfaces.F1TV.Api;
-using System.Collections.ObjectModel;
-using System.Threading.Tasks;
-
-namespace RaceControl.Interfaces
+﻿namespace RaceControl.Interfaces
 {
     public interface IMediaPlayer
     {

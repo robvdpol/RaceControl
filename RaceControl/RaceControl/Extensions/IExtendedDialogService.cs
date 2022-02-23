@@ -1,6 +1,4 @@
-﻿using Prism.Services.Dialogs;
-
-namespace RaceControl.Extensions
+﻿namespace RaceControl.Extensions
 {
     public interface IExtendedDialogService : IDialogService
     {

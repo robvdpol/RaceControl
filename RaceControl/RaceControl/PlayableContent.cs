@@ -1,7 +1,4 @@
-﻿using RaceControl.Common.Enums;
-using RaceControl.Common.Interfaces;
-
-namespace RaceControl
+﻿namespace RaceControl
 {
     public abstract class PlayableContent : IPlayableContent
     {

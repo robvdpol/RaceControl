@@ -1,8 +1,5 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
 using Prism.Ioc;
-using Prism.Services.Dialogs;
-using RaceControl.Views;
-using System.Windows;
 
 namespace RaceControl.Extensions
 {
