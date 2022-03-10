@@ -1,13 +1,16 @@
-﻿namespace RaceControl.Flyleaf;
+﻿using RaceControl.Interfaces;
 
-public class FlyleafAudioDevice : IAudioDevice
+namespace RaceControl.Flyleaf
 {
-    public FlyleafAudioDevice(string device)
+    public class FlyleafAudioDevice : IAudioDevice
     {
-        Identifier = device;
-        Description = device;
-    }
+        public FlyleafAudioDevice(string device)
+        {
+            Identifier = device;
+            Description = device;
+        }
 
-    public string Identifier { get; }
-    public string Description { get; }
+        public string Identifier { get; }
+        public string Description { get; }
+    }
 }

@@ -1,10 +1,11 @@
-﻿namespace RaceControl.Common.Enums;
-
-public enum VideoQuality
+﻿namespace RaceControl.Common.Enums
 {
-    High,
-    Medium,
-    Low,
-    Lowest,
-    Default
+    public enum VideoQuality
+    {
+        High,
+        Medium,
+        Low,
+        Lowest,
+        Default
+    }
 }

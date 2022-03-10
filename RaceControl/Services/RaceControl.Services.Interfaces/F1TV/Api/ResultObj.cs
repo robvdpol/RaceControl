@@ -1,19 +1,23 @@
-namespace RaceControl.Services.Interfaces.F1TV.Api;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
-public class ResultObj
+namespace RaceControl.Services.Interfaces.F1TV.Api
 {
-    [JsonProperty("entitlementToken")]
-    public string EntitlementToken { get; set; }
+    public class ResultObj
+    {
+        [JsonProperty("entitlementToken")]
+        public string EntitlementToken { get; set; }
 
-    [JsonProperty("url")]
-    public string Url { get; set; }
+        [JsonProperty("url")]
+        public string Url { get; set; }
 
-    [JsonProperty("streamType")]
-    public string StreamType { get; set; }
+        [JsonProperty("streamType")]
+        public string StreamType { get; set; }
 
-    [JsonProperty("containers")]
-    public List<Container> Containers { get; set; }
+        [JsonProperty("containers")]
+        public List<Container> Containers { get; set; }
 
-    [JsonProperty("total")]
-    public int Total { get; set; }
+        [JsonProperty("total")]
+        public int Total { get; set; }
+    }
 }

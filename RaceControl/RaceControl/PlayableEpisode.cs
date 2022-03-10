@@ -1,16 +1,20 @@
-﻿namespace RaceControl;
+﻿using RaceControl.Common.Enums;
+using RaceControl.Services.Interfaces.F1TV.Entities;
 
-public class PlayableEpisode : PlayableContent
+namespace RaceControl
 {
-    public PlayableEpisode(Episode episode)
+    public class PlayableEpisode : PlayableContent
     {
-        Title = episode.LongName;
-        Name = episode.ShortName;
-        DisplayName = episode.LongName;
-        ContentType = ContentType.Asset;
-        ContentUrl = episode.PlaybackUrl;
-        ThumbnailUrl = episode.ThumbnailUrl;
-        SyncUID = episode.UID;
-        SeriesUID = episode.SeriesUID;
+        public PlayableEpisode(Episode episode)
+        {
+            Title = episode.LongName;
+            Name = episode.ShortName;
+            DisplayName = episode.LongName;
+            ContentType = ContentType.Asset;
+            ContentUrl = episode.PlaybackUrl;
+            ThumbnailUrl = episode.ThumbnailUrl;
+            SyncUID = episode.UID;
+            SeriesUID = episode.SeriesUID;
+        }
     }
 }

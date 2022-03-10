@@ -1,12 +1,18 @@
-﻿namespace RaceControl.Interfaces;
+﻿using RaceControl.Common.Enums;
+using RaceControl.Services.Interfaces.F1TV.Api;
+using System;
+using System.Threading.Tasks;
 
-public interface IMediaDownloader : IDisposable
+namespace RaceControl.Interfaces
 {
-    DownloadStatus Status { get; }
+    public interface IMediaDownloader : IDisposable
+    {
+        DownloadStatus Status { get; }
 
-    float Progress { get; }
+        float Progress { get; }
 
-    Task StartDownloadAsync(string streamUrl, PlayToken playToken, string filename);
+        Task StartDownloadAsync(string streamUrl, PlayToken playToken, string filename);
 
-    void SetDownloadStatus(DownloadStatus status);
+        void SetDownloadStatus(DownloadStatus status);
+    }
 }

@@ -1,33 +1,41 @@
-﻿namespace RaceControl.ViewModels;
+﻿using NLog;
+using Prism.Commands;
+using Prism.Services.Dialogs;
+using RaceControl.Core.Mvvm;
+using RaceControl.Services.Interfaces.Github;
+using System.Windows.Input;
 
-public class UpgradeDialogViewModel : DialogViewModelBase
+namespace RaceControl.ViewModels
 {
-    private ICommand _closeCommand;
-
-    private Release _release;
-
-    public UpgradeDialogViewModel(ILogger logger) : base(logger)
+    public class UpgradeDialogViewModel : DialogViewModelBase
     {
-    }
+        private ICommand _closeCommand;
 
-    public override string Title => Release?.Name;
+        private Release _release;
 
-    public ICommand CloseCommand => _closeCommand ??= new DelegateCommand<bool?>(CloseExecute);
+        public UpgradeDialogViewModel(ILogger logger) : base(logger)
+        {
+        }
 
-    public Release Release
-    {
-        get => _release;
-        set => SetProperty(ref _release, value);
-    }
+        public override string Title => Release?.Name;
 
-    public override void OnDialogOpened(IDialogParameters parameters)
-    {
-        Release = parameters.GetValue<Release>(ParameterNames.Release);
-        base.OnDialogOpened(parameters);
-    }
+        public ICommand CloseCommand => _closeCommand ??= new DelegateCommand<bool?>(CloseExecute);
 
-    private void CloseExecute(bool? upgrade)
-    {
-        RaiseRequestClose(upgrade.HasValue && upgrade.Value ? ButtonResult.OK : ButtonResult.Cancel);
+        public Release Release
+        {
+            get => _release;
+            set => SetProperty(ref _release, value);
+        }
+
+        public override void OnDialogOpened(IDialogParameters parameters)
+        {
+            Release = parameters.GetValue<Release>(ParameterNames.Release);
+            base.OnDialogOpened(parameters);
+        }
+
+        private void CloseExecute(bool? upgrade)
+        {
+            RaiseRequestClose(upgrade.HasValue && upgrade.Value ? ButtonResult.OK : ButtonResult.Cancel);
+        }
     }
 }

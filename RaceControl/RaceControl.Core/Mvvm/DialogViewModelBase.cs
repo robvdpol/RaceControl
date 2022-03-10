@@ -1,58 +1,61 @@
-﻿using Prism.Commands;
+﻿using NLog;
+using Prism.Commands;
 using Prism.Services.Dialogs;
+using System;
 using System.Windows.Input;
 
-namespace RaceControl.Core.Mvvm;
-
-// ReSharper disable MemberCanBeProtected.Global
-public abstract class DialogViewModelBase : ViewModelBase, IDialogAware
+namespace RaceControl.Core.Mvvm
 {
-    private ICommand _closeWindowCommand;
-    private bool _canClose;
-
-    protected DialogViewModelBase(ILogger logger) : base(logger)
+    // ReSharper disable MemberCanBeProtected.Global
+    public abstract class DialogViewModelBase : ViewModelBase, IDialogAware
     {
-    }
+        private ICommand _closeWindowCommand;
+        private bool _canClose;
 
-    public abstract string Title { get; }
+        protected DialogViewModelBase(ILogger logger) : base(logger)
+        {
+        }
 
-    public ICommand CloseWindowCommand => _closeWindowCommand ??= new DelegateCommand(RaiseRequestClose).ObservesCanExecute(() => CanClose);
+        public abstract string Title { get; }
 
-    protected bool CanClose
-    {
-        get => _canClose;
-        set => SetProperty(ref _canClose, value);
-    }
+        public ICommand CloseWindowCommand => _closeWindowCommand ??= new DelegateCommand(RaiseRequestClose).ObservesCanExecute(() => CanClose);
 
-    public event Action<IDialogResult> RequestClose;
+        protected bool CanClose
+        {
+            get => _canClose;
+            set => SetProperty(ref _canClose, value);
+        }
 
-    public virtual void OnDialogOpened(IDialogParameters parameters)
-    {
-        CanClose = true;
-    }
+        public event Action<IDialogResult> RequestClose;
 
-    public virtual void OnDialogClosed()
-    {
-        CanClose = false;
-    }
+        public virtual void OnDialogOpened(IDialogParameters parameters)
+        {
+            CanClose = true;
+        }
 
-    public bool CanCloseDialog()
-    {
-        return CanClose;
-    }
+        public virtual void OnDialogClosed()
+        {
+            CanClose = false;
+        }
 
-    protected void RaiseRequestClose(ButtonResult result, IDialogParameters parameters = null)
-    {
-        RaiseRequestClose(new DialogResult(result, parameters));
-    }
+        public bool CanCloseDialog()
+        {
+            return CanClose;
+        }
 
-    protected void RaiseRequestClose()
-    {
-        RaiseRequestClose(null);
-    }
+        protected void RaiseRequestClose(ButtonResult result, IDialogParameters parameters = null)
+        {
+            RaiseRequestClose(new DialogResult(result, parameters));
+        }
 
-    private void RaiseRequestClose(IDialogResult dialogResult)
-    {
-        RequestClose?.Invoke(dialogResult);
+        protected void RaiseRequestClose()
+        {
+            RaiseRequestClose(null);
+        }
+
+        private void RaiseRequestClose(IDialogResult dialogResult)
+        {
+            RequestClose?.Invoke(dialogResult);
+        }
     }
 }

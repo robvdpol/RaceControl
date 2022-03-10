@@ -1,5 +1,8 @@
-﻿namespace RaceControl.Events;
+﻿using Prism.Events;
 
-internal class MuteAllEvent : PubSubEvent<long>
+namespace RaceControl.Events
 {
+    internal class MuteAllEvent : PubSubEvent<long>
+    {
+    }
 }

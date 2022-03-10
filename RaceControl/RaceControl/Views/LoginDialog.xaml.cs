@@ -1,9 +1,10 @@
-﻿namespace RaceControl.Views;
-
-public partial class LoginDialog
+﻿namespace RaceControl.Views
 {
-    public LoginDialog()
+    public partial class LoginDialog
     {
-        InitializeComponent();
+        public LoginDialog()
+        {
+            InitializeComponent();
+        }
     }
 }

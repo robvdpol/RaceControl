@@ -1,20 +1,26 @@
-﻿namespace RaceControl.Core.Converters;
+﻿using System;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Data;
 
-[ValueConversion(typeof(long), typeof(TimeSpan))]
-public class TicksToTimeSpanConverter : IValueConverter
+namespace RaceControl.Core.Converters
 {
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    [ValueConversion(typeof(long), typeof(TimeSpan))]
+    public class TicksToTimeSpanConverter : IValueConverter
     {
-        if (value is long longValue)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return TimeSpan.FromTicks(longValue);
+            if (value is long longValue)
+            {
+                return TimeSpan.FromTicks(longValue);
+            }
+
+            return DependencyProperty.UnsetValue;
         }
 
-        return DependencyProperty.UnsetValue;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        throw new NotImplementedException();
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

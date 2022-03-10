@@ -1,5 +1,9 @@
-﻿namespace RaceControl.Events;
+﻿using Prism.Events;
+using RaceControl.Common.Enums;
 
-public class CloseAllEvent : PubSubEvent<ContentType?>
+namespace RaceControl.Events
 {
+    public class CloseAllEvent : PubSubEvent<ContentType?>
+    {
+    }
 }

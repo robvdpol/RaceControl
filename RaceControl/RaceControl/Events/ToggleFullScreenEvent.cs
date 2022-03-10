@@ -1,5 +1,8 @@
-﻿namespace RaceControl.Events;
+﻿using Prism.Events;
 
-public class ToggleFullScreenEvent : PubSubEvent<long>
+namespace RaceControl.Events
 {
+    public class ToggleFullScreenEvent : PubSubEvent<long>
+    {
+    }
 }

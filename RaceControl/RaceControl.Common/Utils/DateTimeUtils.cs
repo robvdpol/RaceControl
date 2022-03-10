@@ -1,14 +1,17 @@
-﻿namespace RaceControl.Common.Utils;
+﻿using System;
 
-public static class DateTimeUtils
+namespace RaceControl.Common.Utils
 {
-    public static DateTime? GetDateTimeFromEpoch(this long seconds)
+    public static class DateTimeUtils
     {
-        if (seconds != default)
+        public static DateTime? GetDateTimeFromEpoch(this long seconds)
         {
-            return DateTimeOffset.FromUnixTimeMilliseconds(seconds).DateTime;
-        }
+            if (seconds != default)
+            {
+                return DateTimeOffset.FromUnixTimeMilliseconds(seconds).DateTime;
+            }
 
-        return null;
+            return null;
+        }
     }
 }

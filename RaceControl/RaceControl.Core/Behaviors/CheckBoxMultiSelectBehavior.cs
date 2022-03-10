@@ -1,123 +1,127 @@
 ﻿using Microsoft.Xaml.Behaviors;
+using System.Collections;
 using System.Collections.Specialized;
+using System.Windows;
+using System.Windows.Controls;
 
-namespace RaceControl.Core.Behaviors;
-
-public class CheckBoxMultiSelectBehavior : Behavior<CheckBox>
+namespace RaceControl.Core.Behaviors
 {
-    public INotifyCollectionChanged SelectedItems
+    public class CheckBoxMultiSelectBehavior : Behavior<CheckBox>
     {
-        get => (INotifyCollectionChanged)GetValue(SelectedItemsProperty);
-        set => SetValue(SelectedItemsProperty, value);
-    }
-
-    public static readonly DependencyProperty SelectedItemsProperty = DependencyProperty.Register(nameof(SelectedItems), typeof(INotifyCollectionChanged), typeof(CheckBoxMultiSelectBehavior), new PropertyMetadata(OnSelectedItemsChanged));
-
-    protected override void OnAttached()
-    {
-        base.OnAttached();
-        SubscribeToEvents(true, false);
-    }
-
-    protected override void OnDetaching()
-    {
-        base.OnDetaching();
-        UnsubscribeFromEvents(true, false);
-    }
-
-    private static void OnSelectedItemsChanged(DependencyObject target, DependencyPropertyChangedEventArgs args)
-    {
-        var behavior = (CheckBoxMultiSelectBehavior)target;
-
-        if (args.OldValue is INotifyCollectionChanged oldCollection)
+        public INotifyCollectionChanged SelectedItems
         {
-            oldCollection.CollectionChanged -= behavior.SelectedItems_CollectionChanged;
+            get => (INotifyCollectionChanged)GetValue(SelectedItemsProperty);
+            set => SetValue(SelectedItemsProperty, value);
         }
 
-        if (args.NewValue is INotifyCollectionChanged newCollection)
+        public static readonly DependencyProperty SelectedItemsProperty = DependencyProperty.Register(nameof(SelectedItems), typeof(INotifyCollectionChanged), typeof(CheckBoxMultiSelectBehavior), new PropertyMetadata(OnSelectedItemsChanged));
+
+        protected override void OnAttached()
         {
-            newCollection.CollectionChanged += behavior.SelectedItems_CollectionChanged;
-            behavior.SelectedItems_CollectionChanged(behavior, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)newCollection));
-        }
-    }
-
-    private void SelectedItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-    {
-        UnsubscribeFromEvents(true, false);
-
-        switch (e.Action)
-        {
-            case NotifyCollectionChangedAction.Add:
-                if (e.NewItems != null && e.NewItems.Contains(AssociatedObject.Tag))
-                {
-                    AssociatedObject.IsChecked = true;
-                }
-                break;
-
-            case NotifyCollectionChangedAction.Remove:
-                if (e.OldItems != null && e.OldItems.Contains(AssociatedObject.Tag))
-                {
-                    AssociatedObject.IsChecked = false;
-                }
-                break;
-
-            case NotifyCollectionChangedAction.Reset:
-                AssociatedObject.IsChecked = false;
-                break;
+            base.OnAttached();
+            SubscribeToEvents(true, false);
         }
 
-        SubscribeToEvents(true, false);
-    }
-
-    private void CheckBox_Checked(object sender, RoutedEventArgs e)
-    {
-        if (e.Source is CheckBox checkBox)
+        protected override void OnDetaching()
         {
-            UnsubscribeFromEvents(false, true);
+            base.OnDetaching();
+            UnsubscribeFromEvents(true, false);
+        }
 
-            var list = (IList)SelectedItems;
-            var item = checkBox.Tag;
+        private static void OnSelectedItemsChanged(DependencyObject target, DependencyPropertyChangedEventArgs args)
+        {
+            var behavior = (CheckBoxMultiSelectBehavior)target;
 
-            switch (checkBox.IsChecked)
+            if (args.OldValue is INotifyCollectionChanged oldCollection)
             {
-                case true when !list.Contains(item):
-                    list.Add(item);
+                oldCollection.CollectionChanged -= behavior.SelectedItems_CollectionChanged;
+            }
+
+            if (args.NewValue is INotifyCollectionChanged newCollection)
+            {
+                newCollection.CollectionChanged += behavior.SelectedItems_CollectionChanged;
+                behavior.SelectedItems_CollectionChanged(behavior, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)newCollection));
+            }
+        }
+
+        private void SelectedItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            UnsubscribeFromEvents(true, false);
+
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    if (e.NewItems != null && e.NewItems.Contains(AssociatedObject.Tag))
+                    {
+                        AssociatedObject.IsChecked = true;
+                    }
                     break;
 
-                case false when list.Contains(item):
-                    list.Remove(item);
+                case NotifyCollectionChangedAction.Remove:
+                    if (e.OldItems != null && e.OldItems.Contains(AssociatedObject.Tag))
+                    {
+                        AssociatedObject.IsChecked = false;
+                    }
+                    break;
+
+                case NotifyCollectionChangedAction.Reset:
+                    AssociatedObject.IsChecked = false;
                     break;
             }
 
-            SubscribeToEvents(false, true);
-        }
-    }
-
-    private void SubscribeToEvents(bool checkBox, bool collection)
-    {
-        if (checkBox)
-        {
-            AssociatedObject.Checked += CheckBox_Checked;
-            AssociatedObject.Unchecked += CheckBox_Checked;
+            SubscribeToEvents(true, false);
         }
 
-        if (collection)
+        private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
-            SelectedItems.CollectionChanged += SelectedItems_CollectionChanged;
-        }
-    }
+            if (e.Source is CheckBox checkBox)
+            {
+                UnsubscribeFromEvents(false, true);
 
-    private void UnsubscribeFromEvents(bool checkBox, bool collection)
-    {
-        if (checkBox)
-        {
-            AssociatedObject.Checked -= CheckBox_Checked;
-            AssociatedObject.Unchecked -= CheckBox_Checked;
+                var list = (IList)SelectedItems;
+                var item = checkBox.Tag;
+
+                switch (checkBox.IsChecked)
+                {
+                    case true when !list.Contains(item):
+                        list.Add(item);
+                        break;
+
+                    case false when list.Contains(item):
+                        list.Remove(item);
+                        break;
+                }
+
+                SubscribeToEvents(false, true);
+            }
         }
 
-        if (collection)
+        private void SubscribeToEvents(bool checkBox, bool collection)
         {
-            SelectedItems.CollectionChanged -= SelectedItems_CollectionChanged;
+            if (checkBox)
+            {
+                AssociatedObject.Checked += CheckBox_Checked;
+                AssociatedObject.Unchecked += CheckBox_Checked;
+            }
+
+            if (collection)
+            {
+                SelectedItems.CollectionChanged += SelectedItems_CollectionChanged;
+            }
+        }
+
+        private void UnsubscribeFromEvents(bool checkBox, bool collection)
+        {
+            if (checkBox)
+            {
+                AssociatedObject.Checked -= CheckBox_Checked;
+                AssociatedObject.Unchecked -= CheckBox_Checked;
+            }
+
+            if (collection)
+            {
+                SelectedItems.CollectionChanged -= SelectedItems_CollectionChanged;
+            }
         }
     }
 }

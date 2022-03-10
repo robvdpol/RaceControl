@@ -1,23 +1,26 @@
-﻿namespace RaceControl.Services.Interfaces.F1TV.Entities;
+﻿using System;
 
-public class Session
+namespace RaceControl.Services.Interfaces.F1TV.Entities
 {
-    public string UID { get; init; }
-    public long ContentID { get; init; }
-    public string ContentType { get; init; } // VIDEO, BUNDLE
-    public string ContentSubtype { get; init; } // LIVE, FEATURE, DOCUMENTARY, REPLAY, SHOW, PRESS CONFERENCE, ANALYSIS, HIGHLIGHTS, EXTENDED HIGHLIGHTS, MEETING
-    public string ShortName { get; init; }
-    public string LongName { get; init; }
-    public string SeriesUID { get; init; }
-    public string ThumbnailUrl { get; init; }
-    public DateTime? StartDate { get; init; }
-    public DateTime? EndDate { get; init; }
-    public long SessionIndex { get; init; }
-
-    public bool IsLive => ContentSubtype == "LIVE";
-
-    public override string ToString()
+    public class Session
     {
-        return IsLive ? $"{ShortName} (live)" : ShortName;
+        public string UID { get; init; }
+        public long ContentID { get; init; }
+        public string ContentType { get; init; } // VIDEO, BUNDLE
+        public string ContentSubtype { get; init; } // LIVE, FEATURE, DOCUMENTARY, REPLAY, SHOW, PRESS CONFERENCE, ANALYSIS, HIGHLIGHTS, EXTENDED HIGHLIGHTS, MEETING
+        public string ShortName { get; init; }
+        public string LongName { get; init; }
+        public string SeriesUID { get; init; }
+        public string ThumbnailUrl { get; init; }
+        public DateTime? StartDate { get; init; }
+        public DateTime? EndDate { get; init; }
+        public long SessionIndex { get; init; }
+
+        public bool IsLive => ContentSubtype == "LIVE";
+
+        public override string ToString()
+        {
+            return IsLive ? $"{ShortName} (live)" : ShortName;
+        }
     }
 }

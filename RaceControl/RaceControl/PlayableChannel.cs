@@ -1,39 +1,44 @@
-﻿namespace RaceControl;
+﻿using RaceControl.Common.Constants;
+using RaceControl.Common.Enums;
+using RaceControl.Services.Interfaces.F1TV.Entities;
 
-public class PlayableChannel : PlayableContent
+namespace RaceControl
 {
-    public PlayableChannel(Session session, Channel channel)
+    public class PlayableChannel : PlayableContent
     {
-        var displayName = GetDisplayName(channel);
-
-        Title = $"{session.LongName} - {displayName}";
-        Name = channel.Name;
-        DisplayName = displayName;
-        ContentType = ContentType.Channel;
-        ContentUrl = channel.PlaybackUrl;
-        IsLive = session.IsLive;
-        SyncUID = session.UID;
-        SeriesUID = session.SeriesUID;
-    }
-
-    private static string GetDisplayName(Channel channel)
-    {
-        switch (channel.Name)
+        public PlayableChannel(Session session, Channel channel)
         {
-            case ChannelNames.Wif:
-                return "World Feed";
+            var displayName = GetDisplayName(channel);
 
-            case ChannelNames.PitLane:
-                return "Pit Lane";
+            Title = $"{session.LongName} - {displayName}";
+            Name = channel.Name;
+            DisplayName = displayName;
+            ContentType = ContentType.Channel;
+            ContentUrl = channel.PlaybackUrl;
+            IsLive = session.IsLive;
+            SyncUID = session.UID;
+            SeriesUID = session.SeriesUID;
+        }
 
-            case ChannelNames.Tracker:
-                return "Driver Tracker";
+        private static string GetDisplayName(Channel channel)
+        {
+            switch (channel.Name)
+            {
+                case ChannelNames.Wif:
+                    return "World Feed";
 
-            case ChannelNames.Data:
-                return "Live Timing";
+                case ChannelNames.PitLane:
+                    return "Pit Lane";
 
-            default:
-                return channel.Name;
+                case ChannelNames.Tracker:
+                    return "Driver Tracker";
+
+                case ChannelNames.Data:
+                    return "Live Timing";
+
+                default:
+                    return channel.Name;
+            }
         }
     }
 }

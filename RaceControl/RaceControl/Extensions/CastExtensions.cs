@@ -1,17 +1,19 @@
 ﻿using GoogleCast.Channels;
+using System.Linq;
 using System.Reflection;
 
-namespace RaceControl.Extensions;
-
-public static class CastExtensions
+namespace RaceControl.Extensions
 {
-    public static void SetApplicationId(this IMediaChannel mediaChannel, string applicationId)
+    public static class CastExtensions
     {
-        var field = mediaChannel.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic).FirstOrDefault(f => f.Name.StartsWith("<ApplicationId>"));
-
-        if (field != null)
+        public static void SetApplicationId(this IMediaChannel mediaChannel, string applicationId)
         {
-            field.SetValue(mediaChannel, applicationId);
+            var field = mediaChannel.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic).FirstOrDefault(f => f.Name.StartsWith("<ApplicationId>"));
+
+            if (field != null)
+            {
+                field.SetValue(mediaChannel, applicationId);
+            }
         }
     }
 }

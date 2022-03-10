@@ -1,10 +1,13 @@
-﻿namespace RaceControl.Services.Interfaces.F1TV.Authorization;
+﻿using Newtonsoft.Json;
 
-public class TokenRequest
+namespace RaceControl.Services.Interfaces.F1TV.Authorization
 {
-    [JsonProperty("identity_provider_url")]
-    public string IdentityProviderUrl { get; set; }
+    public class TokenRequest
+    {
+        [JsonProperty("identity_provider_url")]
+        public string IdentityProviderUrl { get; set; }
 
-    [JsonProperty("access_token")]
-    public string AccessToken { get; set; }
+        [JsonProperty("access_token")]
+        public string AccessToken { get; set; }
+    }
 }

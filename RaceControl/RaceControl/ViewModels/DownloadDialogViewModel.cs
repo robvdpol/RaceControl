@@ -1,71 +1,83 @@
-﻿namespace RaceControl.ViewModels;
+﻿using NLog;
+using Prism.Services.Dialogs;
+using RaceControl.Common.Enums;
+using RaceControl.Common.Interfaces;
+using RaceControl.Core.Mvvm;
+using RaceControl.Core.Settings;
+using RaceControl.Interfaces;
+using RaceControl.Services.Interfaces.F1TV;
+using System;
+using System.Threading.Tasks;
 
-public class DownloadDialogViewModel : DialogViewModelBase
+namespace RaceControl.ViewModels
 {
-    private readonly ISettings _settings;
-    private readonly IApiService _apiService;
-
-    private IPlayableContent _playableContent;
-    private string _filename;
-
-    public DownloadDialogViewModel(
-        ILogger logger,
-        ISettings settings,
-        IApiService apiService,
-        IMediaDownloader mediaDownloader)
-        : base(logger)
+    public class DownloadDialogViewModel : DialogViewModelBase
     {
-        _settings = settings;
-        _apiService = apiService;
-        MediaDownloader = mediaDownloader;
-    }
+        private readonly ISettings _settings;
+        private readonly IApiService _apiService;
 
-    public override string Title => "Download";
+        private IPlayableContent _playableContent;
+        private string _filename;
 
-    public IMediaDownloader MediaDownloader { get; }
+        public DownloadDialogViewModel(
+            ILogger logger,
+            ISettings settings,
+            IApiService apiService,
+            IMediaDownloader mediaDownloader)
+            : base(logger)
+        {
+            _settings = settings;
+            _apiService = apiService;
+            MediaDownloader = mediaDownloader;
+        }
 
-    public IPlayableContent PlayableContent
-    {
-        get => _playableContent;
-        set => SetProperty(ref _playableContent, value);
-    }
+        public override string Title => "Download";
 
-    public string Filename
-    {
-        get => _filename;
-        set => SetProperty(ref _filename, value);
-    }
+        public IMediaDownloader MediaDownloader { get; }
 
-    public override void OnDialogOpened(IDialogParameters parameters)
-    {
-        PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.Content);
-        Filename = parameters.GetValue<string>(ParameterNames.Filename);
-        StartDownloadAsync().Await(DownloadStarted, DownloadFailed);
-    }
+        public IPlayableContent PlayableContent
+        {
+            get => _playableContent;
+            set => SetProperty(ref _playableContent, value);
+        }
 
-    public override void OnDialogClosed()
-    {
-        base.OnDialogClosed();
-        MediaDownloader.Dispose();
-    }
+        public string Filename
+        {
+            get => _filename;
+            set => SetProperty(ref _filename, value);
+        }
 
-    private async Task StartDownloadAsync()
-    {
-        var streamUrl = await _apiService.GetTokenisedUrlAsync(_settings.SubscriptionToken, PlayableContent);
-        var playToken = await _apiService.GetPlayTokenAsync(streamUrl);
-        await MediaDownloader.StartDownloadAsync(streamUrl, playToken, Filename);
-    }
+        public override void OnDialogOpened(IDialogParameters parameters)
+        {
+            PlayableContent = parameters.GetValue<IPlayableContent>(ParameterNames.Content);
+            Filename = parameters.GetValue<string>(ParameterNames.Filename);
+            StartDownloadAsync().Await(DownloadStarted, DownloadFailed);
+        }
 
-    private void DownloadStarted()
-    {
-        base.OnDialogOpened(null);
-        MediaDownloader.SetDownloadStatus(DownloadStatus.Downloading);
-    }
+        public override void OnDialogClosed()
+        {
+            base.OnDialogClosed();
+            MediaDownloader.Dispose();
+        }
 
-    private void DownloadFailed(Exception ex)
-    {
-        base.OnDialogOpened(null);
-        MediaDownloader.SetDownloadStatus(DownloadStatus.Failed);
-        HandleCriticalError(ex);
+        private async Task StartDownloadAsync()
+        {
+            var streamUrl = await _apiService.GetTokenisedUrlAsync(_settings.SubscriptionToken, PlayableContent);
+            var playToken = await _apiService.GetPlayTokenAsync(streamUrl);
+            await MediaDownloader.StartDownloadAsync(streamUrl, playToken, Filename);
+        }
+
+        private void DownloadStarted()
+        {
+            base.OnDialogOpened(null);
+            MediaDownloader.SetDownloadStatus(DownloadStatus.Downloading);
+        }
+
+        private void DownloadFailed(Exception ex)
+        {
+            base.OnDialogOpened(null);
+            MediaDownloader.SetDownloadStatus(DownloadStatus.Failed);
+            HandleCriticalError(ex);
+        }
     }
 }

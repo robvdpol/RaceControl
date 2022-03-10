@@ -1,19 +1,25 @@
-﻿namespace RaceControl.Core.Converters;
+﻿using System;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Data;
 
-public class BooleanToWindowStateConverter : IValueConverter
+namespace RaceControl.Core.Converters
 {
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    public class BooleanToWindowStateConverter : IValueConverter
     {
-        return value is true ? WindowState.Maximized : WindowState.Normal;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        if (value is WindowState state)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return state == WindowState.Maximized;
+            return value is true ? WindowState.Maximized : WindowState.Normal;
         }
 
-        return false;
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is WindowState state)
+            {
+                return state == WindowState.Maximized;
+            }
+
+            return false;
+        }
     }
 }

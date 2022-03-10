@@ -1,14 +1,17 @@
-﻿namespace RaceControl.Services.Interfaces.F1TV.Entities;
+﻿using System;
 
-public class Event
+namespace RaceControl.Services.Interfaces.F1TV.Entities
 {
-    public string UID { get; init; }
-    public string Name { get; init; }
-    public DateTime? StartDate { get; init; }
-    public DateTime? EndDate { get; init; }
-
-    public override string ToString()
+    public class Event
     {
-        return Name;
+        public string UID { get; init; }
+        public string Name { get; init; }
+        public DateTime? StartDate { get; init; }
+        public DateTime? EndDate { get; init; }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

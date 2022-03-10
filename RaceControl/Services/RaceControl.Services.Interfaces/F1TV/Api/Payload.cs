@@ -1,16 +1,19 @@
-﻿namespace RaceControl.Services.Interfaces.F1TV.Api;
+﻿using Newtonsoft.Json;
 
-public class Payload
+namespace RaceControl.Services.Interfaces.F1TV.Api
 {
-    [JsonProperty("objectSubtype")]
-    public string ObjectSubtype { get; set; }
+    public class Payload
+    {
+        [JsonProperty("objectSubtype")]
+        public string ObjectSubtype { get; set; }
 
-    [JsonProperty("contentId")]
-    public string ContentId { get; set; }
+        [JsonProperty("contentId")]
+        public string ContentId { get; set; }
 
-    [JsonProperty("title")]
-    public string Title { get; set; }
+        [JsonProperty("title")]
+        public string Title { get; set; }
 
-    [JsonProperty("objectType")]
-    public string ObjectType { get; set; }
+        [JsonProperty("objectType")]
+        public string ObjectType { get; set; }
+    }
 }

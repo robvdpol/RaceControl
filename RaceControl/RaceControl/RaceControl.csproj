@@ -7,7 +7,6 @@
     <SignAssembly>false</SignAssembly>
     <ApplicationIcon>racecontrol.ico</ApplicationIcon>
     <Platforms>x64;x86</Platforms>
-    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>

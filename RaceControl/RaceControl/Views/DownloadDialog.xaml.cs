@@ -1,9 +1,10 @@
-﻿namespace RaceControl.Views;
-
-public partial class DownloadDialog
+﻿namespace RaceControl.Views
 {
-    public DownloadDialog()
+    public partial class DownloadDialog
     {
-        InitializeComponent();
+        public DownloadDialog()
+        {
+            InitializeComponent();
+        }
     }
 }

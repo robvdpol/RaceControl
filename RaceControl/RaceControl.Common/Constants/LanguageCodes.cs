@@ -1,24 +1,26 @@
-﻿namespace RaceControl.Common.Constants;
+﻿using System.Collections.Generic;
 
-public static class LanguageCodes
+namespace RaceControl.Common.Constants
 {
-    public const string English = "eng";
-    public const string German = "deu";
-    public const string French = "fra";
-    public const string Spanish = "spa";
-    public const string Portuguese = "por";
-    public const string Dutch = "nld";
-    public const string Onboard = "teamradio";
-    public const string Undetermined = "und";
+    public static class LanguageCodes
+    {
+        public const string English = "eng";
+        public const string German = "deu";
+        public const string French = "fra";
+        public const string Spanish = "spa";
+        public const string Portuguese = "por";
+        public const string Dutch = "nld";
+        public const string Onboard = "teamradio";
+        public const string Undetermined = "und";
 
-    private static readonly IDictionary<string, string> FlyleafCodes = new Dictionary<string, string>
+        private static readonly IDictionary<string, string> FlyleafCodes = new Dictionary<string, string>
         {
             { German, "ger" },
             { French, "fre" },
             { Dutch, "dut" }
         };
 
-    private static readonly IDictionary<string, string> TwoLetterCodes = new Dictionary<string, string>
+        private static readonly IDictionary<string, string> TwoLetterCodes = new Dictionary<string, string>
         {
             { English, "en" },
             { German, "de" },
@@ -28,31 +30,32 @@ public static class LanguageCodes
             { Dutch, "nl" }
         };
 
-    public static string GetFlyleafCode(string languageCode)
-    {
-        return FlyleafCodes.TryGetValue(languageCode, out var flyleafCode) ? flyleafCode : languageCode;
-    }
-
-    public static string GetStandardCode(string flyleafCode)
-    {
-        if (string.IsNullOrWhiteSpace(flyleafCode))
+        public static string GetFlyleafCode(string languageCode)
         {
-            return English;
+            return FlyleafCodes.TryGetValue(languageCode, out var flyleafCode) ? flyleafCode : languageCode;
         }
 
-        foreach (var (key, value) in FlyleafCodes)
+        public static string GetStandardCode(string flyleafCode)
         {
-            if (value == flyleafCode)
+            if (string.IsNullOrWhiteSpace(flyleafCode))
             {
-                return key;
+                return English;
             }
+
+            foreach (var (key, value) in FlyleafCodes)
+            {
+                if (value == flyleafCode)
+                {
+                    return key;
+                }
+            }
+
+            return flyleafCode;
         }
 
-        return flyleafCode;
-    }
-
-    public static string GetTwoLetterCode(string languageCode)
-    {
-        return TwoLetterCodes.TryGetValue(languageCode, out var twoLetterCode) ? twoLetterCode : null;
+        public static string GetTwoLetterCode(string languageCode)
+        {
+            return TwoLetterCodes.TryGetValue(languageCode, out var twoLetterCode) ? twoLetterCode : null;
+        }
     }
 }

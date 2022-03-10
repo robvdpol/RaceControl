@@ -1,82 +1,85 @@
 ﻿using CredentialManagement;
+using NLog;
+using RaceControl.Services.Interfaces.Credential;
 
-namespace RaceControl.Services.Credential;
-
-public class CredentialService : ICredentialService
+namespace RaceControl.Services.Credential
 {
-    private const string RaceControlF1TV = "RaceControlF1TV";
-
-    private readonly ILogger _logger;
-
-    public CredentialService(ILogger logger)
+    public class CredentialService : ICredentialService
     {
-        _logger = logger;
-    }
+        private const string RaceControlF1TV = "RaceControlF1TV";
 
-    public bool LoadCredential(out string username, out string password)
-    {
-        using var credential = new CredentialManagement.Credential
-        {
-            Target = RaceControlF1TV,
-            Type = CredentialType.Generic,
-            PersistanceType = PersistanceType.LocalComputer
-        };
+        private readonly ILogger _logger;
 
-        var loaded = credential.Load();
-
-        if (loaded)
+        public CredentialService(ILogger logger)
         {
-            username = credential.Username;
-            password = credential.Password;
-            _logger.Info("Credentials loaded from store.");
-        }
-        else
-        {
-            username = null;
-            password = null;
-            _logger.Warn("Credentials not found in store.");
+            _logger = logger;
         }
 
-        return loaded;
-    }
-
-    public void SaveCredential(string username, string password)
-    {
-        using var credential = new CredentialManagement.Credential
+        public bool LoadCredential(out string username, out string password)
         {
-            Target = RaceControlF1TV,
-            Type = CredentialType.Generic,
-            PersistanceType = PersistanceType.LocalComputer,
-            Username = username,
-            Password = password
-        };
+            using var credential = new CredentialManagement.Credential
+            {
+                Target = RaceControlF1TV,
+                Type = CredentialType.Generic,
+                PersistanceType = PersistanceType.LocalComputer
+            };
 
-        if (credential.Save())
-        {
-            _logger.Info("Credentials saved to store.");
+            var loaded = credential.Load();
+
+            if (loaded)
+            {
+                username = credential.Username;
+                password = credential.Password;
+                _logger.Info("Credentials loaded from store.");
+            }
+            else
+            {
+                username = null;
+                password = null;
+                _logger.Warn("Credentials not found in store.");
+            }
+
+            return loaded;
         }
-        else
-        {
-            _logger.Warn("Credentials not saved to store.");
-        }
-    }
 
-    public void DeleteCredential()
-    {
-        using var credential = new CredentialManagement.Credential
+        public void SaveCredential(string username, string password)
         {
-            Target = RaceControlF1TV,
-            Type = CredentialType.Generic,
-            PersistanceType = PersistanceType.LocalComputer
-        };
+            using var credential = new CredentialManagement.Credential
+            {
+                Target = RaceControlF1TV,
+                Type = CredentialType.Generic,
+                PersistanceType = PersistanceType.LocalComputer,
+                Username = username,
+                Password = password
+            };
 
-        if (credential.Delete())
-        {
-            _logger.Info("Credentials deleted from store.");
+            if (credential.Save())
+            {
+                _logger.Info("Credentials saved to store.");
+            }
+            else
+            {
+                _logger.Warn("Credentials not saved to store.");
+            }
         }
-        else
+
+        public void DeleteCredential()
         {
-            _logger.Warn("Credentials not deleted from store.");
+            using var credential = new CredentialManagement.Credential
+            {
+                Target = RaceControlF1TV,
+                Type = CredentialType.Generic,
+                PersistanceType = PersistanceType.LocalComputer
+            };
+
+            if (credential.Delete())
+            {
+                _logger.Info("Credentials deleted from store.");
+            }
+            else
+            {
+                _logger.Warn("Credentials not deleted from store.");
+            }
         }
     }
 }

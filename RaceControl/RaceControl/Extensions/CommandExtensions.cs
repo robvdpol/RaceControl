@@ -1,16 +1,19 @@
-﻿namespace RaceControl.Extensions;
+﻿using System.Windows.Input;
 
-public static class CommandExtensions
+namespace RaceControl.Extensions
 {
-    public static bool TryExecute(this ICommand command, object parameter = null)
+    public static class CommandExtensions
     {
-        if (command.CanExecute(parameter))
+        public static bool TryExecute(this ICommand command, object parameter = null)
         {
-            command.Execute(parameter);
+            if (command.CanExecute(parameter))
+            {
+                command.Execute(parameter);
 
-            return true;
+                return true;
+            }
+
+            return false;
         }
-
-        return false;
     }
 }

@@ -1,19 +1,22 @@
-﻿namespace RaceControl.Services.Interfaces.F1TV.Authorization;
+﻿using Newtonsoft.Json;
 
-public class AuthResponse
+namespace RaceControl.Services.Interfaces.F1TV.Authorization
 {
-    [JsonProperty("SessionId")]
-    public string SessionId { get; set; }
+    public class AuthResponse
+    {
+        [JsonProperty("SessionId")]
+        public string SessionId { get; set; }
 
-    [JsonProperty("PasswordIsTemporary")]
-    public bool PasswordIsTemporary { get; set; }
+        [JsonProperty("PasswordIsTemporary")]
+        public bool PasswordIsTemporary { get; set; }
 
-    [JsonProperty("Subscriber")]
-    public Subscriber Subscriber { get; set; }
+        [JsonProperty("Subscriber")]
+        public Subscriber Subscriber { get; set; }
 
-    [JsonProperty("Country")]
-    public string Country { get; set; }
+        [JsonProperty("Country")]
+        public string Country { get; set; }
 
-    [JsonProperty("data")]
-    public Data Data { get; set; }
+        [JsonProperty("data")]
+        public Data Data { get; set; }
+    }
 }

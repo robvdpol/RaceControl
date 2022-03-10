@@ -1,6 +1,9 @@
-﻿namespace RaceControl.Services.Interfaces.Github;
+﻿using System.Threading.Tasks;
 
-public interface IGithubService
+namespace RaceControl.Services.Interfaces.Github
 {
-    Task<Release> GetLatestRelease();
+    public interface IGithubService
+    {
+        Task<Release> GetLatestRelease();
+    }
 }

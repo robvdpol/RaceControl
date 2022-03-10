@@ -1,14 +1,20 @@
-﻿namespace RaceControl.Flyleaf;
+﻿using FlyleafLib;
+using FlyleafLib.MediaFramework.MediaStream;
+using RaceControl.Common.Utils;
+using RaceControl.Interfaces;
 
-public class FlyleafAudioTrack : IMediaTrack
+namespace RaceControl.Flyleaf
 {
-    public FlyleafAudioTrack(StreamBase audioStream)
+    public class FlyleafAudioTrack : IMediaTrack
     {
-        var language = audioStream.Language ?? Language.Get(null);
-        Id = language.OriginalInput ?? language.IdSubLanguage;
-        Name = language.OriginalInput != null ? language.OriginalInput.FirstCharToUpper() : language.LanguageName;
-    }
+        public FlyleafAudioTrack(StreamBase audioStream)
+        {
+            var language = audioStream.Language ?? Language.Get(null);
+            Id = language.OriginalInput ?? language.IdSubLanguage;
+            Name = language.OriginalInput != null ? language.OriginalInput.FirstCharToUpper() : language.LanguageName;
+        }
 
-    public string Id { get; }
-    public string Name { get; }
+        public string Id { get; }
+        public string Name { get; }
+    }
 }

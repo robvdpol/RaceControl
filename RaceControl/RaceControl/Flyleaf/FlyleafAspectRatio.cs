@@ -1,13 +1,17 @@
-﻿namespace RaceControl.Flyleaf;
+﻿using FlyleafLib;
+using RaceControl.Interfaces;
 
-public class FlyleafAspectRatio : IAspectRatio
+namespace RaceControl.Flyleaf
 {
-    public FlyleafAspectRatio(AspectRatio aspectRatio)
+    public class FlyleafAspectRatio : IAspectRatio
     {
-        Value = aspectRatio.ValueStr;
-        Description = aspectRatio.ToString();
-    }
+        public FlyleafAspectRatio(AspectRatio aspectRatio)
+        {
+            Value = aspectRatio.ValueStr;
+            Description = aspectRatio.ToString();
+        }
 
-    public string Value { get; }
-    public string Description { get; }
+        public string Value { get; }
+        public string Description { get; }
+    }
 }

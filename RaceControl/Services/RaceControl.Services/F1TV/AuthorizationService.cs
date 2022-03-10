@@ -1,39 +1,47 @@
-﻿namespace RaceControl.Services.F1TV;
+﻿using NLog;
+using RaceControl.Services.Interfaces.F1TV;
+using RaceControl.Services.Interfaces.F1TV.Authorization;
+using RestSharp;
+using System;
+using System.Threading.Tasks;
 
-public class AuthorizationService : IAuthorizationService
+namespace RaceControl.Services.F1TV
 {
-    private readonly ILogger _logger;
-    private readonly RestClient _restClient;
-
-    public AuthorizationService(ILogger logger, RestClient restClient)
+    public class AuthorizationService : IAuthorizationService
     {
-        _logger = logger;
-        _restClient = restClient;
-        _restClient.AddDefaultHeader("apiKey", Constants.ApiKey);
-    }
+        private readonly ILogger _logger;
+        private readonly RestClient _restClient;
 
-    public async Task<AuthResponse> AuthenticateAsync(string login, string password)
-    {
-        var authRequest = new AuthRequest
+        public AuthorizationService(ILogger logger, RestClient restClient)
         {
-            Login = login,
-            Password = password
-        };
-
-        _logger.Info($"Sending authorization request for login '{authRequest.Login}'...");
-        var restRequest = new RestRequest(Constants.AuthenticateUrl, Method.Post).AddJsonBody(authRequest);
-        var restResponse = await _restClient.ExecutePostAsync<AuthResponse>(restRequest);
-
-        if (restResponse.IsSuccessful)
-        {
-            return restResponse.Data;
+            _logger = logger;
+            _restClient = restClient;
+            _restClient.AddDefaultHeader("apiKey", Constants.ApiKey);
         }
 
-        if (restResponse.ErrorException != null)
+        public async Task<AuthResponse> AuthenticateAsync(string login, string password)
         {
-            throw restResponse.ErrorException;
-        }
+            var authRequest = new AuthRequest
+            {
+                Login = login,
+                Password = password
+            };
 
-        throw new Exception($"{(int)restResponse.StatusCode} - {restResponse.StatusDescription}");
+            _logger.Info($"Sending authorization request for login '{authRequest.Login}'...");
+            var restRequest = new RestRequest(Constants.AuthenticateUrl, Method.Post).AddJsonBody(authRequest);
+            var restResponse = await _restClient.ExecutePostAsync<AuthResponse>(restRequest);
+
+            if (restResponse.IsSuccessful)
+            {
+                return restResponse.Data;
+            }
+
+            if (restResponse.ErrorException != null)
+            {
+                throw restResponse.ErrorException;
+            }
+
+            throw new Exception($"{(int)restResponse.StatusCode} - {restResponse.StatusDescription}");
+        }
     }
 }

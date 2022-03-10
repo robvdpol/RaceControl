@@ -1,10 +1,11 @@
-﻿namespace RaceControl.Services.Interfaces.Credential;
-
-public interface ICredentialService
+﻿namespace RaceControl.Services.Interfaces.Credential
 {
-    bool LoadCredential(out string username, out string password);
+    public interface ICredentialService
+    {
+        bool LoadCredential(out string username, out string password);
 
-    void SaveCredential(string username, string password);
+        void SaveCredential(string username, string password);
 
-    void DeleteCredential();
+        void DeleteCredential();
+    }
 }
