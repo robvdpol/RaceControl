@@ -139,6 +139,7 @@ namespace RaceControl
             config.Player.AutoPlay = false;
             config.Demuxer.ReadTimeout = TimeSpan.FromSeconds(30).Ticks;
             config.Demuxer.BufferDuration = TimeSpan.FromSeconds(1).Ticks;
+            config.Decoder.AllowProfileMismatch = false;
 
             return new Player(config);
         }
