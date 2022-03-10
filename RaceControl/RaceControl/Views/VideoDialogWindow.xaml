@@ -33,14 +33,24 @@
         <KeyBinding Key="R" Command="{Binding ToggleRecordingCommand}" />
         <KeyBinding Key="S" Command="{Binding SyncSessionCommand}" />
         <KeyBinding Key="W" Command="{Binding ShowMainWindowCommand}" />
-        <KeyBinding Key="Add" Command="{Binding ZoomCommand}">
+        <KeyBinding Key="Add" Command="{Binding SetZoomCommand}">
             <KeyBinding.CommandParameter>
                 <sys:Int32>50</sys:Int32>
             </KeyBinding.CommandParameter>
         </KeyBinding>
-        <KeyBinding Key="Subtract" Command="{Binding ZoomCommand}">
+        <KeyBinding Key="Subtract" Command="{Binding SetZoomCommand}">
             <KeyBinding.CommandParameter>
                 <sys:Int32>-50</sys:Int32>
+            </KeyBinding.CommandParameter>
+        </KeyBinding>
+        <KeyBinding Key="Multiply" Command="{Binding SetSpeedCommand}">
+            <KeyBinding.CommandParameter>
+                <sys:Boolean>True</sys:Boolean>
+            </KeyBinding.CommandParameter>
+        </KeyBinding>
+        <KeyBinding Key="Divide" Command="{Binding SetSpeedCommand}">
+            <KeyBinding.CommandParameter>
+                <sys:Boolean>False</sys:Boolean>
             </KeyBinding.CommandParameter>
         </KeyBinding>
         <KeyBinding Key="Right" Command="{Binding FastForwardCommand}">

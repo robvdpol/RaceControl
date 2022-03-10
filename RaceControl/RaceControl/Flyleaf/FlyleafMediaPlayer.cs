@@ -14,6 +14,7 @@ public class FlyleafMediaPlayer : BindableBase, IMediaPlayer
     private int _volume = -1;
     private bool _isMuted;
     private int _zoom;
+    private double _speed = 1;
     private VideoQuality _videoQuality = VideoQuality.Default;
     private ObservableCollection<IAspectRatio> _aspectRatios;
     private ObservableCollection<IAudioDevice> _audioDevices;
@@ -99,6 +100,20 @@ public class FlyleafMediaPlayer : BindableBase, IMediaPlayer
             if (SetProperty(ref _zoom, zoom))
             {
                 Player.Zoom = _zoom;
+            }
+        }
+    }
+
+    public double Speed
+    {
+        get => _speed;
+        set
+        {
+            var speed = Math.Min(Math.Max(value, 0.25), 16);
+
+            if (SetProperty(ref _speed, speed))
+            {
+                Player.Speed = speed;
             }
         }
     }
@@ -252,6 +267,30 @@ public class FlyleafMediaPlayer : BindableBase, IMediaPlayer
     public void FastForward(long seconds)
     {
         Player.CurTime += TimeSpan.FromSeconds(seconds).Ticks;
+    }
+
+    public void SpeedUp()
+    {
+        if (Speed < 1)
+        {
+            Speed += 0.25;
+        }
+        else
+        {
+            Speed += 1;
+        }
+    }
+
+    public void SpeedDown()
+    {
+        if (Speed <= 1)
+        {
+            Speed -= 0.25;
+        }
+        else
+        {
+            Speed -= 1;
+        }
     }
 
     private void PlayerOnOpenCompleted(VideoDialogSettings settings)

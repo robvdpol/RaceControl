@@ -20,6 +20,8 @@ public interface IMediaPlayer
 
     int Zoom { get; set; }
 
+    double Speed { get; set; }
+
     VideoQuality VideoQuality { get; set; }
 
     ObservableCollection<IAspectRatio> AspectRatios { get; }
@@ -49,4 +51,8 @@ public interface IMediaPlayer
     void SetCurrentTime(long time);
 
     void FastForward(long seconds);
+
+    void SpeedUp();
+
+    void SpeedDown();
 }
