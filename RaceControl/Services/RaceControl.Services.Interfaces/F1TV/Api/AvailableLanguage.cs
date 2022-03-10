@@ -1,13 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿namespace RaceControl.Services.Interfaces.F1TV.Api;
 
-namespace RaceControl.Services.Interfaces.F1TV.Api
+public class AvailableLanguage
 {
-    public class AvailableLanguage
-    {
-        [JsonProperty("languageCode")]
-        public string LanguageCode { get; set; }
+    [JsonProperty("languageCode")]
+    public string LanguageCode { get; set; }
 
-        [JsonProperty("languageName")]
-        public string LanguageName { get; set; }
-    }
+    [JsonProperty("languageName")]
+    public string LanguageName { get; set; }
 }

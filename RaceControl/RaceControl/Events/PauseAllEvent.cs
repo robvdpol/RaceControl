@@ -1,8 +1,5 @@
-﻿using Prism.Events;
+﻿namespace RaceControl.Events;
 
-namespace RaceControl.Events
+public class PauseAllEvent : PubSubEvent
 {
-    public class PauseAllEvent : PubSubEvent
-    {
-    }
 }

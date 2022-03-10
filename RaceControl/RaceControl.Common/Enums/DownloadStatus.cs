@@ -1,10 +1,9 @@
-﻿namespace RaceControl.Common.Enums
+﻿namespace RaceControl.Common.Enums;
+
+public enum DownloadStatus
 {
-    public enum DownloadStatus
-    {
-        Pending,
-        Downloading,
-        Finished,
-        Failed
-    }
+    Pending,
+    Downloading,
+    Finished,
+    Failed
 }

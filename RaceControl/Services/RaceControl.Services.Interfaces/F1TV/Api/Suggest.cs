@@ -1,14 +1,10 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿namespace RaceControl.Services.Interfaces.F1TV.Api;
 
-namespace RaceControl.Services.Interfaces.F1TV.Api
+public class Suggest
 {
-    public class Suggest
-    {
-        [JsonProperty("input")]
-        public List<string> Input { get; set; }
+    [JsonProperty("input")]
+    public List<string> Input { get; set; }
 
-        [JsonProperty("payload")]
-        public Payload Payload { get; set; }
-    }
+    [JsonProperty("payload")]
+    public Payload Payload { get; set; }
 }

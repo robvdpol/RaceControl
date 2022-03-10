@@ -1,20 +1,14 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
-using System.Windows.Data;
+﻿namespace RaceControl.Core.Converters;
 
-namespace RaceControl.Core.Converters
+public class LogicalAndConverter : IMultiValueConverter
 {
-    public class LogicalAndConverter : IMultiValueConverter
+    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
     {
-        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
-        {
-            return values != null && values.All(value => value is true);
-        }
+        return values != null && values.All(value => value is true);
+    }
 
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
     }
 }

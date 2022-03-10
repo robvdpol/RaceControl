@@ -1,8 +1,7 @@
-﻿namespace RaceControl.Common.Enums
+﻿namespace RaceControl.Common.Enums;
+
+public enum ContentType
 {
-    public enum ContentType
-    {
-        Channel,
-        Asset
-    }
+    Channel,
+    Asset
 }

@@ -1,10 +1,9 @@
-﻿namespace RaceControl.Views
+﻿namespace RaceControl.Views;
+
+public partial class VideoDialog
 {
-    public partial class VideoDialog
+    public VideoDialog()
     {
-        public VideoDialog()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

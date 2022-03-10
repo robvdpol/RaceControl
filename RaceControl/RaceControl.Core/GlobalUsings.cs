@@ -1,0 +1,13 @@
+﻿global using Newtonsoft.Json;
+global using NLog;
+global using Prism.Mvvm;
+global using RaceControl.Common.Enums;
+global using RaceControl.Common.Utils;
+global using RaceControl.Core.Helpers;
+global using System.Collections;
+global using System.Collections.ObjectModel;
+global using System.Globalization;
+global using System.IO;
+global using System.Windows;
+global using System.Windows.Controls;
+global using System.Windows.Data;

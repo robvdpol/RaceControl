@@ -1,84 +1,75 @@
-﻿using Newtonsoft.Json;
-using NLog;
-using Prism.Mvvm;
-using RaceControl.Common.Utils;
-using System;
-using System.Collections.ObjectModel;
-using System.IO;
+﻿namespace RaceControl.Core.Settings;
 
-namespace RaceControl.Core.Settings
+public class VideoDialogLayout : BindableBase, IVideoDialogLayout
 {
-    public class VideoDialogLayout : BindableBase, IVideoDialogLayout
+    private static readonly string Filename = FolderUtils.GetLocalApplicationDataFilename("RaceControl.layout.json");
+
+    private readonly ILogger _logger;
+    private readonly JsonSerializer _serializer;
+
+    private ObservableCollection<VideoDialogSettings> _instances;
+
+    public VideoDialogLayout(ILogger logger, JsonSerializer serializer)
     {
-        private static readonly string Filename = FolderUtils.GetLocalApplicationDataFilename("RaceControl.layout.json");
+        _logger = logger;
+        _serializer = serializer;
+    }
 
-        private readonly ILogger _logger;
-        private readonly JsonSerializer _serializer;
+    public ObservableCollection<VideoDialogSettings> Instances
+    {
+        get => _instances ??= new ObservableCollection<VideoDialogSettings>();
+        set => SetProperty(ref _instances, value);
+    }
 
-        private ObservableCollection<VideoDialogSettings> _instances;
+    public bool Load(string filename = null)
+    {
+        filename ??= Filename;
 
-        public VideoDialogLayout(ILogger logger, JsonSerializer serializer)
+        if (!File.Exists(filename))
         {
-            _logger = logger;
-            _serializer = serializer;
+            return false;
         }
 
-        public ObservableCollection<VideoDialogSettings> Instances
+        Instances.Clear();
+
+        try
         {
-            get => _instances ??= new ObservableCollection<VideoDialogSettings>();
-            set => SetProperty(ref _instances, value);
+            using var file = File.OpenText(filename);
+            _serializer.Populate(file, this);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "An error occurred while loading video dialog layout.");
+
+            return false;
         }
 
-        public bool Load(string filename = null)
+        _logger.Info("Video dialog layout loaded.");
+
+        return true;
+    }
+
+    public bool Save()
+    {
+        try
         {
-            filename ??= Filename;
+            using var file = File.CreateText(Filename);
+            _serializer.Serialize(file, this);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "An error occurred while saving video dialog layout.");
 
-            if (!File.Exists(filename))
-            {
-                return false;
-            }
-
-            Instances.Clear();
-
-            try
-            {
-                using var file = File.OpenText(filename);
-                _serializer.Populate(file, this);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, "An error occurred while loading video dialog layout.");
-
-                return false;
-            }
-
-            _logger.Info("Video dialog layout loaded.");
-
-            return true;
+            return false;
         }
 
-        public bool Save()
-        {
-            try
-            {
-                using var file = File.CreateText(Filename);
-                _serializer.Serialize(file, this);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, "An error occurred while saving video dialog layout.");
+        _logger.Info("Video dialog layout saved.");
 
-                return false;
-            }
+        return true;
+    }
 
-            _logger.Info("Video dialog layout saved.");
-
-            return true;
-        }
-
-        public bool Import(string filename)
-        {
-            return Load(filename) && Save();
-        }
+    public bool Import(string filename)
+    {
+        return Load(filename) && Save();
     }
 }

@@ -1,13 +1,11 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 
-namespace RaceControl.Common.Utils
+namespace RaceControl.Common.Utils;
+
+public static class AssemblyUtils
 {
-    public static class AssemblyUtils
+    public static Version GetApplicationVersion()
     {
-        public static Version GetApplicationVersion()
-        {
-            return Assembly.GetEntryAssembly()?.GetName().Version ?? new Version(1, 0);
-        }
+        return Assembly.GetEntryAssembly()?.GetName().Version ?? new Version(1, 0);
     }
 }
