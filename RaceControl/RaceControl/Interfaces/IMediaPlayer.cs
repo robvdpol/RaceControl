@@ -26,6 +26,8 @@ namespace RaceControl.Interfaces
 
         int Zoom { get; set; }
 
+        double Speed { get; set; }
+
         VideoQuality VideoQuality { get; set; }
 
         ObservableCollection<IAspectRatio> AspectRatios { get; }
@@ -55,5 +57,9 @@ namespace RaceControl.Interfaces
         void SetCurrentTime(long time);
 
         void FastForward(long seconds);
+
+        void SpeedUp();
+
+        void SpeedDown();
     }
 }

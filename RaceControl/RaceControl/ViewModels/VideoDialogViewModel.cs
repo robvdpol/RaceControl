@@ -51,7 +51,8 @@ namespace RaceControl.ViewModels
         private ICommand _toggleRecordingCommand;
         private ICommand _toggleFullScreenCommand;
         private ICommand _moveToCornerCommand;
-        private ICommand _zoomCommand;
+        private ICommand _setZoomCommand;
+        private ICommand _setSpeedCommand;
         private ICommand _selectAspectRatioCommand;
         private ICommand _selectAudioDeviceCommand;
         private ICommand _exitFullScreenOrCloseWindowCommand;
@@ -101,7 +102,8 @@ namespace RaceControl.ViewModels
         public ICommand ToggleRecordingCommand => _toggleRecordingCommand ??= new DelegateCommand(ToggleRecordingExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
         public ICommand ToggleFullScreenCommand => _toggleFullScreenCommand ??= new DelegateCommand<long?>(ToggleFullScreenExecute);
         public ICommand MoveToCornerCommand => _moveToCornerCommand ??= new DelegateCommand<WindowLocation?>(MoveToCornerExecute, CanMoveToCornerExecute).ObservesProperty(() => DialogSettings.FullScreen);
-        public ICommand ZoomCommand => _zoomCommand ??= new DelegateCommand<int?>(ZoomExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
+        public ICommand SetZoomCommand => _setZoomCommand ??= new DelegateCommand<int?>(SetZoomExecute).ObservesCanExecute(() => MediaPlayer.IsStarted);
+        public ICommand SetSpeedCommand => _setSpeedCommand ??= new DelegateCommand<bool?>(SetSpeedExecute, CanSetSpeedExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => PlayableContent);
         public ICommand SelectAspectRatioCommand => _selectAspectRatioCommand ??= new DelegateCommand<IAspectRatio>(SelectAspectRatioExecute, CanSelectAspectRatioExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => MediaPlayer.AspectRatio);
         public ICommand SelectAudioDeviceCommand => _selectAudioDeviceCommand ??= new DelegateCommand<IAudioDevice>(SelectAudioDeviceExecute, CanSelectAudioDeviceExecute).ObservesProperty(() => MediaPlayer.IsStarted).ObservesProperty(() => MediaPlayer.AudioDevice);
         public ICommand ExitFullScreenOrCloseWindowCommand => _exitFullScreenOrCloseWindowCommand ??= new DelegateCommand(ExitFullScreenOrCloseWindowExecute);
@@ -389,7 +391,7 @@ namespace RaceControl.ViewModels
             DialogSettings.Left = windowLeft;
         }
 
-        private void ZoomExecute(int? zoom)
+        private void SetZoomExecute(int? zoom)
         {
             if (zoom.HasValue)
             {
@@ -398,6 +400,30 @@ namespace RaceControl.ViewModels
             else
             {
                 MediaPlayer.Zoom = 0;
+            }
+        }
+
+        private bool CanSetSpeedExecute(bool? speedUp)
+        {
+            return MediaPlayer.IsStarted && !PlayableContent.IsLive;
+        }
+
+        private void SetSpeedExecute(bool? speedUp)
+        {
+            if (speedUp.HasValue)
+            {
+                if (speedUp.Value)
+                {
+                    MediaPlayer.SpeedUp();
+                }
+                else
+                {
+                    MediaPlayer.SpeedDown();
+                }
+            }
+            else
+            {
+                MediaPlayer.Speed = 1;
             }
         }
 
