@@ -1,30 +1,36 @@
-﻿namespace RaceControl.Core.Converters;
+﻿using System;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Data;
 
-[ValueConversion(typeof(DateTime), typeof(bool))]
-public class DatePassedConverter : IValueConverter
+namespace RaceControl.Core.Converters
 {
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    [ValueConversion(typeof(DateTime), typeof(bool))]
+    public class DatePassedConverter : IValueConverter
     {
-        if (value is DateTime date)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (parameter is not int days)
+            if (value is DateTime date)
             {
-                days = 0;
+                if (parameter is not int days)
+                {
+                    days = 0;
+                }
+
+                return DateTime.UtcNow >= date.AddDays(days);
             }
 
-            return DateTime.UtcNow >= date.AddDays(days);
+            return DependencyProperty.UnsetValue;
         }
 
-        return DependencyProperty.UnsetValue;
-    }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        throw new NotImplementedException();
-    }
-
-    public bool HasPassed(DateTime? date, int offset = 0)
-    {
-        return Convert(date, null, offset, CultureInfo.InvariantCulture) is true;
+        public bool HasPassed(DateTime? date, int offset = 0)
+        {
+            return Convert(date, null, offset, CultureInfo.InvariantCulture) is true;
+        }
     }
 }

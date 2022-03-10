@@ -1,8 +1,9 @@
-﻿namespace RaceControl.Common.Generators;
-
-public interface INumberGenerator
+﻿namespace RaceControl.Common.Generators
 {
-    long GetNextNumber();
+    public interface INumberGenerator
+    {
+        long GetNextNumber();
 
-    void RemoveNumber(long number);
+        void RemoveNumber(long number);
+    }
 }

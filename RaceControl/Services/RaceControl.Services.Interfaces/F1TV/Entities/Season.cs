@@ -1,12 +1,13 @@
-﻿namespace RaceControl.Services.Interfaces.F1TV.Entities;
-
-public class Season
+﻿namespace RaceControl.Services.Interfaces.F1TV.Entities
 {
-    public int Year { get; init; }
-    public string Name { get; init; }
-
-    public override string ToString()
+    public class Season
     {
-        return Name;
+        public int Year { get; init; }
+        public string Name { get; init; }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

@@ -1,36 +1,39 @@
-﻿namespace RaceControl.Common.Generators;
+﻿using System.Collections.Generic;
 
-public class NumberGenerator : INumberGenerator
+namespace RaceControl.Common.Generators
 {
-    private readonly List<long> _numbers = new();
-    private readonly object _numbersLock = new();
-
-    public long GetNextNumber()
+    public class NumberGenerator : INumberGenerator
     {
-        var number = 0;
+        private readonly List<long> _numbers = new();
+        private readonly object _numbersLock = new();
 
-        lock (_numbersLock)
+        public long GetNextNumber()
         {
-            while (true)
+            var number = 0;
+
+            lock (_numbersLock)
             {
-                number++;
-
-                if (!_numbers.Contains(number))
+                while (true)
                 {
-                    _numbers.Add(number);
-                    _numbers.Sort();
+                    number++;
 
-                    return number;
+                    if (!_numbers.Contains(number))
+                    {
+                        _numbers.Add(number);
+                        _numbers.Sort();
+
+                        return number;
+                    }
                 }
             }
         }
-    }
 
-    public void RemoveNumber(long number)
-    {
-        lock (_numbersLock)
+        public void RemoveNumber(long number)
         {
-            _numbers.Remove(number);
+            lock (_numbersLock)
+            {
+                _numbers.Remove(number);
+            }
         }
     }
 }

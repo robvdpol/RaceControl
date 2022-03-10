@@ -1,6 +1,9 @@
-﻿namespace RaceControl.Core.Mvvm;
+﻿using System;
 
-public interface ICloseWindow
+namespace RaceControl.Core.Mvvm
 {
-    Action Close { get; set; }
+    public interface ICloseWindow
+    {
+        Action Close { get; set; }
+    }
 }

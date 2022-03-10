@@ -1,34 +1,40 @@
-﻿namespace RaceControl.Extensions;
+﻿using RaceControl.Common.Constants;
+using RaceControl.Common.Enums;
+using RaceControl.Common.Interfaces;
+using System.Collections.Generic;
 
-public static class PlayableContentExtensions
+namespace RaceControl.Extensions
 {
-    public static string GetPreferredAudioLanguage(this IPlayableContent playableContent, string defaultAudioLanguage)
+    public static class PlayableContentExtensions
     {
-        if (playableContent.ContentType != ContentType.Channel || playableContent.Name is ChannelNames.Wif or ChannelNames.Tracker or ChannelNames.Data or ChannelNames.PitLane)
+        public static string GetPreferredAudioLanguage(this IPlayableContent playableContent, string defaultAudioLanguage)
         {
-            return !string.IsNullOrWhiteSpace(defaultAudioLanguage) ? defaultAudioLanguage : LanguageCodes.English;
+            if (playableContent.ContentType != ContentType.Channel || playableContent.Name is ChannelNames.Wif or ChannelNames.Tracker or ChannelNames.Data or ChannelNames.PitLane)
+            {
+                return !string.IsNullOrWhiteSpace(defaultAudioLanguage) ? defaultAudioLanguage : LanguageCodes.English;
+            }
+
+            return LanguageCodes.Onboard;
         }
 
-        return LanguageCodes.Onboard;
-    }
-
-    public static IEnumerable<string> GetAudioLanguages(this IPlayableContent playableContent, string defaultAudioLanguage)
-    {
-        var languageCode = playableContent.GetPreferredAudioLanguage(defaultAudioLanguage);
-        var languageCodes = new List<string> { languageCode };
-        var languageCodeShort = LanguageCodes.GetTwoLetterCode(languageCode);
-
-        if (!string.IsNullOrWhiteSpace(languageCodeShort))
+        public static IEnumerable<string> GetAudioLanguages(this IPlayableContent playableContent, string defaultAudioLanguage)
         {
-            languageCodes.Add(languageCodeShort);
-        }
+            var languageCode = playableContent.GetPreferredAudioLanguage(defaultAudioLanguage);
+            var languageCodes = new List<string> { languageCode };
+            var languageCodeShort = LanguageCodes.GetTwoLetterCode(languageCode);
 
-        if (languageCode != LanguageCodes.English)
-        {
-            languageCodes.Add(LanguageCodes.English);
-            languageCodes.Add(LanguageCodes.GetTwoLetterCode(LanguageCodes.English));
-        }
+            if (!string.IsNullOrWhiteSpace(languageCodeShort))
+            {
+                languageCodes.Add(languageCodeShort);
+            }
 
-        return languageCodes;
+            if (languageCode != LanguageCodes.English)
+            {
+                languageCodes.Add(LanguageCodes.English);
+                languageCodes.Add(LanguageCodes.GetTwoLetterCode(LanguageCodes.English));
+            }
+
+            return languageCodes;
+        }
     }
 }

@@ -1,25 +1,31 @@
-﻿namespace RaceControl.Core.Converters;
+﻿using System;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Data;
 
-[ValueConversion(typeof(double), typeof(double))]
-public class DivideDoubleConverter : IValueConverter
+namespace RaceControl.Core.Converters
 {
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    [ValueConversion(typeof(double), typeof(double))]
+    public class DivideDoubleConverter : IValueConverter
     {
-        if (value != null)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var dblValue = System.Convert.ToDouble(value);
-
-            if (parameter is double dblDivide)
+            if (value != null)
             {
-                return dblValue / dblDivide;
+                var dblValue = System.Convert.ToDouble(value);
+
+                if (parameter is double dblDivide)
+                {
+                    return dblValue / dblDivide;
+                }
             }
+
+            return DependencyProperty.UnsetValue;
         }
 
-        return DependencyProperty.UnsetValue;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        throw new NotImplementedException();
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

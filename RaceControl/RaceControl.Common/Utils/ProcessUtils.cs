@@ -1,30 +1,33 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
 
-namespace RaceControl.Common.Utils;
-
-public static class ProcessUtils
+namespace RaceControl.Common.Utils
 {
-    public static Process CreateProcess(string filename, string arguments, bool useShellExecute = false, bool createNoWindow = false, bool redirectOutput = false)
+    public static class ProcessUtils
     {
-        var workingDirectory = Path.GetDirectoryName(filename) ?? Environment.CurrentDirectory;
-
-        return new()
+        public static Process CreateProcess(string filename, string arguments, bool useShellExecute = false, bool createNoWindow = false, bool redirectOutput = false)
         {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = filename,
-                Arguments = arguments,
-                WorkingDirectory = workingDirectory,
-                UseShellExecute = useShellExecute,
-                CreateNoWindow = createNoWindow,
-                RedirectStandardOutput = redirectOutput,
-                RedirectStandardError = redirectOutput
-            }
-        };
-    }
+            var workingDirectory = Path.GetDirectoryName(filename) ?? Environment.CurrentDirectory;
 
-    public static void BrowseToUrl(string url)
-    {
-        Process.Start("explorer.exe", url)?.Dispose();
+            return new()
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = filename,
+                    Arguments = arguments,
+                    WorkingDirectory = workingDirectory,
+                    UseShellExecute = useShellExecute,
+                    CreateNoWindow = createNoWindow,
+                    RedirectStandardOutput = redirectOutput,
+                    RedirectStandardError = redirectOutput
+                }
+            };
+        }
+
+        public static void BrowseToUrl(string url)
+        {
+            Process.Start("explorer.exe", url)?.Dispose();
+        }
     }
 }

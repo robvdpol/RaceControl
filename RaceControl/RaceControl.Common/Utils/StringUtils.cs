@@ -1,24 +1,27 @@
-﻿namespace RaceControl.Common.Utils;
+﻿using System.IO;
 
-public static class StringUtils
+namespace RaceControl.Common.Utils
 {
-    public static string RemoveInvalidFileNameChars(this string filename, string replaceWith = "")
+    public static class StringUtils
     {
-        return string.Join(replaceWith, filename.Split(Path.GetInvalidFileNameChars()));
-    }
-
-    public static string GetYesNoString(this bool value)
-    {
-        return value ? "yes" : "no";
-    }
-
-    public static string FirstCharToUpper(this string value)
-    {
-        if (string.IsNullOrEmpty(value))
+        public static string RemoveInvalidFileNameChars(this string filename, string replaceWith = "")
         {
-            return value;
+            return string.Join(replaceWith, filename.Split(Path.GetInvalidFileNameChars()));
         }
 
-        return string.Concat(value[..1].ToUpper(), value[1..]);
+        public static string GetYesNoString(this bool value)
+        {
+            return value ? "yes" : "no";
+        }
+
+        public static string FirstCharToUpper(this string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return value;
+            }
+
+            return string.Concat(value[..1].ToUpper(), value[1..]);
+        }
     }
 }

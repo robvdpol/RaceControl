@@ -1,20 +1,26 @@
-﻿namespace RaceControl.Core.Converters;
+﻿using System;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Data;
 
-[ValueConversion(typeof(bool), typeof(bool))]
-public class InverseBooleanConverter : IValueConverter
+namespace RaceControl.Core.Converters
 {
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    [ValueConversion(typeof(bool), typeof(bool))]
+    public class InverseBooleanConverter : IValueConverter
     {
-        if (value is bool boolValue)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return !boolValue;
+            if (value is bool boolValue)
+            {
+                return !boolValue;
+            }
+
+            return DependencyProperty.UnsetValue;
         }
 
-        return DependencyProperty.UnsetValue;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        throw new NotSupportedException();
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
     }
 }

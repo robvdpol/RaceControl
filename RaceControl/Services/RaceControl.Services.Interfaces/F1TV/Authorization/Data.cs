@@ -1,10 +1,13 @@
-﻿namespace RaceControl.Services.Interfaces.F1TV.Authorization;
+﻿using Newtonsoft.Json;
 
-public class Data
+namespace RaceControl.Services.Interfaces.F1TV.Authorization
 {
-    [JsonProperty("subscriptionStatus")]
-    public string SubscriptionStatus { get; set; }
+    public class Data
+    {
+        [JsonProperty("subscriptionStatus")]
+        public string SubscriptionStatus { get; set; }
 
-    [JsonProperty("subscriptionToken")]
-    public string SubscriptionToken { get; set; }
+        [JsonProperty("subscriptionToken")]
+        public string SubscriptionToken { get; set; }
+    }
 }

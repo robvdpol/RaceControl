@@ -1,12 +1,15 @@
-﻿namespace RaceControl.Core.Settings;
+﻿using System.Collections.ObjectModel;
 
-public interface IVideoDialogLayout
+namespace RaceControl.Core.Settings
 {
-    ObservableCollection<VideoDialogSettings> Instances { get; }
+    public interface IVideoDialogLayout
+    {
+        ObservableCollection<VideoDialogSettings> Instances { get; }
 
-    bool Load(string filename = null);
+        bool Load(string filename = null);
 
-    bool Save();
+        bool Save();
 
-    bool Import(string filename);
+        bool Import(string filename);
+    }
 }

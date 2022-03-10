@@ -1,30 +1,36 @@
-﻿namespace RaceControl.Core.Converters;
+﻿using System;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Data;
 
-[ValueConversion(typeof(ResizeMode), typeof(bool))]
-public class ResizeModeToBooleanConverter : IValueConverter
+namespace RaceControl.Core.Converters
 {
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    [ValueConversion(typeof(ResizeMode), typeof(bool))]
+    public class ResizeModeToBooleanConverter : IValueConverter
     {
-        if (value is ResizeMode resizeMode)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return resizeMode == ResizeMode.CanResize;
+            if (value is ResizeMode resizeMode)
+            {
+                return resizeMode == ResizeMode.CanResize;
+            }
+
+            return DependencyProperty.UnsetValue;
         }
 
-        return DependencyProperty.UnsetValue;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        if (targetType != typeof(ResizeMode))
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new InvalidOperationException("The target must be a ResizeMode");
-        }
+            if (targetType != typeof(ResizeMode))
+            {
+                throw new InvalidOperationException("The target must be a ResizeMode");
+            }
 
-        if (value is bool boolValue)
-        {
-            return boolValue ? ResizeMode.CanResize : ResizeMode.NoResize;
-        }
+            if (value is bool boolValue)
+            {
+                return boolValue ? ResizeMode.CanResize : ResizeMode.NoResize;
+            }
 
-        return DependencyProperty.UnsetValue;
+            return DependencyProperty.UnsetValue;
+        }
     }
 }

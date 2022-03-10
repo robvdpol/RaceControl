@@ -1,8 +1,9 @@
-﻿namespace RaceControl.Interfaces;
-
-public interface IAudioDevice
+﻿namespace RaceControl.Interfaces
 {
-    string Identifier { get; }
+    public interface IAudioDevice
+    {
+        string Identifier { get; }
 
-    string Description { get; }
+        string Description { get; }
+    }
 }

@@ -1,17 +1,20 @@
-﻿namespace RaceControl.Events;
+﻿using Prism.Events;
 
-public class SyncStreamsEvent : PubSubEvent<SyncStreamsEventPayload>
+namespace RaceControl.Events
 {
-}
-
-public class SyncStreamsEventPayload
-{
-    public SyncStreamsEventPayload(string syncUID, long time)
+    public class SyncStreamsEvent : PubSubEvent<SyncStreamsEventPayload>
     {
-        SyncUID = syncUID;
-        Time = time;
     }
 
-    public string SyncUID { get; }
-    public long Time { get; }
+    public class SyncStreamsEventPayload
+    {
+        public SyncStreamsEventPayload(string syncUID, long time)
+        {
+            SyncUID = syncUID;
+            Time = time;
+        }
+
+        public string SyncUID { get; }
+        public long Time { get; }
+    }
 }

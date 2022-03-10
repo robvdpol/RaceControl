@@ -1,29 +1,33 @@
-﻿namespace RaceControl.Common.Utils;
+﻿using System;
+using System.IO;
 
-public static class FolderUtils
+namespace RaceControl.Common.Utils
 {
-    public static string GetSpecialFolderPath(Environment.SpecialFolder specialFolder)
+    public static class FolderUtils
     {
-        return Environment.GetFolderPath(specialFolder);
-    }
+        public static string GetSpecialFolderPath(Environment.SpecialFolder specialFolder)
+        {
+            return Environment.GetFolderPath(specialFolder);
+        }
 
-    public static string GetLocalApplicationDataFilename(string filename)
-    {
-        return Path.Combine(GetLocalApplicationDataFolder(), filename);
-    }
+        public static string GetLocalApplicationDataFilename(string filename)
+        {
+            return Path.Combine(GetLocalApplicationDataFolder(), filename);
+        }
 
-    public static string GetLocalApplicationDataFolder()
-    {
-        return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RaceControl");
-    }
+        public static string GetLocalApplicationDataFolder()
+        {
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RaceControl");
+        }
 
-    public static string GetApplicationLogFilePath()
-    {
-        return GetLocalApplicationDataFilename("RaceControl.log");
-    }
+        public static string GetApplicationLogFilePath()
+        {
+            return GetLocalApplicationDataFilename("RaceControl.log");
+        }
 
-    public static string GetFlyleafLogFilePath()
-    {
-        return GetLocalApplicationDataFilename("Flyleaf.log");
+        public static string GetFlyleafLogFilePath()
+        {
+            return GetLocalApplicationDataFilename("Flyleaf.log");
+        }
     }
 }

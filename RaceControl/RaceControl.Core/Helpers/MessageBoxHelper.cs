@@ -1,43 +1,46 @@
-﻿namespace RaceControl.Core.Helpers;
+﻿using System.Windows;
 
-public static class MessageBoxHelper
+namespace RaceControl.Core.Helpers
 {
-    public static void ShowInfo(string message, string caption = "Info")
+    public static class MessageBoxHelper
     {
-        var window = Application.Current.MainWindow;
-
-        if (window != null)
+        public static void ShowInfo(string message, string caption = "Info")
         {
-            MessageBox.Show(window, message, caption, MessageBoxButton.OK, MessageBoxImage.Information);
+            var window = Application.Current.MainWindow;
+
+            if (window != null)
+            {
+                MessageBox.Show(window, message, caption, MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                MessageBox.Show(message, caption, MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
-        else
+
+        public static void ShowError(string message, string caption = "Error")
         {
-            MessageBox.Show(message, caption, MessageBoxButton.OK, MessageBoxImage.Information);
+            var window = Application.Current.MainWindow;
+
+            if (window != null)
+            {
+                MessageBox.Show(window, message, caption, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            else
+            {
+                MessageBox.Show(message, caption, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
-    }
 
-    public static void ShowError(string message, string caption = "Error")
-    {
-        var window = Application.Current.MainWindow;
-
-        if (window != null)
+        public static bool AskQuestion(string message, string caption = "Question")
         {
-            MessageBox.Show(window, message, caption, MessageBoxButton.OK, MessageBoxImage.Error);
+            var window = Application.Current.MainWindow;
+
+            var result = window != null ?
+                MessageBox.Show(window, message, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) :
+                MessageBox.Show(message, caption, MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            return result == MessageBoxResult.Yes;
         }
-        else
-        {
-            MessageBox.Show(message, caption, MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-    }
-
-    public static bool AskQuestion(string message, string caption = "Question")
-    {
-        var window = Application.Current.MainWindow;
-
-        var result = window != null ?
-            MessageBox.Show(window, message, caption, MessageBoxButton.YesNo, MessageBoxImage.Question) :
-            MessageBox.Show(message, caption, MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-        return result == MessageBoxResult.Yes;
     }
 }
