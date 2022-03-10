@@ -1,9 +1,4 @@
-﻿using RaceControl.Common.Enums;
-using RaceControl.Services.Interfaces.F1TV.Api;
-using System;
-using System.Threading.Tasks;
-
-namespace RaceControl.Interfaces
+﻿namespace RaceControl.Interfaces
 {
     public interface IMediaDownloader : IDisposable
     {

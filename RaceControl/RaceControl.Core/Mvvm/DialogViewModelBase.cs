@@ -1,7 +1,5 @@
-﻿using NLog;
-using Prism.Commands;
+﻿using Prism.Commands;
 using Prism.Services.Dialogs;
-using System;
 using System.Windows.Input;
 
 namespace RaceControl.Core.Mvvm

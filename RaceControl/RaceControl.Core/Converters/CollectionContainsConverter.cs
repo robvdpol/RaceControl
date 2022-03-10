@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Globalization;
-using System.Linq;
-using System.Windows.Data;
-
-namespace RaceControl.Core.Converters
+﻿namespace RaceControl.Core.Converters
 {
     public class CollectionContainsConverter : IMultiValueConverter
     {

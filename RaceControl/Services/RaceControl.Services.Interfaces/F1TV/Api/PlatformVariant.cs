@@ -1,7 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using System.Collections.Generic;
-
-namespace RaceControl.Services.Interfaces.F1TV.Api
+﻿namespace RaceControl.Services.Interfaces.F1TV.Api
 {
     public class PlatformVariant
     {

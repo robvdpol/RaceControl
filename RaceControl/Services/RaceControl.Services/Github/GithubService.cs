@@ -1,9 +1,4 @@
-﻿using NLog;
-using RaceControl.Services.Interfaces.Github;
-using RestSharp;
-using System.Threading.Tasks;
-
-namespace RaceControl.Services.Github
+﻿namespace RaceControl.Services.Github
 {
     public class GithubService : IGithubService
     {

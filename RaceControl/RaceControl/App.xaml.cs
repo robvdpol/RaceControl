@@ -1,39 +1,14 @@
 ﻿using DryIoc;
-using FlyleafLib;
-using FlyleafLib.MediaFramework.MediaContext;
-using FlyleafLib.MediaPlayer;
 using GoogleCast;
-using Newtonsoft.Json;
-using NLog;
-using NLog.Config;
-using NLog.Layouts;
-using NLog.Targets;
 using Prism.DryIoc;
 using Prism.Ioc;
-using RaceControl.Common.Generators;
 using RaceControl.Common.JsonConverter;
-using RaceControl.Common.Utils;
-using RaceControl.Core.Helpers;
-using RaceControl.Core.Settings;
-using RaceControl.Extensions;
-using RaceControl.Flyleaf;
-using RaceControl.Interfaces;
-using RaceControl.Services.Credential;
-using RaceControl.Services.F1TV;
-using RaceControl.Services.Github;
-using RaceControl.Services.Interfaces.Credential;
-using RaceControl.Services.Interfaces.F1TV;
-using RaceControl.Services.Interfaces.Github;
 using RaceControl.ViewModels;
-using RaceControl.Views;
 using RestSharp;
 using RestSharp.Serializers.Json;
-using System;
-using System.IO;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Windows;
 using System.Windows.Threading;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
@@ -69,7 +44,7 @@ namespace RaceControl
 
         protected override void RegisterTypes(IContainerRegistry registry)
         {
-            registry.RegisterDialogWindow<DialogWindow>();
+            registry.RegisterDialogWindow<Views.DialogWindow>();
             registry.RegisterDialogWindow<VideoDialogWindow>(nameof(VideoDialogWindow));
             registry.RegisterDialog<LoginDialog, LoginDialogViewModel>();
             registry.RegisterDialog<UpgradeDialog, UpgradeDialogViewModel>();

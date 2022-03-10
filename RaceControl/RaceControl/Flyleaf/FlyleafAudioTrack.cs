@@ -1,9 +1,4 @@
-﻿using FlyleafLib;
-using FlyleafLib.MediaFramework.MediaStream;
-using RaceControl.Common.Utils;
-using RaceControl.Interfaces;
-
-namespace RaceControl.Flyleaf
+﻿namespace RaceControl.Flyleaf
 {
     public class FlyleafAudioTrack : IMediaTrack
     {

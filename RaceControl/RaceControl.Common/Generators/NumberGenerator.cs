@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace RaceControl.Common.Generators
+﻿namespace RaceControl.Common.Generators
 {
     public class NumberGenerator : INumberGenerator
     {

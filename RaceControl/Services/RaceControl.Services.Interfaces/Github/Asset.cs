@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace RaceControl.Services.Interfaces.Github
+﻿namespace RaceControl.Services.Interfaces.Github
 {
     public class Asset
     {

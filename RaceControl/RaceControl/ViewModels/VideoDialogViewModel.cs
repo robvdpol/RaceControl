@@ -1,26 +1,4 @@
-﻿using NLog;
-using Prism.Commands;
-using Prism.Events;
-using Prism.Services.Dialogs;
-using RaceControl.Common.Constants;
-using RaceControl.Common.Enums;
-using RaceControl.Common.Interfaces;
-using RaceControl.Common.Utils;
-using RaceControl.Core.Helpers;
-using RaceControl.Core.Mvvm;
-using RaceControl.Core.Settings;
-using RaceControl.Events;
-using RaceControl.Extensions;
-using RaceControl.Interfaces;
-using RaceControl.Services.Interfaces.F1TV;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-using System.Timers;
-using System.Windows;
-using System.Windows.Input;
-using Timer = System.Timers.Timer;
+﻿using Timer = System.Timers.Timer;
 
 namespace RaceControl.ViewModels
 {

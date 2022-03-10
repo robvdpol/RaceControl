@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace RaceControl.Common.Constants
+﻿namespace RaceControl.Common.Constants
 {
     public static class LanguageCodes
     {

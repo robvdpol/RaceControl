@@ -1,6 +1,4 @@
-﻿using System.Windows;
-
-namespace RaceControl.Core.Helpers
+﻿namespace RaceControl.Core.Helpers
 {
     public static class MessageBoxHelper
     {

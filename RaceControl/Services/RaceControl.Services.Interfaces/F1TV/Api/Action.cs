@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace RaceControl.Services.Interfaces.F1TV.Api
 {
     public class Action

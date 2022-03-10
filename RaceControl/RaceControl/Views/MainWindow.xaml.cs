@@ -1,10 +1,4 @@
-﻿using RaceControl.Common.Utils;
-using RaceControl.Core.Helpers;
-using RaceControl.Core.Mvvm;
-using System;
-using System.Windows;
-using System.Windows.Forms;
-using System.Windows.Interop;
+﻿using System.Windows.Forms;
 
 namespace RaceControl.Views
 {

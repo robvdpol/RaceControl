@@ -1,5 +1,4 @@
 ﻿using GoogleCast.Channels;
-using System.Linq;
 using System.Reflection;
 
 namespace RaceControl.Extensions

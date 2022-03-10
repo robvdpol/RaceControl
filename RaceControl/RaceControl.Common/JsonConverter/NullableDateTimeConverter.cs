@@ -1,12 +1,14 @@
-﻿using System;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace RaceControl.Common.JsonConverter
 {
     public class NullableDateTimeConverter : JsonConverter<DateTime?>
     {
-        public override bool CanConvert(Type typeToConvert) => typeof(DateTime?) == typeToConvert;
+        public override bool CanConvert(Type typeToConvert)
+        {
+            return typeof(DateTime?) == typeToConvert;
+        }
 
         public override DateTime? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {

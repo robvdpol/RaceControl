@@ -1,7 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-
-namespace RaceControl.Core.Mvvm
+﻿namespace RaceControl.Core.Mvvm
 {
     public static class PasswordBoxAssistant
     {

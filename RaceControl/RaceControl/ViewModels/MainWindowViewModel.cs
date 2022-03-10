@@ -2,43 +2,8 @@
 using GoogleCast.Channels;
 using GoogleCast.Models.Media;
 using Microsoft.Win32;
-using Newtonsoft.Json;
-using NLog;
-using Prism.Commands;
-using Prism.Events;
-using Prism.Services.Dialogs;
-using RaceControl.Common.Constants;
-using RaceControl.Common.Enums;
-using RaceControl.Common.Generators;
-using RaceControl.Common.Interfaces;
-using RaceControl.Common.Utils;
-using RaceControl.Comparers;
-using RaceControl.Core.Helpers;
-using RaceControl.Core.Mvvm;
-using RaceControl.Core.Settings;
-using RaceControl.Events;
-using RaceControl.Extensions;
-using RaceControl.Services.Interfaces.Credential;
-using RaceControl.Services.Interfaces.F1TV;
-using RaceControl.Services.Interfaces.F1TV.Entities;
-using RaceControl.Services.Interfaces.Github;
-using RaceControl.Views;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Media;
-using System.Net.NetworkInformation;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using System.Timers;
-using System.Windows;
-using System.Windows.Data;
-using System.Windows.Input;
-using System.Windows.Interop;
-using System.Windows.Navigation;
+using Timer = System.Timers.Timer;
+using Action = System.Action;
 
 namespace RaceControl.ViewModels
 {

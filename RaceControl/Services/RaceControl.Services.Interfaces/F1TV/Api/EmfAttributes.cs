@@ -1,6 +1,3 @@
-using System.Text.Json.Serialization;
-using System;
-
 namespace RaceControl.Services.Interfaces.F1TV.Api
 {
     public class EmfAttributes

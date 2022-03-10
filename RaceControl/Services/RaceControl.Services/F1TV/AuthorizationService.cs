@@ -1,11 +1,4 @@
-﻿using NLog;
-using RaceControl.Services.Interfaces.F1TV;
-using RaceControl.Services.Interfaces.F1TV.Authorization;
-using RestSharp;
-using System;
-using System.Threading.Tasks;
-
-namespace RaceControl.Services.F1TV
+﻿namespace RaceControl.Services.F1TV
 {
     public class AuthorizationService : IAuthorizationService
     {

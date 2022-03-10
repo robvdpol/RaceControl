@@ -1,7 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using System.Collections.Generic;
-
-namespace RaceControl.Services.Interfaces.F1TV.Authorization
+﻿namespace RaceControl.Services.Interfaces.F1TV.Authorization
 {
     public class TokenResponse
     {

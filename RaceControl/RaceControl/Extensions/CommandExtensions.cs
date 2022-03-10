@@ -1,6 +1,4 @@
-﻿using System.Windows.Input;
-
-namespace RaceControl.Extensions
+﻿namespace RaceControl.Extensions
 {
     public static class CommandExtensions
     {

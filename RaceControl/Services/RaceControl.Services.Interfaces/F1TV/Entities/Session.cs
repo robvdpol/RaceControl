@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace RaceControl.Services.Interfaces.F1TV.Entities
+﻿namespace RaceControl.Services.Interfaces.F1TV.Entities
 {
     public class Session
     {

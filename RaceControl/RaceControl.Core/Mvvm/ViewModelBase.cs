@@ -1,10 +1,4 @@
-﻿using NLog;
-using Prism.Mvvm;
-using RaceControl.Core.Helpers;
-using System;
-using System.Windows;
-
-namespace RaceControl.Core.Mvvm
+﻿namespace RaceControl.Core.Mvvm
 {
     public class ViewModelBase : BindableBase
     {

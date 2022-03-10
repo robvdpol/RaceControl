@@ -1,16 +1,4 @@
-﻿using NLog;
-using Prism.Commands;
-using Prism.Services.Dialogs;
-using RaceControl.Core.Mvvm;
-using RaceControl.Extensions;
-using RaceControl.Services.Interfaces.Credential;
-using RaceControl.Services.Interfaces.F1TV;
-using RaceControl.Services.Interfaces.F1TV.Authorization;
-using System;
-using System.Threading.Tasks;
-using System.Windows.Input;
-
-namespace RaceControl.ViewModels
+﻿namespace RaceControl.ViewModels
 {
     public class LoginDialogViewModel : DialogViewModelBase
     {

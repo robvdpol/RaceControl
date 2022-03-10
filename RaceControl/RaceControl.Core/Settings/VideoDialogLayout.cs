@@ -1,12 +1,4 @@
-﻿using Newtonsoft.Json;
-using NLog;
-using Prism.Mvvm;
-using RaceControl.Common.Utils;
-using System;
-using System.Collections.ObjectModel;
-using System.IO;
-
-namespace RaceControl.Core.Settings
+﻿namespace RaceControl.Core.Settings
 {
     public class VideoDialogLayout : BindableBase, IVideoDialogLayout
     {

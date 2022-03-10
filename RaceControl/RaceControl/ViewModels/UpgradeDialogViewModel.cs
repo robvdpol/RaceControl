@@ -1,11 +1,4 @@
-﻿using NLog;
-using Prism.Commands;
-using Prism.Services.Dialogs;
-using RaceControl.Core.Mvvm;
-using RaceControl.Services.Interfaces.Github;
-using System.Windows.Input;
-
-namespace RaceControl.ViewModels
+﻿namespace RaceControl.ViewModels
 {
     public class UpgradeDialogViewModel : DialogViewModelBase
     {

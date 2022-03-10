@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace RaceControl.Common.JsonConverter
@@ -10,8 +9,8 @@ namespace RaceControl.Common.JsonConverter
         {
             if (reader.TokenType == JsonTokenType.Null)
                 return 0;
-            
-            if(reader.TokenType == JsonTokenType.String)
+
+            if (reader.TokenType == JsonTokenType.String)
             {
                 var valueAsString = reader.GetString();
                 if (int.TryParse(valueAsString, out int val))

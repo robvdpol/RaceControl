@@ -1,8 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Windows.Data;
-
-namespace RaceControl.Core.Converters
+﻿namespace RaceControl.Core.Converters
 {
     public class AreEqualConverter : IMultiValueConverter
     {

@@ -1,16 +1,4 @@
-﻿using FlyleafLib.MediaFramework.MediaContext;
-using Prism.Mvvm;
-using RaceControl.Common.Enums;
-using RaceControl.Core.Settings;
-using RaceControl.Interfaces;
-using RaceControl.Services.Interfaces.F1TV.Api;
-using System;
-using System.ComponentModel;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
-
-namespace RaceControl.Flyleaf
+﻿namespace RaceControl.Flyleaf
 {
     public class FlyleafMediaDownloader : BindableBase, IMediaDownloader
     {
