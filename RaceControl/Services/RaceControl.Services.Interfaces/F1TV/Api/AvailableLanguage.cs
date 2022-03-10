@@ -1,11 +1,10 @@
-﻿namespace RaceControl.Services.Interfaces.F1TV.Api
-{
-    public class AvailableLanguage
-    {
-        [JsonPropertyName("languageCode")]
-        public string LanguageCode { get; set; }
+﻿namespace RaceControl.Services.Interfaces.F1TV.Api;
 
-        [JsonPropertyName("languageName")]
-        public string LanguageName { get; set; }
-    }
+public class AvailableLanguage
+{
+    [JsonPropertyName("languageCode")]
+    public string LanguageCode { get; set; }
+
+    [JsonPropertyName("languageName")]
+    public string LanguageName { get; set; }
 }

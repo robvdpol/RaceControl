@@ -1,6 +1,5 @@
-﻿namespace RaceControl.Events
+﻿namespace RaceControl.Events;
+
+public class SaveLayoutEvent : PubSubEvent<ContentType>
 {
-    public class SaveLayoutEvent : PubSubEvent<ContentType>
-    {
-    }
 }
