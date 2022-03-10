@@ -1,14 +1,14 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using System.Collections.Generic;
 
 namespace RaceControl.Services.Interfaces.F1TV.Api
 {
     public class Suggest
     {
-        [JsonProperty("input")]
+        [JsonPropertyName("input")]
         public List<string> Input { get; set; }
 
-        [JsonProperty("payload")]
+        [JsonPropertyName("payload")]
         public Payload Payload { get; set; }
     }
 }

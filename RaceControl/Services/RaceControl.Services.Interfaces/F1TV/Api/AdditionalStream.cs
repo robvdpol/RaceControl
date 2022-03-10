@@ -1,40 +1,40 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace RaceControl.Services.Interfaces.F1TV.Api
 {
     public class AdditionalStream
     {
-        [JsonProperty("racingNumber")]
+        [JsonPropertyName("racingNumber")]
         public int RacingNumber { get; set; }
 
-        [JsonProperty("title")]
+        [JsonPropertyName("title")]
         public string Title { get; set; }
 
-        [JsonProperty("driverFirstName")]
+        [JsonPropertyName("driverFirstName")]
         public string DriverFirstName { get; set; }
 
-        [JsonProperty("driverLastName")]
+        [JsonPropertyName("driverLastName")]
         public string DriverLastName { get; set; }
 
-        [JsonProperty("teamName")]
+        [JsonPropertyName("teamName")]
         public string TeamName { get; set; }
 
-        [JsonProperty("constructorName")]
+        [JsonPropertyName("constructorName")]
         public string ConstructorName { get; set; }
 
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public string Type { get; set; }
 
-        [JsonProperty("playbackUrl")]
+        [JsonPropertyName("playbackUrl")]
         public string PlaybackUrl { get; set; }
 
-        [JsonProperty("driverImg")]
+        [JsonPropertyName("driverImg")]
         public string DriverImg { get; set; }
 
-        [JsonProperty("teamImg")]
+        [JsonPropertyName("teamImg")]
         public string TeamImg { get; set; }
 
-        [JsonProperty("hex")]
+        [JsonPropertyName("hex")]
         public string Hex { get; set; }
     }
 }

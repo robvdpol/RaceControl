@@ -1,128 +1,128 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using System;
 
 namespace RaceControl.Services.Interfaces.F1TV.Api
 {
     public class EmfAttributes
     {
-        [JsonProperty("VideoType")]
+        [JsonPropertyName("VideoType")]
         public string VideoType { get; set; }
 
-        [JsonProperty("MeetingKey")]
+        [JsonPropertyName("MeetingKey")]
         public string MeetingKey { get; set; }
 
-        [JsonProperty("MeetingSessionKey")]
+        [JsonPropertyName("MeetingSessionKey")]
         public string MeetingSessionKey { get; set; }
 
-        [JsonProperty("Meeting_Name")]
+        [JsonPropertyName("Meeting_Name")]
         public string MeetingName { get; set; }
 
-        [JsonProperty("Meeting_Number")]
+        [JsonPropertyName("Meeting_Number")]
         public string MeetingNumber { get; set; }
 
-        [JsonProperty("Circuit_Short_Name")]
+        [JsonPropertyName("Circuit_Short_Name")]
         public string CircuitShortName { get; set; }
 
-        [JsonProperty("Meeting_Code")]
+        [JsonPropertyName("Meeting_Code")]
         public string MeetingCode { get; set; }
 
-        [JsonProperty("MeetingCountryKey")]
+        [JsonPropertyName("MeetingCountryKey")]
         public string MeetingCountryKey { get; set; }
 
-        [JsonProperty("CircuitKey")]
+        [JsonPropertyName("CircuitKey")]
         public string CircuitKey { get; set; }
 
-        [JsonProperty("Meeting_Location")]
+        [JsonPropertyName("Meeting_Location")]
         public string MeetingLocation { get; set; }
 
-        [JsonProperty("Series")]
+        [JsonPropertyName("Series")]
         public string Series { get; set; }
 
-        [JsonProperty("OBC")]
+        [JsonPropertyName("OBC")]
         public bool OBC { get; set; }
 
-        [JsonProperty("state")]
+        [JsonPropertyName("state")]
         public string State { get; set; }
 
-        [JsonProperty("TimetableKey")]
+        [JsonPropertyName("TimetableKey")]
         public string TimetableKey { get; set; }
 
-        [JsonProperty("SessionKey")]
+        [JsonPropertyName("SessionKey")]
         public string SessionKey { get; set; }
 
-        [JsonProperty("SessionPeriod")]
+        [JsonPropertyName("SessionPeriod")]
         public string SessionPeriod { get; set; }
 
-        [JsonProperty("Circuit_Official_Name")]
+        [JsonPropertyName("Circuit_Official_Name")]
         public string CircuitOfficialName { get; set; }
 
-        [JsonProperty("ActivityDescription")]
+        [JsonPropertyName("ActivityDescription")]
         public string ActivityDescription { get; set; }
 
-        [JsonProperty("SeriesMeetingSessionIdentifier")]
+        [JsonPropertyName("SeriesMeetingSessionIdentifier")]
         public string SeriesMeetingSessionIdentifier { get; set; }
 
-        [JsonProperty("sessionEndTime")]
+        [JsonPropertyName("sessionEndTime")]
         public string SessionEndTime { get; set; }
 
-        [JsonProperty("Meeting_Start_Date")]
+        [JsonPropertyName("Meeting_Start_Date")]
         public DateTime? MeetingStartDate { get; set; }
 
-        [JsonProperty("Meeting_End_Date")]
+        [JsonPropertyName("Meeting_End_Date")]
         public DateTime? MeetingEndDate { get; set; }
 
-        [JsonProperty("Track_Length")]
+        [JsonPropertyName("Track_Length")]
         public string TrackLength { get; set; }
 
-        [JsonProperty("Scheduled_Lap_Count")]
+        [JsonPropertyName("Scheduled_Lap_Count")]
         public string ScheduledLapCount { get; set; }
 
-        [JsonProperty("Scheduled_Distance")]
+        [JsonPropertyName("Scheduled_Distance")]
         public string ScheduledDistance { get; set; }
 
-        [JsonProperty("Circuit_Location")]
+        [JsonPropertyName("Circuit_Location")]
         public string CircuitLocation { get; set; }
 
-        [JsonProperty("Meeting_Sponsor")]
+        [JsonPropertyName("Meeting_Sponsor")]
         public string MeetingSponsor { get; set; }
 
-        [JsonProperty("IsTestEvent")]
+        [JsonPropertyName("IsTestEvent")]
         public string IsTestEvent { get; set; }
 
-        [JsonProperty("Season_Meeting_Ordinal")]
+        [JsonPropertyName("Season_Meeting_Ordinal")]
         public int SeasonMeetingOrdinal { get; set; }
 
-        [JsonProperty("Championship_Meeting_Ordinal")]
+        [JsonPropertyName("Championship_Meeting_Ordinal")]
         public string ChampionshipMeetingOrdinal { get; set; }
 
-        [JsonProperty("session_index")]
+        [JsonPropertyName("session_index")]
         public int SessionIndex { get; set; }
 
-        [JsonProperty("Meeting_Official_Name")]
+        [JsonPropertyName("Meeting_Official_Name")]
         public string MeetingOfficialName { get; set; }
 
-        [JsonProperty("Meeting_Display_Date")]
+        [JsonPropertyName("Meeting_Display_Date")]
         public string MeetingDisplayDate { get; set; }
 
-        [JsonProperty("PageID")]
+        [JsonPropertyName("PageID")]
         public int PageID { get; set; }
 
-        [JsonProperty("Meeting_Country_Name")]
+        [JsonPropertyName("Meeting_Country_Name")]
         public string MeetingCountryName { get; set; }
 
-        [JsonProperty("sessionEndDate")]
+        [JsonPropertyName("sessionEndDate")]
         public long SessionEndDate { get; set; }
 
-        [JsonProperty("sessionStartDate")]
+        [JsonPropertyName("sessionStartDate")]
         public long SessionStartDate { get; set; }
 
-        [JsonProperty("Global_Title")]
+        [JsonPropertyName("Global_Title")]
         public string GlobalTitle { get; set; }
 
-        [JsonProperty("Global_Meeting_Country_Name")]
+        [JsonPropertyName("Global_Meeting_Country_Name")]
         public string GlobalMeetingCountryName { get; set; }
 
-        [JsonProperty("Global_Meeting_Name")]
+        [JsonPropertyName("Global_Meeting_Name")]
         public string GlobalMeetingName { get; set; }
     }
 }

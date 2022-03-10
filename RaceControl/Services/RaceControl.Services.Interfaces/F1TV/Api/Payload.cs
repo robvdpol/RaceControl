@@ -1,19 +1,19 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace RaceControl.Services.Interfaces.F1TV.Api
 {
     public class Payload
     {
-        [JsonProperty("objectSubtype")]
+        [JsonPropertyName("objectSubtype")]
         public string ObjectSubtype { get; set; }
 
-        [JsonProperty("contentId")]
+        [JsonPropertyName("contentId")]
         public string ContentId { get; set; }
 
-        [JsonProperty("title")]
+        [JsonPropertyName("title")]
         public string Title { get; set; }
 
-        [JsonProperty("objectType")]
+        [JsonPropertyName("objectType")]
         public string ObjectType { get; set; }
     }
 }

@@ -1,13 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace RaceControl.Services.Interfaces.F1TV.Api
 {
     public class AvailableLanguage
     {
-        [JsonProperty("languageCode")]
+        [JsonPropertyName("languageCode")]
         public string LanguageCode { get; set; }
 
-        [JsonProperty("languageName")]
+        [JsonPropertyName("languageName")]
         public string LanguageName { get; set; }
     }
 }

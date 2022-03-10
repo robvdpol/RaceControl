@@ -1,16 +1,16 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace RaceControl.Services.Interfaces.F1TV.Api
 {
     public class RetrieveItems
     {
-        [JsonProperty("resultObj")]
+        [JsonPropertyName("resultObj")]
         public ResultObj ResultObj { get; set; }
 
-        [JsonProperty("uriOriginal")]
+        [JsonPropertyName("uriOriginal")]
         public string UriOriginal { get; set; }
 
-        [JsonProperty("typeOriginal")]
+        [JsonPropertyName("typeOriginal")]
         public string TypeOriginal { get; set; }
     }
 }

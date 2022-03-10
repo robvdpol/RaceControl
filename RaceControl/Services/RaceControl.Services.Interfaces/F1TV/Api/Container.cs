@@ -1,44 +1,44 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using System.Collections.Generic;
 
 namespace RaceControl.Services.Interfaces.F1TV.Api
 {
     public class Container
     {
-        [JsonProperty("id")]
-        public string Id { get; set; }
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
 
-        [JsonProperty("layout")]
+        [JsonPropertyName("layout")]
         public string Layout { get; set; }
 
-        [JsonProperty("actions")]
+        [JsonPropertyName("actions")]
         public List<Action> Actions { get; set; }
 
-        [JsonProperty("properties")]
+        [JsonPropertyName("properties")]
         public List<Property> Properties { get; set; }
 
-        [JsonProperty("metadata")]
+        [JsonPropertyName("metadata")]
         public Metadata Metadata { get; set; }
 
-        [JsonProperty("bundles")]
+        [JsonPropertyName("bundles")]
         public List<Bundle> Bundles { get; set; }
 
-        [JsonProperty("categories")]
+        [JsonPropertyName("categories")]
         public List<Category> Categories { get; set; }
 
-        [JsonProperty("platformVariants")]
+        [JsonPropertyName("platformVariants")]
         public List<PlatformVariant> PlatformVariants { get; set; }
 
-        [JsonProperty("retrieveItems")]
+        [JsonPropertyName("retrieveItems")]
         public RetrieveItems RetrieveItems { get; set; }
 
-        [JsonProperty("contentId")]
+        [JsonPropertyName("contentId")]
         public long ContentId { get; set; }
 
-        [JsonProperty("suggest")]
+        [JsonPropertyName("suggest")]
         public Suggest Suggest { get; set; }
 
-        [JsonProperty("platformName")]
+        [JsonPropertyName("platformName")]
         public string PlatformName { get; set; }
     }
 }

@@ -11,6 +11,7 @@ using NLog.Targets;
 using Prism.DryIoc;
 using Prism.Ioc;
 using RaceControl.Common.Generators;
+using RaceControl.Common.JsonConverter;
 using RaceControl.Common.Utils;
 using RaceControl.Core.Helpers;
 using RaceControl.Core.Settings;
@@ -26,10 +27,12 @@ using RaceControl.Services.Interfaces.Github;
 using RaceControl.ViewModels;
 using RaceControl.Views;
 using RestSharp;
-using RestSharp.Serializers.NewtonsoftJson;
+using RestSharp.Serializers.Json;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Threading;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
@@ -163,7 +166,14 @@ namespace RaceControl
             };
 
             var restClient = new RestClient(restClientOptions);
-            restClient.UseNewtonsoftJson();
+
+            var options = new JsonSerializerOptions()
+            {
+                NumberHandling = JsonNumberHandling.AllowReadingFromString
+            };
+            options.Converters.Add(new NullableDateTimeConverter());
+            options.Converters.Add(new NullableIntConverter());
+            restClient.UseSystemTextJson(options);
 
             return restClient;
         }

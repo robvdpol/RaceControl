@@ -1,43 +1,43 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace RaceControl.Services.Interfaces.F1TV.Api
 {
     public class Property
     {
-        [JsonProperty("meeting_Number")]
+        [JsonPropertyName("meeting_Number")]
         public int MeetingNumber { get; set; }
 
-        [JsonProperty("sessionEndTime")]
+        [JsonPropertyName("sessionEndTime")]
         public long SessionEndTime { get; set; }
 
-        [JsonProperty("series")]
+        [JsonPropertyName("series")]
         public string Series { get; set; }
 
-        [JsonProperty("lastUpdatedDate")]
+        [JsonPropertyName("lastUpdatedDate")]
         public long LastUpdatedDate { get; set; }
 
-        [JsonProperty("season_Meeting_Ordinal")]
+        [JsonPropertyName("season_Meeting_Ordinal")]
         public int SeasonMeetingOrdinal { get; set; }
 
-        [JsonProperty("meeting_Start_Date")]
+        [JsonPropertyName("meeting_Start_Date")]
         public long MeetingStartDate { get; set; }
 
-        [JsonProperty("meeting_End_Date")]
+        [JsonPropertyName("meeting_End_Date")]
         public long MeetingEndDate { get; set; }
 
-        [JsonProperty("season")]
+        [JsonPropertyName("season")]
         public int Season { get; set; }
 
-        [JsonProperty("session_index")]
+        [JsonPropertyName("session_index")]
         public int SessionIndex { get; set; }
 
-        [JsonProperty("meetingSessionKey")]
+        [JsonPropertyName("meetingSessionKey")]
         public int MeetingSessionKey { get; set; }
 
-        [JsonProperty("sessionStartDate")]
+        [JsonPropertyName("sessionStartDate")]
         public long SessionStartDate { get; set; }
 
-        [JsonProperty("sessionEndDate")]
+        [JsonPropertyName("sessionEndDate")]
         public long SessionEndDate { get; set; }
     }
 }

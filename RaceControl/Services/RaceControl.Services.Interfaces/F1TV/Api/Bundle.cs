@@ -1,22 +1,22 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace RaceControl.Services.Interfaces.F1TV.Api
 {
     public class Bundle
     {
-        [JsonProperty("bundleSubtype")]
+        [JsonPropertyName("bundleSubtype")]
         public string BundleSubtype { get; set; }
 
-        [JsonProperty("isParent")]
+        [JsonPropertyName("isParent")]
         public bool IsParent { get; set; }
 
-        [JsonProperty("orderId")]
+        [JsonPropertyName("orderId")]
         public int OrderId { get; set; }
 
-        [JsonProperty("bundleId")]
+        [JsonPropertyName("bundleId")]
         public int BundleId { get; set; }
 
-        [JsonProperty("bundleType")]
+        [JsonPropertyName("bundleType")]
         public string BundleType { get; set; }
     }
 }

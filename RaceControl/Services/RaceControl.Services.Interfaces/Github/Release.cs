@@ -1,29 +1,29 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace RaceControl.Services.Interfaces.Github
 {
     public class Release
     {
-        [JsonProperty("html_url")]
+        [JsonPropertyName("html_url")]
         public string HtmlUrl { get; set; }
 
-        [JsonProperty("tag_name")]
+        [JsonPropertyName("tag_name")]
         public string TagName { get; set; }
 
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonProperty("draft")]
+        [JsonPropertyName("draft")]
         public bool Draft { get; set; }
 
-        [JsonProperty("prerelease")]
+        [JsonPropertyName("prerelease")]
         public bool PreRelease { get; set; }
 
-        [JsonProperty("body")]
+        [JsonPropertyName("body")]
         public string Body { get; set; }
 
-        [JsonProperty("assets")]
+        [JsonPropertyName("assets")]
         public List<Asset> Assets { get; set; }
     }
 }

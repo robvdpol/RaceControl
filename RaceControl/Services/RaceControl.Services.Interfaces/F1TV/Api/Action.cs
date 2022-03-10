@@ -1,19 +1,19 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace RaceControl.Services.Interfaces.F1TV.Api
 {
     public class Action
     {
-        [JsonProperty("key")]
+        [JsonPropertyName("key")]
         public string Key { get; set; }
 
-        [JsonProperty("uri")]
+        [JsonPropertyName("uri")]
         public string Uri { get; set; }
 
-        [JsonProperty("targetType")]
+        [JsonPropertyName("targetType")]
         public string TargetType { get; set; }
 
-        [JsonProperty("href")]
+        [JsonPropertyName("href")]
         public string Href { get; set; }
     }
 }
