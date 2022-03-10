@@ -2,8 +2,8 @@
 using GoogleCast.Channels;
 using GoogleCast.Models.Media;
 using Microsoft.Win32;
-using Timer = System.Timers.Timer;
 using Action = System.Action;
+using Timer = System.Timers.Timer;
 
 namespace RaceControl.ViewModels;
 
@@ -345,8 +345,8 @@ public class MainWindowViewModel : ViewModelBase, ICloseWindow
 
                 if (SelectedSeason.Year == DateTime.UtcNow.Year)
                 {
-                        // Select the most recent event
-                        SelectedEvent = Events.OrderByDescending(e => e.StartDate).FirstOrDefault(e => DateTime.UtcNow.Date >= e.StartDate.GetValueOrDefault().Date);
+                    // Select the most recent event
+                    SelectedEvent = Events.OrderByDescending(e => e.StartDate).FirstOrDefault(e => DateTime.UtcNow.Date >= e.StartDate.GetValueOrDefault().Date);
                 }
             },
             HandleCriticalError);
