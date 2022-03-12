@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:prism="http://prismlibrary.com/"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    Style="{DynamicResource UserControlStyle}"
     prism:ViewModelLocator.AutoWireViewModel="True">
     <UserControl.Resources>
         <sys:Boolean x:Key="True">True</sys:Boolean>

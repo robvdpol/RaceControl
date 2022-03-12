@@ -5,6 +5,7 @@
     xmlns:core="clr-namespace:RaceControl.Core.Converters;assembly=RaceControl.Core"
     xmlns:mvvm="clr-namespace:RaceControl.Core.Mvvm;assembly=RaceControl.Core"
     xmlns:prism="http://prismlibrary.com/"
+    Style="{DynamicResource UserControlStyle}"
     prism:ViewModelLocator.AutoWireViewModel="True">
     <UserControl.Resources>
         <core:InverseBooleanConverter x:Key="InverseBooleanConverter" />

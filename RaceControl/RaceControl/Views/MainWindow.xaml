@@ -13,37 +13,14 @@
     Height="900"
     prism:ViewModelLocator.AutoWireViewModel="True"
     Loaded="MainWindowLoaded"
+    Style="{DynamicResource WindowStyle}"
     WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <converters:CollectionContainsConverter x:Key="CollectionContainsConverter" />
         <converters:DatePassedConverter x:Key="DatePassedConverter" />
-        <Style x:Key="HeaderLabelStyle" TargetType="Label">
-            <Setter Property="Margin" Value="2" />
-            <Setter Property="Height" Value="28" />
-            <Setter Property="Padding" Value="5,0" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-            <Setter Property="Background" Value="#DDDDDD" />
-            <Setter Property="BorderBrush" Value="#ABADB3" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="FontWeight" Value="Bold" />
-        </Style>
-        <Style x:Key="OptionButtonStyle" TargetType="Button">
-            <Setter Property="Margin" Value="3" />
-            <Setter Property="Height" Value="24" />
-        </Style>
-        <Style x:Key="ContentListBoxStyle" TargetType="ListBox">
-            <Setter Property="Margin" Value="2" />
-            <Setter Property="Background" Value="#FFFFFF" />
-        </Style>
-        <Style x:Key="OptionBorderStyle" TargetType="Border">
-            <Setter Property="Margin" Value="2" />
-            <Setter Property="Background" Value="#FFFFFF" />
-            <Setter Property="BorderBrush" Value="#ABADB3" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="UseLayoutRounding" Value="True" />
-        </Style>
+
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding
@@ -79,10 +56,7 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <DockPanel>
-        <Menu
-            Background="White"
-            DockPanel.Dock="Top"
-            IsMainMenu="True">
+        <Menu DockPanel.Dock="Top" IsMainMenu="True">
             <MenuItem Header="_File">
                 <MenuItem Command="{Binding OpenLogFileCommand}" Header="Open _log file" />
                 <Separator />
@@ -112,21 +86,21 @@
                     Grid.Column="0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="2*" />
+                        <RowDefinition />
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
+                        <RowDefinition Height="122.347" />
                     </Grid.RowDefinitions>
                     <Label
                         Grid.Row="0"
                         Grid.Column="0"
                         Content="Race Seasons"
-                        Style="{StaticResource HeaderLabelStyle}" />
+                        Style="{DynamicResource HeaderLabelStyle}" />
                     <ListBox
                         Grid.Row="1"
                         Grid.Column="0"
                         ItemsSource="{Binding Seasons}"
                         SelectedItem="{Binding SelectedSeason}"
-                        Style="{StaticResource ContentListBoxStyle}">
+                        Style="{DynamicResource ContentListBoxStyle}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="SelectionChanged">
                                 <i:InvokeCommandAction Command="{Binding SeasonSelectionChangedCommand}" />
@@ -137,16 +111,17 @@
                         Grid.Row="2"
                         Grid.Column="0"
                         Content="Series"
-                        Style="{StaticResource HeaderLabelStyle}" />
+                        Style="{DynamicResource HeaderLabelStyle}" />
                     <ListBox
                         Grid.Row="3"
                         Grid.Column="0"
                         ItemsSource="{Binding Series}"
-                        Style="{StaticResource ContentListBoxStyle}">
+                        Style="{DynamicResource ContentListBoxStyle}">
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem">
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                                 <Setter Property="Focusable" Value="False" />
+                                <Setter Property="Foreground" Value="#EEEEEE" />
                             </Style>
                         </ListBox.ItemContainerStyle>
                         <ListBox.ItemTemplate>
@@ -164,13 +139,13 @@
                     Grid.Row="0"
                     Grid.Column="1"
                     Content="Events"
-                    Style="{StaticResource HeaderLabelStyle}" />
+                    Style="{DynamicResource HeaderLabelStyle}" />
                 <ListBox
                     Grid.Row="1"
                     Grid.Column="1"
                     ItemsSource="{Binding Events}"
                     SelectedItem="{Binding SelectedEvent}"
-                    Style="{StaticResource ContentListBoxStyle}">
+                    Style="{DynamicResource ContentListBoxStyle}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="SelectionChanged">
                             <i:InvokeCommandAction Command="{Binding EventSelectionChangedCommand}" />
@@ -212,17 +187,10 @@
                         Grid.Row="0"
                         Grid.Column="0"
                         Grid.ColumnSpan="2"
-                        Content="Live Now">
-                        <Label.Style>
-                            <Style BasedOn="{StaticResource HeaderLabelStyle}" TargetType="Label">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding HasItems, ElementName=LvLiveSessions}" Value="True">
-                                        <Setter Property="Background" Value="LightGreen" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Label.Style>
-                    </Label>
+                        Content="Live Now"
+                        DataContext="{Binding HasItems, ElementName=LvLiveSessions}"
+                        Style="{DynamicResource LiveHeaderLabelStyle}" />
+
                     <ListBox
                         x:Name="LvLiveSessions"
                         Grid.Row="1"
@@ -232,7 +200,7 @@
                         ItemsSource="{Binding LiveSessions}"
                         ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                         SelectedItem="{Binding SelectedLiveSession}"
-                        Style="{StaticResource ContentListBoxStyle}">
+                        Style="{DynamicResource ContentListBoxStyle}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="SelectionChanged">
                                 <i:InvokeCommandAction Command="{Binding LiveSessionSelectionChangedCommand}" />
@@ -243,19 +211,19 @@
                         Grid.Row="2"
                         Grid.Column="0"
                         Content="Sessions"
-                        Style="{StaticResource HeaderLabelStyle}" />
+                        Style="{DynamicResource HeaderLabelStyle}" />
                     <ListBox
                         Grid.Row="3"
                         Grid.Column="0"
                         ItemsSource="{Binding Sessions}"
                         SelectedItem="{Binding SelectedSession}"
-                        Style="{StaticResource ContentListBoxStyle}">
+                        Style="{DynamicResource ContentListBoxStyle}">
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem">
                                 <Setter Property="Visibility" Value="Collapsed" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding IsLive}" Value="True">
-                                        <Setter Property="Background" Value="LightGreen" />
+                                        <Setter Property="Background" Value="#2f8941" />
                                     </DataTrigger>
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
@@ -316,14 +284,14 @@
                         Grid.Row="2"
                         Grid.Column="1"
                         Content="Channels"
-                        Style="{StaticResource HeaderLabelStyle}" />
+                        Style="{DynamicResource HeaderLabelStyle}" />
                     <ListBox
                         Grid.Row="3"
                         Grid.Column="1"
                         HorizontalContentAlignment="Stretch"
                         ItemsSource="{Binding Channels}"
                         ScrollViewer.VerticalScrollBarVisibility="Visible"
-                        Style="{StaticResource ContentListBoxStyle}">
+                        Style="{DynamicResource ContentListBoxStyle}">
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem">
                                 <Setter Property="Focusable" Value="False" />
@@ -401,11 +369,11 @@
                     Grid.Row="2"
                     Grid.Column="0"
                     Content="Options"
-                    Style="{StaticResource HeaderLabelStyle}" />
+                    Style="{DynamicResource HeaderLabelStyle}" />
                 <Border
                     Grid.Row="3"
                     Grid.Column="0"
-                    Style="{StaticResource OptionBorderStyle}">
+                    Style="{DynamicResource OptionBorderStyle}">
                     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -461,6 +429,11 @@
                                         Margin="3"
                                         Content="Enable MPV auto sync (experimental)"
                                         IsChecked="{Binding Settings.EnableMpvAutoSync}" />
+                                    <CheckBox
+                                        Margin="3"
+                                        Command="{Binding UpdateThemeCommand}"
+                                        Content="Use dark theme (experimental)"
+                                        IsChecked="{Binding Settings.UseDarkTheme}" />
                                     <TextBlock Margin="3" Text="Additional MPV parameters:" />
                                     <TextBox
                                         Height="22"
@@ -495,14 +468,12 @@
                                         Grid.Column="0"
                                         Command="{Binding SaveVideoDialogLayoutCommand}"
                                         Content="Save layout"
-                                        Style="{StaticResource OptionButtonStyle}"
                                         ToolTip="Saves the position and size of all currently open video players (Ctrl+S)" />
                                     <Button
                                         Grid.Row="0"
                                         Grid.Column="1"
                                         Command="{Binding ImportVideoDialogLayoutCommand}"
                                         Content="Import layout"
-                                        Style="{StaticResource OptionButtonStyle}"
                                         ToolTip="Import a saved layout from file" />
                                     <Button
                                         Grid.Row="1"
@@ -510,7 +481,6 @@
                                         Command="{Binding OpenVideoDialogLayoutCommand}"
                                         CommandParameter="{x:Static enums:PlayerType.Internal}"
                                         Content="Open internal"
-                                        Style="{StaticResource OptionButtonStyle}"
                                         ToolTip="Watch the selected session in the previously saved layout using the internal player (Ctrl+I)" />
                                     <Button
                                         Grid.Row="1"
@@ -518,7 +488,6 @@
                                         Command="{Binding OpenVideoDialogLayoutCommand}"
                                         CommandParameter="{x:Static enums:PlayerType.Mpv}"
                                         Content="Open in MPV"
-                                        Style="{StaticResource OptionButtonStyle}"
                                         ToolTip="Watch the selected session in the previously saved layout using MPV (Ctrl+M)" />
                                 </Grid>
                             </GroupBox>
@@ -555,7 +524,6 @@
                                         Grid.Column="0"
                                         Command="{Binding ScanReceiversCommand}"
                                         Content="Scan"
-                                        Style="{StaticResource OptionButtonStyle}"
                                         ToolTip="Scan for Chromecast devices in local network" />
                                     <ComboBox
                                         Grid.Row="1"
@@ -609,8 +577,7 @@
                                     <Button
                                         Grid.Row="1"
                                         Command="{Binding LogOutCommand}"
-                                        Content="Log out"
-                                        Style="{StaticResource OptionButtonStyle}" />
+                                        Content="Log out" />
                                 </Grid>
                             </GroupBox>
                             <StackPanel
@@ -649,13 +616,13 @@
                     Grid.Row="2"
                     Grid.Column="1"
                     Content="Archive"
-                    Style="{StaticResource HeaderLabelStyle}" />
+                    Style="{DynamicResource HeaderLabelStyle}" />
                 <ListBox
                     Grid.Row="3"
                     Grid.Column="1"
                     ItemsSource="{Binding VodGenres}"
                     SelectedItem="{Binding SelectedVodGenre}"
-                    Style="{StaticResource ContentListBoxStyle}">
+                    Style="{DynamicResource ContentListBoxStyle}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="SelectionChanged">
                             <i:InvokeCommandAction Command="{Binding VodGenreSelectionChangedCommand}" />
@@ -666,7 +633,7 @@
                     Grid.Row="2"
                     Grid.Column="2"
                     HorizontalContentAlignment="Stretch"
-                    Style="{StaticResource HeaderLabelStyle}">
+                    Style="{DynamicResource HeaderLabelStyle}">
                     <Label.Content>
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -695,7 +662,7 @@
                     HorizontalContentAlignment="Stretch"
                     ItemsSource="{Binding EpisodesView}"
                     ScrollViewer.VerticalScrollBarVisibility="Visible"
-                    Style="{StaticResource ContentListBoxStyle}">
+                    Style="{DynamicResource ContentListBoxStyle}">
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
                             <Setter Property="Focusable" Value="False" />
