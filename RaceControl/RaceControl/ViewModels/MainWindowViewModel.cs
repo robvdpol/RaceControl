@@ -306,7 +306,6 @@ namespace RaceControl.ViewModels
             _hwndSource = HwndSource.FromHwnd(helper.Handle);
 
             IsBusy = true;
-            Settings.Load();
             VideoDialogLayout.Load();
             UpdateThemeCommand.TryExecute();
             SetVlcExeLocation();

@@ -41,6 +41,9 @@ namespace RaceControl
 {
     public partial class App
     {
+        private static readonly ResourceDictionary LightTheme = new() { Source = new Uri(@"/Themes/LightTheme.xaml", UriKind.Relative) };
+        private static readonly ResourceDictionary DarkTheme = new() { Source = new Uri(@"/Themes/DarkTheme.xaml", UriKind.Relative) };
+
         private readonly SplashScreen _splashScreen = new("splashscreen.png");
 
         private static int _flyleafUniqueId;
@@ -100,6 +103,12 @@ namespace RaceControl
 
         protected override Window CreateShell()
         {
+            var settings = Container.Resolve<ISettings>();
+            settings.Load();
+
+            App.Current.Resources.MergedDictionaries.Clear();
+            App.Current.Resources.MergedDictionaries.Add(settings.UseDarkTheme ? DarkTheme : LightTheme);
+
             _splashScreen.Close(TimeSpan.Zero);
 
             return Container.Resolve<MainWindow>();
