@@ -13,7 +13,7 @@
     <SolidColorBrush x:Key="BackgroundColour" Color="#FF232323" />
     <SolidColorBrush x:Key="WindowBorderColour" Color="#FF343434" />
     <SolidColorBrush x:Key="WindowTitleColour" Color="#FF242424" />
-    <!--  Control colour themes. dont mess with em okay unless youre good at styles  -->
+
     <!--  Complete DarkTheme Colours  -->
     <SolidColorBrush x:Key="TransparentBrush" Color="Transparent" />
     <SolidColorBrush x:Key="ContainerBackground" Color="#FF272727" />
