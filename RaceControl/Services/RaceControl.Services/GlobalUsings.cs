@@ -1,0 +1,11 @@
+﻿global using NLog;
+global using RaceControl.Common.Constants;
+global using RaceControl.Common.Interfaces;
+global using RaceControl.Common.Utils;
+global using RaceControl.Services.Interfaces.Credential;
+global using RaceControl.Services.Interfaces.F1TV;
+global using RaceControl.Services.Interfaces.F1TV.Api;
+global using RaceControl.Services.Interfaces.F1TV.Authorization;
+global using RaceControl.Services.Interfaces.F1TV.Entities;
+global using RaceControl.Services.Interfaces.Github;
+global using RestSharp;

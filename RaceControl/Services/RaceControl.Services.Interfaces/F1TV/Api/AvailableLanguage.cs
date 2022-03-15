@@ -1,13 +1,10 @@
-﻿using System.Text.Json.Serialization;
+﻿namespace RaceControl.Services.Interfaces.F1TV.Api;
 
-namespace RaceControl.Services.Interfaces.F1TV.Api
+public class AvailableLanguage
 {
-    public class AvailableLanguage
-    {
-        [JsonPropertyName("languageCode")]
-        public string LanguageCode { get; set; }
+    [JsonPropertyName("languageCode")]
+    public string LanguageCode { get; set; }
 
-        [JsonPropertyName("languageName")]
-        public string LanguageName { get; set; }
-    }
+    [JsonPropertyName("languageName")]
+    public string LanguageName { get; set; }
 }

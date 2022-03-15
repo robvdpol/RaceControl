@@ -1,8 +1,7 @@
-﻿namespace RaceControl.Common.Enums
+﻿namespace RaceControl.Common.Enums;
+
+public enum PlayerType
 {
-    public enum PlayerType
-    {
-        Internal,
-        Mpv
-    }
+    Internal,
+    Mpv
 }

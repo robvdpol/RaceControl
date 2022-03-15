@@ -1,9 +1,8 @@
-﻿namespace RaceControl.Common.Constants
+﻿namespace RaceControl.Common.Constants;
+
+public static class ChannelTypes
 {
-    public static class ChannelTypes
-    {
-        public const string Wif = "wif";
-        public const string Onboard = "obc";
-        public const string Additional = "additional";
-    }
+    public const string Wif = "wif";
+    public const string Onboard = "obc";
+    public const string Additional = "additional";
 }

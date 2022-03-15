@@ -1,32 +1,28 @@
-﻿using System.Text.Json.Serialization;
-using System.Collections.Generic;
+﻿namespace RaceControl.Services.Interfaces.F1TV.Api;
 
-namespace RaceControl.Services.Interfaces.F1TV.Api
+public class Category
 {
-    public class Category
-    {
-        [JsonPropertyName("categoryPathIds")]
-        public List<int> CategoryPathIds { get; set; }
+    [JsonPropertyName("categoryPathIds")]
+    public List<int> CategoryPathIds { get; set; }
 
-        [JsonPropertyName("externalPathIds")]
-        public List<string> ExternalPathIds { get; set; }
+    [JsonPropertyName("externalPathIds")]
+    public List<string> ExternalPathIds { get; set; }
 
-        [JsonPropertyName("endDate")]
-        public long EndDate { get; set; }
+    [JsonPropertyName("endDate")]
+    public long EndDate { get; set; }
 
-        [JsonPropertyName("orderId")]
-        public int OrderId { get; set; }
+    [JsonPropertyName("orderId")]
+    public int OrderId { get; set; }
 
-        [JsonPropertyName("isPrimary")]
-        public bool IsPrimary { get; set; }
+    [JsonPropertyName("isPrimary")]
+    public bool IsPrimary { get; set; }
 
-        [JsonPropertyName("categoryName")]
-        public string CategoryName { get; set; }
+    [JsonPropertyName("categoryName")]
+    public string CategoryName { get; set; }
 
-        [JsonPropertyName("categoryId")]
-        public int CategoryId { get; set; }
+    [JsonPropertyName("categoryId")]
+    public int CategoryId { get; set; }
 
-        [JsonPropertyName("startDate")]
-        public long StartDate { get; set; }
-    }
+    [JsonPropertyName("startDate")]
+    public long StartDate { get; set; }
 }

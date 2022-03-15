@@ -1,44 +1,39 @@
-﻿using RaceControl.Common.Constants;
-using RaceControl.Common.Enums;
-using RaceControl.Services.Interfaces.F1TV.Entities;
+﻿namespace RaceControl;
 
-namespace RaceControl
+public class PlayableChannel : PlayableContent
 {
-    public class PlayableChannel : PlayableContent
+    public PlayableChannel(Session session, Channel channel)
     {
-        public PlayableChannel(Session session, Channel channel)
+        var displayName = GetDisplayName(channel);
+
+        Title = $"{session.LongName} - {displayName}";
+        Name = channel.Name;
+        DisplayName = displayName;
+        ContentType = ContentType.Channel;
+        ContentUrl = channel.PlaybackUrl;
+        IsLive = session.IsLive;
+        SyncUID = session.UID;
+        SeriesUID = session.SeriesUID;
+    }
+
+    private static string GetDisplayName(Channel channel)
+    {
+        switch (channel.Name)
         {
-            var displayName = GetDisplayName(channel);
+            case ChannelNames.Wif:
+                return "World Feed";
 
-            Title = $"{session.LongName} - {displayName}";
-            Name = channel.Name;
-            DisplayName = displayName;
-            ContentType = ContentType.Channel;
-            ContentUrl = channel.PlaybackUrl;
-            IsLive = session.IsLive;
-            SyncUID = session.UID;
-            SeriesUID = session.SeriesUID;
-        }
+            case ChannelNames.PitLane:
+                return "Pit Lane";
 
-        private static string GetDisplayName(Channel channel)
-        {
-            switch (channel.Name)
-            {
-                case ChannelNames.Wif:
-                    return "World Feed";
+            case ChannelNames.Tracker:
+                return "Driver Tracker";
 
-                case ChannelNames.PitLane:
-                    return "Pit Lane";
+            case ChannelNames.Data:
+                return "Live Timing";
 
-                case ChannelNames.Tracker:
-                    return "Driver Tracker";
-
-                case ChannelNames.Data:
-                    return "Live Timing";
-
-                default:
-                    return channel.Name;
-            }
+            default:
+                return channel.Name;
         }
     }
 }

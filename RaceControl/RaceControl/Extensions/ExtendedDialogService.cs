@@ -1,79 +1,75 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
 using Prism.Ioc;
-using Prism.Services.Dialogs;
-using RaceControl.Views;
-using System.Windows;
 
-namespace RaceControl.Extensions
+namespace RaceControl.Extensions;
+
+public class ExtendedDialogService : DialogService, IExtendedDialogService
 {
-    public class ExtendedDialogService : DialogService, IExtendedDialogService
+    public ExtendedDialogService(IContainerExtension containerExtension) : base(containerExtension)
     {
-        public ExtendedDialogService(IContainerExtension containerExtension) : base(containerExtension)
+    }
+
+    public bool SaveFile(string title, string initialDirectory, string initialFilename, string defaultExtension, out string filename)
+    {
+        filename = null;
+
+        var dialog = new CommonSaveFileDialog
         {
+            Title = title,
+            DefaultDirectory = initialDirectory,
+            InitialDirectory = initialDirectory,
+            DefaultFileName = initialFilename,
+            DefaultExtension = defaultExtension,
+            AlwaysAppendDefaultExtension = true,
+            OverwritePrompt = true,
+            IsExpandedMode = true
+        };
+
+        dialog.Filters.Add(new CommonFileDialogFilter($"{defaultExtension}-files", $"*{defaultExtension}"));
+
+        if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+        {
+            filename = dialog.FileName;
+
+            return true;
         }
 
-        public bool SaveFile(string title, string initialDirectory, string initialFilename, string defaultExtension, out string filename)
+        return false;
+    }
+
+    public bool OpenFile(string title, string initialDirectory, string defaultExtension, out string filename)
+    {
+        filename = null;
+
+        var dialog = new CommonOpenFileDialog
         {
-            filename = null;
+            Title = title,
+            DefaultDirectory = initialDirectory,
+            InitialDirectory = initialDirectory,
+            DefaultExtension = defaultExtension,
+            EnsureFileExists = true,
+            EnsurePathExists = true
+        };
 
-            var dialog = new CommonSaveFileDialog
-            {
-                Title = title,
-                DefaultDirectory = initialDirectory,
-                InitialDirectory = initialDirectory,
-                DefaultFileName = initialFilename,
-                DefaultExtension = defaultExtension,
-                AlwaysAppendDefaultExtension = true,
-                OverwritePrompt = true,
-                IsExpandedMode = true
-            };
+        dialog.Filters.Add(new CommonFileDialogFilter($"{defaultExtension}-files", $"*{defaultExtension}"));
 
-            dialog.Filters.Add(new CommonFileDialogFilter($"{defaultExtension}-files", $"*{defaultExtension}"));
+        if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+        {
+            filename = dialog.FileName;
 
-            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-            {
-                filename = dialog.FileName;
-
-                return true;
-            }
-
-            return false;
+            return true;
         }
 
-        public bool OpenFile(string title, string initialDirectory, string defaultExtension, out string filename)
+        return false;
+    }
+
+    protected override void ConfigureDialogWindowProperties(IDialogWindow window, FrameworkElement dialogContent, IDialogAware viewModel)
+    {
+        base.ConfigureDialogWindowProperties(window, dialogContent, viewModel);
+
+        if (window is VideoDialogWindow)
         {
-            filename = null;
-
-            var dialog = new CommonOpenFileDialog
-            {
-                Title = title,
-                DefaultDirectory = initialDirectory,
-                InitialDirectory = initialDirectory,
-                DefaultExtension = defaultExtension,
-                EnsureFileExists = true,
-                EnsurePathExists = true
-            };
-
-            dialog.Filters.Add(new CommonFileDialogFilter($"{defaultExtension}-files", $"*{defaultExtension}"));
-
-            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-            {
-                filename = dialog.FileName;
-
-                return true;
-            }
-
-            return false;
-        }
-
-        protected override void ConfigureDialogWindowProperties(IDialogWindow window, FrameworkElement dialogContent, IDialogAware viewModel)
-        {
-            base.ConfigureDialogWindowProperties(window, dialogContent, viewModel);
-
-            if (window is VideoDialogWindow)
-            {
-                window.Owner = null;
-            }
+            window.Owner = null;
         }
     }
 }

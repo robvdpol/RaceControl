@@ -1,9 +1,8 @@
-﻿namespace RaceControl.Interfaces
-{
-    public interface IMediaTrack
-    {
-        string Id { get; }
+﻿namespace RaceControl.Interfaces;
 
-        string Name { get; }
-    }
+public interface IMediaTrack
+{
+    string Id { get; }
+
+    string Name { get; }
 }
