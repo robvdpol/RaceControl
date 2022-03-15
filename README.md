@@ -55,6 +55,8 @@ The internal player supports the following keyboard shortcuts:
 | Shift + Down arrow  | Jump backward 10 min                   |
 | Numpad +            | Zoom in                                |
 | Numpad -            | Zoom out                               |
+| Numpad *            | Speed up                               |
+| Numpad /            | Slow down                              |
 | Mousewheel up       | Increase volume                        |
 | Mousewheel down     | Decrease volume                        |
 | Mousewheel click    | Reset volume to 100%                   |
