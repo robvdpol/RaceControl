@@ -29,7 +29,7 @@ public class FlyleafMediaDownloader : BindableBase, IMediaDownloader
         private set => SetProperty(ref _progress, value);
     }
 
-    public Task StartDownloadAsync(string streamUrl, PlayToken playToken, string filename)
+    public Task StartDownloadAsync(string streamUrl, bool isLive, PlayToken playToken, string filename)
     {
         return Task.Run(() =>
         {
@@ -60,7 +60,10 @@ public class FlyleafMediaDownloader : BindableBase, IMediaDownloader
             }
 
             // Always start from the beginning (needed for live sessions)
-            _downloader.DecCtx.Seek(0);
+            if (isLive)
+            {
+                _downloader.DecCtx.Seek(0);
+            }
 
             // Selected filename will already have MP4-extension
             _downloader.Download(ref filename, false);

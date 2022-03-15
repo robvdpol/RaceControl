@@ -6,7 +6,7 @@ public interface IMediaDownloader : IDisposable
 
     float Progress { get; }
 
-    Task StartDownloadAsync(string streamUrl, PlayToken playToken, string filename);
+    Task StartDownloadAsync(string streamUrl, bool isLive, PlayToken playToken, string filename);
 
     void SetDownloadStatus(DownloadStatus status);
 }

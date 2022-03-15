@@ -53,7 +53,7 @@ public class DownloadDialogViewModel : DialogViewModelBase
     {
         var streamUrl = await _apiService.GetTokenisedUrlAsync(_settings.SubscriptionToken, PlayableContent);
         var playToken = await _apiService.GetPlayTokenAsync(streamUrl);
-        await MediaDownloader.StartDownloadAsync(streamUrl, playToken, Filename);
+        await MediaDownloader.StartDownloadAsync(streamUrl, PlayableContent.IsLive, playToken, Filename);
     }
 
     private void DownloadStarted()
