@@ -100,7 +100,7 @@ public partial class App
         Engine.Start(new EngineConfig
         {
             FFmpegPath = Path.Combine(Environment.CurrentDirectory, "FFmpeg"),
-            LogOutput = FolderUtils.GetFlyleafLogFilePath(),
+            //LogOutput = FolderUtils.GetFlyleafLogFilePath(),
             LogLevel = FlyleafLib.LogLevel.Warn,
             FFmpegLogLevel = FFmpegLogLevel.Warning
         });
