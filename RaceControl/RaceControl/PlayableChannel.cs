@@ -21,10 +21,10 @@ public class PlayableChannel : PlayableContent
         switch (channel.Name)
         {
             case ChannelNames.Wif:
-                return "World Feed";
+                return "International";
 
             case ChannelNames.PitLane:
-                return "Pit Lane";
+                return "F1 Live";
 
             case ChannelNames.Tracker:
                 return "Driver Tracker";

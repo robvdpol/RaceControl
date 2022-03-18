@@ -866,7 +866,7 @@ public class MainWindowViewModel : ViewModelBase, ICloseWindow
     {
         var channels = await _apiService.GetChannelsForSessionAsync(session);
 
-        Channels.AddRange(channels.OrderBy(c => c.ChannelType, new ChannelTypeComparer()).ThenBy(c => c.Name).Select(c => new PlayableChannel(session, c)));
+        Channels.AddRange(channels.Select(c => new PlayableChannel(session, c)).OrderBy(c => c.Name, new ChannelNameComparer()));
     }
 
     private async Task LoadEpisodesForGenreAsync(string genre)
