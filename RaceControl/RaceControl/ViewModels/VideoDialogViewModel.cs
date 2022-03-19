@@ -641,11 +641,7 @@ public class VideoDialogViewModel : DialogViewModelBase
 
     private void SetWindowed(ResizeMode? resizeMode = null)
     {
-        if (resizeMode.HasValue)
-        {
-            DialogSettings.ResizeMode = resizeMode.Value;
-        }
-
+        DialogSettings.ResizeMode = resizeMode ?? ResizeMode.CanResize;
         DialogSettings.FullScreen = false;
     }
 
