@@ -188,7 +188,7 @@ public class FlyleafMediaPlayer : BindableBase, IMediaPlayer
         {
             if (args.Success)
             {
-                PlayerOnOpenStreamCompleted();
+                PlayerOnOpenStreamCompleted(args.Type, settings);
             }
         };
 
@@ -317,13 +317,19 @@ public class FlyleafMediaPlayer : BindableBase, IMediaPlayer
         });
     }
 
-    private void PlayerOnOpenStreamCompleted()
+    private void PlayerOnOpenStreamCompleted(MediaType type, VideoDialogSettings settings)
     {
         try
         {
             if (!IsStarted)
             {
                 Player.Play();
+            }
+
+            if (type == MediaType.Audio && Volume == -1)
+            {
+                Volume = settings.Volume;
+                ToggleMute(settings.IsMuted);
             }
         }
         catch (Exception ex)
@@ -372,8 +378,6 @@ public class FlyleafMediaPlayer : BindableBase, IMediaPlayer
     {
         AudioDevices.AddRange(Engine.Audio.Devices.Select(device => new FlyleafAudioDevice(device)));
         AudioTracks.AddRange(Player.Audio.Streams.Select(stream => new FlyleafAudioTrack(stream)).OrderBy(t => t.Name));
-        Volume = settings.Volume;
-        ToggleMute(settings.IsMuted);
 
         if (!string.IsNullOrWhiteSpace(settings.AudioDevice))
         {
