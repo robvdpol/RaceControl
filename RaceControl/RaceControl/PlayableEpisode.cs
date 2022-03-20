@@ -12,5 +12,6 @@ public class PlayableEpisode : PlayableContent
         ThumbnailUrl = episode.ThumbnailUrl;
         SyncUID = episode.UID;
         SeriesUID = episode.SeriesUID;
+        RequiredSubscriptionLevel = episode.RequiredSubscriptionLevel ?? "Pro";
     }
 }
