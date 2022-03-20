@@ -151,7 +151,8 @@ public class ApiService : IApiService
                     // Add the world feed seperately
                     Name = ChannelNames.Wif,
                     ChannelType = ChannelTypes.Wif,
-                    PlaybackUrl = GetPlaybackUrl(metadata.ContentId)
+                    PlaybackUrl = GetPlaybackUrl(metadata.ContentId),
+                    RequiredSubcriptionLevel = metadata.Entitlement
                 }
             };
 
