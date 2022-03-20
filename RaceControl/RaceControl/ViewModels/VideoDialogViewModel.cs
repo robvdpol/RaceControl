@@ -450,6 +450,11 @@ public class VideoDialogViewModel : DialogViewModelBase
             SetWindowed();
             SetFullScreen();
         }
+        // Needed to set the resizemode to 'NoResize' when exiting fullscreen using a Windows key combination
+        else if (window.WindowState == WindowState.Normal)
+        {
+            SetWindowed();
+        }
     }
 
     private void OnSyncStreams(SyncStreamsEventPayload payload)
