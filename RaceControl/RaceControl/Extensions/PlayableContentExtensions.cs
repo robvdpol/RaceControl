@@ -4,7 +4,7 @@ public static class PlayableContentExtensions
 {
     public static string GetPreferredAudioLanguage(this IPlayableContent playableContent, string defaultAudioLanguage)
     {
-        if (playableContent.ContentType != ContentType.Channel || playableContent.Name is ChannelNames.Wif or ChannelNames.Tracker or ChannelNames.Data or ChannelNames.PitLane)
+        if (playableContent.ContentType != ContentType.Channel || playableContent.Name is ChannelNames.International or ChannelNames.Wif or ChannelNames.F1Live or ChannelNames.PitLane or ChannelNames.Data or ChannelNames.Tracker)
         {
             return !string.IsNullOrWhiteSpace(defaultAudioLanguage) ? defaultAudioLanguage : LanguageCodes.English;
         }

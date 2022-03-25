@@ -2,9 +2,9 @@
 
 public class PlayableChannel : PlayableContent
 {
-    public PlayableChannel(Season season, Session session, Channel channel)
+    public PlayableChannel(Session session, Channel channel)
     {
-        var displayName = GetDisplayName(season, channel);
+        var displayName = GetDisplayName(channel);
 
         Title = $"{session.LongName} - {displayName}";
         Name = channel.Name;
@@ -17,15 +17,21 @@ public class PlayableChannel : PlayableContent
         RequiredSubscriptionLevel = channel.RequiredSubcriptionLevel ?? "Pro";
     }
 
-    private static string GetDisplayName(Season season, Channel channel)
+    private static string GetDisplayName(Channel channel)
     {
         switch (channel.Name)
         {
-            case ChannelNames.Wif:
+            case ChannelNames.International:
                 return "International";
 
+            case ChannelNames.Wif:
+                return "World Feed";
+
+            case ChannelNames.F1Live:
+                return "F1 Live";
+
             case ChannelNames.PitLane:
-                return season.Year >= 2022 ? "F1 Live" : "Pit Lane";
+                return "Pit Lane";
 
             case ChannelNames.Tracker:
                 return "Driver Tracker";

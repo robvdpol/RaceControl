@@ -12,6 +12,17 @@ public class ChannelNameComparer : IComparer<string>
         }
 
         // International
+        if (x == ChannelNames.International)
+        {
+            return -1;
+        }
+
+        if (y == ChannelNames.International)
+        {
+            return 1;
+        }
+
+        // World Feed
         if (x == ChannelNames.Wif)
         {
             return -1;
@@ -23,6 +34,17 @@ public class ChannelNameComparer : IComparer<string>
         }
 
         // F1 Live
+        if (x == ChannelNames.F1Live)
+        {
+            return -1;
+        }
+
+        if (y == ChannelNames.F1Live)
+        {
+            return 1;
+        }
+
+        // Pit Lane
         if (x == ChannelNames.PitLane)
         {
             return -1;

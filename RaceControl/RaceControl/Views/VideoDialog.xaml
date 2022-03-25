@@ -129,7 +129,7 @@
                                 CommandParameter="{x:Null}"
                                 Header="Reset" />
                         </MenuItem>
-                        <MenuItem Header="Aspect ratio" ItemsSource="{Binding MediaPlayer.AspectRatios}">
+                        <MenuItem Header="Aspect Ratio" ItemsSource="{Binding MediaPlayer.AspectRatios}">
                             <MenuItem.ItemContainerStyle>
                                 <Style TargetType="MenuItem">
                                     <Setter Property="IsCheckable" Value="True" />
@@ -231,7 +231,7 @@
                                 Header="Bottom Right" />
                         </MenuItem>
                         <Separator />
-                        <MenuItem Command="{Binding ShowMainWindowCommand}" Header="Show main window" />
+                        <MenuItem Command="{Binding ShowMainWindowCommand}" Header="Show Main Window" />
                         <MenuItem Command="{Binding CloseWindowCommand}" Header="Close Player" />
                         <MenuItem Command="{Binding CloseAllWindowsCommand}" Header="Close All Players" />
                     </ContextMenu>
@@ -243,6 +243,13 @@
                     FontSize="22"
                     Foreground="White"
                     Visibility="{Binding ShowControls, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                <Label
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Bottom"
+                    Content="{Binding NotificationText}"
+                    FontSize="22"
+                    Foreground="White"
+                    Visibility="{Binding ShowNotificationText, Converter={StaticResource BooleanToVisibilityConverter}}" />
             </Grid>
             <Border
                 Grid.Row="1"
@@ -361,8 +368,7 @@
                         </Grid.ColumnDefinitions>
                         <Grid Grid.Row="0" Grid.Column="0">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <CheckBox
@@ -378,13 +384,6 @@
                                 VerticalAlignment="Center"
                                 Content="Always on top"
                                 IsChecked="{Binding DialogSettings.Topmost}" />
-                            <TextBlock
-                                Grid.Column="2"
-                                Margin="1,0"
-                                VerticalAlignment="Center"
-                                Text="{Binding MediaPlayer.Speed, StringFormat=Speed: {0:0.00}x}"
-                                TextAlignment="Right"
-                                Visibility="{Binding MediaPlayer.IsStarted, Converter={StaticResource BooleanToVisibilityConverter}}" />
                         </Grid>
                         <StackPanel
                             Grid.Row="1"

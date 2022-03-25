@@ -12,6 +12,7 @@ public class VideoDialogViewModel : DialogViewModelBase
     private readonly IApiService _apiService;
     private readonly IVideoDialogLayout _videoDialogLayout;
     private readonly object _showControlsTimerLock = new();
+    private readonly object _showNotificationTimerLock = new();
 
     private ICommand _mouseDownCommand;
     private ICommand _mouseEnterOrLeaveOrMoveVideoCommand;
@@ -43,8 +44,11 @@ public class VideoDialogViewModel : DialogViewModelBase
     private WindowStartupLocation _startupLocation = WindowStartupLocation.CenterOwner;
     private bool _isMouseOver;
     private bool _showControls = true;
+    private bool _showNotificationText;
     private bool _contextMenuIsOpen;
+    private string _notificationText;
     private Timer _showControlsTimer;
+    private Timer _showNotificationTimer;
 
     public VideoDialogViewModel(
         ILogger logger,
@@ -116,6 +120,12 @@ public class VideoDialogViewModel : DialogViewModelBase
         set => SetProperty(ref _startupLocation, value);
     }
 
+    public string NotificationText
+    {
+        get => _notificationText;
+        set => SetProperty(ref _notificationText, value);
+    }
+
     public bool IsMouseOver
     {
         get => _isMouseOver;
@@ -126,6 +136,12 @@ public class VideoDialogViewModel : DialogViewModelBase
     {
         get => _showControls;
         set => SetProperty(ref _showControls, value);
+    }
+
+    public bool ShowNotificationText
+    {
+        get => _showNotificationText;
+        set => SetProperty(ref _showNotificationText, value);
     }
 
     public bool ContextMenuIsOpen
@@ -160,6 +176,7 @@ public class VideoDialogViewModel : DialogViewModelBase
     {
         base.OnDialogClosed();
         RemoveShowControlsTimer();
+        RemoveShowNotificationTimer();
         UnsubscribeEvents();
     }
 
@@ -173,6 +190,15 @@ public class VideoDialogViewModel : DialogViewModelBase
             {
                 Mouse.OverrideCursor = Cursors.None;
             }
+        });
+    }
+
+    private void ShowNotificationTimer_Elapsed(object sender, ElapsedEventArgs e)
+    {
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            ShowNotificationText = false;
+            NotificationText = null;
         });
     }
 
@@ -379,6 +405,8 @@ public class VideoDialogViewModel : DialogViewModelBase
         {
             MediaPlayer.Zoom = 0;
         }
+
+        ShowNotification($"Zoom: {MediaPlayer.Zoom}");
     }
 
     private bool CanSetSpeedExecute(bool? speedUp)
@@ -403,6 +431,8 @@ public class VideoDialogViewModel : DialogViewModelBase
         {
             MediaPlayer.Speed = 1;
         }
+
+        ShowNotification($"Speed: {MediaPlayer.Speed:0.##}x");
     }
 
     private bool CanSelectAspectRatioExecute(IAspectRatio aspectRatio)
@@ -413,6 +443,7 @@ public class VideoDialogViewModel : DialogViewModelBase
     private void SelectAspectRatioExecute(IAspectRatio aspectRatio)
     {
         MediaPlayer.AspectRatio = aspectRatio;
+        ShowNotification($"Aspect Ratio: {MediaPlayer.AspectRatio.Description}");
     }
 
     private bool CanSelectAudioDeviceExecute(IAudioDevice audioDevice)
@@ -423,6 +454,7 @@ public class VideoDialogViewModel : DialogViewModelBase
     private void SelectAudioDeviceExecute(IAudioDevice audioDevice)
     {
         MediaPlayer.AudioDevice = audioDevice;
+        ShowNotification($"Audio Device: {MediaPlayer.AudioDevice.Description}");
     }
 
     private void ExitFullScreenOrCloseWindowExecute()
@@ -449,6 +481,11 @@ public class VideoDialogViewModel : DialogViewModelBase
         {
             SetWindowed();
             SetFullScreen();
+        }
+        // Needed to set the resizemode to 'CanResize' when exiting fullscreen using a Windows key combination
+        else if (window.WindowState == WindowState.Normal)
+        {
+            SetWindowed();
         }
     }
 
@@ -561,6 +598,7 @@ public class VideoDialogViewModel : DialogViewModelBase
         base.OnDialogOpened(null);
         SubscribeEvents();
         CreateShowControlsTimer();
+        CreateShowNotificationTimer();
     }
 
     private void StreamFailed(Exception ex)
@@ -600,6 +638,15 @@ public class VideoDialogViewModel : DialogViewModelBase
         }
     }
 
+    private void CreateShowNotificationTimer()
+    {
+        lock (_showNotificationTimerLock)
+        {
+            _showNotificationTimer = new Timer(2000) { AutoReset = false };
+            _showNotificationTimer.Elapsed += ShowNotificationTimer_Elapsed;
+        }
+    }
+
     private void RemoveShowControlsTimer()
     {
         lock (_showControlsTimerLock)
@@ -609,6 +656,19 @@ public class VideoDialogViewModel : DialogViewModelBase
                 _showControlsTimer.Stop();
                 _showControlsTimer.Dispose();
                 _showControlsTimer = null;
+            }
+        }
+    }
+
+    private void RemoveShowNotificationTimer()
+    {
+        lock (_showNotificationTimerLock)
+        {
+            if (_showNotificationTimer != null)
+            {
+                _showNotificationTimer.Stop();
+                _showNotificationTimer.Dispose();
+                _showNotificationTimer = null;
             }
         }
     }
@@ -637,12 +697,14 @@ public class VideoDialogViewModel : DialogViewModelBase
     {
         DialogSettings.ResizeMode = ResizeMode.NoResize;
         DialogSettings.FullScreen = true;
+        ShowNotification("Fullscreen");
     }
 
     private void SetWindowed(ResizeMode? resizeMode = null)
     {
         DialogSettings.ResizeMode = resizeMode ?? ResizeMode.CanResize;
         DialogSettings.FullScreen = false;
+        ShowNotification("Windowed");
     }
 
     private void SetVolume(int volume)
@@ -650,11 +712,24 @@ public class VideoDialogViewModel : DialogViewModelBase
         if (MediaPlayer.IsStarted)
         {
             MediaPlayer.Volume = volume;
+            ShowNotification($"Volume: {volume}%");
         }
     }
 
     private void AddVolume(int delta)
     {
         SetVolume(MediaPlayer.Volume + delta);
+    }
+
+    private void ShowNotification(string text)
+    {
+        NotificationText = text;
+        ShowNotificationText = true;
+
+        lock (_showNotificationTimerLock)
+        {
+            _showNotificationTimer?.Stop();
+            _showNotificationTimer?.Start();
+        }
     }
 }

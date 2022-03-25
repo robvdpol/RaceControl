@@ -144,21 +144,9 @@ public class ApiService : IApiService
         var apiResponse = await QuerySessionChannelsAsync(session.ContentID);
         var metadata = apiResponse.ResultObj.Containers.First().Metadata;
 
-        var channels = new List<Channel>
-            {
-                new()
-                {
-                    // Add the world feed seperately
-                    Name = ChannelNames.Wif,
-                    ChannelType = ChannelTypes.Wif,
-                    PlaybackUrl = GetPlaybackUrl(metadata.ContentId),
-                    RequiredSubcriptionLevel = metadata.Entitlement
-                }
-            };
-
         if (metadata.AdditionalStreams != null && metadata.AdditionalStreams.Any())
         {
-            channels.AddRange(metadata.AdditionalStreams
+            return metadata.AdditionalStreams
                 .Select(s => new Channel
                 {
                     Name = s.Type == ChannelTypes.Onboard ? $"{s.DriverFirstName} {s.DriverLastName}" : s.Title,
@@ -166,10 +154,19 @@ public class ApiService : IApiService
                     PlaybackUrl = s.PlaybackUrl,
                     RequiredSubcriptionLevel = metadata.Entitlement
                 })
-                .ToList());
+                .ToList();
         }
 
-        return channels;
+        return new List<Channel>
+        {
+            new()
+            {
+                Name = ChannelNames.Wif,
+                ChannelType = ChannelTypes.Wif,
+                PlaybackUrl = GetPlaybackUrl(metadata.ContentId),
+                RequiredSubcriptionLevel = metadata.Entitlement
+            }
+        };
     }
 
     public async Task<List<string>> GetVodGenresAsync()
@@ -284,7 +281,7 @@ public class ApiService : IApiService
 
     private async Task<ApiResponse> QuerySessionChannelsAsync(long contentID)
     {
-        var restRequest = new RestRequest(new Uri(ApiEndpointUri, $"2.0/R/ENG/{DefaultStreamType}/ALL/CONTENT/VIDEO/{contentID}/F1_TV_Pro_Annual/2"));
+        var restRequest = new RestRequest(new Uri(ApiEndpointUri, $"3.0/R/ENG/{DefaultStreamType}/ALL/CONTENT/VIDEO/{contentID}/F1_TV_Pro_Annual/2"));
 
         return await _restClient.GetAsync<ApiResponse>(restRequest);
     }
