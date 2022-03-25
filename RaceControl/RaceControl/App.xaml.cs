@@ -101,7 +101,7 @@ public partial class App
         {
             FFmpegPath = Path.Combine(Environment.CurrentDirectory, "FFmpeg"),
             //LogOutput = FolderUtils.GetFlyleafLogFilePath(),
-            LogLevel = FlyleafLib.LogLevel.Warn,
+            LogLevel = FlyleafLib.LogLevel.Debug,
             FFmpegLogLevel = FFmpegLogLevel.Warning
         });
     }
