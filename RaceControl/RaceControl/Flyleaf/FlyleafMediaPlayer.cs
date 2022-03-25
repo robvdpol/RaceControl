@@ -271,7 +271,7 @@ public class FlyleafMediaPlayer : BindableBase, IMediaPlayer
 
     public void SpeedUp()
     {
-        if (Speed < 1)
+        if (Speed < 2)
         {
             Speed += 0.25;
         }
@@ -283,7 +283,7 @@ public class FlyleafMediaPlayer : BindableBase, IMediaPlayer
 
     public void SpeedDown()
     {
-        if (Speed <= 1)
+        if (Speed <= 2)
         {
             Speed -= 0.25;
         }
