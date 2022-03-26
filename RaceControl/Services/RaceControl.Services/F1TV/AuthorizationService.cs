@@ -22,7 +22,7 @@ public class AuthorizationService : IAuthorizationService
 
         _logger.Info($"Sending authorization request for login '{authRequest.Login}'...");
         var restRequest = new RestRequest(Constants.AuthenticateUrl, Method.Post).AddJsonBody(authRequest);
-        var restResponse = await _restClient.ExecutePostAsync<AuthResponse>(restRequest);
+        var restResponse = await _restClient.ExecutePostAsync<AuthResponse>(restRequest).ConfigureAwait(false);
 
         if (restResponse.IsSuccessful)
         {
