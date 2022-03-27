@@ -42,6 +42,7 @@ public class VideoDialogViewModel : DialogViewModelBase
     private IPlayableContent _playableContent;
     private VideoDialogSettings _dialogSettings;
     private WindowStartupLocation _startupLocation = WindowStartupLocation.CenterOwner;
+    private ResizeMode _windowedResizeMode;
     private bool _isMouseOver;
     private bool _showControls = true;
     private bool _showNotificationText;
@@ -120,6 +121,12 @@ public class VideoDialogViewModel : DialogViewModelBase
         set => SetProperty(ref _startupLocation, value);
     }
 
+    public ResizeMode WindowedResizeMode
+    {
+        get => _windowedResizeMode;
+        set => SetProperty(ref _windowedResizeMode, value);
+    }
+
     public string NotificationText
     {
         get => _notificationText;
@@ -160,11 +167,13 @@ public class VideoDialogViewModel : DialogViewModelBase
         if (dialogSettings != null)
         {
             StartupLocation = WindowStartupLocation.Manual;
+            WindowedResizeMode = dialogSettings.ResizeMode;
             LoadDialogSettings(dialogSettings);
         }
         else
         {
             StartupLocation = WindowStartupLocation.CenterScreen;
+            WindowedResizeMode = DialogSettings.ResizeMode;
             DialogSettings.VideoQuality = _settings.DefaultVideoQuality;
             DialogSettings.AudioTrack = PlayableContent.GetPreferredAudioLanguage(_settings.DefaultAudioLanguage);
         }
@@ -476,14 +485,13 @@ public class VideoDialogViewModel : DialogViewModelBase
 
     private void WindowStateChangedExecute(Window window)
     {
-        // Needed to set the resizemode to 'NoResize' when going fullscreen using a Windows key combination
         if (window.WindowState == WindowState.Maximized && DialogSettings.ResizeMode != ResizeMode.NoResize)
         {
             SetWindowed();
             SetFullScreen();
         }
-        // Needed to set the resizemode to 'CanResize' when exiting fullscreen using a Windows key combination
-        else if (window.WindowState == WindowState.Normal)
+
+        if (window.WindowState == WindowState.Normal && DialogSettings.ResizeMode != WindowedResizeMode)
         {
             SetWindowed();
         }
@@ -536,7 +544,7 @@ public class VideoDialogViewModel : DialogViewModelBase
         }
         else
         {
-            SetWindowed(settings.ResizeMode);
+            SetWindowed();
         }
 
         DialogSettings.Topmost = settings.Topmost;
@@ -696,13 +704,14 @@ public class VideoDialogViewModel : DialogViewModelBase
 
     private void SetFullScreen()
     {
+        WindowedResizeMode = DialogSettings.ResizeMode;
         DialogSettings.ResizeMode = ResizeMode.NoResize;
         DialogSettings.FullScreen = true;
     }
 
-    private void SetWindowed(ResizeMode? resizeMode = null)
+    private void SetWindowed()
     {
-        DialogSettings.ResizeMode = resizeMode ?? ResizeMode.CanResize;
+        DialogSettings.ResizeMode = WindowedResizeMode;
         DialogSettings.FullScreen = false;
     }
 
