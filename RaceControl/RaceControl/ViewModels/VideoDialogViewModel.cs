@@ -644,6 +644,7 @@ public class VideoDialogViewModel : DialogViewModelBase
         {
             _showNotificationTimer = new Timer(2000) { AutoReset = false };
             _showNotificationTimer.Elapsed += ShowNotificationTimer_Elapsed;
+            _showNotificationTimer.Start();
         }
     }
 
@@ -697,14 +698,12 @@ public class VideoDialogViewModel : DialogViewModelBase
     {
         DialogSettings.ResizeMode = ResizeMode.NoResize;
         DialogSettings.FullScreen = true;
-        ShowNotification("Fullscreen");
     }
 
     private void SetWindowed(ResizeMode? resizeMode = null)
     {
         DialogSettings.ResizeMode = resizeMode ?? ResizeMode.CanResize;
         DialogSettings.FullScreen = false;
-        ShowNotification("Windowed");
     }
 
     private void SetVolume(int volume)
