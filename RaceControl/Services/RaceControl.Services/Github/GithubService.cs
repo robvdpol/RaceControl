@@ -18,6 +18,6 @@ public class GithubService : IGithubService
         _logger.Info("Getting latest release from GitHub...");
         var restRequest = new RestRequest(RaceControlLatestReleaseUrl);
 
-        return await _restClient.GetAsync<Release>(restRequest);
+        return await _restClient.GetAsync<Release>(restRequest).ConfigureAwait(false);
     }
 }

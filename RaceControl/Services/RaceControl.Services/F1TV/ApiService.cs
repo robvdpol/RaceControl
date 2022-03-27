@@ -68,7 +68,7 @@ public class ApiService : IApiService
     {
         _logger.Info("Querying live sessions...");
 
-        var apiResponse = await QueryLiveSessionsAsync();
+        var apiResponse = await QueryLiveSessionsAsync().ConfigureAwait(false);
 
         return apiResponse.ResultObj.Containers
             .SelectMany(c1 => c1.RetrieveItems.ResultObj.Containers
@@ -84,7 +84,7 @@ public class ApiService : IApiService
     {
         _logger.Info($"Querying events for season '{season.Name}'...");
 
-        var apiResponse = await QuerySeasonEventsAsync(season.Year);
+        var apiResponse = await QuerySeasonEventsAsync(season.Year).ConfigureAwait(false);
         var events = apiResponse != null ? apiResponse.ResultObj.Containers.Select(CreateEvent).ToList() : new List<Event>();
 
         // Show events for current season in reverse
@@ -100,7 +100,7 @@ public class ApiService : IApiService
     {
         _logger.Info($"Querying episodes for season '{season.Name}'...");
 
-        var apiResponse = await QuerySeasonEpisodesAsync(season.Year);
+        var apiResponse = await QuerySeasonEpisodesAsync(season.Year).ConfigureAwait(false);
 
         return apiResponse.ResultObj.Containers
             .Select(CreateEpisode)
@@ -112,7 +112,7 @@ public class ApiService : IApiService
     {
         _logger.Info($"Querying sessions for event with UID '{evt.UID}'...");
 
-        var apiResponse = await QueryEventVideosAsync(evt.UID);
+        var apiResponse = await QueryEventVideosAsync(evt.UID).ConfigureAwait(false);
 
         return apiResponse.ResultObj.Containers
             .Where(c => c.Metadata.ContentType == "VIDEO")
@@ -127,7 +127,7 @@ public class ApiService : IApiService
     {
         _logger.Info($"Querying episodes for event with UID '{evt.UID}'...");
 
-        var apiResponse = await QueryEventVideosAsync(evt.UID);
+        var apiResponse = await QueryEventVideosAsync(evt.UID).ConfigureAwait(false);
 
         return apiResponse.ResultObj.Containers
             .Where(c => c.Metadata.ContentType == "VIDEO")
@@ -141,7 +141,7 @@ public class ApiService : IApiService
     {
         _logger.Info($"Querying channels for session with UID '{session.UID}'...");
 
-        var apiResponse = await QuerySessionChannelsAsync(session.ContentID);
+        var apiResponse = await QuerySessionChannelsAsync(session.ContentID).ConfigureAwait(false);
         var metadata = apiResponse.ResultObj.Containers.First().Metadata;
 
         if (metadata.AdditionalStreams != null && metadata.AdditionalStreams.Any())
@@ -171,9 +171,9 @@ public class ApiService : IApiService
     {
         _logger.Info("Querying vod genres...");
 
-        var showsResponse = await QueryPageAsync(410);
-        var documentariesResponse = await QueryPageAsync(413);
-        var archiveResponse = await QueryPageAsync(493);
+        var showsResponse = await QueryPageAsync(410).ConfigureAwait(false);
+        var documentariesResponse = await QueryPageAsync(413).ConfigureAwait(false);
+        var archiveResponse = await QueryPageAsync(493).ConfigureAwait(false);
 
         return showsResponse.ResultObj.Containers
             .Union(documentariesResponse.ResultObj.Containers)
@@ -190,7 +190,7 @@ public class ApiService : IApiService
     {
         _logger.Info($"Querying episodes for vod genre '{genre}'...");
 
-        var apiResponse = await QueryGenreVideosAsync(genre);
+        var apiResponse = await QueryGenreVideosAsync(genre).ConfigureAwait(false);
 
         return apiResponse.ResultObj.Containers
             .Where(c => c.Metadata.ContentType == "VIDEO")
@@ -202,20 +202,20 @@ public class ApiService : IApiService
 
     public async Task<string> GetTokenisedUrlAsync(string subscriptionToken, IPlayableContent playableContent)
     {
-        return await GetTokenisedUrlAsync(subscriptionToken, playableContent, DefaultStreamType);
+        return await GetTokenisedUrlAsync(subscriptionToken, playableContent, DefaultStreamType).ConfigureAwait(false);
     }
 
     public async Task<string> GetTokenisedUrlAsync(string subscriptionToken, IPlayableContent playableContent, string streamType)
     {
         _logger.Info($"Getting tokenised URL for content-type '{playableContent.ContentType}' and content-URL '{playableContent.ContentUrl}'...");
 
-        return (await QueryTokenisedUrlAsync(subscriptionToken, streamType, playableContent.ContentUrl)).ResultObj.Url;
+        return (await QueryTokenisedUrlAsync(subscriptionToken, streamType, playableContent.ContentUrl).ConfigureAwait(false)).ResultObj.Url;
     }
 
     public async Task<PlayToken> GetPlayTokenAsync(string streamUrl)
     {
         var restRequest = new RestRequest(streamUrl, Method.Head);
-        var restResponse = await _restClient.HeadAsync(restRequest);
+        var restResponse = await _restClient.HeadAsync(restRequest).ConfigureAwait(false);
         var playToken = restResponse.Cookies?.FirstOrDefault(cookie => string.Equals(cookie.Name, "playToken", StringComparison.OrdinalIgnoreCase));
 
         return playToken != null ? new PlayToken(playToken.Domain, playToken.Path, playToken.Value) : null;
@@ -225,7 +225,7 @@ public class ApiService : IApiService
     {
         var restRequest = new RestRequest(new Uri(ApiEndpointUri, $"2.0/R/ENG/{DefaultStreamType}/ALL/PAGE/395/F1_TV_Pro_Annual/2"));
 
-        return await _restClient.GetAsync<ApiResponse>(restRequest);
+        return await _restClient.GetAsync<ApiResponse>(restRequest).ConfigureAwait(false);
     }
 
     private async Task<ApiResponse> QuerySeasonEventsAsync(int year)
@@ -240,7 +240,7 @@ public class ApiService : IApiService
 
         try
         {
-            return await _restClient.GetAsync<ApiResponse>(restRequest);
+            return await _restClient.GetAsync<ApiResponse>(restRequest).ConfigureAwait(false);
         }
         catch (HttpRequestException ex)
         {
@@ -262,7 +262,7 @@ public class ApiService : IApiService
         restRequest.AddQueryParameter("filter_orderByFom", "Y");
         restRequest.AddQueryParameter("maxResults", "100");
 
-        return await _restClient.GetAsync<ApiResponse>(restRequest);
+        return await _restClient.GetAsync<ApiResponse>(restRequest).ConfigureAwait(false);
     }
 
     private async Task<ApiResponse> QueryEventVideosAsync(string meetingKey)
@@ -274,21 +274,21 @@ public class ApiService : IApiService
         restRequest.AddQueryParameter("filter_orderByFom", "Y");
         restRequest.AddQueryParameter("maxResults", "100");
 
-        return await _restClient.GetAsync<ApiResponse>(restRequest);
+        return await _restClient.GetAsync<ApiResponse>(restRequest).ConfigureAwait(false);
     }
 
     private async Task<ApiResponse> QuerySessionChannelsAsync(long contentID)
     {
         var restRequest = new RestRequest(new Uri(ApiEndpointUri, $"3.0/R/ENG/{DefaultStreamType}/ALL/CONTENT/VIDEO/{contentID}/F1_TV_Pro_Annual/2"));
 
-        return await _restClient.GetAsync<ApiResponse>(restRequest);
+        return await _restClient.GetAsync<ApiResponse>(restRequest).ConfigureAwait(false);
     }
 
     private async Task<ApiResponse> QueryPageAsync(int page)
     {
         var restRequest = new RestRequest(new Uri(ApiEndpointUri, $"2.0/R/ENG/{DefaultStreamType}/ALL/PAGE/{page}/F1_TV_Pro_Annual/2"));
 
-        return await _restClient.GetAsync<ApiResponse>(restRequest);
+        return await _restClient.GetAsync<ApiResponse>(restRequest).ConfigureAwait(false);
     }
 
     private async Task<ApiResponse> QueryGenreVideosAsync(string genre)
@@ -300,7 +300,7 @@ public class ApiService : IApiService
         restRequest.AddQueryParameter("filter_orderByFom", "Y");
         restRequest.AddQueryParameter("maxResults", "100");
 
-        return await _restClient.GetAsync<ApiResponse>(restRequest);
+        return await _restClient.GetAsync<ApiResponse>(restRequest).ConfigureAwait(false);
     }
 
     private async Task<ApiResponse> QueryTokenisedUrlAsync(string subscriptionToken, string streamType, string contentUrl)
@@ -308,7 +308,7 @@ public class ApiService : IApiService
         var restRequest = new RestRequest(new Uri(ApiEndpointUri, $"/2.0/R/ENG/{streamType}/ALL/{contentUrl}"));
         restRequest.AddHeader("ascendontoken", subscriptionToken);
 
-        return await _restClient.GetAsync<ApiResponse>(restRequest);
+        return await _restClient.GetAsync<ApiResponse>(restRequest).ConfigureAwait(false);
     }
 
     private static Event CreateEvent(Container container)
