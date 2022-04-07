@@ -1,24 +1,32 @@
-﻿namespace RaceControl.ViewModels;
+﻿using Microsoft.Web.WebView2.Wpf;
+using Newtonsoft.Json.Linq;
+using System.Web;
+
+namespace RaceControl.ViewModels;
 
 public class LoginDialogViewModel : DialogViewModelBase
 {
-    private readonly IAuthorizationService _authorizationService;
     private readonly ICredentialService _credentialService;
 
     private ICommand _loginCommand;
+    private ICommand _initializationCompletedCommand;
+    private ICommand _navigationCompletedCommand;
+    private ICommand _sourceChangedCommand;
 
     private string _email;
     private string _password;
-    private string _error;
+    private WebView2 _webView;
 
-    public LoginDialogViewModel(ILogger logger, IAuthorizationService authorizationService, ICredentialService credentialService) : base(logger)
+    public LoginDialogViewModel(ILogger logger, ICredentialService credentialService) : base(logger)
     {
-        _authorizationService = authorizationService;
         _credentialService = credentialService;
     }
 
     public override string Title => "Login";
 
+    public ICommand InitializationCompletedCommand => _initializationCompletedCommand ??= new DelegateCommand<WebView2>(InitializationCompletedExecute);
+    public ICommand NavigationCompletedCommand => _navigationCompletedCommand ??= new DelegateCommand(NavigationCompletedExecute);
+    public ICommand SourceChangedCommand => _sourceChangedCommand ??= new DelegateCommand(SourceChangedExecute);
     public ICommand LoginCommand => _loginCommand ??= new DelegateCommand(LoginExecute, CanLoginExecute).ObservesProperty(() => IsBusy).ObservesProperty(() => Email).ObservesProperty(() => Password);
 
     public string Email
@@ -33,12 +41,6 @@ public class LoginDialogViewModel : DialogViewModelBase
         set => SetProperty(ref _password, value);
     }
 
-    public string Error
-    {
-        get => _error;
-        set => SetProperty(ref _error, value);
-    }
-
     public override void OnDialogOpened(IDialogParameters parameters)
     {
         base.OnDialogOpened(parameters);
@@ -51,6 +53,28 @@ public class LoginDialogViewModel : DialogViewModelBase
         }
     }
 
+    private void InitializationCompletedExecute(WebView2 webView)
+    {
+        _webView = webView;
+        _webView.CoreWebView2.CookieManager.DeleteAllCookies();
+    }
+
+    private void NavigationCompletedExecute()
+    {
+        if (string.Equals(_webView.Source.ToString(), Constants.LoginUrl, StringComparison.OrdinalIgnoreCase))
+        {
+            SubmitLoginFormAsync().Await(() =>
+            {
+                IsBusy = false;
+            });
+        }
+    }
+
+    private void SourceChangedExecute()
+    {
+        FindSubscriptionTokenAsync().Await(LoginSuccess, LoginError, true);
+    }
+
     private bool CanLoginExecute()
     {
         return !IsBusy && !string.IsNullOrWhiteSpace(Email) && !string.IsNullOrWhiteSpace(Password);
@@ -58,34 +82,74 @@ public class LoginDialogViewModel : DialogViewModelBase
 
     private void LoginExecute()
     {
-        Error = null;
+        if (_webView == null)
+        {
+            return;
+        }
+
         IsBusy = true;
-        LoginAsync().Await(LoginSuccess, LoginError, true);
+
+        if (!string.Equals(_webView.Source.ToString(), Constants.LoginUrl, StringComparison.OrdinalIgnoreCase))
+        {
+            _webView.CoreWebView2.Navigate(Constants.LoginUrl);
+        }
+        else
+        {
+            _webView.Reload();
+        }
     }
 
-    private async Task<AuthResponse> LoginAsync()
+    private void LoginSuccess(string subscriptionToken)
     {
-        return await _authorizationService.AuthenticateAsync(Email, Password);
-    }
+        if (string.IsNullOrWhiteSpace(subscriptionToken))
+        {
+            return;
+        }
 
-    private void LoginSuccess(AuthResponse authResponse)
-    {
         Logger.Info("Login successful.");
-        Error = null;
         IsBusy = false;
         _credentialService.SaveCredential(Email, Password);
 
         RaiseRequestClose(ButtonResult.OK, new DialogParameters
-            {
-                { ParameterNames.SubscriptionToken, authResponse.Data.SubscriptionToken },
-                { ParameterNames.SubscriptionStatus, authResponse.Data.SubscriptionStatus }
-            });
+        {
+            { ParameterNames.SubscriptionToken, subscriptionToken },
+            { ParameterNames.SubscriptionStatus, "active" }
+        });
     }
 
     private void LoginError(Exception ex)
     {
-        Logger.Error(ex, "Login failed.");
-        Error = ex.Message;
+        Logger.Warn(ex, "Login failed.");
         IsBusy = false;
+    }
+
+    private async Task SubmitLoginFormAsync()
+    {
+        await _webView.ExecuteScriptAsync("document.getElementById('truste-consent-button').click()");
+        await Task.Delay(250);
+        await _webView.ExecuteScriptAsync($"document.getElementsByName('Login')[0].value = '{Email}'");
+        await _webView.ExecuteScriptAsync($"document.getElementsByName('Password')[0].value = '{Password}'");
+        await Task.Delay(250);
+        await _webView.ExecuteScriptAsync("document.querySelectorAll('button[type=submit]')[0].click()");
+    }
+
+    private async Task<string> FindSubscriptionTokenAsync()
+    {
+        var cookies = await _webView.CoreWebView2.CookieManager.GetCookiesAsync(Constants.ApiEndpointUrl);
+        var loginCookie = cookies.FirstOrDefault(cookie => string.Equals(cookie.Name, "login-session", StringComparison.OrdinalIgnoreCase));
+
+        if (loginCookie != null)
+        {
+            var loginJson = HttpUtility.UrlDecode(loginCookie.Value);
+            var loginSession = JsonConvert.DeserializeObject<JObject>(loginJson);
+            var subscriptionToken = loginSession?["data"]?["subscriptionToken"];
+
+            if (subscriptionToken != null)
+            {
+                return subscriptionToken.Value<string>();
+            }
+        }
+
+        return null;
     }
 }
