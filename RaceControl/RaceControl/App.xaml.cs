@@ -145,6 +145,7 @@ public partial class App
         {
             NumberHandling = JsonNumberHandling.AllowReadingFromString
         };
+
         options.Converters.Add(new NullableDateTimeConverter());
         options.Converters.Add(new NullableIntConverter());
         restClient.UseSystemTextJson(options);
