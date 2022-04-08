@@ -17,7 +17,6 @@ public class MainWindowViewModel : ViewModelBase, ICloseWindow
     private readonly IEventAggregator _eventAggregator;
     private readonly IApiService _apiService;
     private readonly IGithubService _githubService;
-    private readonly ICredentialService _credentialService;
     private readonly INumberGenerator _numberGenerator;
     private readonly IDeviceLocator _deviceLocator;
     private readonly ISender _sender;
@@ -84,7 +83,6 @@ public class MainWindowViewModel : ViewModelBase, ICloseWindow
         IEventAggregator eventAggregator,
         IApiService apiService,
         IGithubService githubService,
-        ICredentialService credentialService,
         INumberGenerator numberGenerator,
         IDeviceLocator deviceLocator,
         ISender sender,
@@ -96,7 +94,6 @@ public class MainWindowViewModel : ViewModelBase, ICloseWindow
         _eventAggregator = eventAggregator;
         _apiService = apiService;
         _githubService = githubService;
-        _credentialService = credentialService;
         _numberGenerator = numberGenerator;
         _deviceLocator = deviceLocator;
         _sender = sender;
@@ -557,7 +554,6 @@ public class MainWindowViewModel : ViewModelBase, ICloseWindow
 
         if (MessageBoxHelper.AskQuestion("Are you sure you want to log out?", "Account"))
         {
-            _credentialService.DeleteCredential();
             Login();
         }
 

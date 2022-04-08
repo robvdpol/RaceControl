@@ -55,8 +55,6 @@ public partial class App
             .RegisterSingleton<IExtendedDialogService, ExtendedDialogService>()
             .RegisterSingleton<ISettings, Settings>()
             .RegisterSingleton<IVideoDialogLayout, VideoDialogLayout>()
-            .RegisterSingleton<ICredentialService, CredentialService>()
-            .RegisterSingleton<IAuthorizationService, AuthorizationService>()
             .RegisterSingleton<IApiService, ApiService>()
             .RegisterSingleton<IGithubService, GithubService>()
             .Register<Player>(CreateFlyleafPlayer)
