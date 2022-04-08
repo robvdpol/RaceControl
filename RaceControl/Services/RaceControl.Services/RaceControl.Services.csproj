@@ -15,7 +15,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CredentialManagement.Standard" Version="1.0.4" />
     <PackageReference Include="RestSharp" Version="107.3.0" />
   </ItemGroup>
 
