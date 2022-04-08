@@ -17,6 +17,11 @@ public static class FolderUtils
         return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RaceControl");
     }
 
+    public static string GetWebView2UserDataPath()
+    {
+        return GetLocalApplicationDataFilename("WebView2");
+    }
+
     public static string GetApplicationLogFilePath()
     {
         return GetLocalApplicationDataFilename("RaceControl.log");

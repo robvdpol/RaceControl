@@ -24,6 +24,7 @@ public class LoginDialogViewModel : DialogViewModelBase
     {
         _webView = webView;
         _webView.CoreWebView2.CookieManager.DeleteAllCookies();
+        _webView.Source = new Uri("https://account.formula1.com/#/en/login");
     }
 
     private void SourceChangedExecute()

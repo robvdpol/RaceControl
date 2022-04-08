@@ -7,7 +7,8 @@
     xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
     Width="700"
     Height="600"
-    prism:ViewModelLocator.AutoWireViewModel="True">
+    prism:ViewModelLocator.AutoWireViewModel="True"
+    Loaded="LoginDialogLoaded">
     <prism:Dialog.WindowStyle>
         <Style TargetType="Window">
             <Setter Property="ResizeMode" Value="NoResize" />
@@ -15,7 +16,7 @@
             <Setter Property="SizeToContent" Value="WidthAndHeight" />
         </Style>
     </prism:Dialog.WindowStyle>
-    <wv2:WebView2 Source="https://account.formula1.com/#/en/login">
+    <wv2:WebView2 Name="WebView2">
         <i:Interaction.Triggers>
             <i:EventTrigger EventName="CoreWebView2InitializationCompleted">
                 <i:InvokeCommandAction Command="{Binding InitializationCompletedCommand}" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=wv2:WebView2}}" />
