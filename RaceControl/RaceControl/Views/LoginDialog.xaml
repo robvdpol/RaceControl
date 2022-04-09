@@ -18,11 +18,8 @@
     </prism:Dialog.WindowStyle>
     <wv2:WebView2 Name="WebView2">
         <i:Interaction.Triggers>
-            <i:EventTrigger EventName="CoreWebView2InitializationCompleted">
-                <i:InvokeCommandAction Command="{Binding InitializationCompletedCommand}" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=wv2:WebView2}}" />
-            </i:EventTrigger>
             <i:EventTrigger EventName="SourceChanged">
-                <i:InvokeCommandAction Command="{Binding SourceChangedCommand}" />
+                <i:InvokeCommandAction Command="{Binding SourceChangedCommand}" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=wv2:WebView2}}" />
             </i:EventTrigger>
         </i:Interaction.Triggers>
     </wv2:WebView2>
