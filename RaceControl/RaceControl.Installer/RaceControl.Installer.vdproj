@@ -52,9 +52,14 @@
             "ComponentsUrl" = "8:"
                 "Items"
                 {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.EdgeRuntime"
+                    {
+                    "Name" = "8:Edge WebView runtime"
+                    "ProductCode" = "8:Microsoft.EdgeRuntime"
+                    }
                     "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.NetCore.DesktopRuntime.6.0.x64"
                     {
-                    "Name" = "8:.NET Desktop Runtime 6.0.1 (x64)"
+                    "Name" = "8:.NET Desktop Runtime 6.0.3 (x64)"
                     "ProductCode" = "8:Microsoft.NetCore.DesktopRuntime.6.0.x64"
                     }
                 }
@@ -84,9 +89,14 @@
             "ComponentsUrl" = "8:"
                 "Items"
                 {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.EdgeRuntime"
+                    {
+                    "Name" = "8:Edge WebView runtime"
+                    "ProductCode" = "8:Microsoft.EdgeRuntime"
+                    }
                     "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.NetCore.DesktopRuntime.6.0.x64"
                     {
-                    "Name" = "8:.NET Desktop Runtime 6.0.1 (x64)"
+                    "Name" = "8:.NET Desktop Runtime 6.0.3 (x64)"
                     "ProductCode" = "8:Microsoft.NetCore.DesktopRuntime.6.0.x64"
                     }
                 }
@@ -222,7 +232,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Race Control"
         "ProductCode" = "8:{4D98E143-EA41-4482-B546-0A297A1BE939}"
-        "PackageCode" = "8:{FA7428DB-4F7B-4A46-B2FA-DCDDF67A8C6D}"
+        "PackageCode" = "8:{2695561D-C3EE-4BBA-A7D9-99644BAF3340}"
         "UpgradeCode" = "8:{AED9C889-7712-4594-8E9C-2BD1BA1CEE3A}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -781,7 +791,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_F867FD2856644403AF46E4B92E0A8B4E"
             {
-            "SourcePath" = "8:"
+            "SourcePath" = "8:..\\RaceControl\\obj\\x64\\Release\\net6.0-windows\\win-x64\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_8C370B7B2E2A4A1C8F1DE261C79191C2"
