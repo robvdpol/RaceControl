@@ -16,11 +16,21 @@
             <Setter Property="SizeToContent" Value="WidthAndHeight" />
         </Style>
     </prism:Dialog.WindowStyle>
-    <wv2:WebView2 Name="WebView2">
-        <i:Interaction.Triggers>
-            <i:EventTrigger EventName="SourceChanged">
-                <i:InvokeCommandAction Command="{Binding SourceChangedCommand}" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=wv2:WebView2}}" />
-            </i:EventTrigger>
-        </i:Interaction.Triggers>
-    </wv2:WebView2>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <TextBlock
+            Grid.Row="0"
+            Margin="5"
+            Text="Please login using the form below. If you don't see anything, make sure to install the Microsoft Edge WebView2 runtime." />
+        <wv2:WebView2 Name="WebView2" Grid.Row="1">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SourceChanged">
+                    <i:InvokeCommandAction Command="{Binding SourceChangedCommand}" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=wv2:WebView2}}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </wv2:WebView2>
+    </Grid>
 </UserControl>
