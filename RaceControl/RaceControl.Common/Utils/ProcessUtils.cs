@@ -25,6 +25,7 @@ public static class ProcessUtils
 
     public static void BrowseToUrl(string url)
     {
-        Process.Start("explorer.exe", url)?.Dispose();
+        using var process = CreateProcess(url, null, true);
+        process.Start();
     }
 }
