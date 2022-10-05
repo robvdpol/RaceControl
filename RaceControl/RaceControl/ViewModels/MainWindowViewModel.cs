@@ -873,6 +873,7 @@ public class MainWindowViewModel : ViewModelBase, ICloseWindow
 
     private void WatchContent(IPlayableContent playableContent, VideoDialogSettings settings = null)
     {
+        ValidateActiveSubscription(playableContent);
         var identifier = _numberGenerator.GetNextNumber();
         var parameters = new DialogParameters
             {
@@ -882,10 +883,11 @@ public class MainWindowViewModel : ViewModelBase, ICloseWindow
             };
 
         _dialogService.Show(nameof(VideoDialog), parameters, _ => _numberGenerator.RemoveNumber(identifier), nameof(VideoDialogWindow));
-    }
+    }    
 
     private async Task WatchInVlcAsync(IPlayableContent playableContent)
     {
+        ValidateActiveSubscription(playableContent);
         var streamUrl = await _apiService.GetTokenisedUrlAsync(Settings.SubscriptionToken, playableContent);
         ValidateStreamUrl(streamUrl);
         using var process = ProcessUtils.CreateProcess(VlcExeLocation, $"\"{streamUrl}\" --meta-title=\"{playableContent.Title}\"");
@@ -894,6 +896,7 @@ public class MainWindowViewModel : ViewModelBase, ICloseWindow
 
     private async Task WatchInMpvAsync(IPlayableContent playableContent, VideoDialogSettings settings = null)
     {
+        ValidateActiveSubscription(playableContent);
         // Use different stream type because this one doesn't require a playToken cookie (not supported by MPV)
         var streamUrl = await _apiService.GetTokenisedUrlAsync(Settings.SubscriptionToken, playableContent, StreamTypeKeys.BigScreenHls);
         ValidateStreamUrl(streamUrl);
@@ -999,6 +1002,7 @@ public class MainWindowViewModel : ViewModelBase, ICloseWindow
 
     private async Task WatchInMpcAsync(IPlayableContent playableContent)
     {
+        ValidateActiveSubscription(playableContent);
         var streamUrl = await _apiService.GetTokenisedUrlAsync(Settings.SubscriptionToken, playableContent);
         ValidateStreamUrl(streamUrl);
         using var process = ProcessUtils.CreateProcess(MpcExeLocation, $"\"{streamUrl}\"");
@@ -1007,6 +1011,7 @@ public class MainWindowViewModel : ViewModelBase, ICloseWindow
 
     private async Task CastContentAsync(IReceiver receiver, IPlayableContent playableContent)
     {
+        ValidateActiveSubscription(playableContent);
         var streamUrl = await _apiService.GetTokenisedUrlAsync(Settings.SubscriptionToken, playableContent);
         ValidateStreamUrl(streamUrl);
         AudioTracks.Clear();
@@ -1065,6 +1070,7 @@ public class MainWindowViewModel : ViewModelBase, ICloseWindow
 
     private async Task CopyUrlAsync(IPlayableContent playableContent)
     {
+        ValidateActiveSubscription(playableContent);
         var streamUrl = await _apiService.GetTokenisedUrlAsync(Settings.SubscriptionToken, playableContent);
         ValidateStreamUrl(streamUrl);
         Clipboard.SetText(streamUrl);
@@ -1072,6 +1078,7 @@ public class MainWindowViewModel : ViewModelBase, ICloseWindow
 
     private void StartDownload(IPlayableContent playableContent)
     {
+        ValidateActiveSubscription(playableContent);
         var defaultFilename = $"{playableContent.Title}.mp4".RemoveInvalidFileNameChars();
         var initialDirectory = !string.IsNullOrWhiteSpace(Settings.RecordingLocation) ? Settings.RecordingLocation : FolderUtils.GetSpecialFolderPath(Environment.SpecialFolder.Desktop);
         var filename = Path.Join(initialDirectory, defaultFilename);
@@ -1198,11 +1205,19 @@ public class MainWindowViewModel : ViewModelBase, ICloseWindow
         SelectedVodGenre = null;
     }
 
+    private void ValidateActiveSubscription(IPlayableContent playableContent)
+    {
+        if (Settings.SubscriptionStatus.ToLower() != "active")
+        {
+            throw new InvalidOperationException($"Failed to execute action: \nAn active F1TV subscription is required of type '{playableContent.RequiredSubscriptionLevel}' or higher");
+        }
+    }
+
     private static void ValidateStreamUrl(string streamUrl)
     {
         if (string.IsNullOrWhiteSpace(streamUrl))
         {
-            throw new Exception("An error occurred while retrieving the stream URL.");
+            throw new ArgumentException("An error occurred while retrieving the stream URL.");
         }
     }
 

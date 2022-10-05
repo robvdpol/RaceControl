@@ -5,4 +5,5 @@ public class Channel
     public string Name { get; init; }
     public string ChannelType { get; init; }
     public string PlaybackUrl { get; init; }
+    public string RequiredSubcriptionLevel { get; init; }
 }

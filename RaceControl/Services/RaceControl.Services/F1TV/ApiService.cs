@@ -151,7 +151,8 @@ public class ApiService : IApiService
                 {
                     Name = s.Type == ChannelTypes.Onboard ? $"{s.DriverFirstName} {s.DriverLastName}" : s.Title,
                     ChannelType = s.Type,
-                    PlaybackUrl = s.PlaybackUrl
+                    PlaybackUrl = s.PlaybackUrl,
+                    RequiredSubcriptionLevel = metadata.Entitlement
                 })
                 .ToList();
         }
@@ -162,7 +163,8 @@ public class ApiService : IApiService
             {
                 Name = ChannelNames.Wif,
                 ChannelType = ChannelTypes.Wif,
-                PlaybackUrl = GetPlaybackUrl(metadata.ContentId)
+                PlaybackUrl = GetPlaybackUrl(metadata.ContentId),
+                RequiredSubcriptionLevel = metadata.Entitlement
             }
         };
     }
@@ -361,7 +363,8 @@ public class ApiService : IApiService
             EndDate = container.Metadata.EmfAttributes.SessionEndDate.GetDateTimeFromEpoch(),
             ContractStartDate = container.Metadata.ContractStartDate.GetDateTimeFromEpoch(),
             ContractEndDate = container.Metadata.ContractEndDate.GetDateTimeFromEpoch(),
-            SessionIndex = container.Metadata.EmfAttributes.SessionIndex
+            SessionIndex = container.Metadata.EmfAttributes.SessionIndex,
+            RequiredSubscriptionLevel = container.Metadata.Entitlement
         };
     }
 

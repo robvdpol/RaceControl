@@ -11,6 +11,7 @@ public abstract class PlayableContent : IPlayableContent
     public bool IsLive { get; protected init; }
     public string SyncUID { get; protected init; }
     public string SeriesUID { get; protected init; }
+    public string RequiredSubscriptionLevel { get; protected init; }
 
     public override string ToString()
     {

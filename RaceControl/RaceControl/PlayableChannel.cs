@@ -14,6 +14,7 @@ public class PlayableChannel : PlayableContent
         IsLive = session.IsLive;
         SyncUID = session.UID;
         SeriesUID = session.SeriesUID;
+        RequiredSubscriptionLevel = channel.RequiredSubcriptionLevel ?? "Pro";
     }
 
     private static string GetDisplayName(Channel channel)

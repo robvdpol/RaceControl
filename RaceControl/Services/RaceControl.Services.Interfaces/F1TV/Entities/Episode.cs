@@ -16,6 +16,7 @@ public class Episode
     public DateTime? ContractStartDate { get; init; }
     public DateTime? ContractEndDate { get; init; }
     public long SessionIndex { get; init; }
+    public string RequiredSubscriptionLevel { get; init; }
 
     public override string ToString()
     {

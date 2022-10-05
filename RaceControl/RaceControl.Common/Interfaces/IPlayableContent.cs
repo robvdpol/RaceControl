@@ -13,4 +13,5 @@ public interface IPlayableContent
     bool IsLive { get; }
     string SyncUID { get; }
     string SeriesUID { get; }
+    string RequiredSubscriptionLevel { get; }
 }
